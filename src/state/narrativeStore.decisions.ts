@@ -2,6 +2,7 @@ import { Decision } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils';
 import { mapAlignmentToChoiceType } from '../lib/narrative/choiceType';
+import { inferChoiceTypeFromText } from '../lib/ai/choiceTypeInference';
 import { logger } from '../lib/utils/logger';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
 import { useWorldStore } from './worldStore';
@@ -108,13 +109,16 @@ export const createNarrativeDecisionActions = (
         }
 
         if (sessionId && characterId) {
-          const choiceType = mapAlignmentToChoiceType(selectedOption.alignment);
+          const hasAlignment = selectedOption.alignment !== undefined;
+          const choiceType = hasAlignment
+            ? mapAlignmentToChoiceType(selectedOption.alignment)
+            : 'neutral';
 
           const sessionSegmentIds = state.sessionSegments[sessionId] || [];
           const sessionSegments = sessionSegmentIds.map(id => state.segments[id]).filter(Boolean);
           const context = extractDecisionContext(decision.prompt, sessionSegments);
 
-          playerDecisionTracker.recordDecision(
+          const recorded = playerDecisionTracker.recordDecision(
             decision.prompt,
             selectedOption.text,
             choiceType,
@@ -122,6 +126,16 @@ export const createNarrativeDecisionActions = (
             worldId || 'unknown-world',
             context
           );
+
+          if (!hasAlignment && recorded?.id) {
+            inferChoiceTypeFromText(selectedOption.text)
+              .then((inferredType) => {
+                playerDecisionTracker.updateDecisionChoiceType(recorded.id, inferredType);
+              })
+              .catch((err) => {
+                logger.warn('Failed to update inferred choice type:', err);
+              });
+          }
         }
       } catch (error) {
         logger.warn('Failed to track player decision:', error);

@@ -133,7 +133,7 @@ Options:
         useAlignedChoices: true
       });
 
-      expect(result.options[0].alignment).toBe('neutral'); // No tag = neutral fallback
+      expect(result.options[0].alignment).toBeUndefined(); // No tag = undefined for AI inference
       expect(result.options[1].alignment).toBe('neutral');
       expect(result.options[2].alignment).toBe('chaotic');
     });
@@ -216,9 +216,9 @@ Options:
         expect.stringContaining('ALIGNMENT DEFINITIONS')
       );
       
-      // Should assign neutral alignment to parsed options
-      expect(result.options[0].alignment).toBe('neutral');
-      expect(result.options[1].alignment).toBe('neutral');
+      // Options without alignment tags have undefined alignment
+      expect(result.options[0].alignment).toBeUndefined();
+      expect(result.options[1].alignment).toBeUndefined();
     });
   });
 
@@ -308,10 +308,10 @@ Options:
       });
 
       expect(result.options).toHaveLength(4);
-      expect(result.options[0].alignment).toBe('neutral'); // Unknown tag defaults to neutral
+      expect(result.options[0].alignment).toBeUndefined(); // Unknown tag leaves alignment undefined
       expect(result.options[1].alignment).toBe('lawful'); // Lowercase should work
       expect(result.options[2].alignment).toBe('chaotic');
-      expect(result.options[3].alignment).toBe('neutral'); // Empty tag defaults to neutral
+      expect(result.options[3].alignment).toBeUndefined(); // Empty tag leaves alignment undefined
     });
 
     it('should handle missing alignment tags in numbered list', async () => {
@@ -333,9 +333,9 @@ Options:
         useAlignedChoices: true
       });
 
-      expect(result.options[0].alignment).toBe('neutral');
+      expect(result.options[0].alignment).toBeUndefined();
       expect(result.options[1].alignment).toBe('lawful');
-      expect(result.options[2].alignment).toBe('neutral');
+      expect(result.options[2].alignment).toBeUndefined();
     });
   });
 });

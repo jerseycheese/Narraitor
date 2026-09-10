@@ -92,7 +92,7 @@ export const parseChoiceResponse = (
 
         const optionText = safeTrim(optionMatch[2]);
         const alignmentMatch = optionText.match(/^\[([^\]]+)\]\s*(.+)$/);
-        let alignment: ChoiceAlignment = 'neutral';
+        let alignment: ChoiceAlignment | undefined = undefined;
         let text = optionText;
 
         if (alignmentMatch) {
@@ -101,6 +101,8 @@ export const parseChoiceResponse = (
             alignment = 'lawful';
           } else if (alignmentText === 'chaos' || alignmentText === 'chaotic') {
             alignment = 'chaotic';
+          } else if (alignmentText === 'neutral') {
+            alignment = 'neutral';
           }
           text = safeTrim(alignmentMatch[2]);
         }
@@ -226,7 +228,7 @@ const finalizeOption = (
   const finalOption: DecisionOption = {
     id: option.id || generateUniqueId('option'),
     text: normalizedText,
-    alignment: option.alignment || 'neutral',
+    ...(option.alignment ? { alignment: option.alignment } : {}),
   };
 
   if (option.hint && safeTrim(option.hint)) {

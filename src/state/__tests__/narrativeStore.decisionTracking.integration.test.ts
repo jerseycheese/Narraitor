@@ -12,6 +12,7 @@
 import { useNarrativeStore } from '../narrativeStore';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { playerDecisionTracker } from '../../lib/ai/playerDecisionTracker';
+import * as choiceInference from '../../lib/ai/choiceTypeInference';
 import { DecisionOption } from '../../types/narrative.types';
 
 // Test helpers
@@ -247,6 +248,99 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
       });
 
       expect(playerDecisionTracker.getSessionDecisions(TEST_SESSION)).toHaveLength(lawfulVariations.length);
+    });
+  });
+
+  describe('AI-based Choice Type Inference (Issue #666)', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('records choice as neutral synchronously and updates to inferred type when AI resolves', async () => {
+      let resolveInference!: (value: 'stealthy') => void;
+      const inferencePromise = new Promise<'stealthy'>((resolve) => {
+        resolveInference = resolve;
+      });
+      jest.spyOn(choiceInference, 'inferChoiceTypeFromText').mockReturnValue(inferencePromise);
+
+      const decisionId = createTestDecision(TEST_SESSION, 'You spot guards ahead. What do you do?', [
+        { id: 'sneak-past', text: 'Slip into the shadows and sneak past' }
+      ] as DecisionOption[]);
+
+      useNarrativeStore.getState().selectDecisionOption(decisionId, 'sneak-past', TEST_CHARACTER);
+
+      // Synchronously recorded as neutral so game flow is never blocked
+      const [initialTracked] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+      expect(initialTracked.choiceType).toBe('neutral');
+
+      // Resolve the AI inference
+      resolveInference('stealthy');
+      await inferencePromise;
+
+      // Tracked decision is now updated
+      const [updatedTracked] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+      expect(updatedTracked.choiceType).toBe('stealthy');
+    });
+
+    it('does not trigger AI inference when alignment is explicitly provided', () => {
+      const inferSpy = jest.spyOn(choiceInference, 'inferChoiceTypeFromText');
+
+      const decisionId = createTestDecision(TEST_SESSION, 'Combat starts', [
+        { id: 'attack-opt', text: 'Strike first', alignment: 'chaotic' }
+      ] as DecisionOption[]);
+
+      useNarrativeStore.getState().selectDecisionOption(decisionId, 'attack-opt', TEST_CHARACTER);
+
+      const [tracked] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+      expect(tracked.choiceType).toBe('aggressive');
+      expect(inferSpy).not.toHaveBeenCalled();
+    });
+
+    it('keeps decision as neutral if AI inference fails or rejects', async () => {
+      jest.spyOn(choiceInference, 'inferChoiceTypeFromText').mockRejectedValue(new Error('AI inference failure'));
+
+      const decisionId = createTestDecision(TEST_SESSION, 'Path branches ahead', [
+        { id: 'explore-opt', text: 'Explore the abandoned corridor' }
+      ] as DecisionOption[]);
+
+      useNarrativeStore.getState().selectDecisionOption(decisionId, 'explore-opt', TEST_CHARACTER);
+
+      const [initialTracked] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+      expect(initialTracked.choiceType).toBe('neutral');
+
+      // Allow microtask queue to process rejection
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      const [finalTracked] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+      expect(finalTracked.choiceType).toBe('neutral');
+    });
+
+    it('infers choice type for custom freeform choices added to decision', async () => {
+      jest.spyOn(choiceInference, 'inferChoiceTypeFromText').mockResolvedValue('diplomatic');
+
+      const decisionId = createTestDecision(TEST_SESSION, 'The bandit demands your gold', [
+        { id: 'opt-fight', text: 'Draw weapon and fight', alignment: 'chaotic' }
+      ] as DecisionOption[]);
+
+      const customOption: DecisionOption = {
+        id: 'custom-opt-1',
+        text: 'Offer to share your rations and talk about why they turned to banditry',
+        isCustomInput: true,
+        customText: 'Offer to share your rations and talk about why they turned to banditry'
+      };
+
+      useNarrativeStore.getState().updateDecision(decisionId, {
+        options: [...useNarrativeStore.getState().decisions[decisionId].options, customOption],
+        selectedOptionId: customOption.id
+      });
+      useNarrativeStore.getState().selectDecisionOption(decisionId, customOption.id, TEST_CHARACTER);
+
+      // Allow microtask queue to process async inference
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      const [tracked] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+      expect(tracked.choiceType).toBe('diplomatic');
+      expect(tracked.choiceText).toContain('Offer to share your rations');
     });
   });
 });

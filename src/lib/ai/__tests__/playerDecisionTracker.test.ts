@@ -197,4 +197,27 @@ describe('PlayerDecisionTracker - MVP Tests', () => {
       expect(tracker.getSessionDecisions('session-2')).toHaveLength(1);
     });
   });
+
+  describe('updateDecisionChoiceType', () => {
+    test('updates the choice type of an existing decision and returns true', () => {
+      const decision = tracker.recordDecision('Prompt', 'Sneak past', 'neutral', 'session-1', 'world-1');
+      const updated = tracker.updateDecisionChoiceType(decision.id, 'stealthy');
+
+      expect(updated).toBe(true);
+      const sessionDecisions = tracker.getSessionDecisions('session-1');
+      expect(sessionDecisions[0].choiceType).toBe('stealthy');
+    });
+
+    test('returns false when decision ID is not found', () => {
+      const updated = tracker.updateDecisionChoiceType('non-existent-id', 'diplomatic');
+      expect(updated).toBe(false);
+    });
+
+    test('throws error when updated choice type is invalid', () => {
+      const decision = tracker.recordDecision('Prompt', 'Action', 'neutral', 'session-1', 'world-1');
+      expect(() => {
+        tracker.updateDecisionChoiceType(decision.id, 'invalid-type' as ChoiceTypePreference);
+      }).toThrow('Invalid choice type: invalid-type');
+    });
+  });
 });

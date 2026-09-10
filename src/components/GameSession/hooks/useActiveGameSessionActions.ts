@@ -178,10 +178,16 @@ export const useActiveGameSessionActions = ({
       };
 
       // Update the decision in the store with the new custom option and select it
+      // so decision tracking, AI choice type inference, and world state updates apply.
       useNarrativeStore.getState().updateDecision(currentDecision.id, {
         options: [...currentDecision.options, customOption],
         selectedOptionId: customChoiceId,
       });
+      useNarrativeStore.getState().selectDecisionOption(
+        currentDecision.id,
+        customChoiceId,
+        characterId || undefined
+      );
     }
 
     // Clear current decision to prevent showing stale choices during generation

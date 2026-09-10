@@ -37,6 +37,11 @@ const DEFAULT_CONFIG: DecisionTrackerConfig = {
   storageKey: 'narraitor_player_decisions'
 };
 
+const VALID_CHOICE_TYPES: readonly ChoiceTypePreference[] = [
+  'diplomatic', 'aggressive', 'stealthy', 'helpful',
+  'selfish', 'lawful', 'chaotic', 'neutral'
+];
+
 /**
  * Maintains a persistent, validated record of player choices and provides
  * pattern analysis over them.
@@ -94,6 +99,25 @@ export class PlayerDecisionTracker {
   }
 
   /**
+   * Updates the choice type of a previously recorded decision.
+   * Returns true if the decision was found and updated, false otherwise.
+   */
+  updateDecisionChoiceType(id: EntityID, choiceType: ChoiceTypePreference): boolean {
+    if (!VALID_CHOICE_TYPES.includes(choiceType)) {
+      throw new Error(`Invalid choice type: ${choiceType}`);
+    }
+
+    const decision = this.decisions.find(d => d.id === id);
+    if (!decision) {
+      return false;
+    }
+
+    decision.choiceType = choiceType;
+    this.saveDecisions();
+    return true;
+  }
+
+  /**
    * Validates and sanitizes decision input data
    */
   private validateDecisionInput(input: {
@@ -134,11 +158,7 @@ export class PlayerDecisionTracker {
     }
 
     // Validate choice type
-    const validChoiceTypes: ChoiceTypePreference[] = [
-      'diplomatic', 'aggressive', 'stealthy', 'helpful',
-      'selfish', 'lawful', 'chaotic', 'neutral'
-    ];
-    if (!validChoiceTypes.includes(input.choiceType)) {
+    if (!VALID_CHOICE_TYPES.includes(input.choiceType)) {
       throw new Error(`Invalid choice type: ${input.choiceType}`);
     }
 
