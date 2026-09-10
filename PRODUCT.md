@@ -21,7 +21,8 @@ attributes, and tone; create characters that fit it; and play a generated, choic
 story with tracked consequences, inventory, and a journal. The story adapts to your world's
 voice rather than defaulting to generic fantasy. No backend database; generation runs through
 the player's own key. Success is an immersive, coherent, replayable story loop that stays out
-of its own way. Currently in v1.0 polish + launch-gate phase.
+of its own way. v1.6 shipped on 2026-09-10. v1.7 is in progress, and its flagship work
+charges world costs to the decisions that incur them.
 
 ## Positioning
 
@@ -42,10 +43,10 @@ Long reading sessions in a browser tab, desktop and mobile. The core loop: build
 create a character in it, then play turns of generated prose, picking from offered choices,
 with inventory, journal, and consequence state accumulating alongside.
 
-Before any of that, the player has to supply their own Gemini API key. That's a real
+Before any of that, the player has to supply their own provider key. That's a real
 onboarding step with real friction, and it happens outside the app. The player goes to
-Google's console, creates a key, and pastes it back in. Any surface that sells the product
-has to survive that ask honestly.
+Google's console or another provider's, creates a key, and pastes it back in. Any surface
+that sells the product has to survive that ask honestly.
 
 Sessions are resumable and long-lived. Players return to worlds and characters they made
 earlier, so the app is as much a library of your own stuff as it is a game.
@@ -56,14 +57,18 @@ earlier, so the app is as much a library of your own stuff as it is a game.
   no `cva`/`cn()` (both removed deliberately).
 - Zustand 5 stores under `src/state/`, persisted to IndexedDB. There is no backend database
   and no user account system.
-- Generation runs through `src/lib/ai/` against Google Gemini (`gemini-2.5-flash`), keyed by
-  the player's own provider key. Gemini is the only provider.
+- Generation runs through `src/lib/ai/`, keyed by the player's own provider key. Gemini
+  (`gemini-2.5-flash`) is the default and the longest-proven. OpenRouter, Ollama and OpenAI
+  are available too. The rest of the presets in `src/lib/ai/presets.ts` stay out of reach
+  until someone runs a live streamed turn through each.
 - Storybook is the canon design surface (ADR-012). The retired `/dev/design-system*` style
   guide is not coming back.
 - Terminology: worlds, characters, narrative/turns, choices, consequences, inventory, journal,
   lore. "AI" never appears in player-facing copy, not in labels and not in marketing text.
-- Undecided: pricing, licensing, and any hosted or multiplayer tier. v1.0 shipped free and
-  single-player; nothing beyond that has been settled, and no surface should imply otherwise.
+- Undecided: pricing and licensing. No surface should imply a paid tier.
+- Settled the other way: accounts and hosted persistence. ADR-014 keeps Narraitor
+  browser-local until one of three named triggers fires, so no issue may assume server
+  state or a multiplayer tier.
 
 ## Brand Commitments
 
@@ -107,7 +112,7 @@ Real, usable:
 - The product itself. Every route runs locally, and the story loop works end to end with a
   key. Screenshots and captures of actual play are available and are the strongest proof
   material on hand.
-- Architecture decisions of record at `public_docs/architecture/` (ADR-001 through ADR-013).
+- Architecture decisions of record at `public_docs/architecture/` (ADR-001 through ADR-014).
 - Three generated images at `public/visual-assets/`: `world-cyberpunk.png`,
   `portrait-cyberpunk.png`, `portrait-fantasy.png`. Both `/` and `/about` currently use the
   same `world-cyberpunk.png`.
