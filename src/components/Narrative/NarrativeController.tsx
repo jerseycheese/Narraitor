@@ -6,6 +6,8 @@ import React, {
   useCallback,
 } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
+import { useSessionPacing } from './hooks/useSessionPacing';
+import { SessionBreakPrompt } from './SessionBreakPrompt';
 import { useNarrativeGenerator } from '@/hooks/useNarrativeGenerator';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useEndingDetection } from './useEndingDetection';
@@ -73,6 +75,11 @@ interface NarrativeControllerProps {
    * feed that display instead.
    */
   onStreamingPreviewChange?: (preview: string) => void;
+  /**
+   * Whether to enable session pacing milestones and soft break prompts.
+   * Defaults to true.
+   */
+  enableSessionPacing?: boolean;
 }
 
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
@@ -90,6 +97,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   hideHistory = false,
   retryToken = 0,
   onStreamingPreviewChange,
+  enableSessionPacing = process.env.NODE_ENV !== 'test',
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -193,6 +201,16 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [processedChoices, setProcessedChoices] = useState<Set<string>>(
     new Set()
   );
+  const {
+    showBreakPrompt,
+    dismissBreakPrompt,
+    continueReading,
+    metrics: pacingMetrics,
+  } = useSessionPacing({
+    segmentCount: segments.length,
+    decisionCount: processedChoices.size,
+    enabled: enableSessionPacing,
+  });
   const mountedRef = useRef(false);
   const warnedMissingSessionIdRef = useRef(false);
 
@@ -859,6 +877,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
   return (
     <div className={`narrative-controller ${className || ''}`}>
+      <SessionBreakPrompt
+        isOpen={showBreakPrompt}
+        onDismiss={dismissBreakPrompt}
+        onContinue={continueReading}
+        sessionMetrics={pacingMetrics}
+      />
       {!hideHistory && (
         <NarrativeHistory
           segments={segments}

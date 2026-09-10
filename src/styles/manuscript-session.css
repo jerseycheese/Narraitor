@@ -3951,3 +3951,168 @@ body.manuscript-overlay-open {
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
 }
+
+/* Session pacing: history expand button and break prompt (#805) */
+
+:root .narrative-history-expand-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: var(--space-3) 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+:root .narrative-history-expand-button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+:root .narrative-history-expand-button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+:root .session-break-prompt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 170;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-scrim);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: var(--space-4);
+}
+
+:root .session-break-prompt {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  max-width: 480px;
+  width: 100%;
+  box-shadow: var(--shadow-overlay);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+:root .session-break-prompt-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+:root .session-break-prompt-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+:root .session-break-prompt-description {
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+:root .session-break-prompt-metrics {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+}
+
+:root .session-break-prompt-metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+:root .session-break-prompt-metric-label {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+:root .session-break-prompt-metric-value {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+:root .session-break-prompt-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+:root .session-break-prompt-continue-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+:root .session-break-prompt-continue-button:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+:root .session-break-prompt-continue-button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+:root .session-break-prompt-dismiss-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+:root .session-break-prompt-dismiss-button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+:root .session-break-prompt-dismiss-button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
