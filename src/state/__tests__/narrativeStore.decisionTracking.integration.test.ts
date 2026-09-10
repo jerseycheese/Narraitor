@@ -314,5 +314,33 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
       const [finalTracked] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
       expect(finalTracked.choiceType).toBe('neutral');
     });
+
+    it('infers choice type for custom freeform choices added to decision', async () => {
+      jest.spyOn(choiceInference, 'inferChoiceTypeFromText').mockResolvedValue('diplomatic');
+
+      const decisionId = createTestDecision(TEST_SESSION, 'The bandit demands your gold', [
+        { id: 'opt-fight', text: 'Draw weapon and fight', alignment: 'chaotic' }
+      ] as DecisionOption[]);
+
+      const customOption: DecisionOption = {
+        id: 'custom-opt-1',
+        text: 'Offer to share your rations and talk about why they turned to banditry',
+        isCustomInput: true,
+        customText: 'Offer to share your rations and talk about why they turned to banditry'
+      };
+
+      useNarrativeStore.getState().updateDecision(decisionId, {
+        options: [...useNarrativeStore.getState().decisions[decisionId].options, customOption],
+        selectedOptionId: customOption.id
+      });
+      useNarrativeStore.getState().selectDecisionOption(decisionId, customOption.id, TEST_CHARACTER);
+
+      // Allow microtask queue to process async inference
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      const [tracked] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
+      expect(tracked.choiceType).toBe('diplomatic');
+      expect(tracked.choiceText).toContain('Offer to share your rations');
+    });
   });
 });

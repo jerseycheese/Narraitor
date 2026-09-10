@@ -151,6 +151,13 @@ describe('useActiveGameSessionActions', () => {
       // onChoiceSelected must be called with the same id that was registered
       expect(onChoiceSelected).toHaveBeenCalledTimes(1);
       expect(onChoiceSelected).toHaveBeenCalledWith(patch.selectedOptionId);
+
+      // selectDecisionOption must be called so decision tracking and inference run
+      expect(mockNarrativeStoreState.selectDecisionOption).toHaveBeenCalledWith(
+        'decision-2',
+        patch.selectedOptionId,
+        'character-1'
+      );
     });
   });
 

@@ -55,6 +55,19 @@ Hint: Loud but fast`;
     expect(decision.options[1].alignment).toBe('chaotic');
   });
 
+  it('leaves alignment undefined when no alignment tag is present', () => {
+    const world = createMockWorld({ id: 'world-1' });
+    const content = `Decision: What do you do?
+
+1. Examine the strange markings
+2. [Neutral] Wait and listen`;
+
+    const decision = parseChoiceResponse(content, narrativeContext, world);
+
+    expect(decision.options[0].alignment).toBeUndefined();
+    expect(decision.options[1].alignment).toBe('neutral');
+  });
+
   it('parses bracketed multi-word skill requirements', () => {
     const world = createMockWorld({
       id: 'world-1',
