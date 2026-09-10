@@ -130,8 +130,13 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     setCurrentWizardStep(wizard.state.currentStep);
   }, [wizard.state.currentStep, setCurrentWizardStep]);
 
-  // Sync tour step index to wizard step when tour is active and not paused for recovery
+  const prevStepIndexRef = useRef(stepIndex);
+
+  // Sync tour step index to wizard step when tour step index advances while tour is active and not paused for recovery
   React.useEffect(() => {
+    const prevStepIndex = prevStepIndexRef.current;
+    prevStepIndexRef.current = stepIndex;
+
     if (
       !isTourActive ||
       isPaused ||
@@ -141,6 +146,11 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     ) {
       return;
     }
+
+    if (prevStepIndex === stepIndex) {
+      return;
+    }
+
     const targetWizardStep = tourStepToWizardStep[stepIndex];
     if (targetWizardStep !== undefined && targetWizardStep !== wizard.state.currentStep) {
       wizard.goToStep(targetWizardStep);

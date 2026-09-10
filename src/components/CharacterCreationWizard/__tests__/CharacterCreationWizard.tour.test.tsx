@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import { TutorialProvider, useTutorial } from '@/components/TutorialProvider';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
 import { useSessionStore } from '@/state/sessionStore';
@@ -263,4 +263,50 @@ describe('CharacterCreationWizard Joyride Next integration', () => {
       useSessionStore.getState().tutorialProgress.phases.characterCreation.completed
     ).toBe(false);
   });
+
+  it('preserves manual wizard Next navigation mid-tour without reverting', async () => {
+    render(
+      <TutorialProvider>
+        <TourTrigger />
+        <CharacterCreationWizard worldId="world-1" />
+      </TutorialProvider>
+    );
+
+    // Start tour
+    await act(async () => {
+      screen.getByTestId('start-char-tour-btn').click();
+    });
+
+    expect(screen.getByTestId('tour-active')).toHaveTextContent('yes');
+    expect(screen.getByTestId('joyride-step-index')).toHaveTextContent('0');
+    expect(document.querySelector('[data-tutorial="basic-info"]')).not.toBeNull();
+
+    // Fill in character name so step 0 is valid
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/character name/i), {
+        target: { value: 'Hero' },
+      });
+    });
+
+    // Click the wizard's own Next button (advancing wizard from step 0 to step 1)
+    const wizardNextButton = screen.getByRole('button', { name: /^next$/i });
+    await act(async () => {
+      wizardNextButton.click();
+    });
+
+    // Wizard should advance to step 1 (Attributes) and not be reverted to step 0
+    expect(document.querySelector('[data-tutorial="attribute-allocation"]')).not.toBeNull();
+    expect(document.querySelector('[data-tutorial="basic-info"]')).toBeNull();
+
+    // Click the wizard's own Back button (returning wizard from step 1 to step 0)
+    const wizardBackButton = screen.getByRole('button', { name: /^back$/i });
+    await act(async () => {
+      wizardBackButton.click();
+    });
+
+    // Wizard should return to step 0 (Basic Info) and not be reverted to step 1
+    expect(document.querySelector('[data-tutorial="basic-info"]')).not.toBeNull();
+    expect(document.querySelector('[data-tutorial="attribute-allocation"]')).toBeNull();
+  });
 });
+
