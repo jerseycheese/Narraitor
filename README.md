@@ -117,13 +117,13 @@ Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
 
 ## Roadmap
 
-1.0 is a public, single-player release: bring your own key, everything local, no accounts. The core systems all shipped a while back (world and character creation, the narrative engine, journal and inventory, persistence, the design-system migration, visual regression testing), and what's left is the launch gate, tracked in [#1320](https://github.com/jerseycheese/Narraitor/issues/1320) with the tag-and-cut in [#1635](https://github.com/jerseycheese/Narraitor/issues/1635).
+1.0 shipped in August 2026: public, single-player, bring-your-own-key, everything local, no accounts. The work since has been steady refinement rather than new pillars, and every tagged version is written up in [RELEASES.md](RELEASES.md). The current line is v1.6.
 
-Worth being explicit about what 1.0 deliberately leaves out: no accounts, no server-side sync. That's not an oversight. Monetization needs auth and backend persistence that don't exist yet, so it's been decoupled into its own track ([#495](https://github.com/jerseycheese/Narraitor/issues/495)) instead of bolted onto a launch checklist.
+What's landed since launch: a bolder design-system pass, image generation beyond portraits (worlds, journal entries, items, endings), keyboard accessibility, a world clock and continuity guards that hold long campaigns together, and multi-provider support. Gemini is still the default, but OpenRouter, OpenAI, and Ollama presets work end to end too, so generation can point at another service or a local model.
 
-After 1.0, player-facing polish lives on the [v1.1 milestone](https://github.com/jerseycheese/Narraitor/milestone/2): a bolder pass on the design system, portrait improvements, keyboard accessibility, session pacing. Multi-provider AI support ([#878](https://github.com/jerseycheese/Narraitor/issues/878)) is post-1.0 too; only the bring-your-own-key slice of it landed for launch, so Gemini is the one provider for now.
+[v1.7](https://github.com/jerseycheese/Narraitor/milestone/8) ties the world's costs to the decisions that cause them, so a loss reads as something your choice earned rather than a fee on the next turn.
 
-Further out, the ideas worth exploring are shared worlds, voice narration, and mobile builds. Having the foundation solid means those can land incrementally without breaking what's there.
+Accounts and server-side sync stay out on purpose. [ADR-014](public_docs/architecture/ADR-014-browser-local-until-named-trigger.md) makes that a written decision rather than a gap: browser-local until a specific named trigger fires, at which point the question reopens. Further out, the ideas worth exploring are shared worlds, voice narration, and mobile builds.
 
 ## License
 
