@@ -1,44 +1,47 @@
 # Narraitor
 
-Play a story that answers to the world you built. Define a setting, create a character, and make the choices that steer what happens. Your decisions get tested against your character's skills, so what happens next is earned.
+A solo role-playing game where the story answers to the world you built. You define a setting with its own rules, attributes, and skills, create a character who fits it, and play through a story that is written from those rules, with your choices tested against your character's abilities.
 
-**[Play it at narraitor-six.vercel.app](https://narraitor-six.vercel.app/)**. No account, runs in your browser, on a Google Gemini key you bring.
+It runs entirely in your browser. No account, nothing stored on a server, and it generates on a model key you bring yourself.
 
-## What this actually does
+**[Play it at narraitor-six.vercel.app](https://narraitor-six.vercel.app/)**
 
-The core idea came from wanting tabletop RPG experiences that could happen anytime, without coordinating schedules or finding a game master. You define a world's rules, attributes, and tone; create characters that fit it; then play through a generated story that responds to your choices.
+![The Narraitor landing page](public_docs/images/readme-landing.png)
 
-The storytelling adapts to the world you described, so a noir detective setting reads completely differently from a space opera. Middle Earth, the beaches of Normandy, something you invented last week: all fair game.
+## What makes it different
 
-## What to know before you start
+Most generated-story tools drop you into someone else's setting, or a chat box with a genre label. Narraitor treats the world as the thing you author. Its tone, attributes, skills, and rules are data the story generator reads on every turn, so a hardboiled-noir world and a high-fantasy world produce genuinely different writing from the same engine.
 
-**You bring your own key.** Generation runs on a [Google Gemini](https://aistudio.google.com/apikey) key you provide once under Settings, then Providers. It's encrypted in your browser and sent per request, so the stories you generate run on your own account.
+Two things it commits to:
 
-**It runs on your device.** Worlds, characters, and saves live in your browser's storage (IndexedDB). There's no backend database and no server-side copy of your games. Settings has export/import if you want a backup or you're moving between browsers, and clearing site data really does delete everything.
+- **Choices carry weight across turns.** Decisions are tracked, an alignment reading from lawful to chaotic builds up over a session, and the story keeps a record of where your character stands with the people in it.
+- **Your data stays yours.** There is no account system and no database. Worlds, characters, and saved games live in your browser. Your model key is encrypted there and used only to make each request.
 
-**No accounts.** Nothing to sign up for, no profile, no email.
+![A turn in progress](public_docs/images/readme-play.png)
 
 ## What you can do
 
-**Build a world.** Describe a setting and the creation wizard suggests attributes and skills that fit it ("Force Sensitivity" for Star Wars, "Sanity" for Lovecraft), all of which you can edit, replace, or write yourself.
+- **Build a world.** Describe a setting and the wizard suggests attributes and skills that fit it, all of which you can edit or replace. "Force Sensitivity" for a Star Wars world, "Sanity" for cosmic horror.
+- **Create a character.** Spend attribute points, pick skills that make sense for the setting, write a background. A portrait is generated to match.
+- **Play.** Pick from the offered choices or type your own action. A skill check decides how it goes. An inventory, a journal, and a running "story so far" summary keep a long session coherent.
+- **Reach an ending.** When a story is near its natural close, you get a suggested ending and a generated conclusion.
+- **Take it with you.** Settings exports everything as a single file you can re-import later or move to another browser.
 
-**Create characters.** Multi-step creation that works off your world's rules: allocate attribute points, pick skills that make sense for the setting, write a background. Portraits get generated to match.
+![Building a world](public_docs/images/readme-world-creation.png)
 
-**Play the story.** Pick from suggested choices or type your own action. Decisions get weighted Minor, Major, or Critical so you can see what's actually at stake, and alignment tracking (Lawful, Neutral, Chaotic) keeps a read on how your character has been playing.
+## Before you play
 
-**Keep track of it.** A journal drawer holds story history and past decisions, inventory tracks what you're carrying, and "Story So Far" summaries capture where things stand, which also keeps long campaigns coherent.
+You supply your own model key. The simplest is a free [Google Gemini](https://aistudio.google.com/apikey) key, added once under Settings, then Providers. OpenAI, OpenRouter, and a server you run yourself also work.
 
-**Finish it.** When a story's reaching its natural end, you get an ending suggestion and a generated conclusion, so a campaign gets a real ending.
-
-**Take it with you.** Settings exports everything (worlds, characters, sessions, journal, narrative, inventory, and lore) as a JSON file you can re-import later.
+Everything is stored locally, so clearing your browser's site data really does delete your worlds and characters. Use the export in Settings if you want a backup.
 
 ---
 
-The rest of this is for running Narraitor locally or working on it.
+The rest of this is for running Narraitor or working on it.
 
 ## Running it locally
 
-You'll need Node 20 (see [.nvmrc](.nvmrc)), npm, and a Google Gemini key. Nothing generates without the key, but you don't need it to install; add it through Settings, then Providers once the app is running, the same way players do.
+You need Node 20 (see [.nvmrc](.nvmrc)) and npm. You do not need a key to install or start it; add one through Settings once it is running, the same way a player does.
 
 ```bash
 git clone https://github.com/jerseycheese/narraitor.git
@@ -47,15 +50,13 @@ npm install
 npm run dev
 ```
 
-That's it. The app comes up on `localhost:3000` at the landing page, and **Build your world** starts the wizard.
+The app comes up on `localhost:3000`. If you would rather not re-enter a key each time, copy `.env.example` to `.env.local` and set `GEMINI_API_KEY`. That is a local convenience only, and a player's own key always takes precedence.
 
-If you'd rather use a server-side key than go through the provider settings screen (handy locally so you're not re-entering it), copy `.env.example` to `.env.local` and set `GEMINI_API_KEY`. That's a fallback for local work only; in normal use the player's own key wins.
-
-> Running from a git worktree? `npm run dev` picks a stable per-worktree port automatically (the main checkout keeps 3000), so multiple worktrees can run side by side without fighting over the port. The chosen URL is printed on startup; set `PORT` to override.
+Running from a git worktree? `npm run dev` picks a stable per-worktree port so several checkouts can run at once. The URL is printed on start.
 
 ## Development
 
-The approach here is component-first with Storybook and TDD: build components in isolation, then integrate them. It keeps things manageable.
+Components are built in isolation in Storybook first, then wired into the app.
 
 ```bash
 npm run storybook      # component catalog on :6006
@@ -65,55 +66,46 @@ npm run lint           # ESLint
 npm run lint:css       # Stylelint
 ```
 
-Run the last four before committing; CI runs them separately and the production build enforces lint and types anyway.
+Run the last four before committing. CI runs them separately, and the production build enforces types and lint anyway.
 
-Worth knowing about `npm run build`: it builds the app *and* Storybook, then copies the static Storybook output into `public/`. If you just want to check the app compiles, `npm run build:app` is the faster one.
+`npm run build` builds the app and Storybook together. `npm run build:app` is the faster app-only build.
 
-There are also `/dev` routes for exercising components against real data without walking the whole app flow: `/dev/game-session`, `/dev/world-generation`, and eight more. For the full themed component catalog, Storybook is the place.
+There are ten `/dev` routes for exercising one screen against real data without walking the whole flow (`/dev/game-session`, `/dev/world-generation`, and the rest). For the full themed catalog, use Storybook.
 
-Contributor PRs should target `develop` (see [Branches and releases](#branches-and-releases) below).
+Contributor PRs target `develop`, never `main` (see [Branches and releases](#branches-and-releases)).
 
-## How it's organized
+## How the code is organized
 
-Next.js 15 with the App Router. The structure follows domain-driven design, so related functionality stays together:
+Next.js 15 with the App Router. Files are grouped by feature area rather than by type, so a world component lives under `components/world/`, not `components/editors/`.
 
 ```
 src/
-├── app/           # Next.js pages and API routes
-├── components/    # UI components (organized by domain)
-├── state/         # Zustand stores for each domain
-├── lib/           # AI services, theme tokens, generators, utilities
-├── services/      # cross-domain service logic
+├── app/           # pages and API routes
+├── components/    # UI, grouped by feature area
+├── state/         # one store per feature area (worlds, characters, narrative, ...)
+├── lib/           # generation, theme, utilities
+├── services/      # cross-feature logic
 ├── hooks/         # shared React hooks
 ├── stories/       # Storybook stories
-├── styles/        # global and shared CSS
-├── types/         # TypeScript definitions
-└── utils/         # helper functions
+├── styles/        # global CSS
+└── types/         # TypeScript definitions
 ```
 
-Components are grouped by domain (World, Character, Narrative, and so on) rather than by type, so you'll find `components/world/SkillEditor/` instead of `components/editors/SkillEditor/`.
+## How it works
 
-## Under the hood
+**Generation.** Story text comes from Google Gemini through the app's own API routes (`/api/narrative/generate`, `/api/narrative/choices`, and others). Each prompt carries the world's rules, the character sheet, and recent story history so the writing stays consistent with the setting. The browser never calls the provider directly.
 
-**World and character creation.** Multi-step wizards that adapt to each other: the world defines the attributes and skills, and character creation allocates against them. AI suggestions seed both, and everything stays editable.
+**State and saves.** Each feature area has its own small [Zustand](https://github.com/pmndrs/zustand) store, saved to the browser's IndexedDB. Sessions survive a reload. If IndexedDB is unavailable the app keeps running in memory and tells you it will not persist.
 
-**Narrative engine.** Gemini handles generation through Next.js API routes (`/api/narrative/generate`, `/api/narrative/choices`, and others). The interesting part is context management: prompts carry your world's rules, character details, and recent story history so what gets generated stays consistent with the setting.
+**Your key.** A player's key is encrypted in the browser. On each request it travels in a header, gets used once server-side for that call, and is never logged or stored. The `GEMINI_API_KEY` environment variable is a separate local-only fallback and stays on the server.
 
-**State and persistence.** Zustand stores backed by IndexedDB, one store per domain. Sessions survive a browser restart, and if IndexedDB is unavailable the storage layer falls back to memory-only so the app still runs. It just won't persist, and it says so.
+**Request limits.** All seventeen generation routes go through one wrapper (`withAIRoute`) that caps requests per IP (50 an hour in production, looser locally), rejects bodies over 64KB, holds output to a fixed ceiling, and strips provider error text before it reaches the client.
 
-**Provider keys.** A player's key travels from the browser to the API routes in a per-request header (`x-provider-api-key`), gets used server-side for that single call, and is never logged or persisted. At rest in the browser it's encrypted. The `GEMINI_API_KEY` env var is a local/dev fallback that stays server-side.
-
-**Rate limiting & route protection.** All 17 AI routes are wrapped by `withAIRoute` with in-memory per-IP rate limiting (50 requests per hour in production, looser in development; per-instance on serverless), a 64KB request body size cap (HTTP 413), and server-enforced max output token ceilings (`SERVER_MAX_OUTPUT_TOKENS = 4096`). Upstream provider errors are normalized to sanitize raw upstream error messages and prevent credential leakage.
-
-**Design system.** Narraitor ships a single design system, DS3 ([ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md)). Plain CSS with design tokens, no Tailwind. [DESIGN.md](DESIGN.md) is the AI-readable surface for tokens and components, and [public_docs/design-system/](public_docs/design-system/) has the full reference. Storybook (`npm run storybook`) is the single canon surface: every component, themed, with mock data and no backend, plus a light/dark switcher in the toolbar. See [ADR-012](public_docs/architecture/ADR-012-storybook-single-canon-surface.md).
-
-**Images.** Beyond character portraits there's generation for world, journal, item, and ending images. [public_docs/features/portrait-generation-guide.md](public_docs/features/portrait-generation-guide.md) covers how the portrait side works.
+**Design.** One design system, "The Mechanical Manuscript" ([ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md)): aged paper, drafting ink, a dot grid. Plain CSS driven by named tokens rather than hard-coded colors, and no Tailwind. Storybook is the reference for how every component should look ([ADR-012](public_docs/architecture/ADR-012-storybook-single-canon-surface.md)); when the app and Storybook disagree, the app is wrong. [DESIGN.md](DESIGN.md) lists the tokens and components.
 
 ## Branches and releases
 
-Two branches matter. `main` is the latest tagged release and the default clone target, so pin here if you want something stable. `develop` is the rolling integration line where in-flight work lands, which means it may include partial features at any given moment. Contributor PRs should target `develop`.
-
-Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
+`main` is the latest tagged release and the default clone target, so start there if you want something stable. `develop` is where in-progress work lands, which means it can carry half-finished features. Contributor PRs go to `develop`. Each release is written up in [RELEASES.md](RELEASES.md).
 
 ## Roadmap
 
