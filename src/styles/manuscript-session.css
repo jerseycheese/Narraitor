@@ -4014,7 +4014,7 @@ body.manuscript-overlay-open {
 }
 
 :root .session-break-prompt-title {
-  font-family: var(--font-display);
+  font-family: var(--font-narrative);
   font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--color-text-primary);
@@ -4022,7 +4022,7 @@ body.manuscript-overlay-open {
 }
 
 :root .session-break-prompt-description {
-  font-family: var(--font-body);
+  font-family: var(--font-interface);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: 1.5;
