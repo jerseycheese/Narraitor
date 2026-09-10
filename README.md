@@ -119,7 +119,7 @@ Release notes for each tagged version live in [RELEASES.md](RELEASES.md).
 
 1.0 shipped in August 2026: public, single-player, bring-your-own-key, everything local, no accounts. The work since has been steady refinement rather than new pillars, and every tagged version is written up in [RELEASES.md](RELEASES.md). The current line is v1.6.
 
-What's landed since launch: a bolder design-system pass, image generation beyond portraits (worlds, journal entries, items, endings), keyboard accessibility, a world clock and continuity guards that hold long campaigns together, and multi-provider support. Gemini is still the default, but OpenRouter, OpenAI, and Ollama presets work end to end too, so generation can point at another service or a local model.
+What's landed since launch: a bolder design-system pass, image generation beyond portraits (worlds, journal entries, items, endings), keyboard accessibility, a world clock and continuity guards that hold long campaigns together, and multi-provider support. Gemini is still the default. OpenRouter, OpenAI, and self-hosted Ollama presets also work end to end, so generation can run through another hosted service or a server you run yourself (Ollama has to be reachable at a public address, not a laptop).
 
 [v1.7](https://github.com/jerseycheese/Narraitor/milestone/8) ties the world's costs to the decisions that cause them, so a loss reads as something your choice earned rather than a fee on the next turn.
 
