@@ -24,8 +24,8 @@ Narraitor is a world-adaptive storytelling app. You define a fictional world's r
 attributes, and tone; create characters that fit it; and play a generated, choice-driven story
 with tracked consequences, inventory, and a journal. The story adapts to your world's voice
 rather than defaulting to generic fantasy. Success is an immersive, coherent, replayable story
-loop that stays out of its own way. v1.6 shipped on 2026-09-10. v1.7 is in progress, and its
-flagship work charges world costs to the decisions that incur them.
+loop that stays out of its own way. v1.7 shipped on 2026-09-10, and its flagship work charges
+world costs to the decisions that incur them.
 
 ## Positioning
 

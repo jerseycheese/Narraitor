@@ -4,6 +4,37 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.7.0 - 2026-09-10
+
+v1.7 closes the loop the [#1818](https://github.com/jerseycheese/Narraitor/issues/1818) playtest campaign left open. A world cost now lands on the decision that caused it, so losing something reads as a consequence of what the player chose instead of a fee charged on the next turn. The milestone closes 4 issues across 6 commits since [v1.6.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.6.0), two of which are docs.
+
+**What's in this release**
+
+The world answers back:
+
+- World costs are charged to the decisions that incur them. The cost extraction now sees the choice the player made and how it resolved, marks each cost that choice caused, and records the decision id on the segment, where later prompts and the journal can read it. In a live paired evaluation, risky choices had their cost attributed in 3 of 3 cases and safe choices drew no attributed cost in 3 of 3. It ships on by default, and `NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS=false` is the kill switch ([#2020](https://github.com/jerseycheese/Narraitor/issues/2020)).
+- Choices without alignment metadata get a real category. They used to default to `neutral` and stay there. The decision is still recorded as `neutral` straight away so the turn never waits, then a background call classifies the choice text as diplomatic, aggressive, stealthy, helpful, selfish or neutral and updates the record ([#666](https://github.com/jerseycheese/Narraitor/issues/666)).
+
+Long sessions:
+
+- Once the story passes seven segments, older ones collapse behind a "Show earlier story" control. A milestone toast marks every five story beats, and a dismissible prompt offers a natural stopping point every 15 minutes ([#805](https://github.com/jerseycheese/Narraitor/issues/805)).
+
+Fixes and docs:
+
+- The world and character creation tours no longer undo a manual Next or Back click. The step-sync effect from [#2037](https://github.com/jerseycheese/Narraitor/issues/2037) now moves the wizard only when the tour's own step changes ([#2069](https://github.com/jerseycheese/Narraitor/issues/2069)).
+- README rewritten for a developer audience, with three current screenshots ([#2073](https://github.com/jerseycheese/Narraitor/pull/2073)).
+- PRODUCT.md rewritten against the tree, and seven pre-DS3 screenshots deleted ([#2074](https://github.com/jerseycheese/Narraitor/pull/2074)).
+
+**Known incomplete**
+
+The evaluation behind [#2020](https://github.com/jerseycheese/Narraitor/issues/2020) is thin: three paired cases, 12 calls, single turns in two worlds. That cleared the ship rule its eval log committed to up front, but it isn't a read across a whole session. A 30-turn playtest with the flag on is what would catch attribution drifting as a session wears on, and that hasn't run yet.
+
+**What's next**
+
+No v1.8 milestone is set yet. The top of the backlog is [#487](https://github.com/jerseycheese/Narraitor/issues/487), the long-deferred call on adopting the Vercel AI SDK or keeping the hand-rolled provider layer, which is answerable now that three providers run through it. Behind it is [#2000](https://github.com/jerseycheese/Narraitor/issues/2000): four stores carry a comment saying a version bump clears old saved data, while the code preserves it.
+
+---
+
 ## v1.6.0 - 2026-09-10
 
 v1.5 catalogued what the new-player path gets wrong. v1.6 fixes it. The milestone closes 12 issues from the [#2022](https://github.com/jerseycheese/Narraitor/issues/2022) discovery sweep across 14 commits since [v1.5.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.5.0), and picks up a production bug that turned out to break every dynamic route in the app.

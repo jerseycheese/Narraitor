@@ -109,11 +109,11 @@ src/
 
 ## Roadmap
 
-Version 1.0 shipped in August 2026: a single-player release you run in your browser with your own key, no account needed. The releases since have been refinements rather than big new features, and each one is written up in [RELEASES.md](RELEASES.md). The current version is 1.6.
+Version 1.0 shipped in August 2026: a single-player release you run in your browser with your own key, no account needed. The releases since have been refinements rather than big new features, and each one is written up in [RELEASES.md](RELEASES.md). The current version is 1.7.
 
 Recent work: a visual redesign, generated images for worlds and journal entries and endings, better keyboard support, longer stories that stay consistent turn to turn, and the option to generate with OpenAI or OpenRouter instead of Gemini (or your own server, if you run one).
 
-The next version, [1.7](https://github.com/jerseycheese/Narraitor/milestone/8), makes what the story takes away from you land as a consequence of your choices rather than something that would have happened regardless.
+Version [1.7](https://github.com/jerseycheese/Narraitor/milestone/8) made what the story takes away from you land as a consequence of your choices, not something that would have happened regardless. The next version doesn't have a milestone yet.
 
 There are no plans for accounts or cloud saves: Narraitor stays on your device unless a clear reason to change that turns up, and [the reasoning is written down](public_docs/architecture/ADR-014-browser-local-until-named-trigger.md). Further out, the ideas worth exploring are shared worlds, voice narration, and mobile apps.
 
