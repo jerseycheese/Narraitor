@@ -17,6 +17,7 @@ import {
   parseWorldThreadExtraction,
 } from './worldThreadExtraction';
 import { buildWorldCostPromptSection, parseWorldCostExtraction } from './worldCostExtraction';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('GoalExtractor');
@@ -128,7 +129,7 @@ function buildGoalExtractionPrompt(request: GoalExtractionRequest): string {
   const worldCostSkeleton = request.worldCost
     ? `,
   "worldCost": {
-    "imposed": [{ "kind": "condition|item", "detail": "...", "threadId": "thread-id or null" }],
+    "imposed": [{ "kind": "condition|item", "detail": "...", "threadId": "thread-id or null"${isFeatureEnabled('DECISION_ATTRIBUTED_WORLD_COSTS') ? ', "causedByDecision": true|false' : ''} }],
     "cleared": ["condition text"],
     "fatal": false
   }`

@@ -347,5 +347,66 @@ describe('goalExtractor', () => {
       expect(result.updatedGoals).toEqual([]);
       expect(result.completedGoals).toEqual([]);
     });
+
+    test('includes causedByDecision in worldCost skeleton when feature flag is enabled', async () => {
+      const originalEnv = process.env.NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS;
+      try {
+        process.env.NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS = 'true';
+        mockSentPrompts.length = 0;
+
+        const request: GoalExtractionRequest = {
+          content: 'You scramble up the cliffside.',
+          sessionId: 'session-123',
+          segmentId: 'segment-456',
+          existingGoals: [],
+          worldCost: {
+            conditions: [],
+            itemsLost: [],
+          },
+        };
+
+        await extractGoalsFromNarrative(request);
+
+        const prompt = mockSentPrompts[mockSentPrompts.length - 1];
+        expect(prompt).toContain('"causedByDecision": true|false');
+      } finally {
+        if (originalEnv === undefined) {
+          delete process.env.NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS;
+        } else {
+          process.env.NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS = originalEnv;
+        }
+      }
+    });
+
+    test('omits causedByDecision from worldCost skeleton when feature flag is disabled', async () => {
+      const originalEnv = process.env.NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS;
+      try {
+        process.env.NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS = 'false';
+        mockSentPrompts.length = 0;
+
+        const request: GoalExtractionRequest = {
+          content: 'You scramble up the cliffside.',
+          sessionId: 'session-123',
+          segmentId: 'segment-456',
+          existingGoals: [],
+          worldCost: {
+            conditions: [],
+            itemsLost: [],
+          },
+        };
+
+        await extractGoalsFromNarrative(request);
+
+        const prompt = mockSentPrompts[mockSentPrompts.length - 1];
+        expect(prompt).not.toContain('"causedByDecision"');
+        expect(prompt).toContain('"imposed": [{ "kind": "condition|item", "detail": "...", "threadId": "thread-id or null" }]');
+      } finally {
+        if (originalEnv === undefined) {
+          delete process.env.NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS;
+        } else {
+          process.env.NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS = originalEnv;
+        }
+      }
+    });
   });
 });
