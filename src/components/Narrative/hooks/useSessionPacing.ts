@@ -63,16 +63,19 @@ export function useSessionPacing(options: UseSessionPacingOptions = {}): UseSess
     }
   }, [count, milestoneInterval, enabled, toast]);
 
-  // Schedule break prompts at regular intervals once reading begins
+  // Schedule break prompts at regular intervals once reading begins. Keyed on
+  // hasStartedReading, not count: a new segment must not restart the wait, or
+  // a player who keeps reading would never see the prompt.
+  const hasStartedReading = count > 0;
   useEffect(() => {
-    if (!enabled || count === 0 || showBreakPrompt || breakIntervalMs <= 0) return;
+    if (!enabled || !hasStartedReading || showBreakPrompt || breakIntervalMs <= 0) return;
 
     const timer = setTimeout(() => {
       setShowBreakPrompt(true);
     }, breakIntervalMs);
 
     return () => clearTimeout(timer);
-  }, [enabled, count, showBreakPrompt, breakIntervalMs]);
+  }, [enabled, hasStartedReading, showBreakPrompt, breakIntervalMs]);
 
   const dismissBreakPrompt = useCallback(() => {
     setShowBreakPrompt(false);

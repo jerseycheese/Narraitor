@@ -85,6 +85,30 @@ describe('useSessionPacing', () => {
     expect(result.current.showBreakPrompt).toBe(true);
   });
 
+  it('keeps the break timer running while new segments arrive', () => {
+    const breakIntervalMs = 15 * 60 * 1000;
+    const { result, rerender } = renderHook(
+      ({ count }) => useSessionPacing({ segmentCount: count, breakIntervalMs }),
+      { initialProps: { count: 1 } }
+    );
+
+    // A player reading steadily: a new segment every five minutes.
+    act(() => {
+      jest.advanceTimersByTime(5 * 60 * 1000);
+      rerender({ count: 2 });
+    });
+    act(() => {
+      jest.advanceTimersByTime(5 * 60 * 1000);
+      rerender({ count: 3 });
+    });
+    expect(result.current.showBreakPrompt).toBe(false);
+
+    act(() => {
+      jest.advanceTimersByTime(5 * 60 * 1000);
+    });
+    expect(result.current.showBreakPrompt).toBe(true);
+  });
+
   it('dismissing break prompt keeps session going and schedules next break', () => {
     const breakIntervalMs = 15 * 60 * 1000;
     const { result } = renderHook(() =>
