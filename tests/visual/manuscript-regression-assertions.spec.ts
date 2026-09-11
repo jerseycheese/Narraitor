@@ -105,10 +105,22 @@ test.describe('Manuscript regression assertions', () => {
     });
 
     await page.waitForFunction(
-      () => document.querySelectorAll('.narrative-segment').length >= 16,
+      () =>
+        document.querySelector('.narrative-history-expand-button') !== null ||
+        document.querySelectorAll('.narrative-segment').length >= 16,
       undefined,
       { timeout: 10000 }
     );
+
+    const expandButton = await page.$('.narrative-history-expand-button');
+    if (expandButton) {
+      await expandButton.click();
+      await page.waitForFunction(
+        () => document.querySelectorAll('.narrative-segment').length >= 16,
+        undefined,
+        { timeout: 10000 }
+      );
+    }
 
     // Let the surface finish parking itself at the latest beat before scrolling
     // away from it. Its own settle scroll is smooth, so it emits a run of scroll
