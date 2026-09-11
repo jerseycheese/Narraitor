@@ -19,6 +19,10 @@ export interface WorldCostEntry {
   detail: string;
   /** The open world-clock thread whose landing or move imposed it, when one did. */
   threadId?: EntityID;
+  /** Set to true when the extractor determined the player's chosen decision caused this cost. */
+  causedByDecision?: boolean;
+  /** ID of the decision that caused this cost, stamped by the reconcile path. */
+  decisionId?: EntityID;
 }
 
 /** Input to the post-segment extraction's world-cost section. */
@@ -27,6 +31,8 @@ export interface WorldCostExtractionInput {
   conditions: string[];
   /** Item names the scene recorded as lost this turn. */
   itemsLost: string[];
+  /** The player's chosen decision and outcome that led into this turn's scene, if any. */
+  decision?: { id: string; text: string; outcome?: string };
 }
 
 /** What the extraction returns for the cost channel; both arrays may be empty. */
@@ -51,6 +57,8 @@ export interface WorldCostSegmentNote {
     detail: string;
     /** Summary of the thread it was attributed to, when it was. */
     thread?: string;
+    /** Decision ID that caused this cost, when attributed to the player's chosen decision. */
+    decisionId?: EntityID;
   }>;
   cleared: string[];
   /** Set when the extractor read a death or incapacitation in the prose; the segment is tagged fatal-outcome. */

@@ -44,6 +44,9 @@ const FEATURE_FLAG_DEFAULTS = {
   // Feeds delivered commitments into the live aligned-choice prompt as a short
   // already-settled block. Off by default until live evaluation passes.
   SETTLED_COMMITMENT_CHOICES: false,
+  // Attributes world costs to the player decision that directly incurred them.
+  // Shipped default-on following successful paired live evaluation (#2020).
+  DECISION_ATTRIBUTED_WORLD_COSTS: true,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAG_DEFAULTS;
@@ -84,6 +87,10 @@ const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
   SETTLED_COMMITMENT_CHOICES: resolve(
     process.env.NEXT_PUBLIC_FEATURE_SETTLED_COMMITMENT_CHOICES,
     FEATURE_FLAG_DEFAULTS.SETTLED_COMMITMENT_CHOICES
+  ),
+  DECISION_ATTRIBUTED_WORLD_COSTS: resolve(
+    process.env.NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS,
+    FEATURE_FLAG_DEFAULTS.DECISION_ATTRIBUTED_WORLD_COSTS
   ),
 });
 
