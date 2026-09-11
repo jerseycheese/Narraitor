@@ -2,7 +2,7 @@
 
 <!-- impeccable:product-schema 1 -->
 
-*Verified against the tree on 2026-09-10, at v1.6.0. Every claim below is checkable from a
+*Verified against the tree on 2026-09-11, at v1.7.0. Every claim below is checkable from a
 path in this file. When one stops matching the code, fix it here rather than working around
 it, and re-date this line.*
 
@@ -56,6 +56,10 @@ for a model.
 
 Sessions are resumable and long-lived. Players return to worlds and characters they made
 earlier, so the app is as much a library of your own stuff as it is a game.
+
+Long sessions pace themselves: past seven segments, older ones collapse behind a "Show
+earlier story" control, a milestone toast marks every five story beats, and a dismissible
+prompt offers a natural stopping point every 15 minutes.
 
 ## Capabilities and Constraints
 
