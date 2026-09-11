@@ -51,6 +51,11 @@ interface NarrativeHistoryProps {
    * fallback for the gap before that.
    */
   streamingContent?: string;
+  /**
+   * Maximum number of recent segments visible before collapsing older
+   * segments behind an expand control. Defaults to 7.
+   */
+  maxVisibleSegments?: number;
 }
 
 export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
@@ -61,7 +66,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   onRetry,
   disableInitialAutoScroll = false,
   isHydrating = false,
-  streamingContent
+  streamingContent,
+  maxVisibleSegments = 7,
 }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const scrollViewportRef = useRef<HTMLElement>(null);
@@ -70,8 +76,13 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   const followStateRef = useRef<FollowState>(createFollowState());
   const hasSettledInitialScrollRef = useRef(false);
   const [hasUnreadBelow, setHasUnreadBelow] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const { renderedSegments } = useBufferedNarrativeSegments(segments, { isHydrating });
+  const shouldCollapse = !isExpanded && renderedSegments.length > maxVisibleSegments;
+  const visibleSegments = shouldCollapse
+    ? renderedSegments.slice(-maxVisibleSegments)
+    : renderedSegments;
 
   // Fold each scroll event into the follow decision. The rules, and why
   // distance from the bottom can't decide this on its own, live in
@@ -309,13 +320,13 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     }
 
     // If we have segments, render them (using buffered content)
-    if (renderedSegments.length > 0) {
+    if (visibleSegments.length > 0) {
       return (
         <>
-          {renderedSegments.map((segment, index) => (
+          {visibleSegments.map((segment, index) => (
             <React.Fragment key={segment.id}>
               {index > 0 && (
-                <SessionTimeDivider segment={segment} previousSegment={renderedSegments[index - 1]} />
+                <SessionTimeDivider segment={segment} previousSegment={visibleSegments[index - 1]} />
               )}
               <NarrativeDisplay
                 segment={segment}
@@ -332,7 +343,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
               {streamingPreviewSegment && (
                 <SessionTimeDivider
                   segment={streamingPreviewSegment}
-                  previousSegment={renderedSegments[renderedSegments.length - 1] ?? null}
+                  previousSegment={visibleSegments[visibleSegments.length - 1] ?? null}
                 />
               )}
               <NarrativeDisplay
@@ -417,6 +428,15 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         viewportClassName="scroll-smooth"
       >
         <div ref={scrollContentRef} className="narrative-history-segments">
+          {shouldCollapse && (
+            <button
+              type="button"
+              className="narrative-history-expand-button"
+              onClick={() => setIsExpanded(true)}
+            >
+              Show earlier story
+            </button>
+          )}
           {renderContent()}
         </div>
       </ScrollArea>

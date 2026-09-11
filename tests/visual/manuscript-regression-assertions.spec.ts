@@ -105,7 +105,10 @@ test.describe('Manuscript regression assertions', () => {
     });
 
     await page.waitForFunction(
-      () => document.querySelectorAll('.narrative-segment').length >= 16,
+      () =>
+        Array.from(document.querySelectorAll('.narrative-segment')).some((segment) =>
+          segment.textContent?.includes('corridor 12')
+        ),
       undefined,
       { timeout: 10000 }
     );
