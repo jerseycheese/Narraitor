@@ -38,8 +38,13 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
   // Create form updater utilities
   const formUpdater = createFormUpdater(toneSettings, onToneSettingsChange);
   
-  // Convert description objects to select options
-  const contentRatingOptions = descriptionsToSelectOptions(CONTENT_RATING_DESCRIPTIONS);
+  // Convert description objects to select options.
+  // Content rating keys (G, PG, PG-13, ...) are already correctly cased —
+  // the default titleCase formatter would mangle "PG" into "Pg".
+  const contentRatingOptions = descriptionsToSelectOptions(
+    CONTENT_RATING_DESCRIPTIONS,
+    (key) => key
+  );
   const narrativeStyleOptions = descriptionsToSelectOptions(NARRATIVE_STYLE_DESCRIPTIONS);
   const languageComplexityOptions = descriptionsToSelectOptions(LANGUAGE_COMPLEXITY_DESCRIPTIONS);
 
@@ -60,13 +65,13 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </p>
         </div>
       )}
-      <div>
+      <div className="component-tone-settings-form">
         {/* Tone Settings Grid */}
-        <div>
+        <div className="component-tone-settings-form-grid">
           {/* Content Rating */}
-          <div>
+          <div className="form-group">
             <Label htmlFor="content-rating">Content Rating</Label>
-            <p id="content-rating-description" >Set the age-appropriate content level for generated narratives</p>
+            <p id="content-rating-description" className="form-help-text">Set the age-appropriate content level for generated narratives</p>
             <Select
               id="content-rating"
               value={toneSettings.contentRating}
@@ -83,9 +88,9 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Narrative Style */}
-          <div>
+          <div className="form-group">
             <Label htmlFor="narrative-style">Narrative Style</Label>
-            <p id="narrative-style-description" >Choose how the story will be told and presented</p>
+            <p id="narrative-style-description" className="form-help-text">Choose how the story will be told and presented</p>
             <Select
               id="narrative-style"
               value={toneSettings.narrativeStyle}
@@ -102,9 +107,9 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Language Complexity */}
-          <div>
+          <div className="form-group">
             <Label htmlFor="language-complexity">Language Complexity</Label>
-            <p id="language-complexity-description" >Set the vocabulary and sentence complexity level</p>
+            <p id="language-complexity-description" className="form-help-text">Set the vocabulary and sentence complexity level</p>
             <Select
               id="language-complexity"
               value={toneSettings.languageComplexity}
@@ -121,9 +126,9 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           </div>
 
           {/* Custom Instructions */}
-          <div>
+          <div className="form-group">
             <Label htmlFor="custom-instructions">Custom Instructions (Optional)</Label>
-            <p id="custom-instructions-description" >Add specific guidance for tone, style, or narrative elements</p>
+            <p id="custom-instructions-description" className="form-help-text">Add specific guidance for tone, style, or narrative elements</p>
             <Textarea
               id="custom-instructions"
               placeholder="Enter specific tone or style instructions..."

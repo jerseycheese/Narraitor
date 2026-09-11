@@ -38,6 +38,14 @@ describe('JournalEntryDetail', () => {
     expect(screen.getByText('Tags')).toBeInTheDocument();
   });
 
+  it('puts the significance badge and date in a spaced meta row (#2082)', () => {
+    const entry = createEntry();
+    render(<JournalEntryDetail entry={entry} />);
+
+    const badge = screen.getByText('Major');
+    expect(badge.closest('.journal-entry-meta')).toBeInTheDocument();
+  });
+
   it('renders discovery content as text', () => {
     const entry = createEntry({
       type: 'discovery',

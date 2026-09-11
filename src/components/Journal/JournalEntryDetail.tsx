@@ -51,7 +51,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
           )}
           {entry.title || titleCase(entry.type.replace('_', ' '))}
         </h3>
-        <div>
+        <div className="journal-entry-meta">
           <Badge
             variant={getSignificanceBadgeVariant(entry.significance)}
             size="sm"

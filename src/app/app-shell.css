@@ -767,6 +767,7 @@
   font-family: var(--font-interface);
   font-size: var(--font-size-xs_5);
   font-weight: 500;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 120ms ease;
 }
@@ -2154,14 +2155,14 @@
   margin: 0 0 var(--space-2);
 }
 
-.journal-entry-detail > div:nth-child(2) {
+.journal-entry-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-.journal-entry-detail > div:nth-child(2) > span {
+.journal-entry-meta > span {
   font-family: var(--font-system);
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
@@ -2568,6 +2569,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2);
   padding: var(--space-6);
   font-family: var(--font-interface);
   color: var(--color-text-muted);

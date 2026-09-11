@@ -78,7 +78,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
               {truncate(entry.content, 60)}
             </p>
 
-            <div>
+            <div className="journal-entry-meta">
               <Badge
                 variant={getSignificanceBadgeVariant(entry.significance)}
                 size="sm"
