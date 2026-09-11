@@ -67,4 +67,19 @@ describe('JournalEntryList', () => {
     expect(onEntrySelect).toHaveBeenCalledWith(entry);
   });
 
+  it('puts the significance badge and date in a spaced meta row (#2082)', () => {
+    const entry = createEntry({ id: 'entry-1', title: 'Meta Row Entry' });
+
+    render(
+      <JournalEntryList
+        entries={[entry]}
+        selectedEntryId={null}
+        onEntrySelect={jest.fn()}
+      />
+    );
+
+    const badge = screen.getByText('Minor');
+    expect(badge.closest('.journal-entry-meta')).toBeInTheDocument();
+  });
+
 });
