@@ -201,6 +201,19 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [processedChoices, setProcessedChoices] = useState<Set<string>>(
     new Set()
   );
+  const totalDecisionCount = useMemo(() => {
+    const decisionIds = new Set<string>();
+    for (const segment of segments) {
+      const id = segment.metadata?.causedByDecisionId;
+      if (id) {
+        decisionIds.add(id);
+      }
+    }
+    for (const id of processedChoices) {
+      decisionIds.add(id);
+    }
+    return decisionIds.size;
+  }, [segments, processedChoices]);
   const {
     showBreakPrompt,
     dismissBreakPrompt,
@@ -208,7 +221,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     metrics: pacingMetrics,
   } = useSessionPacing({
     segmentCount: segments.length,
-    decisionCount: processedChoices.size,
+    decisionCount: totalDecisionCount,
     enabled: enableSessionPacing,
   });
   const mountedRef = useRef(false);

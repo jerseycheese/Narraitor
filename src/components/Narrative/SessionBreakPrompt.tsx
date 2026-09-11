@@ -21,9 +21,12 @@ export const SessionBreakPrompt: React.FC<SessionBreakPromptProps> = ({
   className = '',
 }) => {
   const continueButtonRef = useRef<HTMLButtonElement>(null);
+  const dismissButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
+
+    const previousActiveElement = document.activeElement as HTMLElement | null;
 
     // Focus primary action on mount
     continueButtonRef.current?.focus();
@@ -32,11 +35,33 @@ export const SessionBreakPrompt: React.FC<SessionBreakPromptProps> = ({
       if (e.key === 'Escape') {
         e.preventDefault();
         onDismiss();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const dismissBtn = dismissButtonRef.current;
+        const continueBtn = continueButtonRef.current;
+        if (!dismissBtn || !continueBtn) return;
+
+        if (e.shiftKey) {
+          if (document.activeElement === dismissBtn) {
+            e.preventDefault();
+            continueBtn.focus();
+          }
+        } else {
+          if (document.activeElement === continueBtn) {
+            e.preventDefault();
+            dismissBtn.focus();
+          }
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      previousActiveElement?.focus?.();
+    };
   }, [isOpen, onDismiss]);
 
   if (!isOpen) return null;
@@ -103,6 +128,7 @@ export const SessionBreakPrompt: React.FC<SessionBreakPromptProps> = ({
 
         <div className="session-break-prompt-actions">
           <button
+            ref={dismissButtonRef}
             type="button"
             className="session-break-prompt-dismiss-button"
             onClick={onDismiss}

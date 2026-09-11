@@ -104,4 +104,62 @@ describe('NarrativeController session pacing integration', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('Good stopping point')).toBeInTheDocument();
   });
+
+  it('counts decisions from persisted segments metadata in break prompt metrics', async () => {
+    const segmentsWithDecisions = [
+      {
+        id: 'seg-1',
+        sessionId: 'test-session',
+        worldId: 'test-world',
+        content: 'Beat 1',
+        type: 'scene' as const,
+        metadata: { tags: [], causedByDecisionId: 'decision-101' },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        characterIds: [],
+      },
+      {
+        id: 'seg-2',
+        sessionId: 'test-session',
+        worldId: 'test-world',
+        content: 'Beat 2',
+        type: 'scene' as const,
+        metadata: { tags: [], causedByDecisionId: 'decision-102' },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        characterIds: [],
+      },
+    ];
+
+    mockZustandStore(
+      useNarrativeStore as jest.MockedFunction<typeof useNarrativeStore>,
+      createMockNarrativeStore({
+        _hasHydrated: true,
+        getSessionSegments: jest.fn().mockReturnValue(segmentsWithDecisions),
+        getSessionDecisions: jest.fn().mockReturnValue([]),
+      })
+    );
+
+    render(
+      <ToastProvider>
+        <NarrativeController
+          worldId="test-world"
+          sessionId="test-session"
+          triggerGeneration={false}
+          generateChoices={false}
+          enableSessionPacing={true}
+        />
+      </ToastProvider>
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(15 * 60 * 1000);
+    });
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    const decisionsLabel = screen.getByText('Decisions made');
+    expect(decisionsLabel.nextElementSibling).toHaveTextContent('2');
+  });
 });

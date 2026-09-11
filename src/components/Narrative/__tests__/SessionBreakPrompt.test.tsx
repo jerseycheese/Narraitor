@@ -61,4 +61,22 @@ describe('SessionBreakPrompt', () => {
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(handleDismiss).toHaveBeenCalledTimes(1);
   });
+
+  it('traps focus between action buttons on Tab and Shift+Tab', () => {
+    render(<SessionBreakPrompt isOpen={true} onDismiss={jest.fn()} />);
+
+    const continueBtn = screen.getByRole('button', { name: /continue reading/i });
+    const dismissBtn = screen.getByRole('button', { name: /dismiss/i });
+
+    // Focus starts on continue button
+    expect(continueBtn).toHaveFocus();
+
+    // Tab moves focus to dismiss button
+    fireEvent.keyDown(window, { key: 'Tab' });
+    expect(dismissBtn).toHaveFocus();
+
+    // Shift+Tab moves focus back to continue button
+    fireEvent.keyDown(window, { key: 'Tab', shiftKey: true });
+    expect(continueBtn).toHaveFocus();
+  });
 });
