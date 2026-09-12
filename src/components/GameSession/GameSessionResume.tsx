@@ -42,7 +42,7 @@ const GameSessionResume: React.FC<GameSessionResumeProps> = ({
             onClick={onNewGame}
             
             data-testid="new-session-button"
-            variant="default"
+            variant="secondary"
           >
             Start New Adventure
           </Button>

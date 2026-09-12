@@ -99,7 +99,9 @@ describe('DashboardContinueCard', () => {
     );
 
     const continueButton = screen.getByRole('button', { name: /continue last game/i });
-    // ActionButtonGroup maps 'default' → button-default; must not be button-success
+    // ActionButtonGroup maps 'default' → button-default: the card owns the one
+    // filled CTA in the active-session dashboard.
+    expect(continueButton).toHaveClass('button-default');
     expect(continueButton).not.toHaveClass('button-success');
   });
 

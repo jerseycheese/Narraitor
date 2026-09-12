@@ -212,7 +212,6 @@ export const CompleteShowcase: Story = {
             <h3>Semantic Action Examples</h3>
             <div className="ds-showcase-button-row">
               <Button variant="default">Play in World</Button>
-              <Button variant="default">Continue Last Game</Button>
               <Button variant="secondary">Edit</Button>
               <Button variant="outline">Play (header shortcut)</Button>
               <Button variant="destructive-outline">Delete</Button>

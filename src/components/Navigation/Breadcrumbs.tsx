@@ -109,6 +109,9 @@ export function Breadcrumbs({
     </nav>
   );
 
+  // Breadcrumb shortcuts are shell chrome, like the header Play button: they
+  // sit above whatever page is rendered, so they stay outline and never
+  // compete with that page's own primary (#2083).
   function renderNextStepGuidance() {
     const nextStep = getNextStep();
     if (!nextStep) return null;
@@ -127,7 +130,7 @@ export function Breadcrumbs({
                 });
               }
             }}
-            variant="default"
+            variant="outline"
             size="sm"
           >
             Play as {character?.name}
@@ -157,7 +160,7 @@ export function Breadcrumbs({
                 });
               }
             }}
-            variant="default"
+            variant="outline"
             size="sm"
           >
             Quick Start

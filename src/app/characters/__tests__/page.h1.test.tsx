@@ -125,3 +125,61 @@ describe('CharactersPage heading hierarchy (#1530)', () => {
     expect(h1s[0]).toHaveTextContent('My Characters');
   });
 });
+
+// Exactly one filled ink-blue CTA per rendered state (#2083). The toolbar owns
+// it on the world's roster; the no-world state routes to Worlds instead.
+describe('CharactersPage action hierarchy (#2083)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
+  });
+
+  function primaryCtas(container: HTMLElement) {
+    return Array.from(
+      container.querySelectorAll<HTMLButtonElement>('.button-default')
+    ).filter((button) => !button.hasAttribute('aria-pressed'));
+  }
+
+  it('renders the toolbar Create as the only primary when the world is empty', async () => {
+    mockStores({ populated: true });
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
+      characters: {},
+      currentCharacterId: null,
+      setCurrentCharacter: jest.fn(),
+      createCharacter: jest.fn(),
+      updateCharacter: jest.fn(),
+    });
+
+    const { container } = render(
+      <ToastProvider>
+        <CharactersPage />
+      </ToastProvider>
+    );
+
+    await screen.findByRole('heading', {
+      level: 2,
+      name: 'No characters in Fantasy Realm yet',
+    });
+
+    expect(primaryCtas(container)).toHaveLength(1);
+    expect(
+      screen.getAllByRole('button', { name: 'Create Character' })[0]
+    ).toHaveClass('button-default');
+  });
+
+  it('leaves the no-world state with Go to Worlds as its only primary', async () => {
+    mockStores({ populated: false });
+
+    const { container } = render(
+      <ToastProvider>
+        <CharactersPage />
+      </ToastProvider>
+    );
+
+    await screen.findByText('Choose Your World');
+
+    const primaries = primaryCtas(container);
+    expect(primaries).toHaveLength(1);
+    expect(primaries[0]).toHaveTextContent('Go to Worlds');
+  });
+});

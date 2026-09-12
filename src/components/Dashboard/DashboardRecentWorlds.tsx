@@ -35,7 +35,7 @@ export function DashboardRecentWorlds({
         <h2>Recent Worlds</h2>
         <div className="dashboard-recent-empty-state">
           <p>No worlds yet</p>
-          <Button onClick={() => onNavigate('/worlds')} variant="default">
+          <Button onClick={() => onNavigate('/worlds')} variant="secondary">
             <Plus aria-hidden="true" />
             Create Your First World
           </Button>

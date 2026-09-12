@@ -377,6 +377,6 @@ describe('EndingScreen - Action hierarchy (#2083)', () => {
 
     expect(newStoryBtn).toHaveClass('card-action-variant-primary');
     expect(newStoryBtn).not.toHaveClass('card-action-variant-success');
-    expect(backToWorldsBtn).not.toHaveClass('card-action-variant-primary');
+    expect(backToWorldsBtn).toHaveClass('card-action-variant-secondary');
   });
 });

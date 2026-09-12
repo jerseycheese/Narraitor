@@ -532,7 +532,8 @@ export default function CharactersPage() {
                 {
                   label: 'Create Character',
                   onClick: handleCreateCharacter,
-                  variant: 'primary',
+                  // The toolbar above owns the page's one filled CTA (#2083).
+                  variant: 'secondary',
                   size: 'lg',
                 },
               ]}

@@ -115,6 +115,7 @@ describe('WorldCard', () => {
     render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
 
     const playButton = screen.getByTestId('world-card-actions-play-button');
+    expect(playButton).toHaveClass('card-action-variant-secondary');
     expect(playButton).not.toHaveClass('card-action-variant-success');
   });
 

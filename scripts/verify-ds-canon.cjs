@@ -26,6 +26,8 @@ const {
   dedupeByName,
   collectComponentImportSegments,
   findUncovered,
+  isProductActionFile,
+  findSuccessVerbActions,
 } = require('./ds-canon-lib.cjs');
 
 const ROOT = process.cwd();
@@ -81,60 +83,25 @@ const storybookViolations = findUncovered(inScopeNames, coveredNames, {
 //
 // Green (success) is reserved for confirmed completion states. The verbs below
 // are task-advancing or navigation — they belong on default/primary (ink-blue)
-// or outline/secondary, never on success. This check scans the compiled source
-// for the pattern and fails if any are found outside explicitly allowed contexts.
+// or outline/secondary, never on success. The check parses each product source
+// file and fails on any success-variant action whose label is one of those verbs.
 //
 // Covers all three public action paths:
 //   direct <Button variant="success">
 //   ActionButtonGroup actions: { variant: 'success', label: '...' }
 //   CardActionGroup primaryActions: { variant: 'success', text: '...' }
 //
-// "Completion" allowlist: these labels are genuine end-states and may use success.
-const COMPLETION_CONTEXT_RE = /story.?complete|session.?saved|ending.?saved|saved|confirm.*delete|delete.*confirm/i;
-
-// Navigation/task verbs that must not use success
-const NAV_VERB_RE = /\b(Play|Continue|Start|Create|New Story|Begin)\b/;
-
-// Match variant="success" or variant: 'success' followed closely by a label/text
-// in either JSX prop form or object literal form.
-const SUCCESS_VARIANT_WITH_LABEL_RE =
-  /variant\s*[=:]\s*['"]success['"]\s*[^}]{0,300}?(?:label|text|children)\s*[=:]\s*['"`]([^'"`]+)['"`]|(?:label|text|children)\s*[=:]\s*['"`]([^'"`]+)['"`][^}]{0,300}?variant\s*[=:]\s*['"]success['"]/gs;
-
-// JSX children inline: >Play<  >Continue< etc with variant="success" on the button
-const SUCCESS_JSX_CHILDREN_RE = /variant="success"[^>]*>([^<]+)</gs;
-
 const srcFiles = glob.sync('src/**/*.{tsx,ts}', { cwd: ROOT, nodir: true });
 
 const successVerbViolations = [];
 
 for (const relPath of srcFiles) {
-  // Skip test files and stories — we want to check the stories too, actually,
-  // but allow the showcase variant-catalog row which names the variant itself.
-  if (relPath.includes('__tests__') || relPath.includes('.test.')) continue;
+  if (!isProductActionFile(relPath)) continue;
 
   let content;
   try { content = fs.readFileSync(path.join(ROOT, relPath), 'utf8'); } catch { continue; }
 
-  // Check object-literal form (ActionButtonGroup, CardActionGroup)
-  let m;
-  SUCCESS_VARIANT_WITH_LABEL_RE.lastIndex = 0;
-  while ((m = SUCCESS_VARIANT_WITH_LABEL_RE.exec(content)) !== null) {
-    const label = (m[1] || m[2] || '').trim();
-    if (!label) continue;
-    if (!NAV_VERB_RE.test(label)) continue;
-    if (COMPLETION_CONTEXT_RE.test(label)) continue;
-    successVerbViolations.push({ file: relPath, label });
-  }
-
-  // Check JSX children form (<Button variant="success">Play</Button>)
-  SUCCESS_JSX_CHILDREN_RE.lastIndex = 0;
-  while ((m = SUCCESS_JSX_CHILDREN_RE.exec(content)) !== null) {
-    const label = (m[1] || '').trim();
-    if (!label) continue;
-    if (!NAV_VERB_RE.test(label)) continue;
-    if (COMPLETION_CONTEXT_RE.test(label)) continue;
-    // Allow the variant catalog row in stories (just the word "Success" as a label)
-    if (/^success$/i.test(label)) continue;
+  for (const label of findSuccessVerbActions(content, relPath)) {
     successVerbViolations.push({ file: relPath, label });
   }
 }
