@@ -224,7 +224,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
               onClick={() =>
                 handleNavigation(`/worlds/${currentWorld.id}/play`)
               }
-              variant="success"
+              variant="outline"
             >
               <Play aria-hidden="true" />
               Play {currentWorld.name}

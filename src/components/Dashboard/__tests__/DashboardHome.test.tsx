@@ -169,6 +169,14 @@ describe('DashboardHome', () => {
       expect(screen.getAllByRole('button', { name: /continue/i }).length).toBeGreaterThan(0);
     });
 
+    it('does not render DashboardGettingStarted when a session is active — avoids a second competing primary', () => {
+      render(<DashboardHome />);
+
+      // "Start Playing" / "Create Your World" only appear in the getting-started guide
+      expect(screen.queryByRole('button', { name: /start playing/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /getting started/i })).not.toBeInTheDocument();
+    });
+
     it('renders exactly one page-level h1 (#1530)', () => {
       render(<DashboardHome />);
 

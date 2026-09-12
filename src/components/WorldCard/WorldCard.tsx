@@ -256,7 +256,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   key: 'play',
                   text: 'Play',
                   onClick: handlePlayClick,
-                  variant: 'success',
+                  variant: 'secondary',
                   flex: true,
                   testId: 'world-card-actions-play-button',
                   icon: <Play aria-hidden="true" />,

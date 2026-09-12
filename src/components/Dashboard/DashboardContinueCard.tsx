@@ -98,7 +98,7 @@ export function DashboardContinueCard({
             {
               label: 'Continue Last Game',
               onClick: () => onContinue(session.id),
-              variant: 'success',
+              variant: 'default',
             },
             {
               label: 'Delete',

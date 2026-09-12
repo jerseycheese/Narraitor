@@ -87,7 +87,7 @@ export default function WorldViewPage() {
     {
       label: 'Play in World',
       onClick: handlePlayInWorld,
-      variant: 'success' as const,
+      variant: 'default' as const,
       icon: (
         <Play aria-hidden="true" />
       )
@@ -103,7 +103,7 @@ export default function WorldViewPage() {
         <ActionButtonGroup
           actions={actionButtons.map(btn => ({
             ...btn,
-            flex: btn.variant === 'success'
+            flex: btn.variant === 'default'
           }))}
           layout="horizontal"
           gap="sm"

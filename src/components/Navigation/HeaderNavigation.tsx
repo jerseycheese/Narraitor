@@ -116,7 +116,7 @@ export function HeaderNavigation() {
           `Starting ${currentWorld.name}...`
         )
       }
-      variant="success"
+      variant="outline"
     >
       <Play aria-hidden="true" />
       Play

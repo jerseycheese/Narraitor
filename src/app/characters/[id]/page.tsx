@@ -68,7 +68,7 @@ export default function CharacterViewPage() {
         setCurrentCharacter(characterId);
         router.push(`/worlds/${character.worldId}/play`);
       },
-      variant: 'success' as const,
+      variant: 'default' as const,
       icon: <Play aria-hidden="true" />,
     },
     {
@@ -87,7 +87,7 @@ export default function CharacterViewPage() {
         <ActionButtonGroup 
           actions={actionButtons.map(btn => ({
             ...btn,
-            flex: btn.variant === 'success'
+            flex: btn.variant === 'default'
           }))}
           layout="horizontal" 
           gap="sm" 

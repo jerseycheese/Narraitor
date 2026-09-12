@@ -440,7 +440,7 @@ export function GuidedFirstTimeExperience() {
                 disabled={
                   !wizard.stepValidation?.valid || wizard.state.isProcessing
                 }
-                variant="success"
+                variant="default"
               >
                 {wizard.state.isProcessing
                   ? 'Creating world...'

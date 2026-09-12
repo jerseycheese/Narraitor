@@ -77,6 +77,68 @@ const storybookViolations = findUncovered(inScopeNames, coveredNames, {
   grandfathered: baselineStorybook,
 }).map((name) => ({ name, file: inScopeByName.get(name) }));
 
+// --- Semantic: success must not be used for task/navigation verbs -----------
+//
+// Green (success) is reserved for confirmed completion states. The verbs below
+// are task-advancing or navigation — they belong on default/primary (ink-blue)
+// or outline/secondary, never on success. This check scans the compiled source
+// for the pattern and fails if any are found outside explicitly allowed contexts.
+//
+// Covers all three public action paths:
+//   direct <Button variant="success">
+//   ActionButtonGroup actions: { variant: 'success', label: '...' }
+//   CardActionGroup primaryActions: { variant: 'success', text: '...' }
+//
+// "Completion" allowlist: these labels are genuine end-states and may use success.
+const COMPLETION_CONTEXT_RE = /story.?complete|session.?saved|ending.?saved|saved|confirm.*delete|delete.*confirm/i;
+
+// Navigation/task verbs that must not use success
+const NAV_VERB_RE = /\b(Play|Continue|Start|Create|New Story|Begin)\b/;
+
+// Match variant="success" or variant: 'success' followed closely by a label/text
+// in either JSX prop form or object literal form.
+const SUCCESS_VARIANT_WITH_LABEL_RE =
+  /variant\s*[=:]\s*['"]success['"]\s*[^}]{0,300}?(?:label|text|children)\s*[=:]\s*['"`]([^'"`]+)['"`]|(?:label|text|children)\s*[=:]\s*['"`]([^'"`]+)['"`][^}]{0,300}?variant\s*[=:]\s*['"]success['"]/gs;
+
+// JSX children inline: >Play<  >Continue< etc with variant="success" on the button
+const SUCCESS_JSX_CHILDREN_RE = /variant="success"[^>]*>([^<]+)</gs;
+
+const srcFiles = glob.sync('src/**/*.{tsx,ts}', { cwd: ROOT, nodir: true });
+
+const successVerbViolations = [];
+
+for (const relPath of srcFiles) {
+  // Skip test files and stories — we want to check the stories too, actually,
+  // but allow the showcase variant-catalog row which names the variant itself.
+  if (relPath.includes('__tests__') || relPath.includes('.test.')) continue;
+
+  let content;
+  try { content = fs.readFileSync(path.join(ROOT, relPath), 'utf8'); } catch { continue; }
+
+  // Check object-literal form (ActionButtonGroup, CardActionGroup)
+  let m;
+  SUCCESS_VARIANT_WITH_LABEL_RE.lastIndex = 0;
+  while ((m = SUCCESS_VARIANT_WITH_LABEL_RE.exec(content)) !== null) {
+    const label = (m[1] || m[2] || '').trim();
+    if (!label) continue;
+    if (!NAV_VERB_RE.test(label)) continue;
+    if (COMPLETION_CONTEXT_RE.test(label)) continue;
+    successVerbViolations.push({ file: relPath, label });
+  }
+
+  // Check JSX children form (<Button variant="success">Play</Button>)
+  SUCCESS_JSX_CHILDREN_RE.lastIndex = 0;
+  while ((m = SUCCESS_JSX_CHILDREN_RE.exec(content)) !== null) {
+    const label = (m[1] || '').trim();
+    if (!label) continue;
+    if (!NAV_VERB_RE.test(label)) continue;
+    if (COMPLETION_CONTEXT_RE.test(label)) continue;
+    // Allow the variant catalog row in stories (just the word "Success" as a label)
+    if (/^success$/i.test(label)) continue;
+    successVerbViolations.push({ file: relPath, label });
+  }
+}
+
 // --- Report ------------------------------------------------------------------
 if (storybookViolations.length > 0) {
   console.error('Canon violation — in-scope component(s) without a Storybook story:');
@@ -87,9 +149,18 @@ if (storybookViolations.length > 0) {
   process.exit(1);
 }
 
+if (successVerbViolations.length > 0) {
+  console.error('Canon violation — success (green) variant used on navigation/task verbs (#2083):');
+  console.error('success is reserved for confirmed completion states. Play, Continue, Start, Create, and navigation shortcuts must use default (ink-blue), outline, or secondary.\n');
+  for (const v of successVerbViolations) console.error(` - "${v.label}" in ${v.file}`);
+  console.error('\nFix: change variant="success" to variant="default" (page primary), "outline" (shell shortcut), or "secondary" (per-card supporting action).');
+  process.exit(1);
+}
+
 const sbN = baselineStorybook.size;
 const excN = Object.keys(coverageExceptions).length;
 console.log(
   `Storybook canon OK — ${inScopeNames.length} in-scope component(s) checked ` +
   `(${sbN} grandfathered gap(s), ${excN} exception(s)).`,
 );
+console.log('Semantic success-verb check OK — no navigation/task verbs found on the success (green) variant.');

@@ -238,7 +238,7 @@ export function EndingScreen() {
       key: 'back-to-worlds',
       text: 'Back to Worlds',
       onClick: () => router.push('/worlds'),
-      variant: 'primary',
+      variant: 'secondary',
       flex: true,
     },
     {
@@ -264,7 +264,7 @@ export function EndingScreen() {
         clearEnding();
         router.push(`/worlds/${currentEnding.worldId}/play?fresh=true`);
       },
-      variant: 'success',
+      variant: 'primary',
       flex: true,
       icon: <Play aria-hidden="true" />,
     },

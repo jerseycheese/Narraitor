@@ -127,7 +127,7 @@ export function Breadcrumbs({
                 });
               }
             }}
-            variant="success"
+            variant="default"
             size="sm"
           >
             Play as {character?.name}

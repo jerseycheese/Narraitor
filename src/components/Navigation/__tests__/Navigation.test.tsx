@@ -190,14 +190,14 @@ describe('HeaderNavigation', () => {
       mockWorldStore.currentWorldId = 'world-1';
     };
 
-    it('renders Play in the success variant so it matches every other Play control', () => {
+    it('renders Play in the outline variant — it is a shell shortcut, not the page primary', () => {
       mockPathname = '/dashboard';
       seedActiveWorld();
 
       render(<HeaderNavigation />);
 
       expect(screen.getByRole('button', { name: /^Play$/ })).toHaveClass(
-        'button-success'
+        'button-outline'
       );
     });
 

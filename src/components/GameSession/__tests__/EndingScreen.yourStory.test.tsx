@@ -362,3 +362,21 @@ describe('EndingScreen - Legacy/Achievements layout', () => {
     expect(legacyOuterSection?.parentElement).toHaveClass('component-ending-screen-content');
   });
 });
+
+describe('EndingScreen - Action hierarchy (#2083)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders New Story as primary and Back to Worlds as secondary', () => {
+    setupStores([]);
+    render(<EndingScreen />);
+
+    const newStoryBtn = screen.getByRole('button', { name: /new story/i });
+    const backToWorldsBtn = screen.getByRole('button', { name: /back to worlds/i });
+
+    expect(newStoryBtn).toHaveClass('card-action-variant-primary');
+    expect(newStoryBtn).not.toHaveClass('card-action-variant-success');
+    expect(backToWorldsBtn).not.toHaveClass('card-action-variant-primary');
+  });
+});

@@ -177,7 +177,7 @@ export const CharactersPageExample: Story = {
           {
             label: 'Start Playing',
             onClick: () => console.log('Start Playing clicked'),
-            variant: 'success',
+            variant: 'secondary',
             icon: <Sparkles aria-hidden="true" />,
           },
         ]}
@@ -198,7 +198,7 @@ export const CharactersPageExample: Story = {
                 <Button variant="default" size="sm">
                   Edit
                 </Button>
-                <Button variant="success" size="sm">
+                <Button variant="secondary" size="sm">
                   Play
                 </Button>
               </div>
