@@ -9,7 +9,7 @@
 const ts = require('typescript');
 
 // Task-advancing / navigation verbs. These move the player through the app, so
-// they belong on default, outline or secondary — never on success (#2083).
+// they belong on default, outline or secondary — never on success.
 const TASK_VERB_RE = /\b(?:Play|Continue|Start|Create|Begin)\b|\bNew\s+Story\b/i;
 
 // A component file is "storyable" (in scope as a standalone catalog entry) only

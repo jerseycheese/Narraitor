@@ -126,8 +126,8 @@ describe('CharactersPage heading hierarchy (#1530)', () => {
   });
 });
 
-// Exactly one filled ink-blue CTA per rendered state (#2083). The toolbar owns
-// it on the world's roster; the no-world state routes to Worlds instead.
+// Exactly one filled ink-blue CTA per rendered state. The toolbar owns it on
+// the world's roster; the no-world state routes to Worlds instead.
 describe('CharactersPage action hierarchy (#2083)', () => {
   beforeEach(() => {
     jest.clearAllMocks();

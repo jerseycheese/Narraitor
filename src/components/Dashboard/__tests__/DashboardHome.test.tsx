@@ -143,7 +143,7 @@ describe('DashboardHome', () => {
       expect(screen.getByRole('button', { name: /start playing/i })).toBeInTheDocument();
     });
 
-    // One filled ink-blue CTA per rendered state (#2083). The recent-worlds and
+    // One filled ink-blue CTA per rendered state. The recent-worlds and
     // recent-character empty states offer the same routes as the guide, so they
     // stay secondary and the guide's next step owns the primary.
     it('renders one primary CTA when a world exists but no character does', () => {
