@@ -83,16 +83,19 @@ export const CompleteShowcase: Story = {
       <section className="ds-showcase-section">
         <h2>Typography</h2>
         <div className="ds-showcase-typography-samples">
-          <h1>Heading 1 - Main Page Titles</h1>
-          <h2>Heading 2 - Section Titles</h2>
-          <h3>Heading 3 - Subsection Titles</h3>
-          <h4>Heading 4 - Component Titles</h4>
+          <h1>Heading 1 - Page Title Role (Newsreader Upright)</h1>
+          <h2>Heading 2 - Section Heading Role (DM Sans Semibold)</h2>
+          <h3>Heading 3 - Subsection Heading Role (DM Sans Semibold)</h3>
+          <h4>Heading 4 - Component Heading Role (DM Sans Semibold)</h4>
+          <p className="ds-showcase-text-narrative">
+            Story text and long prose - Newsreader narrative prose for immersive reading comfort.
+          </p>
           <p className="ds-showcase-text-large">Large text - Prominent body copy</p>
           <p className="ds-showcase-text-body">Body text - Default paragraph text</p>
           <p className="ds-showcase-text-small">Small text - Secondary information</p>
           <p className="ds-showcase-text-xs">Extra small - Captions and metadata</p>
           <p className="ds-showcase-text-muted">Muted text - Less important information</p>
-          <code>Inline code</code>
+          <code className="ds-showcase-data-value">Data value / computed metric: char_a6dd5cc3</code>
         </div>
       </section>
 
