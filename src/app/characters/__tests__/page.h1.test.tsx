@@ -134,13 +134,15 @@ describe('CharactersPage action hierarchy (#2083)', () => {
     (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
   });
 
+  // The view toggle marks its selected mode with button-default too, so filter
+  // on aria-pressed to count only real CTAs.
   function primaryCtas(container: HTMLElement) {
     return Array.from(
       container.querySelectorAll<HTMLButtonElement>('.button-default')
     ).filter((button) => !button.hasAttribute('aria-pressed'));
   }
 
-  it('renders the toolbar Create as the only primary when the world is empty', async () => {
+  function renderEmptyRoster() {
     mockStores({ populated: true });
     (useCharacterStore as unknown as jest.Mock).mockReturnValue({
       characters: {},
@@ -150,21 +152,44 @@ describe('CharactersPage action hierarchy (#2083)', () => {
       updateCharacter: jest.fn(),
     });
 
-    const { container } = render(
+    return render(
       <ToastProvider>
         <CharactersPage />
       </ToastProvider>
     );
+  }
+
+  it('gives the empty roster one Create Character, and it is the primary', async () => {
+    const { container } = renderEmptyRoster();
 
     await screen.findByRole('heading', {
       level: 2,
       name: 'No characters in Fantasy Realm yet',
     });
 
+    const createButtons = screen.getAllByRole('button', {
+      name: 'Create Character',
+    });
+    expect(createButtons).toHaveLength(1);
+    expect(createButtons[0]).toHaveClass('button-default');
     expect(primaryCtas(container)).toHaveLength(1);
+  });
+
+  it('drops the toolbar and its view toggle from the empty roster (#2099)', async () => {
+    const { container } = renderEmptyRoster();
+
+    await screen.findByRole('heading', {
+      level: 2,
+      name: 'No characters in Fantasy Realm yet',
+    });
+
+    expect(container.querySelector('.characters-toolbar')).toBeNull();
     expect(
-      screen.getAllByRole('button', { name: 'Create Character' })[0]
-    ).toHaveClass('button-default');
+      screen.queryByRole('button', { name: /table view/i })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getAllByRole('button', { name: /generate character/i })
+    ).toHaveLength(1);
   });
 
   it('leaves the no-world state with Go to Worlds as its only primary', async () => {
