@@ -642,7 +642,7 @@
 }
 
 :root .dashboard-recent-item h3 {
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
   font-size: var(--font-size-sm);
   font-weight: 600;
   letter-spacing: 0;

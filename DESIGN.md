@@ -148,13 +148,24 @@ DS3 is aged-paper canvas with a single ink accent, drafted over a dot grid — t
 
 ## Typography
 
-There are exactly three font slots, named by **purpose, not size**:
+There are five typography roles across the app, matching the landing page:
 
-- **narrative** (Newsreader) — long-form prose. Story content, character backgrounds, lore entries. Serif for reading comfort over long sessions.
+| Role | Font | Usage |
+|---|---|---|
+| **Page title** | Newsreader, upright | Display headline, hero titles, wizard and play page titles (`var(--font-narrative)`, weight 500) |
+| **Section heading** | DM Sans, semibold | Section headings, panel titles, card titles (`var(--font-interface)`, weight 600) |
+| **Story text and long prose** | Newsreader | Long-form narrative, story prose, lore entries (`var(--font-narrative)`) |
+| **UI, labels, body copy** | DM Sans | Buttons, navigation, form labels, body copy, metadata (`var(--font-interface)`) |
+| **Numbers and data values** | Fira Code | IDs, counters, debug content, computed metrics (`var(--font-system)`) |
+
+Page titles use narrative, upright. No heading is italic; italic is for emphasis inside prose.
+
+The slot names predate DS3 and map to real families:
+- **narrative** (Newsreader) — long-form prose. Story content, character backgrounds, lore entries. Serif for reading comfort over long sessions, and upright for page titles.
 - **system** (Fira Code) — code-adjacent surfaces, IDs, debug content, computed values. Monospace.
-- **interface** (DM Sans) — buttons, navigation, form labels, headings, metadata. Sans-serif.
+- **interface** (DM Sans) — buttons, navigation, form labels, section headings, metadata. Sans-serif.
 
-The names predate DS3 and outlived the multi-theme system that motivated them, but they still map to real families, not placeholders. Source: the `next/font/google` imports in [layout.tsx](src/app/layout.tsx) and the `--font-*` custom properties in [ds3.css](src/lib/theme/themes/ds3.css).
+Source: the `next/font/google` imports in [layout.tsx](src/app/layout.tsx) and the `--font-*` custom properties in [ds3.css](src/lib/theme/themes/ds3.css).
 
 Use the utility classes when consuming in components:
 

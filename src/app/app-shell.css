@@ -1150,9 +1150,8 @@
   padding-top: var(--space-3);
   padding-bottom: var(--space-3);
   margin-bottom: var(--space-4);
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-weight: 400;
+  font-family: var(--font-interface);
+  font-weight: 600;
 }
 
 :root .world-detail-section h2::after {
@@ -1555,9 +1554,8 @@
 
 :root .characters-empty h2 {
   position: relative;
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-weight: 400;
+  font-family: var(--font-interface);
+  font-weight: 600;
 }
 
 :root .characters-empty h2::after {
@@ -1682,9 +1680,8 @@
   padding-top: var(--space-3);
   padding-bottom: var(--space-3);
   margin-bottom: var(--space-4);
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-weight: 400;
+  font-family: var(--font-interface);
+  font-weight: 600;
 }
 
 :root .character-detail-section h2::after {
@@ -1795,9 +1792,8 @@
 :root .component-character-editor
   .skills-form-header
   > h2 {
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-weight: 400;
+  font-family: var(--font-interface);
+  font-weight: 600;
 }
 
 :root .character-editor-actions,
@@ -1941,9 +1937,8 @@
   position: relative;
   padding-top: var(--space-3);
   padding-bottom: var(--space-3);
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-weight: 400;
+  font-family: var(--font-interface);
+  font-weight: 600;
 }
 
 :root .settings-section h2::after {
@@ -1969,7 +1964,7 @@
 }
 
 :root .settings-export-import-help {
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
   font-size: var(--font-size-xs_5);
 }
 
@@ -2385,7 +2380,6 @@
 
 :root .component-hero-title {
   font-family: var(--font-narrative);
-  font-style: italic;
   font-weight: 500;
 }
 
@@ -2629,7 +2623,6 @@
 
 :root .component-ending-screen-hero-title {
   font-family: var(--font-narrative);
-  font-style: italic;
   font-weight: 500;
 }
 
@@ -3056,12 +3049,10 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 .character-detail-background-heading {
   margin: 0 0 var(--space-2);
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
   font-size: var(--font-size-2xs_5);
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
 .character-detail-background-text {
@@ -3267,9 +3258,9 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 }
 
 :root .component-world-card .component-hero-title {
+  font-family: var(--font-interface);
   font-size: var(--font-size-sm_5);
-  font-style: italic;
-  font-family: var(--font-narrative);
+  font-weight: 600;
 
   /* Long unbroken names break instead of bleeding into the next column */
   overflow-wrap: break-word;
@@ -3378,9 +3369,9 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   grid-column: 2;
   margin: 0;
   padding: 0;
-  font-family: var(--font-narrative);
-  font-style: italic;
+  font-family: var(--font-interface);
   font-size: var(--font-size-base);
+  font-weight: 600;
 }
 
 :root .component-character-card .character-card-meta {

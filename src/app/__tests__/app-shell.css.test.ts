@@ -85,5 +85,90 @@ describe('app-shell.css static checks', () => {
       expect(css).not.toMatch(bareBulletEyebrow);
     }
   });
-
 });
+
+import postcss, { Rule } from 'postcss';
+
+const HEADING_SELECTOR_REGEX = /\bh[1-4]\b|\.[\w-]+-(title|heading|name)\b/;
+
+function findItalicHeadingRules(cssContent: string, filepath = 'inline.css'): { file: string; selector: string }[] {
+  const root = postcss.parse(cssContent, { from: filepath });
+  const violations: { file: string; selector: string }[] = [];
+
+  root.walkRules((rule: Rule) => {
+    const hasItalic = rule.nodes?.some(
+      (node) => node.type === 'decl' && node.prop === 'font-style' && node.value.includes('italic')
+    );
+    if (!hasItalic) return;
+
+    let current: Rule | undefined = rule;
+    const selectors: string[] = [];
+    while (current && current.type === 'rule') {
+      selectors.unshift(current.selector);
+      current = current.parent as Rule | undefined;
+    }
+    const fullSelector = selectors.join(' ');
+
+    if (HEADING_SELECTOR_REGEX.test(fullSelector)) {
+      violations.push({
+        file: filepath,
+        selector: rule.selector.replace(/\s+/g, ' ').trim(),
+      });
+    }
+  });
+
+  return violations;
+}
+
+function getCssFiles(dirs: string[]): string[] {
+  const files: string[] = [];
+  for (const dir of dirs) {
+    if (!fs.existsSync(dir)) continue;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        files.push(...getCssFiles([fullPath]));
+      } else if (entry.isFile() && entry.name.endsWith('.css')) {
+        files.push(fullPath);
+      }
+    }
+  }
+  return files;
+}
+
+describe('heading typography static guards', () => {
+  const targetCssFiles = getCssFiles([
+    path.join(__dirname, '..'),
+    path.join(__dirname, '../../styles'),
+  ]);
+
+  it('does not declare font-style: italic on heading selectors in app or styles css', () => {
+    const rootDir = path.join(__dirname, '../../..');
+    const allViolations: { file: string; selector: string }[] = [];
+    for (const filepath of targetCssFiles) {
+      const css = fs.readFileSync(filepath, 'utf-8');
+      const violations = findItalicHeadingRules(css, path.relative(rootDir, filepath));
+      allViolations.push(...violations);
+    }
+
+    const violationMessages = allViolations.map(
+      (v) => `${v.file}: ${v.selector}`
+    );
+    expect(violationMessages).toEqual([]);
+  });
+
+  it('catches a multi-line heading selector with italic', () => {
+    const fixture = `:root .x\n > h2 {\n font-style: italic;\n}`;
+    const violations = findItalicHeadingRules(fixture, 'fixture.css');
+    expect(violations.length).toBe(1);
+    expect(violations[0].selector).toBe(':root .x > h2');
+  });
+
+  it('ignores prose emphasis', () => {
+    const fixture = `.text-narrative em { font-style: italic; }`;
+    const violations = findItalicHeadingRules(fixture, 'fixture.css');
+    expect(violations).toEqual([]);
+  });
+});
+
