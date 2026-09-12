@@ -26,6 +26,8 @@ const {
   dedupeByName,
   collectComponentImportSegments,
   findUncovered,
+  isProductActionFile,
+  findSuccessVerbActions,
 } = require('./ds-canon-lib.cjs');
 
 const ROOT = process.cwd();
@@ -77,6 +79,33 @@ const storybookViolations = findUncovered(inScopeNames, coveredNames, {
   grandfathered: baselineStorybook,
 }).map((name) => ({ name, file: inScopeByName.get(name) }));
 
+// --- Semantic: success must not be used for task/navigation verbs -----------
+//
+// Green (success) is reserved for confirmed completion states. The verbs below
+// are task-advancing or navigation — they belong on default/primary (ink-blue)
+// or outline/secondary, never on success. The check parses each product source
+// file and fails on any success-variant action whose label is one of those verbs.
+//
+// Covers all three public action paths:
+//   direct <Button variant="success">
+//   ActionButtonGroup actions: { variant: 'success', label: '...' }
+//   CardActionGroup primaryActions: { variant: 'success', text: '...' }
+//
+const srcFiles = glob.sync('src/**/*.{tsx,ts}', { cwd: ROOT, nodir: true });
+
+const successVerbViolations = [];
+
+for (const relPath of srcFiles) {
+  if (!isProductActionFile(relPath)) continue;
+
+  let content;
+  try { content = fs.readFileSync(path.join(ROOT, relPath), 'utf8'); } catch { continue; }
+
+  for (const label of findSuccessVerbActions(content, relPath)) {
+    successVerbViolations.push({ file: relPath, label });
+  }
+}
+
 // --- Report ------------------------------------------------------------------
 if (storybookViolations.length > 0) {
   console.error('Canon violation — in-scope component(s) without a Storybook story:');
@@ -87,9 +116,18 @@ if (storybookViolations.length > 0) {
   process.exit(1);
 }
 
+if (successVerbViolations.length > 0) {
+  console.error('Canon violation — success (green) variant used on navigation/task verbs (#2083):');
+  console.error('success is reserved for confirmed completion states. Play, Continue, Start, Create, and navigation shortcuts must use default (ink-blue), outline, or secondary.\n');
+  for (const v of successVerbViolations) console.error(` - "${v.label}" in ${v.file}`);
+  console.error('\nFix: change variant="success" to variant="default" (page primary), "outline" (shell shortcut), or "secondary" (per-card supporting action).');
+  process.exit(1);
+}
+
 const sbN = baselineStorybook.size;
 const excN = Object.keys(coverageExceptions).length;
 console.log(
   `Storybook canon OK — ${inScopeNames.length} in-scope component(s) checked ` +
   `(${sbN} grandfathered gap(s), ${excN} exception(s)).`,
 );
+console.log('Semantic success-verb check OK — no navigation/task verbs found on the success (green) variant.');

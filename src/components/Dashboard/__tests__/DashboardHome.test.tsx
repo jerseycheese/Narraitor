@@ -142,6 +142,35 @@ describe('DashboardHome', () => {
       // Should show next steps
       expect(screen.getByRole('button', { name: /start playing/i })).toBeInTheDocument();
     });
+
+    // One filled ink-blue CTA per rendered state. The recent-worlds and
+    // recent-character empty states offer the same routes as the guide, so they
+    // stay secondary and the guide's next step owns the primary.
+    it('renders one primary CTA when a world exists but no character does', () => {
+      (useCharacterStore as unknown as jest.Mock).mockImplementation(() => ({
+        characters: {},
+      }));
+
+      const { container } = render(<DashboardHome />);
+
+      expect(container.querySelectorAll('.button-default')).toHaveLength(1);
+      expect(
+        screen.getByRole('button', { name: /create a character/i })
+      ).toHaveClass('button-default');
+    });
+
+    it('renders one primary CTA when a character exists but no world does', () => {
+      (useWorldStore as unknown as jest.Mock).mockImplementation(() => ({
+        worlds: {},
+      }));
+
+      const { container } = render(<DashboardHome />);
+
+      expect(container.querySelectorAll('.button-default')).toHaveLength(1);
+      expect(
+        screen.getByRole('button', { name: /create your world/i })
+      ).toHaveClass('button-default');
+    });
   });
 
   describe('active session user state', () => {
@@ -163,10 +192,21 @@ describe('DashboardHome', () => {
       });
     });
 
-    it('shows continue card as primary CTA', () => {
+    it('shows continue card as the only primary CTA', () => {
+      const { container } = render(<DashboardHome />);
+
+      expect(
+        screen.getByRole('button', { name: /continue last game/i })
+      ).toHaveClass('button-default');
+      expect(container.querySelectorAll('.button-default')).toHaveLength(1);
+    });
+
+    it('does not render DashboardGettingStarted when a session is active — avoids a second competing primary', () => {
       render(<DashboardHome />);
 
-      expect(screen.getAllByRole('button', { name: /continue/i }).length).toBeGreaterThan(0);
+      // "Start Playing" / "Create Your World" only appear in the getting-started guide
+      expect(screen.queryByRole('button', { name: /start playing/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /getting started/i })).not.toBeInTheDocument();
     });
 
     it('renders exactly one page-level h1 (#1530)', () => {

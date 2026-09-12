@@ -207,21 +207,21 @@ export const CompleteShowcase: Story = {
             </div>
           </div>
 
-          {/* Semantic Action Buttons */}
+          {/* Semantic Action Examples */}
           <div className="ds-showcase-subsection">
-            <h3>Semantic Action Buttons</h3>
+            <h3>Semantic Action Examples</h3>
             <div className="ds-showcase-button-row">
-              <Button variant="success">Start Game</Button>
-              <Button variant="success">Create Character</Button>
-              <Button variant="success">Play World</Button>
-              <Button variant="success">Continue</Button>
-              <Button>Edit</Button>
-              <Button variant="destructive">Delete</Button>
+              <Button variant="default">Play in World</Button>
+              <Button variant="secondary">Edit</Button>
+              <Button variant="outline">Play (header shortcut)</Button>
+              <Button variant="destructive-outline">Delete</Button>
             </div>
             <p className="ds-showcase-description">
-              Green buttons (success variant) are used for forward momentum
-              actions like starting games or creating content. They provide
-              4.6:1 contrast ratio for WCAG AA compliance.
+              Each rendered state has exactly one filled ink-blue CTA
+              (default/primary). Green (success) is reserved for confirmed
+              completion states — never for Play, Continue, Create, or
+              navigation shortcuts. Header Play is outline because the page
+              below it owns the real primary.
             </p>
           </div>
         </div>

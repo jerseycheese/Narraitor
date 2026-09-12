@@ -39,7 +39,7 @@ export const WorldCardActions: Story = {
         key: 'play',
         text: 'Play',
         onClick: () => console.log('Play clicked'),
-        variant: 'success',
+        variant: 'secondary',
         flex: true,
       },
     ],
@@ -79,7 +79,7 @@ export const CharacterCardActions: Story = {
         key: 'play',
         text: 'Play',
         onClick: () => console.log('Play as character clicked'),
-        variant: 'success',
+        variant: 'secondary',
       },
       {
         key: 'edit',
@@ -117,7 +117,7 @@ export const InCardContext: Story = {
             key: 'play',
             text: 'Play',
             onClick: () => console.log('Play'),
-            variant: 'success',
+            variant: 'secondary',
             flex: true,
           },
         ]}

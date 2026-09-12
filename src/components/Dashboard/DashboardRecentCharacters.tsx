@@ -37,7 +37,7 @@ export function DashboardRecentCharacters({
         <h2>Recent Characters</h2>
         <div className="dashboard-recent-empty-state">
           <p>No characters yet</p>
-          <Button onClick={() => onNavigate('/characters')} variant="default">
+          <Button onClick={() => onNavigate('/characters')} variant="secondary">
             <Plus aria-hidden="true" />
             Create Your First Character
           </Button>

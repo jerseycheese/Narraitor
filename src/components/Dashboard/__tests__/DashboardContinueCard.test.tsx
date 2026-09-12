@@ -87,6 +87,24 @@ describe('DashboardContinueCard', () => {
     expect(mockOnContinue).toHaveBeenCalledWith(mockSession.id);
   });
 
+  it('renders Continue Last Game with the ink-blue primary variant, not green success', () => {
+    render(
+      <DashboardContinueCard
+        session={mockSession}
+        world={mockWorld}
+        character={mockCharacter}
+        onContinue={mockOnContinue}
+        onDelete={mockOnDelete}
+      />
+    );
+
+    const continueButton = screen.getByRole('button', { name: /continue last game/i });
+    // ActionButtonGroup maps 'default' → button-default: the card owns the one
+    // filled CTA in the active-session dashboard.
+    expect(continueButton).toHaveClass('button-default');
+    expect(continueButton).not.toHaveClass('button-success');
+  });
+
   it('shows delete confirmation dialog when delete clicked', async () => {
     const user = userEvent.setup();
 

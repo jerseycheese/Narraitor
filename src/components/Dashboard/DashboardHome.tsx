@@ -157,13 +157,17 @@ export function DashboardHome() {
         onNavigate={handleNavigate}
       />
 
-      {/* Getting Started Guide */}
-      <DashboardGettingStarted
-        hasWorlds={metrics.worldsCreated > 0}
-        hasCharacters={metrics.charactersCreated > 0}
-        hasSessions={metrics.sessionsPlayed > 0}
-        onNavigate={handleNavigate}
-      />
+      {/* Getting Started Guide — only for returning users without an active session.
+          When a session is present, DashboardContinueCard is the primary CTA
+          and this guide would add a competing ink-blue button. */}
+      {dashboardState !== 'active-session' && (
+        <DashboardGettingStarted
+          hasWorlds={metrics.worldsCreated > 0}
+          hasCharacters={metrics.charactersCreated > 0}
+          hasSessions={metrics.sessionsPlayed > 0}
+          onNavigate={handleNavigate}
+        />
+      )}
     </main>
   );
 }

@@ -502,7 +502,10 @@ export default function CharactersPage() {
         />
       )}
 
-      {mounted && currentWorld && (
+      {/* An empty roster has nothing to switch views on, and the empty state
+          below already offers both Create and Generate, so the toolbar would
+          only repeat itself. */}
+      {mounted && currentWorld && worldCharacters.length > 0 && (
         <div className="characters-toolbar">
           <CharacterViewToggle
             mode={viewMode}
@@ -532,6 +535,8 @@ export default function CharactersPage() {
                 {
                   label: 'Create Character',
                   onClick: handleCreateCharacter,
+                  // The one filled CTA for this state: with an empty roster the
+                  // toolbar above doesn't render.
                   variant: 'primary',
                   size: 'lg',
                 },

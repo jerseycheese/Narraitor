@@ -204,7 +204,7 @@ export function CharacterCard({
                 key: 'play',
                 text: 'Play',
                 onClick: onPlay,
-                variant: 'success',
+                variant: 'secondary',
                 flex: true,
                 icon: <Play aria-hidden="true" />,
               },

@@ -109,6 +109,16 @@ describe('WorldCard', () => {
     setCurrentWorldSpy.mockRestore();
   });
 
+  // One-primary-per-state: page-level Create is the primary on the worlds list;
+  // per-card Play must be secondary so it doesn't compete.
+  test('Play button is not the green success variant — page Create is the primary', () => {
+    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+
+    const playButton = screen.getByTestId('world-card-actions-play-button');
+    expect(playButton).toHaveClass('card-action-variant-secondary');
+    expect(playButton).not.toHaveClass('card-action-variant-success');
+  });
+
   // Test for character avatar pill styling
   test('character avatar buttons use design system classes', () => {
     const mockCharacter = {

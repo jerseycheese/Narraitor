@@ -36,15 +36,18 @@ export interface CardActionGroupProps {
 
 /**
  * CardActionGroup - Handles button layouts for card actions
- * 
- * @example
+ *
+ * Each rendered state must have exactly one filled ink-blue primary CTA. On list
+ * pages the page-level Create action is that primary; per-card Play is secondary.
+ * On detail pages Play is primary and Edit is secondary.
+ *
+ * @example List page (worlds list, characters list)
  * <CardActionGroup
  *   primaryActions={[
- *     { key: 'create', text: 'Create Character', onClick: handleCreate, variant: 'primary', flex: true },
- *     { key: 'play', text: 'Play', onClick: handlePlay, variant: 'success', flex: true }
+ *     { key: 'make-active', text: 'Make Active', onClick: handleMakeActive, variant: 'secondary', flex: true },
+ *     { key: 'play', text: 'Play', onClick: handlePlay, variant: 'secondary', flex: true }
  *   ]}
  *   secondaryActions={[
- *     { key: 'view', text: 'View', onClick: handleView },
  *     { key: 'edit', text: 'Edit', onClick: handleEdit },
  *     { key: 'delete', text: 'Delete', onClick: handleDelete, variant: 'danger' }
  *   ]}

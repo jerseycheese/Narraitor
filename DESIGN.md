@@ -140,6 +140,8 @@ DS3 is aged-paper canvas with a single ink accent, drafted over a dot grid — t
 ### Usage rules
 
 - **One accent per view.** The screen has exactly one primary action emphasized in `accent`. Secondary actions use `surface-hover` (secondary button) or `transparent` (ghost button). Two solid-accent buttons on the same screen is wrong.
+- **One primary CTA per rendered state.** Each discrete rendered state (dashboard with active session, dashboard without session, worlds list, world detail, character detail, ending screen) has exactly one filled ink-blue button (`variant="default"` or `variant="primary"`). All other task-triggering controls are `secondary`, `outline`, or absent. "Rendered state" means a concrete, user-visible condition — not just a route.
+- **`success` (green) is for confirmed completion only.** Use it for genuine end-states: "Story Complete", "Session Saved", a modal confirm button that acknowledges a completed action. Never for Play, Continue, Create, Start, New Story, or any navigation shortcut. When Play or Continue is the page primary, it renders as `default` (ink-blue). When the header carries a Play shortcut that sits above a page owning its own primary, that shortcut is `outline`.
 - **Never use `text-muted` for narrative or instructional content.** It's reserved for genuinely de-emphasized metadata and the drafting marks.
 - **Status colors are for status, not decoration.** Don't use `success` green to make something feel "fresh" or `danger` red to make something feel urgent if no error has occurred.
 - **Lore and ending-tone colors** (`--lore-*`, `--ending-*` tokens in the theme files) are for tagging story content, not general UI. Don't use them on buttons or controls.
@@ -347,6 +349,8 @@ The don'ts here come from real failures during the design-system migration. They
 - **Don't use `!important` to override theme values.** If you need to override, you're fighting the system — fix the token instead.
 - **Don't add a token without a fallback thought through.** There's one theme file now (`ds3.css`); a missing variable silently falls back to undefined and breaks layout the same way a missing DS2 token used to.
 - **Don't put two solid-accent (primary) buttons on the same screen.** One primary action per view. Secondary actions go in `secondary`, `outline`, or `ghost`.
+- **Don't put two filled ink-blue buttons in the same rendered state.** "Rendered state" is a user-visible condition, not just a route. The dashboard with an active session is one state; the dashboard without one is another. Each gets exactly one `default`/`primary` CTA.
+- **Don't use `success` (green) for Play, Continue, Create, Start, or navigation shortcuts.** Green means confirmed completion — a state that has already happened, not a task the user is about to start. Play and Continue are ink-blue (`default`) when they are the page primary, `outline` when they are shell shortcuts, and `secondary` when per-card actions sit alongside a page-level primary.
 - **Don't use `text-muted` for narrative or instructional content.** It fails the legibility bar for anything users actually need to read.
 - **Don't ship a component that hasn't been verified in Storybook.** There's one design system to check now, not three, but light/dark and mobile/tablet/desktop still both need a look via the toolbar.
 - **Don't add per-world theming.** DS3 is fixed, not genre-driven, and was never meant to flex per world. Adding a `world.theme` field is scope creep with no demand.

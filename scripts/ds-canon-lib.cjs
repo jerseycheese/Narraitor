@@ -6,6 +6,12 @@
 //
 // Mirrors the route-validation.js / validate-routes.js split (issue #420).
 
+const ts = require('typescript');
+
+// Task-advancing / navigation verbs. These move the player through the app, so
+// they belong on default, outline or secondary — never on success.
+const TASK_VERB_RE = /\b(?:Play|Continue|Start|Create|Begin)\b|\bNew\s+Story\b/i;
+
 // A component file is "storyable" (in scope as a standalone catalog entry) only
 // if it's a real component module — not a test, a story, or a barrel index.
 const NON_COMPONENT_RE = /(\.test\.|\.stories\.|(^|[/\\])index\.)/;
@@ -68,10 +74,126 @@ function dedupeByName(relPaths) {
   return byName;
 }
 
+// The success-verb check polices product surfaces. Tests assert the wrong
+// variants on purpose, and the "Wrong…" anti-pattern stories have to render a
+// green Play for the rule to be legible, so both are out of scope.
+function isProductActionFile(relPath) {
+  const normalized = relPath.replace(/\\/g, '/');
+  if (normalized.includes('__tests__') || normalized.includes('.test.')) return false;
+  if (normalized.startsWith('src/stories/') || normalized.includes('.stories.')) return false;
+  return true;
+}
+
+function getStringLiteralValue(node) {
+  if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) {
+    return node.text;
+  }
+  return null;
+}
+
+function getPropertyName(node) {
+  if (ts.isIdentifier(node) || ts.isStringLiteral(node)) return node.text;
+  return null;
+}
+
+function getJsxAttributeValue(attribute) {
+  if (!attribute.initializer) return null;
+  if (ts.isStringLiteral(attribute.initializer)) return attribute.initializer.text;
+  if (ts.isJsxExpression(attribute.initializer) && attribute.initializer.expression) {
+    return getStringLiteralValue(attribute.initializer.expression);
+  }
+  return null;
+}
+
+// The visible label of a button: its JSX text plus any string literals its
+// children render. Icons are self-closing elements and contribute nothing, so
+// <Button variant="success"><Play />Play</Button> still reads as "Play".
+function collectRenderedStrings(node, values) {
+  if (ts.isJsxText(node)) {
+    const value = node.text.trim();
+    if (value) values.push(value);
+    return;
+  }
+
+  if (ts.isJsxElement(node) || ts.isJsxFragment(node)) {
+    for (const child of node.children) collectRenderedStrings(child, values);
+    return;
+  }
+
+  if (ts.isJsxSelfClosingElement(node)) return;
+
+  const literalValue = getStringLiteralValue(node);
+  if (literalValue) {
+    values.push(literalValue);
+    return;
+  }
+
+  ts.forEachChild(node, (child) => collectRenderedStrings(child, values));
+}
+
+// Returns the labels of every success-variant action whose label is a task verb,
+// across all three action APIs: a direct <Button variant="success">, an
+// ActionButtonGroup action ({ variant, label }) and a CardActionGroup action
+// ({ variant, text }). Parsing beats regex here because an action object may
+// carry an arrow-function onClick, and a Button may wrap its label in an icon —
+// both of which a flat pattern walks straight past.
+function findSuccessVerbActions(source, relPath = 'source.tsx') {
+  const sourceFile = ts.createSourceFile(
+    relPath,
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX
+  );
+  const labels = [];
+
+  function visit(node) {
+    if (ts.isObjectLiteralExpression(node)) {
+      let variant = null;
+      let label = null;
+
+      for (const property of node.properties) {
+        if (!ts.isPropertyAssignment(property)) continue;
+        const propertyName = getPropertyName(property.name);
+        if (propertyName === 'variant') variant = getStringLiteralValue(property.initializer);
+        if (propertyName === 'label' || propertyName === 'text') {
+          label = getStringLiteralValue(property.initializer);
+        }
+      }
+
+      if (variant === 'success' && label && TASK_VERB_RE.test(label)) labels.push(label);
+    }
+
+    if (ts.isJsxElement(node)) {
+      const opening = node.openingElement;
+      if (opening.tagName.getText(sourceFile) === 'Button') {
+        const variantAttribute = opening.attributes.properties.find(
+          (attribute) =>
+            ts.isJsxAttribute(attribute) && attribute.name.getText(sourceFile) === 'variant'
+        );
+
+        if (variantAttribute && getJsxAttributeValue(variantAttribute) === 'success') {
+          const renderedStrings = [];
+          for (const child of node.children) collectRenderedStrings(child, renderedStrings);
+          const label = renderedStrings.join(' ').replace(/\s+/g, ' ').trim();
+          if (label && TASK_VERB_RE.test(label)) labels.push(label);
+        }
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return labels;
+}
+
 module.exports = {
   isStoryableComponentFile,
   componentNameFromPath,
   collectComponentImportSegments,
   findUncovered,
   dedupeByName,
+  isProductActionFile,
+  findSuccessVerbActions,
 };
