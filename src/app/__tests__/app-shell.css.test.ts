@@ -88,7 +88,7 @@ describe('app-shell.css static checks', () => {
   });
 });
 
-const HEADING_SELECTOR_REGEX = /\bh[1-4]\b|\.[a-zA-Z0-9_-]*(?:title|heading|name)(?![a-zA-Z0-9_-])/i;
+const HEADING_SELECTOR_REGEX = /\bh[1-4]\b|\.(?:[a-zA-Z0-9_-]+-)?(?:title|heading|subheading|name)(?![a-zA-Z0-9_-])/;
 
 function findItalicHeadingRules(cssContent: string, filepath = 'inline.css'): { file: string; selector: string }[] {
   const root = postcss.parse(cssContent, { from: filepath });
@@ -184,6 +184,12 @@ describe('heading typography static guards', () => {
 
   it('does not false-positive on heading wrapper classes', () => {
     const fixture = `.component-hero-title-wrapper { font-style: italic; }`;
+    const violations = findItalicHeadingRules(fixture, 'fixture.css');
+    expect(violations).toEqual([]);
+  });
+
+  it('does not false-positive on words ending in title, name, or heading without hyphen', () => {
+    const fixture = `.username, .filename, .subtitle { font-style: italic; }`;
     const violations = findItalicHeadingRules(fixture, 'fixture.css');
     expect(violations).toEqual([]);
   });

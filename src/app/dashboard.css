@@ -653,10 +653,13 @@
   border-radius: 0;
 }
 
-:root .dashboard-progress-stat-label,
+:root .dashboard-progress-stat-label {
+  font-family: var(--font-system);
+}
+
 :root .dashboard-recent-item span,
 :root .dashboard-recent-item p {
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
 }
 
 :root .dashboard-progress-stat-value span {

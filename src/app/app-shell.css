@@ -64,33 +64,21 @@
 }
 
 .app-surface-app h1 {
-  font-family: var(--font-narrative);
-  font-weight: 500;
-  font-style: normal;
   font-size: 2rem;
   line-height: 1.2;
 }
 
 .app-surface-app h2 {
-  font-family: var(--font-interface);
-  font-weight: 600;
-  font-style: normal;
   font-size: var(--font-size-xl);
   line-height: 1.25;
 }
 
 .app-surface-app h3 {
-  font-family: var(--font-interface);
-  font-weight: 600;
-  font-style: normal;
   font-size: var(--font-size-md);
   line-height: 1.35;
 }
 
 .app-surface-app h4 {
-  font-family: var(--font-interface);
-  font-weight: 600;
-  font-style: normal;
   font-size: var(--font-size-base);
   line-height: 1.4;
 }
