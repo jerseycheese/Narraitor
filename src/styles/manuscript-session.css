@@ -1409,7 +1409,7 @@ body.manuscript-overlay-open {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--color-text-muted);
-  font-family: var(--font-system), ui-monospace, monospace;
+  font-family: var(--font-interface);
 }
 
 .manuscript-character-summary-list {
@@ -1457,7 +1457,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-inventory-category-title {
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
   font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
@@ -2027,7 +2027,7 @@ body.manuscript-overlay-open {
 
 .manuscript-hud-panel-title {
   margin: 0 0 var(--space-2);
-  font-family: var(--font-system), ui-monospace, monospace;
+  font-family: var(--font-interface);
   font-size: var(--font-size-2xs_5);
   font-weight: 400;
   letter-spacing: 0.05em;

@@ -626,7 +626,7 @@
 }
 
 .mobile-nav-section-title {
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
   font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
