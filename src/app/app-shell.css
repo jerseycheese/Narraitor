@@ -2127,12 +2127,10 @@
 }
 
 .journal-entry-detail h4 {
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-text-muted);
+  color: var(--color-text-primary);
   margin: 0 0 var(--space-2);
 }
 
@@ -2177,7 +2175,7 @@
 
 /* Per-entry AI image generation (#975).
    The "Entry Image" heading renders as an h4 and inherits the shared
-   .journal-entry-detail h4 label styling. */
+   .journal-entry-detail h4 heading styling. */
 .journal-entry-image-preview {
   display: flex;
   flex-direction: column;

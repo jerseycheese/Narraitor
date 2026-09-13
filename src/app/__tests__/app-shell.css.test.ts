@@ -122,7 +122,7 @@ function findItalicHeadingRules(cssContent: string, filepath = 'inline.css'): { 
   return violations;
 }
 
-const DATA_LABEL_REGEX = /(?:data|meta|metric|stat|snapshot|jumplist|label|detail\s+h[3-4])/i;
+const DATA_LABEL_REGEX = /(?:data|meta|metric|stat|snapshot|jumplist|label|badge|allocation)/i;
 
 function findBulletOrDotHeadingRules(
   cssContent: string,
@@ -172,47 +172,124 @@ function findBulletOrDotHeadingRules(
   return violations;
 }
 
+interface SelectorHeadingState {
+  selector: string;
+  hasMono: boolean;
+  hasUppercase: boolean;
+  declaresNonMono: boolean;
+  declaresNonUppercase: boolean;
+  file: string;
+}
+
+interface CascadeTrackingState {
+  selectorMap: Map<string, SelectorHeadingState>;
+  tagMap: Map<string, string>;
+}
+
 function findMonoUppercaseHeadingRules(
   cssContent: string,
-  filepath = 'inline.css'
+  filepath = 'inline.css',
+  sharedState?: CascadeTrackingState
 ): { file: string; selector: string }[] {
   const root = postcss.parse(cssContent, { from: filepath });
-  const violations: { file: string; selector: string }[] = [];
+  const state: CascadeTrackingState = sharedState || {
+    selectorMap: new Map(),
+    tagMap: new Map(),
+  };
+  const { selectorMap, tagMap } = state;
 
   root.walkRules((rule: Rule) => {
     if (rule.selector.includes('::before') || rule.selector.includes('::after')) return;
 
     let current: Rule | undefined = rule;
-    const selectors: string[] = [];
+    const parentSelectors: string[] = [];
     while (current && current.type === 'rule') {
-      selectors.unshift(current.selector);
+      parentSelectors.unshift(current.selector);
       current = current.parent as Rule | undefined;
     }
-    const fullSelector = selectors.join(' ');
+    const rawFull = parentSelectors.join(' ');
 
-    if (!HEADING_SELECTOR_REGEX.test(fullSelector)) return;
-    if (DATA_LABEL_REGEX.test(fullSelector)) return;
+    for (const sel of rawFull.split(',')) {
+      const normalized = sel
+        .replace(/^:root\s+/, '')
+        .replace(/\s+/g, ' ')
+        .trim();
 
-    const hasMono = rule.nodes?.some(
-      (node) =>
-        node.type === 'decl' &&
-        ((node.prop === 'font-family' && /(?:--font-system|--font-mono|monospace)/.test(node.value)) ||
-          (node.prop === 'font' && /(?:--font-system|--font-mono|monospace)/.test(node.value)))
-    );
-    const hasUppercase = rule.nodes?.some(
-      (node) =>
-        node.type === 'decl' &&
-        node.prop === 'text-transform' &&
-        node.value.includes('uppercase')
-    );
+      if (!HEADING_SELECTOR_REGEX.test(normalized)) continue;
+      if (DATA_LABEL_REGEX.test(normalized)) continue;
+      if (normalized.includes('devtools')) continue;
 
-    if (hasMono && hasUppercase) {
-      violations.push({
+      const declaresMono = rule.nodes?.some(
+        (node) =>
+          node.type === 'decl' &&
+          ((node.prop === 'font-family' && /(?:--font-system|--font-mono|monospace)/.test(node.value)) ||
+            (node.prop === 'font' && /(?:--font-system|--font-mono|monospace)/.test(node.value)))
+      );
+      const declaresUppercase = rule.nodes?.some(
+        (node) =>
+          node.type === 'decl' &&
+          node.prop === 'text-transform' &&
+          node.value.includes('uppercase')
+      );
+      const declaresNonMono = rule.nodes?.some(
+        (node) =>
+          node.type === 'decl' &&
+          ((node.prop === 'font-family' && /(?:--font-interface|--font-narrative)/.test(node.value)) ||
+            (node.prop === 'font' && /(?:--font-interface|--font-narrative)/.test(node.value)))
+      );
+      const declaresNonUppercase = rule.nodes?.some(
+        (node) =>
+          node.type === 'decl' &&
+          node.prop === 'text-transform' &&
+          node.value.includes('none')
+      );
+
+      if (!declaresMono && !declaresUppercase && !declaresNonMono && !declaresNonUppercase) continue;
+
+      const entry = selectorMap.get(normalized) || {
+        selector: normalized,
+        hasMono: false,
+        hasUppercase: false,
+        declaresNonMono: false,
+        declaresNonUppercase: false,
         file: filepath,
-        selector: rule.selector.replace(/\s+/g, ' ').trim(),
-      });
+      };
+
+      if (declaresMono) entry.hasMono = true;
+      if (declaresNonMono) {
+        entry.hasMono = false;
+        entry.declaresNonMono = true;
+      }
+      if (declaresUppercase) entry.hasUppercase = true;
+      if (declaresNonUppercase) {
+        entry.hasUppercase = false;
+        entry.declaresNonUppercase = true;
+      }
+      selectorMap.set(normalized, entry);
+
+      const matchTag = normalized.match(/(?:^|\s)(h[1-4])$/);
+      if (matchTag) {
+        const tag = matchTag[1];
+        if (declaresMono) tagMap.set(tag + ':mono', filepath);
+        if (declaresUppercase) tagMap.set(tag + ':uppercase', filepath);
+      }
     }
   });
+
+  const violations: { file: string; selector: string }[] = [];
+  for (const [selector, entry] of selectorMap.entries()) {
+    const matchTag = selector.match(/(?:^|\s)(h[1-4])$/);
+    const tag = matchTag ? matchTag[1] : null;
+    const inheritsMono = Boolean(tag && tagMap.has(tag + ':mono') && !entry.declaresNonMono);
+    const inheritsUppercase = Boolean(tag && tagMap.has(tag + ':uppercase') && !entry.declaresNonUppercase);
+
+    if ((entry.hasMono || inheritsMono) && (entry.hasUppercase || inheritsUppercase)) {
+      violations.push({
+        file: entry.file,
+        selector,
+      });
+    }
+  }
 
   return violations;
 }
@@ -347,7 +424,7 @@ describe('heading typography static guards', () => {
     const fixture = `:root .card\n > h2 {\n font-family: var(--font-system);\n text-transform: uppercase;\n}`;
     const violations = findMonoUppercaseHeadingRules(fixture, 'fixture.css');
     expect(violations.length).toBe(1);
-    expect(violations[0].selector).toBe(':root .card > h2');
+    expect(violations[0].selector).toBe('.card > h2');
   });
 
   it('catches named classes such as .wizard-subheading with mono-uppercase or bullet', () => {
@@ -386,6 +463,48 @@ describe('heading typography static guards', () => {
       }
     `;
     const violations = findBulletOrDotHeadingRules(fixture, 'fixture.css');
+    expect(violations).toEqual([]);
+  });
+
+  it('catches a heading selector where mono and uppercase are declared in separate rules across the cascade', () => {
+    const fixture = `
+      .card h2 { font-family: var(--font-system); }
+      :root .card h2 { text-transform: uppercase; }
+    `;
+    const violations = findMonoUppercaseHeadingRules(fixture, 'fixture.css');
+    expect(violations.length).toBe(1);
+    expect(violations[0].selector).toBe('.card h2');
+  });
+
+  it('catches a heading where base tag has mono and nested rule declares uppercase', () => {
+    const fixture = `
+      h2 { font-family: var(--font-system); }
+      .card h2 { text-transform: uppercase; }
+    `;
+    const violations = findMonoUppercaseHeadingRules(fixture, 'fixture.css');
+    expect(violations.some((v) => v.selector === '.card h2' || v.selector === 'h2')).toBe(true);
+  });
+
+  it('catches mono-uppercase on journal detail h4 (no broad exemption)', () => {
+    const fixture = `
+      .journal-entry-detail h4 {
+        font-family: var(--font-system);
+        text-transform: uppercase;
+      }
+    `;
+    const violations = findMonoUppercaseHeadingRules(fixture, 'fixture.css');
+    expect(violations.length).toBe(1);
+    expect(violations[0].selector).toBe('.journal-entry-detail h4');
+  });
+
+  it('does not flag heading where uppercase is declared but font is explicitly DM Sans (non-mono)', () => {
+    const fixture = `
+      .mobile-nav-section-title {
+        font-family: var(--font-interface);
+        text-transform: uppercase;
+      }
+    `;
+    const violations = findMonoUppercaseHeadingRules(fixture, 'fixture.css');
     expect(violations).toEqual([]);
   });
 });
