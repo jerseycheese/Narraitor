@@ -279,7 +279,7 @@ DS3's decorative vocabulary is one family of ink marks, not a set of unrelated o
 | Registration cross | A bracket promoted to a full trim mark | One per surface, in accent |
 | Dimension ticks | 1px ticks tiled along a top edge at 12px pitch | Detail-section top edge only |
 | Perforated dotted rule | `radial-gradient` dots at `12px 4px` | Section dividers, under headings |
-| Bullet eyebrow | Mono-uppercase label prefixed with a bullet | Above a heading |
+| Data eyebrow | Compact data label | Above or beside genuine data values (World, Character, Last Played, metrics), never headings |
 
 The brackets are the root. A corner bracket and a registration cross are the same referent, which is why the family grew out of them rather than being invented beside them. The bracket isn't drawn the same everywhere, though: list cards (`.component-world-card`, `.component-character-card`, the dashboard cards) get the full two-corner treatment, `::before` (top-left) paired with `::after` (bottom-right) in [app-shell.css](src/app/app-shell.css) and [dashboard.css](src/app/dashboard.css). Detail-page data cards (`.world-detail-npc`, `.world-detail-stat`, `.world-detail-meta-grid .component-data-field`) and detail sections (`.world-detail-section`, `.character-detail-section`) get a single top-left `::before` bracket only — their `::after` is spent on dimension ticks instead of a second bracket (see below), so a detail section carries one corner mark plus a tick band, not two corner marks. The play surface's `.choice-outcome-callout`, carved into the left page gutter at >=1280px ([manuscript-session.css](src/styles/manuscript-session.css)), is the same single top-left bracket applied to marginalia rather than a card — it identifies the mark as annotation rather than decoration, matching the weight rule below rather than the DS3 card chrome (border, fill, shadow) the callout carries in its in-flow, sub-1280px form.
 
@@ -295,7 +295,7 @@ Marks with arms share `--mark-arm-length` (`10px`, [_shared-tokens.css](src/lib/
 ### The attachment rule
 
 - Marks attach to **cards and detail sections**.
-- **Never the wizard.** It already carries ten dotted rules and six bullet eyebrows — the most decorated surface in the app. A fourth family there is noise.
+- **Never the wizard.** It already carries ten dotted rules — the most decorated surface in the app. A fourth family there is noise.
 - **Never full-bleed.** Marks are figure and the dot grid is ground. A mark that tiles the page stops being figure and becomes a second ground.
 - **Ticks are section-only.** A tick band repeated across a dense card grid drowns the dot grid.
 - Any mark that offsets past its element's edge must check for `overflow: hidden` on that element first. The dashboard continue card clips to contain its world-image background layer, so its registration cross sits inside the corner rather than straddling it.

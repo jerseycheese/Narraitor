@@ -3,9 +3,8 @@ import Link from 'next/link';
 
 /**
  * LegalPage — shared layout for the lightweight privacy/terms surfaces (#1366).
- * Token-driven server component. Structural treatment (mono labels with a dot
- * bullet, compact) lives in src/app/legal.css under .component-legal*
- * selectors (mirrors the About/dashboard pattern).
+ * Token-driven server component. Structural treatment lives in src/app/legal.css
+ * under .component-legal* selectors (mirrors the About/dashboard pattern).
  */
 
 interface LegalPageProps {
@@ -22,7 +21,6 @@ export function LegalPage({ title, lead, updated, children }: LegalPageProps) {
   return (
     <div className="component-legal">
       <header className="component-legal-hero">
-        <p className="component-legal-eyebrow">Narraitor</p>
         <h1 className="component-legal-title">{title}</h1>
         <p className="component-legal-lead">{lead}</p>
         <p className="component-legal-updated">Last updated {updated}</p>

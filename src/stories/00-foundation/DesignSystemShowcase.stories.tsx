@@ -522,13 +522,12 @@ export const CompleteShowcase: Story = {
               <h2>Section heading</h2>
             </div>
             <p className="ds-showcase-mark-name">
-              Dimension ticks, dotted rule, bullet eyebrow
+              Dimension ticks, dotted rule
             </p>
             <p className="ds-showcase-mark-where">
               Ticks measure the section&rsquo;s top edge at the dotted rule&rsquo;s own 12px
-              pitch. The perforated rule sits under the heading, the bullet eyebrow above it.
-              Detail sections only: a tick band repeated across a dense card grid drowns the
-              dot grid.
+              pitch. The perforated rule sits under the heading. Detail sections only: a tick
+              band repeated across a dense card grid drowns the dot grid.
             </p>
           </div>
         </div>

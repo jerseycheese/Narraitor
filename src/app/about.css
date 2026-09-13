@@ -256,46 +256,13 @@
 
 /* ═══════════════════════════════════════════════════════════════
    DS3 — "Mechanical Manuscript"
-   Compact: corner-bracket step cards, tighter gaps, medium radius, mono
-   section labels with a dot bullet. Dot-grid field comes from the
-   app-surface root (app-shell.css), not defined per-page — see ds3.css
-   --pattern-dot-grid-image.
+   Compact: corner-bracket step cards, tighter gaps, medium radius.
+   Dot-grid field comes from the app-surface root (app-shell.css),
+   not defined per-page — see ds3.css --pattern-dot-grid-image.
    ═══════════════════════════════════════════════════════════════ */
 
 :root .component-about {
   gap: var(--space-6);
-}
-
-:root .component-about-section-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs_5);
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
-
-/* The CTA is the one section whose band is a --color-accent-soft fill rather
-   than canvas, and secondary ink only reaches 3.85:1 on it. accent-strong is
-   the token that exists for small text over that fill. */
-:root .component-about-cta .component-about-section-title {
-  color: var(--color-accent-strong);
-}
-
-/* About spends its accent on the CTA button, so the eyebrow dots stay in mark
-   ink. That holds on the CTA band too, where the label goes accent-strong for
-   text contrast a decorative 6px dot doesn't need. */
-:root .component-about-section-title::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--color-text-muted);
-  flex-shrink: 0;
 }
 
 :root .component-about-lead {

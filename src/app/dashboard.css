@@ -586,38 +586,6 @@
   background: transparent;
 }
 
-:root .component-dashboard-progress-card h2,
-:root .component-dashboard-continue-card h2,
-:root .component-dashboard-recent-worlds h2,
-:root .component-dashboard-recent-characters h2,
-:root .component-dashboard-getting-started h2 {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
-
-/* Canonical DS3 dot bullet, in the mark ink the whole drafting-marks family uses
-   and rhyming with the dot-grid background. The dashboard spends its one accent
-   mark on the continue card's registration cross, so these stay quiet. */
-:root .component-dashboard-progress-card h2::before,
-:root .component-dashboard-continue-card h2::before,
-:root .component-dashboard-recent-worlds h2::before,
-:root .component-dashboard-recent-characters h2::before,
-:root .component-dashboard-getting-started h2::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--color-text-muted);
-  flex-shrink: 0;
-}
 
 /* Recent rows: tight monospace, no radius, hairline rules between. */
 :root .dashboard-recent-list {
@@ -760,28 +728,6 @@
   border: 1px dotted var(--color-border);
 }
 
-:root .world-list-empty-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs_5);
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
-
-:root .world-list-empty-title::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--color-text-muted);
-  flex-shrink: 0;
-}
-
 :root .world-list-empty-lede {
   font-family: var(--font-narrative);
   font-size: var(--font-size-lg);
@@ -792,15 +738,6 @@
   border-radius: var(--radius-sm);
   border: 1px dotted var(--color-border);
   padding: var(--space-4) var(--space-5);
-}
-
-:root .world-list-empty-guide-heading {
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
 }
 
 :root .world-list-empty-guide-steps {

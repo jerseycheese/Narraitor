@@ -122,6 +122,101 @@ function findItalicHeadingRules(cssContent: string, filepath = 'inline.css'): { 
   return violations;
 }
 
+const DATA_LABEL_REGEX = /(?:data|meta|metric|stat|snapshot|jumplist|label|detail\s+h[3-4])/i;
+
+function findBulletOrDotHeadingRules(
+  cssContent: string,
+  filepath = 'inline.css'
+): { file: string; selector: string; reason: string }[] {
+  const root = postcss.parse(cssContent, { from: filepath });
+  const violations: { file: string; selector: string; reason: string }[] = [];
+
+  root.walkRules((rule: Rule) => {
+    if (!rule.selector.includes('::before') && !rule.selector.includes('::after')) return;
+
+    let current: Rule | undefined = rule;
+    const selectors: string[] = [];
+    while (current && current.type === 'rule') {
+      selectors.unshift(current.selector);
+      current = current.parent as Rule | undefined;
+    }
+    const fullSelector = selectors.join(' ');
+    const baseSelector = fullSelector.replace(/::(before|after)[^,\s]*/g, '');
+
+    if (!HEADING_SELECTOR_REGEX.test(baseSelector)) return;
+    if (DATA_LABEL_REGEX.test(baseSelector)) return;
+
+    // Bullet text or circular dot bullet on pseudo-element
+    const hasBulletText = rule.nodes?.some(
+      (node) =>
+        node.type === 'decl' &&
+        node.prop === 'content' &&
+        /•|\\2022/.test(node.value)
+    );
+    const hasDot = rule.nodes?.some(
+      (node) =>
+        node.type === 'decl' &&
+        node.prop === 'border-radius' &&
+        /full|50%|\d+px/.test(node.value)
+    );
+
+    if (hasBulletText || hasDot) {
+      violations.push({
+        file: filepath,
+        selector: rule.selector.replace(/\s+/g, ' ').trim(),
+        reason: hasBulletText ? 'bullet' : 'dot',
+      });
+    }
+  });
+
+  return violations;
+}
+
+function findMonoUppercaseHeadingRules(
+  cssContent: string,
+  filepath = 'inline.css'
+): { file: string; selector: string }[] {
+  const root = postcss.parse(cssContent, { from: filepath });
+  const violations: { file: string; selector: string }[] = [];
+
+  root.walkRules((rule: Rule) => {
+    if (rule.selector.includes('::before') || rule.selector.includes('::after')) return;
+
+    let current: Rule | undefined = rule;
+    const selectors: string[] = [];
+    while (current && current.type === 'rule') {
+      selectors.unshift(current.selector);
+      current = current.parent as Rule | undefined;
+    }
+    const fullSelector = selectors.join(' ');
+
+    if (!HEADING_SELECTOR_REGEX.test(fullSelector)) return;
+    if (DATA_LABEL_REGEX.test(fullSelector)) return;
+
+    const hasMono = rule.nodes?.some(
+      (node) =>
+        node.type === 'decl' &&
+        ((node.prop === 'font-family' && /(?:--font-system|--font-mono|monospace)/.test(node.value)) ||
+          (node.prop === 'font' && /(?:--font-system|--font-mono|monospace)/.test(node.value)))
+    );
+    const hasUppercase = rule.nodes?.some(
+      (node) =>
+        node.type === 'decl' &&
+        node.prop === 'text-transform' &&
+        node.value.includes('uppercase')
+    );
+
+    if (hasMono && hasUppercase) {
+      violations.push({
+        file: filepath,
+        selector: rule.selector.replace(/\s+/g, ' ').trim(),
+      });
+    }
+  });
+
+  return violations;
+}
+
 function getCssFiles(dirs: string[]): string[] {
   const files: string[] = [];
   for (const dir of dirs) {
@@ -197,6 +292,100 @@ describe('heading typography static guards', () => {
   it('ignores prose emphasis', () => {
     const fixture = `.text-narrative em { font-style: italic; }`;
     const violations = findItalicHeadingRules(fixture, 'fixture.css');
+    expect(violations).toEqual([]);
+  });
+
+  it('does not attach bullet or dot pseudo-elements to heading selectors in app, styles, or components css', () => {
+    const rootDir = path.join(__dirname, '../../..');
+    const allViolations: { file: string; selector: string; reason: string }[] = [];
+    for (const filepath of targetCssFiles) {
+      const css = fs.readFileSync(filepath, 'utf-8');
+      const violations = findBulletOrDotHeadingRules(css, path.relative(rootDir, filepath));
+      allViolations.push(...violations);
+    }
+
+    const violationMessages = allViolations.map(
+      (v) => `${v.file}: ${v.selector} (${v.reason})`
+    );
+    expect(violationMessages).toEqual([]);
+  });
+
+  it('does not declare mono-uppercase typography on heading selectors in app, styles, or components css', () => {
+    const rootDir = path.join(__dirname, '../../..');
+    const allViolations: { file: string; selector: string }[] = [];
+    for (const filepath of targetCssFiles) {
+      const css = fs.readFileSync(filepath, 'utf-8');
+      const violations = findMonoUppercaseHeadingRules(css, path.relative(rootDir, filepath));
+      allViolations.push(...violations);
+    }
+
+    const violationMessages = allViolations.map(
+      (v) => `${v.file}: ${v.selector}`
+    );
+    expect(violationMessages).toEqual([]);
+  });
+
+  it('catches a semantic h2 with a bullet or dot pseudo-element', () => {
+    const bulletFixture = `h2::before { content: "• "; }`;
+    const dotFixture = `:root .card h2::before { content: ""; border-radius: var(--radius-full); width: 6px; height: 6px; }`;
+    const bulletViolations = findBulletOrDotHeadingRules(bulletFixture, 'fixture.css');
+    const dotViolations = findBulletOrDotHeadingRules(dotFixture, 'fixture.css');
+    expect(bulletViolations.length).toBe(1);
+    expect(bulletViolations[0].selector).toBe('h2::before');
+    expect(dotViolations.length).toBe(1);
+    expect(dotViolations[0].selector).toBe(':root .card h2::before');
+  });
+
+  it('catches a semantic h2 with mono-uppercase typography', () => {
+    const fixture = `h2 { font-family: var(--font-system); text-transform: uppercase; }`;
+    const violations = findMonoUppercaseHeadingRules(fixture, 'fixture.css');
+    expect(violations.length).toBe(1);
+    expect(violations[0].selector).toBe('h2');
+  });
+
+  it('catches a multi-line heading selector with mono-uppercase or dot bullet', () => {
+    const fixture = `:root .card\n > h2 {\n font-family: var(--font-system);\n text-transform: uppercase;\n}`;
+    const violations = findMonoUppercaseHeadingRules(fixture, 'fixture.css');
+    expect(violations.length).toBe(1);
+    expect(violations[0].selector).toBe(':root .card > h2');
+  });
+
+  it('catches named classes such as .wizard-subheading with mono-uppercase or bullet', () => {
+    const monoFixture = `.wizard-subheading { font-family: var(--font-system); text-transform: uppercase; }`;
+    const bulletFixture = `.wizard-subheading::before { content: "• "; }`;
+    const monoViolations = findMonoUppercaseHeadingRules(monoFixture, 'fixture.css');
+    const bulletViolations = findBulletOrDotHeadingRules(bulletFixture, 'fixture.css');
+    expect(monoViolations.length).toBe(1);
+    expect(monoViolations[0].selector).toBe('.wizard-subheading');
+    expect(bulletViolations.length).toBe(1);
+    expect(bulletViolations[0].selector).toBe('.wizard-subheading::before');
+  });
+
+  it('does not false-positive on genuine data labels or metric labels', () => {
+    const fixture = `
+      .character-data-label { font-family: var(--font-system); text-transform: uppercase; }
+      .component-data-field .data-label { font-family: var(--font-system); text-transform: uppercase; }
+      .metric-label::before { content: "• "; }
+      .manuscript-character-snapshot-subheading { font-family: var(--font-system); text-transform: uppercase; }
+    `;
+    const monoViolations = findMonoUppercaseHeadingRules(fixture, 'fixture.css');
+    const bulletViolations = findBulletOrDotHeadingRules(fixture, 'fixture.css');
+    expect(monoViolations).toEqual([]);
+    expect(bulletViolations).toEqual([]);
+  });
+
+  it('preserves perforated dotted rules under headings', () => {
+    const fixture = `
+      :root .world-detail-section h2::after {
+        content: "";
+        display: block;
+        height: 4px;
+        background-image: radial-gradient(circle, var(--color-text-muted) 1.5px, transparent 1.5px);
+        background-size: 12px 4px;
+        background-repeat: repeat-x;
+      }
+    `;
+    const violations = findBulletOrDotHeadingRules(fixture, 'fixture.css');
     expect(violations).toEqual([]);
   });
 });
