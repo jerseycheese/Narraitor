@@ -89,7 +89,7 @@
 }
 
 .dashboard-progress-stat-value span {
-  font-family: var(--font-narrative);
+  font-family: var(--font-system);
   font-size: 1.75rem;
   line-height: 1;
   font-weight: 500;
@@ -319,7 +319,7 @@
 
 .dashboard-recent-empty-state p {
   margin: 0;
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
   font-size: var(--font-size-xs_5);
   color: var(--color-text-muted);
 }
@@ -642,7 +642,7 @@
 }
 
 :root .dashboard-recent-item h3 {
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
   font-size: var(--font-size-sm);
   font-weight: 600;
   letter-spacing: 0;
@@ -653,14 +653,17 @@
   border-radius: 0;
 }
 
-:root .dashboard-progress-stat-label,
-:root .dashboard-recent-item span,
-:root .dashboard-recent-item p {
+:root .dashboard-progress-stat-label {
   font-family: var(--font-system);
 }
 
+:root .dashboard-recent-item span,
+:root .dashboard-recent-item p {
+  font-family: var(--font-interface);
+}
+
 :root .dashboard-progress-stat-value span {
-  font-family: var(--font-narrative);
+  font-family: var(--font-system);
   font-size: 2rem;
   line-height: 1;
   letter-spacing: -0.01em;

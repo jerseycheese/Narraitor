@@ -173,7 +173,7 @@
   scroll-margin-top: calc(
     var(--control-height-touch) + var(--space-6) + var(--space-4)
   );
-  font-family: var(--font-narrative);
+  font-family: var(--font-interface);
   font-size: var(--font-size-lg);
   font-weight: 600;
   line-height: 1.3;

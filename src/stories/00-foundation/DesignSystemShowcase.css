@@ -37,6 +37,18 @@
   gap: var(--space-2);
 }
 
+.ds-showcase-text-narrative {
+  font-family: var(--font-narrative);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+}
+
+.ds-showcase-data-value {
+  font-family: var(--font-system);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
 .ds-showcase-text-large {
   font-size: var(--font-size-md);
   color: var(--color-text-primary);

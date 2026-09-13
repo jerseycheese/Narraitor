@@ -245,10 +245,9 @@ body.manuscript-overlay-open {
   margin: 0;
 }
 
-/* DS3 — Mechanical Manuscript: italic interface heading, monospace bullet eyebrow */
+/* DS3 — Mechanical Manuscript: upright narrative heading, monospace bullet eyebrow */
 :root .play-page-shell > div > div > header h1 {
-  font-family: var(--font-interface);
-  font-style: italic;
+  font-family: var(--font-narrative);
   font-weight: 500;
   letter-spacing: -0.005em;
   color: var(--color-text-primary);
@@ -268,8 +267,7 @@ body.manuscript-overlay-open {
 }
 
 :root .play-page-active > div > div > header h1 {
-  font-family: var(--font-interface);
-  font-style: italic;
+  font-family: var(--font-narrative);
   font-weight: 500;
   letter-spacing: -0.005em;
 }
@@ -1411,7 +1409,7 @@ body.manuscript-overlay-open {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--color-text-muted);
-  font-family: var(--font-system), ui-monospace, monospace;
+  font-family: var(--font-interface);
 }
 
 .manuscript-character-summary-list {
@@ -1459,7 +1457,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-inventory-category-title {
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
   font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
@@ -2029,7 +2027,7 @@ body.manuscript-overlay-open {
 
 .manuscript-hud-panel-title {
   margin: 0 0 var(--space-2);
-  font-family: var(--font-system), ui-monospace, monospace;
+  font-family: var(--font-interface);
   font-size: var(--font-size-2xs_5);
   font-weight: 400;
   letter-spacing: 0.05em;
@@ -4014,7 +4012,7 @@ body.manuscript-overlay-open {
 }
 
 :root .session-break-prompt-title {
-  font-family: var(--font-narrative);
+  font-family: var(--font-interface);
   font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--color-text-primary);

@@ -12,6 +12,15 @@
   font-size: var(--font-size-xs_5);
 }
 
+.devtools-panel h1,
+.devtools-panel h2,
+.devtools-panel h3,
+.devtools-panel h4,
+.devtools-panel h5,
+.devtools-panel h6 {
+  font-family: var(--font-system);
+}
+
 .devtools-panel-header {
   display: flex;
   flex-wrap: wrap;

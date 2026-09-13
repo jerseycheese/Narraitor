@@ -103,6 +103,21 @@ a[href="#main-content"]:focus {
   border: 0;
 }
 
+/* Shared Heading Typography Roles (#2084) */
+h1 {
+  font-family: var(--font-narrative);
+  font-weight: 500;
+  font-style: normal;
+}
+
+h2,
+h3,
+h4 {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  font-style: normal;
+}
+
 /* Narrative Content Styling for Readable Storytelling */
 .text-narrative {
   font-family: var(--font-narrative);

@@ -1011,8 +1011,8 @@
 
 :root .wizard-page .wizard-title,
 :root .wizard-page .wizard-page-title {
-  font-family: var(--font-interface);
-  font-style: italic;
+  font-family: var(--font-narrative);
+  font-weight: 500;
   letter-spacing: -0.005em;
 }
 
@@ -1062,8 +1062,7 @@
   position: relative;
   padding-top: var(--space-3);
   font-family: var(--font-interface);
-  font-style: italic;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 :root .wizard-page .wizard-step-title::before {
@@ -1825,9 +1824,9 @@
 }
 
 :root .wizard-page .wizard-custom-editor h2 {
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
   font-size: var(--font-size-sm);
-  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 :root .wizard-page .wizard-custom-editor input,
@@ -2055,7 +2054,6 @@
 
 :root .component-guided-first-time .wizard-title {
   font-family: var(--font-narrative);
-  font-style: italic;
   font-weight: 500;
 }
 
@@ -2077,15 +2075,13 @@
 }
 
 :root .component-guided-first-time-step-heading {
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-weight: 500;
+  font-family: var(--font-interface);
+  font-weight: 600;
 }
 
 :root .component-guided-first-time-step-title {
-  font-family: var(--font-narrative);
-  font-style: italic;
-  font-weight: 500;
+  font-family: var(--font-interface);
+  font-weight: 600;
 }
 
 :root .component-guided-first-time-nav {
