@@ -152,13 +152,13 @@ There are five typography roles across the app, matching the landing page:
 
 | Role | Font | Usage |
 |---|---|---|
-| **Page title** | Newsreader, upright | Display headline, hero titles, wizard and play page titles (`var(--font-narrative)`, weight 500) |
+| **Page title** | Newsreader, upright | Display headline (weight 600), layout and app shell titles (weight 500) (`var(--font-narrative)`) |
 | **Section heading** | DM Sans, semibold | Section headings, panel titles, card titles (`var(--font-interface)`, weight 600) |
 | **Story text and long prose** | Newsreader | Long-form narrative, story prose, lore entries (`var(--font-narrative)`) |
 | **UI, labels, body copy** | DM Sans | Buttons, navigation, form labels, body copy, metadata (`var(--font-interface)`) |
 | **Numbers and data values** | Fira Code | IDs, counters, debug content, computed metrics (`var(--font-system)`) |
 
-Page titles use narrative, upright. No heading is italic; italic is for emphasis inside prose.
+Page titles use narrative, upright (weight 500 in layout and app shell, weight 600 for display hero headings, as the landing page reference uses). No heading is italic; italic is for emphasis inside prose.
 
 The slot names predate DS3 and map to real families:
 - **narrative** (Newsreader) — long-form prose. Story content, character backgrounds, lore entries. Serif for reading comfort over long sessions, and upright for page titles.

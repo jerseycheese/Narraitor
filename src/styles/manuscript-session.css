@@ -4012,7 +4012,7 @@ body.manuscript-overlay-open {
 }
 
 :root .session-break-prompt-title {
-  font-family: var(--font-narrative);
+  font-family: var(--font-interface);
   font-size: var(--font-size-xl);
   font-weight: 600;
   color: var(--color-text-primary);

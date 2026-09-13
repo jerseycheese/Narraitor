@@ -37,20 +37,6 @@
   gap: var(--space-2);
 }
 
-.ds-showcase-typography-samples h1 {
-  font-family: var(--font-narrative);
-  font-weight: 500;
-  font-style: normal;
-}
-
-.ds-showcase-typography-samples h2,
-.ds-showcase-typography-samples h3,
-.ds-showcase-typography-samples h4 {
-  font-family: var(--font-interface);
-  font-weight: 600;
-  font-style: normal;
-}
-
 .ds-showcase-text-narrative {
   font-family: var(--font-narrative);
   font-size: var(--font-size-base);

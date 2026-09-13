@@ -64,21 +64,35 @@
 }
 
 .app-surface-app h1 {
-  font-family: var(--font-interface);
+  font-family: var(--font-narrative);
+  font-weight: 500;
+  font-style: normal;
   font-size: 2rem;
   line-height: 1.2;
 }
 
 .app-surface-app h2 {
   font-family: var(--font-interface);
+  font-weight: 600;
+  font-style: normal;
   font-size: var(--font-size-xl);
   line-height: 1.25;
 }
 
 .app-surface-app h3 {
   font-family: var(--font-interface);
+  font-weight: 600;
+  font-style: normal;
   font-size: var(--font-size-md);
   line-height: 1.35;
+}
+
+.app-surface-app h4 {
+  font-family: var(--font-interface);
+  font-weight: 600;
+  font-style: normal;
+  font-size: var(--font-size-base);
+  line-height: 1.4;
 }
 
 /* The content gutter steps with the viewport and is mirrored by
@@ -3050,8 +3064,9 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 .character-detail-background-heading {
   margin: 0 0 var(--space-2);
   font-family: var(--font-interface);
-  font-size: var(--font-size-2xs_5);
+  font-size: var(--font-size-md);
   font-weight: 600;
+  line-height: 1.35;
   color: var(--color-text-secondary);
 }
 

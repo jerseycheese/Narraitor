@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import postcss, { Rule } from 'postcss';
 
 const appShellCss = fs.readFileSync(path.join(__dirname, '../app-shell.css'), 'utf-8');
 const dashboardCss = fs.readFileSync(path.join(__dirname, '../dashboard.css'), 'utf-8');
@@ -87,9 +88,7 @@ describe('app-shell.css static checks', () => {
   });
 });
 
-import postcss, { Rule } from 'postcss';
-
-const HEADING_SELECTOR_REGEX = /\bh[1-4]\b|\.[\w-]+-(title|heading|name)\b/;
+const HEADING_SELECTOR_REGEX = /\bh[1-4]\b|\.[a-zA-Z0-9_-]*(?:title|heading|name)(?![a-zA-Z0-9_-])/i;
 
 function findItalicHeadingRules(cssContent: string, filepath = 'inline.css'): { file: string; selector: string }[] {
   const root = postcss.parse(cssContent, { from: filepath });
@@ -97,7 +96,10 @@ function findItalicHeadingRules(cssContent: string, filepath = 'inline.css'): { 
 
   root.walkRules((rule: Rule) => {
     const hasItalic = rule.nodes?.some(
-      (node) => node.type === 'decl' && node.prop === 'font-style' && node.value.includes('italic')
+      (node) =>
+        node.type === 'decl' &&
+        ((node.prop === 'font-style' && node.value.includes('italic')) ||
+          (node.prop === 'font' && /\bitalic\b/.test(node.value)))
     );
     if (!hasItalic) return;
 
@@ -141,9 +143,10 @@ describe('heading typography static guards', () => {
   const targetCssFiles = getCssFiles([
     path.join(__dirname, '..'),
     path.join(__dirname, '../../styles'),
+    path.join(__dirname, '../../components'),
   ]);
 
-  it('does not declare font-style: italic on heading selectors in app or styles css', () => {
+  it('does not declare font-style: italic on heading selectors in app, styles, or components css', () => {
     const rootDir = path.join(__dirname, '../../..');
     const allViolations: { file: string; selector: string }[] = [];
     for (const filepath of targetCssFiles) {
@@ -163,6 +166,26 @@ describe('heading typography static guards', () => {
     const violations = findItalicHeadingRules(fixture, 'fixture.css');
     expect(violations.length).toBe(1);
     expect(violations[0].selector).toBe(':root .x > h2');
+  });
+
+  it('catches font shorthand containing italic', () => {
+    const fixture = `h2 { font: italic 1.2rem sans-serif; }`;
+    const violations = findItalicHeadingRules(fixture, 'fixture.css');
+    expect(violations.length).toBe(1);
+    expect(violations[0].selector).toBe('h2');
+  });
+
+  it('catches heading selectors without preceding hyphen', () => {
+    const fixture = `.wizard-subheading { font-style: italic; }`;
+    const violations = findItalicHeadingRules(fixture, 'fixture.css');
+    expect(violations.length).toBe(1);
+    expect(violations[0].selector).toBe('.wizard-subheading');
+  });
+
+  it('does not false-positive on heading wrapper classes', () => {
+    const fixture = `.component-hero-title-wrapper { font-style: italic; }`;
+    const violations = findItalicHeadingRules(fixture, 'fixture.css');
+    expect(violations).toEqual([]);
   });
 
   it('ignores prose emphasis', () => {

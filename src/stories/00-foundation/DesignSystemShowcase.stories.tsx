@@ -95,7 +95,7 @@ export const CompleteShowcase: Story = {
           <p className="ds-showcase-text-small">Small text - Secondary information</p>
           <p className="ds-showcase-text-xs">Extra small - Captions and metadata</p>
           <p className="ds-showcase-text-muted">Muted text - Less important information</p>
-          <code className="ds-showcase-data-value">Data value / computed metric: char_a6dd5cc3</code>
+          <p className="ds-showcase-text-small">Data value: <code className="ds-showcase-data-value">char_a6dd5cc3</code></p>
         </div>
       </section>
 
