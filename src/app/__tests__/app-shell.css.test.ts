@@ -186,16 +186,40 @@ interface CascadeTrackingState {
   tagMap: Map<string, string>;
 }
 
+function createCascadeTrackingState(): CascadeTrackingState {
+  return {
+    selectorMap: new Map(),
+    tagMap: new Map(),
+  };
+}
+
+function evaluateCascadeViolations(state: CascadeTrackingState): { file: string; selector: string }[] {
+  const { selectorMap, tagMap } = state;
+  const violations: { file: string; selector: string }[] = [];
+  for (const [selector, entry] of selectorMap.entries()) {
+    const matchTag = selector.match(/(?:^|\s)(h[1-4])$/);
+    const tag = matchTag ? matchTag[1] : null;
+    const inheritsMono = Boolean(tag && tagMap.has(tag + ':mono') && !entry.declaresNonMono);
+    const inheritsUppercase = Boolean(tag && tagMap.has(tag + ':uppercase') && !entry.declaresNonUppercase);
+
+    if ((entry.hasMono || inheritsMono) && (entry.hasUppercase || inheritsUppercase)) {
+      violations.push({
+        file: entry.file,
+        selector,
+      });
+    }
+  }
+  return violations;
+}
+
 function findMonoUppercaseHeadingRules(
   cssContent: string,
   filepath = 'inline.css',
   sharedState?: CascadeTrackingState
 ): { file: string; selector: string }[] {
   const root = postcss.parse(cssContent, { from: filepath });
-  const state: CascadeTrackingState = sharedState || {
-    selectorMap: new Map(),
-    tagMap: new Map(),
-  };
+  const isLocalState = !sharedState;
+  const state: CascadeTrackingState = sharedState || createCascadeTrackingState();
   const { selectorMap, tagMap } = state;
 
   root.walkRules((rule: Rule) => {
@@ -255,43 +279,40 @@ function findMonoUppercaseHeadingRules(
         file: filepath,
       };
 
-      if (declaresMono) entry.hasMono = true;
+      if (declaresMono) {
+        entry.hasMono = true;
+        if (entry.file !== filepath && entry.hasUppercase) {
+          entry.file = `${entry.file} + ${filepath}`;
+        }
+      }
       if (declaresNonMono) {
         entry.hasMono = false;
         entry.declaresNonMono = true;
       }
-      if (declaresUppercase) entry.hasUppercase = true;
+      if (declaresUppercase) {
+        entry.hasUppercase = true;
+        if (entry.file !== filepath && entry.hasMono) {
+          entry.file = `${entry.file} + ${filepath}`;
+        }
+      }
       if (declaresNonUppercase) {
         entry.hasUppercase = false;
         entry.declaresNonUppercase = true;
       }
       selectorMap.set(normalized, entry);
 
-      const matchTag = normalized.match(/(?:^|\s)(h[1-4])$/);
-      if (matchTag) {
-        const tag = matchTag[1];
-        if (declaresMono) tagMap.set(tag + ':mono', filepath);
-        if (declaresUppercase) tagMap.set(tag + ':uppercase', filepath);
+      const isBaseTag = /^(h[1-4])$/.test(normalized);
+      if (isBaseTag) {
+        if (declaresMono) tagMap.set(normalized + ':mono', filepath);
+        if (declaresUppercase) tagMap.set(normalized + ':uppercase', filepath);
       }
     }
   });
 
-  const violations: { file: string; selector: string }[] = [];
-  for (const [selector, entry] of selectorMap.entries()) {
-    const matchTag = selector.match(/(?:^|\s)(h[1-4])$/);
-    const tag = matchTag ? matchTag[1] : null;
-    const inheritsMono = Boolean(tag && tagMap.has(tag + ':mono') && !entry.declaresNonMono);
-    const inheritsUppercase = Boolean(tag && tagMap.has(tag + ':uppercase') && !entry.declaresNonUppercase);
-
-    if ((entry.hasMono || inheritsMono) && (entry.hasUppercase || inheritsUppercase)) {
-      violations.push({
-        file: entry.file,
-        selector,
-      });
-    }
+  if (isLocalState) {
+    return evaluateCascadeViolations(state);
   }
-
-  return violations;
+  return [];
 }
 
 function getCssFiles(dirs: string[]): string[] {
@@ -389,13 +410,13 @@ describe('heading typography static guards', () => {
 
   it('does not declare mono-uppercase typography on heading selectors in app, styles, or components css', () => {
     const rootDir = path.join(__dirname, '../../..');
-    const allViolations: { file: string; selector: string }[] = [];
+    const sharedState = createCascadeTrackingState();
     for (const filepath of targetCssFiles) {
       const css = fs.readFileSync(filepath, 'utf-8');
-      const violations = findMonoUppercaseHeadingRules(css, path.relative(rootDir, filepath));
-      allViolations.push(...violations);
+      findMonoUppercaseHeadingRules(css, path.relative(rootDir, filepath), sharedState);
     }
 
+    const allViolations = evaluateCascadeViolations(sharedState);
     const violationMessages = allViolations.map(
       (v) => `${v.file}: ${v.selector}`
     );
@@ -506,6 +527,16 @@ describe('heading typography static guards', () => {
     `;
     const violations = findMonoUppercaseHeadingRules(fixture, 'fixture.css');
     expect(violations).toEqual([]);
+  });
+
+  it('catches mono in one file and uppercase in another file across the cascade for the same selector', () => {
+    const sharedState = createCascadeTrackingState();
+    findMonoUppercaseHeadingRules('.card h2 { font-family: var(--font-system); }', 'src/app/app-shell.css', sharedState);
+    findMonoUppercaseHeadingRules('.card h2 { text-transform: uppercase; }', 'src/app/dashboard.css', sharedState);
+    const violations = evaluateCascadeViolations(sharedState);
+    expect(violations.length).toBe(1);
+    expect(violations[0].selector).toBe('.card h2');
+    expect(violations[0].file).toContain('app-shell.css + src/app/dashboard.css');
   });
 });
 
