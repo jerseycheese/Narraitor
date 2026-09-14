@@ -84,7 +84,7 @@ components:
 
 # Narraitor Design
 
-> **Note:** Narraitor ships a single design system, DS3 ("The Mechanical Manuscript") — see [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md), which collapsed the three-system architecture described in [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md). Colors, typography, and the drafting-marks vocabulary below are verified against [ds3.css](src/lib/theme/themes/ds3.css) and [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) as of 2026-08-09 (`develop` @ `44fc072d`). Those two files stay the literal source of truth going forward — if a token value here and in the CSS ever disagree, the CSS is right and this doc is stale.
+> **Note:** Narraitor ships a single design system, DS3 ("The Mechanical Manuscript") — see [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md), which collapsed the three-system architecture described in [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md). Colors, typography, and the drafting-marks vocabulary below are verified against [ds3.css](src/lib/theme/themes/ds3.css) and [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) as of 2026-09-14 (`develop` @ `e353451a`, post-v1.8 design foundations #2081–#2087). Those two files stay the literal source of truth going forward — if a token value here and in the CSS ever disagree, the CSS is right and this doc is stale.
 
 ## Overview
 
@@ -379,6 +379,11 @@ The don'ts here come from real failures during the design-system migration. They
 - **Don't put a bordered element inside a bordered element.** Box-in-box was the loudest "generated" signal in the app. Group inner content with spacing, a dotted rule, or a tint.
 - **Don't introduce a third chrome.** A new page picks app or manuscript. The last time a surface was added to differentiate one part of the product, the two shells drifted until the same three links looked like two different apps (#1655). To make part of the app surface look different, reach for a register, not a shell.
 - **Don't put an element rule in `_register-brand.css`.** It's a token layer. The moment it starts styling elements it's a shell in disguise, and the drift starts again.
+- **Don't use eyebrow labels on headings.** Eyebrows are compact data labels for genuine data values, never headings. A heading already provides typographic hierarchy; adding an eyebrow bullet or label above it is redundant noise (#2085).
+- **Don't use registration crosses, dimension ticks, or bordered-card corner brackets.** The drafting-mark family is strictly one mark (the section-heading dotted rule) plus corner brackets on genuinely borderless cards (#2087).
+- **Don't attach dotted rules anywhere except beneath section headings.** Never standalone dividers, toolbar lines, card footers, paragraph separators, or in the wizard (#2087).
+- **Don't attach corner brackets to bordered surfaces.** Brackets on a bordered card sit awkwardly on the corner radius and look like rendering artifacts. Only borderless cards (dashboard cards, About step cards, detail cells) permit them (#2087).
+- **Don't use italic for headings.** Page titles are upright Newsreader; section headings are upright DM Sans semibold. Italic is reserved for emphasis inside prose (#2084).
 
 ### Do's
 
