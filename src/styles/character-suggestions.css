@@ -6,9 +6,8 @@
   gap: var(--space-4);
   margin-top: var(--space-4);
   padding: var(--space-4);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background-color: var(--color-surface);
+  background-color: var(--color-canvas);
   font-family: var(--font-interface);
 }
 
@@ -47,9 +46,8 @@
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-4);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background-color: var(--color-canvas);
+  background-color: var(--color-surface);
 }
 
 .character-suggestion-card-title {

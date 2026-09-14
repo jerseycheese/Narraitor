@@ -262,7 +262,7 @@ Depth is conveyed primarily through **borders and tonal shifts**, not shadows. C
 
 **No bordered element inside a bordered element.** The border belongs to the outer layer. Anything grouped inside it uses spacing, a perforated dotted rule, or a background tint (`canvas` on a `surface` parent, `accent-soft` for a selected option), never a second border. Two levels isn't a compromise; two levels is where most of the old clutter lived.
 
-- **Wizards:** the progress, step and nav panels are the one bordered layer. The wizard frame around them has no border. Form sections, step chips, radio options and the provider-key disclosure inside a panel are borderless.
+- **Wizards:** the progress, step and nav panels are the one bordered layer. The wizard frame around them has no border. Everything grouped inside a panel is borderless: form sections, step chips, radio options, review and point-pool cards (`.wizard-card`), linked-attribute options, the custom editor, empty states, error and disclosure alerts, and the character suggestions box. Cards inside a panel take a `canvas` tint; a selected card takes `accent-soft`.
 - **Detail sections and `SectionWrapper`:** the section keeps its border. The NPC, stat, data-field, background and achievement cells inside it are `canvas`-tinted, and attribute and skill cards keep their own `surface-hover` and `accent-soft` fills. None of them is outlined.
 - **Controls are exempt.** Inputs, selects, textareas, buttons and the stepper's number circles have borders because they're controls, not grouping.
 
