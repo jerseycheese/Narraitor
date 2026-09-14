@@ -1509,22 +1509,6 @@
   opacity: 0.7;
 }
 
-:root .component-character-card h3 {
-  position: relative;
-  padding-top: var(--space-3);
-}
-
-:root .component-character-card h3::before {
-  content: "• Character";
-  display: block;
-  margin-bottom: var(--space-1);
-  font-family: var(--font-system);
-  font-size: var(--font-size-2xs_5);
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
 
 :root .component-character-card footer {
   border-top: none;
@@ -2143,12 +2127,10 @@
 }
 
 .journal-entry-detail h4 {
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-text-muted);
+  color: var(--color-text-primary);
   margin: 0 0 var(--space-2);
 }
 
@@ -2193,7 +2175,7 @@
 
 /* Per-entry AI image generation (#975).
    The "Entry Image" heading renders as an h4 and inherits the shared
-   .journal-entry-detail h4 label styling. */
+   .journal-entry-detail h4 heading styling. */
 .journal-entry-image-preview {
   display: flex;
   flex-direction: column;
@@ -2238,20 +2220,7 @@
 }
 
 /* DS3 — Mechanical Manuscript: dotted radial-gradient divider above the nav,
-   monospace voice on the entry summary, dot-bullet on the section title. */
-
-:root .journal-page .journal-list-header h2 {
-  position: relative;
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs_5);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-:root .journal-page .journal-list-header h2::before {
-  content: "• ";
-  color: var(--color-text-muted);
-}
+   monospace voice on the entry summary. */
 
 :root .journal-page .journal-nav {
   background-image: radial-gradient(
@@ -2448,18 +2417,6 @@
   border-color: var(--color-border-strong);
 }
 
-:root .component-section-wrapper-title {
-  position: relative;
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs_5);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-:root .component-section-wrapper-title::before {
-  content: "• ";
-  color: var(--color-text-muted);
-}
 
 /* ═══════════════════════════════════════════════════════════════
    EndingScreen — story conclusion page.

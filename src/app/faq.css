@@ -36,15 +36,6 @@
   gap: var(--space-3);
 }
 
-.component-faq-eyebrow {
-  margin: 0;
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
 
 .component-faq-title {
   margin: 0;
@@ -127,35 +118,16 @@
   gap: var(--space-5);
 }
 
-/* Scoped (.component-faq prefix) to outrank the app-surface heading baselines
-   in app-shell.css (.app-surface-app h2 / h3) — both headings here are
-   deliberately off the surface default: the group label is a small mono
-   uppercase eyebrow, the question is narrative-face body weight. A bare
-   single class loses to `.app-surface-app h2` on specificity. */
+/* Section heading role (#2084): DM Sans, semibold, normal casing, no bullet.
+   Scoped (.component-faq prefix) to outrank the app-surface heading baselines
+   in app-shell.css (.app-surface-app h2). */
 .component-faq .component-faq-group-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
   margin: 0;
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs_5);
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-}
-
-/* The FAQ spends its accent on the inline links inside answers, so the eyebrow
-   dots stay in mark ink. No focal accent mark here: the dot is the page's only
-   drafting mark, and there's no bracket to promote to a registration cross. */
-.component-faq .component-faq-group-title::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--color-text-muted);
-  flex-shrink: 0;
+  font-family: var(--font-interface);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
 }
 
 .component-faq-item {

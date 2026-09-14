@@ -16,7 +16,6 @@ export default function Faq() {
   return (
     <div className="component-faq">
       <header className="component-faq-hero">
-        <p className="component-faq-eyebrow">Narraitor</p>
         <h1 className="component-faq-title">Questions and answers</h1>
         <p className="component-faq-lead">
           What Narraitor is, what it needs from you, and what happens to your
