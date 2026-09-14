@@ -69,6 +69,6 @@ test('World creation tour: Review Skills (tour steps 15-18)', async ({ page }) =
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-creation-skills-${zeroPad(stepIndex)}.png`, { clip });
+    await expect.soft(page).toHaveScreenshot(`tutorial-world-creation-skills-${zeroPad(stepIndex)}.png`, { clip });
   }
 });

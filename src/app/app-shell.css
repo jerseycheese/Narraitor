@@ -2553,7 +2553,6 @@
 
 .component-ending-screen-achievement {
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-canvas);
 }
@@ -2590,10 +2589,6 @@
   font-size: var(--font-size-xs_5);
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
-}
-
-:root .component-ending-screen-achievement {
-  border-color: var(--color-border-strong);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2682,9 +2677,8 @@
   align-items: start;
   gap: var(--space-3);
   padding: var(--space-3);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
 }
 
 .world-detail-npc-avatar {
@@ -2739,9 +2733,8 @@
 
 .world-detail-stat {
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
 }
 
 .world-detail-stat-head {
@@ -2816,9 +2809,8 @@
   flex-direction: column;
   gap: var(--space-1);
   padding: var(--space-3);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm, 0.25rem);
-  background: var(--color-surface);
+  background: var(--color-canvas);
 }
 
 .world-detail-meta-grid .component-data-field > span:first-child {
@@ -2930,9 +2922,8 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 .character-detail-derived-stat {
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
 }
 
 .character-detail-derived-stat-head {
@@ -3001,9 +2992,8 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 .character-detail-background-section {
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
 }
 
 .character-detail-background-heading {

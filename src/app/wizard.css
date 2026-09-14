@@ -566,15 +566,13 @@
   flex-direction: column;
   gap: var(--space-2);
   padding: var(--space-4);
-  border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: background 120ms ease;
 }
 
 .wizard-card:hover {
-  border-color: var(--color-border-strong);
   background: var(--color-surface-hover);
 }
 
@@ -584,16 +582,7 @@
 }
 
 .wizard-card-selected {
-  border-color: var(--color-accent);
   background: var(--color-accent-soft);
-}
-
-.wizard-card-selected:hover {
-  border-color: var(--color-accent);
-}
-
-.wizard-card-unselected {
-  border-color: var(--color-border);
 }
 
 /* ─── Badges ─── */
@@ -715,7 +704,6 @@
 
 .wizard-error-container {
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-danger);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-danger) 8%, transparent);
   color: var(--color-danger);
@@ -831,9 +819,8 @@
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-6);
-  border: 1px dashed var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
   font-family: var(--font-interface);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
@@ -1165,16 +1152,6 @@
     "actions"
     "content";
   gap: var(--space-3);
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-text-primary) 14%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: calc(var(--space-6) + var(--space-2)) calc(var(--space-6) + var(--space-2));
-  background-repeat: repeat;
 }
 
 :root .component-world-creation-wizard > .component-wizard-progress,
@@ -1232,14 +1209,12 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-1_5) var(--space-2);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-canvas);
 }
 
 :root .component-world-creation-wizard .wizard-progress-step-active,
 :root .component-character-creation-wizard .wizard-progress-step-active {
-  border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-on-accent);
 }
@@ -1274,10 +1249,6 @@
 :root .component-world-creation-wizard .wizard-form-section,
 :root .component-character-creation-wizard .wizard-form-section {
   margin: 0;
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
 }
 
 :root .component-world-creation-wizard .wizard-form-section + .wizard-form-section,
@@ -1431,7 +1402,6 @@
   flex-direction: column;
   gap: var(--space-0_5);
   padding: var(--space-2);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
 }
@@ -1466,9 +1436,8 @@
 
 .wizard-custom-editor {
   padding: var(--space-4);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
 }
 
 .wizard-custom-editor h2 {
@@ -1622,9 +1591,8 @@
   flex-direction: column;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
 }
 
 .portrait-step-success-label {
@@ -1911,7 +1879,6 @@
   flex-direction: column;
   gap: var(--space-2);
   padding: var(--space-4);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-canvas);
 }
@@ -1993,9 +1960,8 @@
 
 .component-guided-first-time-error {
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background-color: var(--color-surface);
+  background-color: var(--color-canvas);
   font-family: var(--font-interface);
   color: var(--color-text-primary);
 }
@@ -2098,10 +2064,9 @@
   align-items: flex-start;
   gap: var(--space-2_5);
   padding: var(--space-3);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
-  transition: border-color 120ms ease, background 120ms ease;
+  background: var(--color-canvas);
+  transition: background 120ms ease;
 }
 
 /* Native radios inherit .form-input's width:100% from the shared Input
@@ -2113,7 +2078,6 @@
 }
 
 .component-world-creation-wizard .wizard-radio-option:has(input:checked) {
-  border-color: var(--color-accent);
   background: var(--color-accent-soft);
 }
 
@@ -2230,7 +2194,9 @@
 
 /* ─── F18 — provider key disclosure (#2044) ─── */
 
+/* Sits inside the bordered step panel, so it groups by tint alone. */
 .component-world-creation-wizard .wizard-byok-disclosure {
+  border: none;
   margin-top: var(--space-3);
   margin-bottom: var(--space-3);
 }
