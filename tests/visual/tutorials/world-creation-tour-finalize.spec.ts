@@ -101,7 +101,7 @@ test('World creation tour: Finalize (tour steps 19-23)', async ({ page }) => {
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-creation-finalize-${zeroPad(stepIndex)}.png`, {
+    await expect.soft(page).toHaveScreenshot(`tutorial-world-creation-finalize-${zeroPad(stepIndex)}.png`, {
       clip,
       stylePath,
     });
