@@ -209,10 +209,8 @@
   color: var(--color-text-muted);
 }
 
-/* Drafting marks. Layout only — the marks themselves come from the production
-   classes each sample carries, so this section can't drift from the app. The
-   generous gap gives the registration cross room to straddle its corner without
-   colliding with the neighbouring sample. */
+/* Drafting marks. Layout only - the marks themselves come from the production
+   classes each sample carries, so this section can't drift from the app. */
 .ds-showcase-marks-intro {
   max-width: var(--page-width-prose);
   margin-bottom: var(--space-3);

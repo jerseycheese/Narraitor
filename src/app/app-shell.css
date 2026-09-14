@@ -47,20 +47,6 @@
 :root .home-dashboard {
   border-top: none;
   padding-top: var(--space-6);
-  position: relative;
-}
-
-:root .home-dashboard::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 4px;
-  background-image: radial-gradient(circle, var(--color-text-muted) 1.5px, transparent 1.5px);
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
 }
 
 .app-surface-app h1 {
@@ -1481,55 +1467,15 @@
 }
 
 /* ─── DS3: Mechanical Manuscript ────────────────────────────────
-   Aged-paper rhythm. Dotted divider above the grid, monospace
-   uppercase eyebrow with bullet over each card title, italic
-   serif fallback styling, dotted hairline above the card footer
-   instead of the solid border. */
+   Aged-paper rhythm. Monospace uppercase eyebrow with bullet over each
+   card title, italic serif fallback styling. */
 
 :root .characters-toolbar {
   padding-bottom: var(--space-3);
-  position: relative;
 }
-
-:root .characters-toolbar::after {
-  content: "";
-  display: block;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.7;
-}
-
 
 :root .component-character-card footer {
   border-top: none;
-  position: relative;
-}
-
-:root .component-character-card footer::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: var(--space-4);
-  right: var(--space-4);
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
 }
 
 :root .characters-empty {
@@ -1539,25 +1485,8 @@
 }
 
 :root .characters-empty h2 {
-  position: relative;
   font-family: var(--font-interface);
   font-weight: 600;
-}
-
-:root .characters-empty h2::after {
-  content: "";
-  display: block;
-  width: 96px;
-  height: 4px;
-  margin: var(--space-3) auto 0;
-  background-image: radial-gradient(
-    circle,
-    var(--color-accent) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.7;
 }
 
 /* ─── Character Detail Page ─── */
@@ -1636,30 +1565,7 @@
   }
 }
 
-/* DS3 — Mechanical Manuscript: dotted dividers */
-
-:root .character-detail-header {
-  position: relative;
-  padding-bottom: var(--space-4);
-}
-
-:root .character-detail-header::after {
-  content: "";
-  display: block;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.7;
-}
+/* DS3 - Mechanical Manuscript: dotted dividers under section headings */
 
 :root .character-detail-section h2 {
   position: relative;
@@ -1734,34 +1640,9 @@
 
 :root .component-character-editor .attributes-form-row,
 :root .component-character-editor .skills-form-row {
-  position: relative;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 0;
-  padding-top: var(--space-4);
-}
-
-:root .component-character-editor
-  .attributes-form-row
-  + .attributes-form-row::before,
-:root .component-character-editor
-  .skills-form-row
-  + .skills-form-row::before {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.5;
 }
 
 :root .component-character-editor .attributes-form-meta,
@@ -1784,30 +1665,9 @@
 
 :root .character-editor-actions,
 :root .world-editor-actions {
-  position: relative;
-  padding-top: var(--space-5);
   background: transparent;
   border: none;
   border-radius: 0;
-}
-
-:root .character-editor-actions::before,
-:root .world-editor-actions::before {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: var(--space-5);
-  right: var(--space-5);
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1952,18 +1812,6 @@
 :root .settings-export-import-help {
   font-family: var(--font-interface);
   font-size: var(--font-size-xs_5);
-}
-
-:root .settings-export-import-help p + p {
-  padding-top: var(--space-2);
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  background-position: top left;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2219,19 +2067,9 @@
   font-size: var(--font-size-sm);
 }
 
-/* DS3 — Mechanical Manuscript: dotted radial-gradient divider above the nav,
-   monospace voice on the entry summary. */
+/* DS3 - Mechanical Manuscript: monospace voice on the entry summary. */
 
 :root .journal-page .journal-nav {
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  background-position: top left;
-  padding-top: var(--space-4);
   font-family: var(--font-system);
   font-size: var(--font-size-xs_5);
   letter-spacing: 0.05em;
@@ -2337,8 +2175,7 @@
   margin-top: var(--space-2);
 }
 
-/* DS3 — Mechanical Manuscript: rounded-square radii, italic narrative title
-   with a dotted divider above it, monospace dot-bullet subtitle. */
+/* DS3 - Mechanical Manuscript: rounded-square radii, monospace subtitle. */
 
 :root .component-hero {
   border-radius: var(--radius-md);
@@ -2355,29 +2192,10 @@
 }
 
 :root .component-hero-subtitle {
-  position: relative;
-  padding-top: var(--space-2);
   font-family: var(--font-system);
   font-size: var(--font-size-xs_5);
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
-}
-
-:root .component-hero-subtitle::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3086,10 +2904,9 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   object-fit: cover;
 }
 
-/* ─── DS3 — Console ──────────────────────────────────────────────
-   Lists: dense condensed rows — each card becomes a 5-column line.
-   Detail/edit: 3-col multi-column readout with corner-bracket
-   accents on each section.
+/* ─── DS3 - Console ──────────────────────────────────────────────
+   Lists: dense condensed rows - each card becomes a 5-column line.
+   Detail/edit: multi-column readout.
 */
 
 :root .worlds-screen {
@@ -3110,31 +2927,6 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   padding: var(--space-3) var(--space-3);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
-  position: relative;
-}
-
-:root .component-world-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: var(--mark-arm-length);
-  height: var(--mark-arm-length);
-  border-top: 1px solid var(--color-text-muted);
-  border-left: 1px solid var(--color-text-muted);
-  pointer-events: none;
-}
-
-:root .component-world-card::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: var(--mark-arm-length);
-  height: var(--mark-arm-length);
-  border-bottom: 1px solid var(--color-text-muted);
-  border-right: 1px solid var(--color-text-muted);
-  pointer-events: none;
 }
 
 /* Flatten only as far as the hero link, which becomes the media cell itself —
@@ -3267,31 +3059,6 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   padding: var(--space-3);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
-  position: relative;
-}
-
-:root .component-character-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: var(--mark-arm-length);
-  height: var(--mark-arm-length);
-  border-top: 1px solid var(--color-text-muted);
-  border-left: 1px solid var(--color-text-muted);
-  pointer-events: none;
-}
-
-:root .component-character-card::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: var(--mark-arm-length);
-  height: var(--mark-arm-length);
-  border-bottom: 1px solid var(--color-text-muted);
-  border-right: 1px solid var(--color-text-muted);
-  pointer-events: none;
 }
 
 :root .component-character-card .character-card-body,
@@ -3431,41 +3198,8 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 :root .world-detail-section,
 :root .character-detail-section {
-  position: relative;
   padding: var(--space-4);
   border-radius: 0;
-}
-
-:root .world-detail-section::before,
-:root .character-detail-section::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: var(--mark-arm-length);
-  height: var(--mark-arm-length);
-  border-top: 1px solid var(--color-text-muted);
-  border-left: 1px solid var(--color-text-muted);
-  pointer-events: none;
-}
-
-/* Dimension ticks along the section's top edge — the measured-drawing sibling
-   of the perforated dotted rule, sharing its 12px pitch and its tiling trick so
-   the two read as one family. Detail sections only: they're large and few, and
-   a tick band repeated across a dense card grid would drown the dot grid. */
-:root .world-detail-section::after,
-:root .character-detail-section::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 6px;
-  background-image: linear-gradient(90deg, var(--color-text-muted) 1px, transparent 1px);
-  background-position: 0 0;
-  background-size: 12px 100%;
-  background-repeat: repeat-x;
-  pointer-events: none;
 }
 
 @media (width <= 640px) {

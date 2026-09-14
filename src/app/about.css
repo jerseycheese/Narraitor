@@ -284,9 +284,8 @@
   background: var(--color-surface);
 }
 
-/* Corner brackets — top-left + bottom-right L-marks in muted ink, matching
-   the rest of the app: the one-accent-mark budget is per surface, not per
-   register, so brand pages follow the same rule as product pages. */
+/* Corner brackets - top-left + bottom-right L-marks in muted ink, matching
+   the rest of the app: corner brackets are reserved for borderless cards. */
 :root .component-about-step::before {
   content: "";
   position: absolute;
