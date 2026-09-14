@@ -30,16 +30,16 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
       )}
     >
       {/* Mobile view: current label, step count, and segmented progress */}
-      <div className="wizard-progress-mobile" aria-hidden="true">
+      <div className="wizard-progress-mobile">
         <div className="wizard-progress-mobile-header">
           <span className="wizard-progress-mobile-count">
             Step {currentStep + 1} of {steps.length}
           </span>
-          <span className="wizard-progress-mobile-current">
+          <span className="wizard-progress-mobile-current" aria-current="step">
             {currentStepData?.label}
           </span>
         </div>
-        <div className="wizard-progress-segments">
+        <div className="wizard-progress-segments" aria-hidden="true">
           {steps.map((step, index) => (
             <div
               key={`segment-${step.id}`}

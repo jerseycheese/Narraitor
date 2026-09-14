@@ -16,7 +16,7 @@ const logger = new Logger('FinalizeStep');
 
 interface FinalizeStepProps {
   worldData: Partial<World>;
-  errors: Record<string, string>;
+  errors?: Record<string, string>;
   onComplete?: () => void;
   onBack?: () => void;
   onCancel?: () => void;
@@ -25,7 +25,7 @@ interface FinalizeStepProps {
 
 export default function FinalizeStep({
   worldData,
-  errors,
+  errors = {},
   onUpdateWorldData,
 }: FinalizeStepProps) {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -164,6 +164,9 @@ export default function FinalizeStep({
               <div key={index} className={`${wizardStyles.card.base} wizard-review-card`} data-testid={`review-attribute-${index}`}>
                 <div className="wizard-review-card-meta">{attr.name}</div>
                 <div className="wizard-review-card-detail">{attr.description}</div>
+                <div className="wizard-review-card-range">
+                  Range: {attr.minValue} - {attr.maxValue}
+                </div>
               </div>
             ))}
           </div>

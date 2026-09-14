@@ -371,7 +371,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
             <WizardStep error={error}>
               {renderStep()}
             </WizardStep>
-            
+
             <WizardNavigation
               onCancel={handleCancel}
               onBack={wizard.canGoBack ? handleBack : undefined}

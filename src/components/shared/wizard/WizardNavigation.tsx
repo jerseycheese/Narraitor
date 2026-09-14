@@ -107,4 +107,3 @@ export const WizardNavigation: React.FC<WizardNavigationProps> = ({
     </div>
   );
 };
-

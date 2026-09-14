@@ -582,7 +582,7 @@ export default function WorldCreationWizard({
               {renderCurrentStep()}
             </div>
           </WizardStep>
-          
+
           <WizardNavigation
             onCancel={handleCancel}
             onBack={wizard.canGoBack ? handleBack : undefined}

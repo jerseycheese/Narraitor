@@ -93,6 +93,7 @@ export default function BasicInfoStep({
             helpText="Pick how closely this world should track an existing setting. The choice controls whether your world invents new canon or leans on established material."
           >
             <RadioGroup
+              name="world-type"
               value={worldData.relationship || 'original'}
               onValueChange={(val: string) => {
                 if (val === 'original') {

@@ -634,22 +634,19 @@
 }
 
 .wizard-toggle-active {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  border-color: var(--color-accent);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
 }
 
 .wizard-toggle-active:hover {
-  background: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
-
-  /* Hover darkens the accent (in dark mode too), so white clears AA here even
-   * though the base state uses dark ink on the lighter base accent. */
-  color: var(--color-text-inverse);
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 .wizard-toggle-inactive {
-  background: var(--color-surface);
+  background: transparent;
   color: var(--color-text-muted);
 }
 

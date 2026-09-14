@@ -248,4 +248,3 @@ test('Character creation wizard visual sequence - Mobile (Steps 1–5)', async (
   test.setTimeout(90000);
   await runCharacterCreationSequence(page, 'character-creation-mobile-', { isMobile: true });
 });
-

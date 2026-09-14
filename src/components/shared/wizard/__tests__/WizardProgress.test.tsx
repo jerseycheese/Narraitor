@@ -26,14 +26,21 @@ describe('WizardProgress', () => {
     expect(listItems[4]).not.toHaveAttribute('aria-current');
   });
 
-  it('renders mobile step indicator with current label and step count', () => {
+  it('renders accessible mobile step indicator without aria-hidden on text content', () => {
     const { container } = render(<WizardProgress steps={steps} currentStep={1} />);
+
+    const mobileContainer = container.querySelector('.wizard-progress-mobile');
+    expect(mobileContainer).not.toHaveAttribute('aria-hidden');
 
     const mobileCount = container.querySelector('.wizard-progress-mobile-count');
     expect(mobileCount).toHaveTextContent('Step 2 of 5');
 
     const mobileCurrent = container.querySelector('.wizard-progress-mobile-current');
     expect(mobileCurrent).toHaveTextContent('Description');
+    expect(mobileCurrent).toHaveAttribute('aria-current', 'step');
+
+    const segmentsContainer = container.querySelector('.wizard-progress-segments');
+    expect(segmentsContainer).toHaveAttribute('aria-hidden', 'true');
 
     const segments = container.querySelectorAll('.wizard-progress-segment');
     expect(segments).toHaveLength(5);
