@@ -4,6 +4,42 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.8.0 - 2026-09-14
+
+v1.8 is a design release with no gameplay changes. It sets the shared visual rules that keep the app from looking generated: one filled button per screen, one set of font roles, labels only on data, no border inside a border, and a single decorative mark. The milestone closes 7 issues, plus [#2099](https://github.com/jerseycheese/Narraitor/issues/2099) fixed along the way, across 8 commits since [v1.7.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.7.0), two of which are docs.
+
+**What's in this release**
+
+The foundation rules:
+
+- Each screen has one filled button, in ink blue. The header, mobile drawer and breadcrumbs use outline buttons, per-card actions use secondary, and green now means something finished rather than "go". A `lint:ds-canon` check in CI fails when a green button is labelled with a task verb like Play, Continue, Start or Create ([#2083](https://github.com/jerseycheese/Narraitor/issues/2083)).
+- Font roles match the landing page. Page titles are upright Newsreader, section headings are DM Sans semibold, story prose stays Newsreader, and Fira Code is kept for data values. Sixteen italic heading rules went upright, and a static test fails if `font-style: italic` comes back on a heading selector ([#2084](https://github.com/jerseycheese/Narraitor/issues/2084)).
+- Uppercase mono eyebrow labels now only label data. Dashboard card titles, character card headings and wizard step titles are regular section headings, with the "• Step" and "• Character" prefixes removed ([#2085](https://github.com/jerseycheese/Narraitor/issues/2085)).
+- No bordered element sits inside another bordered element. The wizards, world and character detail pages, and the ending screen group their inner content with spacing, a dotted rule or a tint instead ([#2086](https://github.com/jerseycheese/Narraitor/issues/2086)).
+- The drafting-mark family is down to two marks: a dotted rule under each section heading, and corner brackets on cards that have no border of their own. Registration crosses, dimension ticks and brackets on bordered sections are gone ([#2087](https://github.com/jerseycheese/Narraitor/issues/2087)).
+
+Fixes:
+
+- The characters page no longer shows Create Character and Generate Character twice when the roster is empty. It had been rendering the toolbar and the empty state at the same time ([#2099](https://github.com/jerseycheese/Narraitor/issues/2099)).
+- Five small visual bugs: the journal badge and date running together, the ending screen placeholder touching its link, wizard help text outsizing its label, "Pg" instead of "PG" in the content rating dropdown, and "Make Active" wrapping onto two lines ([#2082](https://github.com/jerseycheese/Narraitor/issues/2082)).
+
+Docs and tooling:
+
+- `DESIGN.md` and the Storybook foundation showcase now match the new rules, including the Don'ts list ([#2104](https://github.com/jerseycheese/Narraitor/pull/2104)).
+- The impeccable design-review plugin moved to 4.3.1, and PRODUCT.md was refreshed for it ([#2081](https://github.com/jerseycheese/Narraitor/issues/2081)).
+
+**Known incomplete**
+
+The rules are in, but no page has had its own design pass yet, and the play screen was out of scope. There's no static guard for the nesting rule because it depends too much on context to lint, so review and screenshots are the only thing enforcing it. Before-and-after screenshots in light and dark are attached to the font, eyebrow, nesting and drafting-mark PRs, but not to [#2097](https://github.com/jerseycheese/Narraitor/pull/2097) or [#2098](https://github.com/jerseycheese/Narraitor/pull/2098).
+
+The world creation screenshot in the README predates this release and still shows the italic headings and nested borders. It should be retaken after the wizard pass in v1.9 rather than twice.
+
+**What's next**
+
+[v1.9](https://github.com/jerseycheese/Narraitor/milestone/10) runs page-by-page design passes on top of these foundations: creation wizards ([#2088](https://github.com/jerseycheese/Narraitor/issues/2088)), lists, detail pages, edit pages, dashboard, journal and ending, settings and providers, and a light check of the public pages. Each pass adds dark and mobile baselines. Flow changes and the play screen stay out.
+
+---
+
 ## v1.7.0 - 2026-09-10
 
 v1.7 closes the loop the [#1818](https://github.com/jerseycheese/Narraitor/issues/1818) playtest campaign left open. A world cost now lands on the decision that caused it, so losing something reads as a consequence of what the player chose instead of a fee charged on the next turn. The milestone closes 4 issues across 6 commits since [v1.6.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.6.0), two of which are docs.
