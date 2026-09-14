@@ -15,27 +15,91 @@ const sharedTokensCss = fs.readFileSync(
   'utf-8'
 );
 
-/** A corner-bracket block: an absolute pseudo-element with 1px L-shaped borders. */
-const BRACKET_BLOCK = /content:\s*""[^}]*?border-(?:top|bottom):\s*1px solid[^}]*?\}/g;
-
-const bracketBlocksIn = (css: string) => css.match(BRACKET_BLOCK) ?? [];
-
-/** The span of every radial-gradient(...) call, paren-matched. */
-function radialGradients(css: string): string[] {
-  const spans: string[] = [];
-  let i = css.indexOf('radial-gradient(');
-  while (i >= 0) {
-    let k = i + 'radial-gradient('.length;
-    let depth = 1;
-    while (depth > 0 && k < css.length) {
-      if (css[k] === '(') depth += 1;
-      else if (css[k] === ')') depth -= 1;
-      k += 1;
+function getCssFiles(dirs: string[]): string[] {
+  const files: string[] = [];
+  for (const dir of dirs) {
+    if (!fs.existsSync(dir)) continue;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        files.push(...getCssFiles([fullPath]));
+      } else if (entry.isFile() && entry.name.endsWith('.css')) {
+        files.push(fullPath);
+      }
     }
-    spans.push(css.slice(i, k));
-    i = css.indexOf('radial-gradient(', k);
   }
-  return spans;
+  return files;
+}
+
+const targetCssFiles = getCssFiles([
+  path.join(__dirname, '..'),
+  path.join(__dirname, '../../styles'),
+  path.join(__dirname, '../../components'),
+]);
+
+const ALL_STYLES = targetCssFiles.map((filepath) => ({
+  file: path.relative(path.join(__dirname, '../../..'), filepath),
+  css: fs.readFileSync(filepath, 'utf-8'),
+}));
+
+const APPROVED_BRACKET_SELECTORS = new Set([
+  ':root .world-detail-npc::before',
+  ':root .world-detail-stat::before',
+  ':root .world-detail-meta-grid .component-data-field::before',
+  ':root .character-detail-derived-stat::before',
+  ':root .character-detail-background-section::before',
+  ':root .character-attribute-card::before',
+  ':root .character-skill-card::before',
+  ':root .component-dashboard-progress-card::before',
+  ':root .component-dashboard-continue-card::before',
+  ':root .component-dashboard-recent-worlds::before',
+  ':root .component-dashboard-recent-characters::before',
+  ':root .component-dashboard-getting-started::before',
+  ':root .component-dashboard-progress-card::after',
+  ':root .component-dashboard-continue-card::after',
+  ':root .component-dashboard-recent-worlds::after',
+  ':root .component-dashboard-recent-characters::after',
+  ':root .component-dashboard-getting-started::after',
+  ':root .component-about-step::before',
+  ':root .component-about-step::after',
+]);
+
+const APPROVED_HEADING_RADIAL_SELECTORS = new Set([
+  ':root .world-detail-section h2::after',
+  ':root .component-collapsible-section [data-testid="collapsible-section-header"][aria-expanded="true"]::after',
+  ':root .character-detail-section h2::after',
+  ':root .settings-section h2::after',
+]);
+
+const EXEMPTED_FUNCTIONAL_PROGRESS_SELECTORS = new Set([
+  ':root .wizard-page .wizard-progress-connector',
+  ':root .wizard-page .wizard-progress-connector-active',
+]);
+
+function extractMatchingSelectors(
+  predicate: (rule: Rule, decls: { prop: string; value: string }[]) => boolean
+): { file: string; selector: string; decls: { prop: string; value: string }[] }[] {
+  const matches: { file: string; selector: string; decls: { prop: string; value: string }[] }[] = [];
+  for (const { file, css } of ALL_STYLES) {
+    const root = postcss.parse(css, { from: file });
+    root.walkRules((rule) => {
+      const decls = (rule.nodes?.filter((n) => n.type === 'decl') ?? []) as {
+        prop: string;
+        value: string;
+      }[];
+      if (predicate(rule, decls)) {
+        for (const sel of rule.selectors) {
+          matches.push({
+            file,
+            selector: sel.replace(/\s+/g, ' ').trim(),
+            decls,
+          });
+        }
+      }
+    });
+  }
+  return matches;
 }
 
 describe('drafting-mark family', () => {
@@ -46,29 +110,74 @@ describe('drafting-mark family', () => {
     expect(aboutCss).not.toMatch(/--mark-arm-length:/);
   });
 
-  it('sizes every corner bracket from the token, never a literal arm length', () => {
-    for (const css of [appShellCss, dashboardCss, aboutCss]) {
-      for (const block of bracketBlocksIn(css)) {
-        expect(block).not.toMatch(/width:\s*\d+px/);
-      }
+  it('permits corner brackets only on approved borderless-card selectors', () => {
+    const bracketRules = extractMatchingSelectors((rule, decls) => {
+      const isPseudo = rule.selector.includes('::before') || rule.selector.includes('::after');
+      const hasMarkArm = decls.some(
+        (d) => (d.prop === 'width' || d.prop === 'height') && d.value.includes('--mark-arm-length')
+      );
+      const hasLBorder = decls.some(
+        (d) => d.prop.startsWith('border-') && d.value.includes('1px solid')
+      );
+      return isPseudo && (hasMarkArm || hasLBorder);
+    });
+
+    for (const { selector } of bracketRules) {
+      expect(APPROVED_BRACKET_SELECTORS.has(selector)).toBe(true);
     }
+    const foundSelectors = new Set(bracketRules.map((r) => r.selector));
+    expect(foundSelectors).toEqual(APPROVED_BRACKET_SELECTORS);
+  });
+
+  it('permits decorative radial-gradient rules only under approved section headings', () => {
+    const radialRules = extractMatchingSelectors((_rule, decls) =>
+      decls.some((d) => d.prop === 'background-image' && d.value.includes('radial-gradient'))
+    );
+
+    for (const { selector } of radialRules) {
+      const isApprovedHeading = APPROVED_HEADING_RADIAL_SELECTORS.has(selector);
+      const isExemptedProgress = EXEMPTED_FUNCTIONAL_PROGRESS_SELECTORS.has(selector);
+      expect(isApprovedHeading || isExemptedProgress).toBe(true);
+    }
+
+    const foundSelectors = new Set(radialRules.map((r) => r.selector));
+    const allExpected = new Set([
+      ...APPROVED_HEADING_RADIAL_SELECTORS,
+      ...EXEMPTED_FUNCTIONAL_PROGRESS_SELECTORS,
+    ]);
+    expect(foundSelectors).toEqual(allExpected);
+  });
+
+  it('asserts no pseudo-element implements registration-cross or dimension-tick patterns', () => {
+    const tickOrCrossRules = extractMatchingSelectors((rule, decls) => {
+      const isPseudo = rule.selector.includes('::before') || rule.selector.includes('::after');
+      if (!isPseudo) return false;
+
+      const hasCross = decls.some(
+        (d) => d.prop === 'background-size' && d.value.includes('100% 1px, 1px 100%')
+      );
+      const hasTicks = decls.some(
+        (d) =>
+          d.value.includes('linear-gradient') &&
+          decls.some((d2) => d2.prop === 'background-size' && d2.value.includes('12px 100%'))
+      );
+      return hasCross || hasTicks;
+    });
+
+    expect(tickOrCrossRules).toEqual([]);
+    expect(appShellCss).not.toMatch(/repeating-linear-gradient/);
   });
 
   it('draws dotted rules at ink weight, not at border weight', () => {
-    // --color-border-strong sits ~0.2:1 above the card's own border, which makes
-    // the mark read as a darker edge rather than a mark. The family shares one
-    // weight; see the bracket rules for the same choice.
-    for (const css of [appShellCss, wizardCss]) {
-      for (const gradient of radialGradients(css)) {
-        expect(gradient).not.toMatch(/--color-border-strong/);
+    for (const { selector, decls } of extractMatchingSelectors((_rule, decls) =>
+      decls.some((d) => d.prop === 'background-image' && d.value.includes('radial-gradient'))
+    )) {
+      if (APPROVED_HEADING_RADIAL_SELECTORS.has(selector)) {
+        // Assert heading radial-gradients never use border-strong
+        const usesBorderStrong = decls.some((d) => d.value.includes('--color-border-strong'));
+        expect(usesBorderStrong).toBe(false);
       }
     }
-  });
-
-  it('tiles dimension ticks without repeating-linear-gradient', () => {
-    // Not in this file group's stylelint function-allowed-list, and background-size
-    // tiling covers it. Guards against reaching for the allow-list instead.
-    expect(appShellCss).not.toMatch(/repeating-linear-gradient/);
   });
 });
 
@@ -315,29 +424,7 @@ function findMonoUppercaseHeadingRules(
   return [];
 }
 
-function getCssFiles(dirs: string[]): string[] {
-  const files: string[] = [];
-  for (const dir of dirs) {
-    if (!fs.existsSync(dir)) continue;
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        files.push(...getCssFiles([fullPath]));
-      } else if (entry.isFile() && entry.name.endsWith('.css')) {
-        files.push(fullPath);
-      }
-    }
-  }
-  return files;
-}
-
 describe('heading typography static guards', () => {
-  const targetCssFiles = getCssFiles([
-    path.join(__dirname, '..'),
-    path.join(__dirname, '../../styles'),
-    path.join(__dirname, '../../components'),
-  ]);
 
   it('does not declare font-style: italic on heading selectors in app, styles, or components css', () => {
     const rootDir = path.join(__dirname, '../../..');

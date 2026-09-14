@@ -977,6 +977,7 @@
   font-size: var(--font-size-xs_5);
 }
 
+/* Functional progress UI: dotted connector between wizard steps (outside decorative drafting-mark family). */
 :root .wizard-page .wizard-progress-connector {
   height: 4px;
   background: transparent;
@@ -1002,29 +1003,6 @@
   opacity: 1;
 }
 
-:root .wizard-page .wizard-form-section {
-  position: relative;
-  padding-top: var(--space-4);
-}
-
-:root .wizard-page .wizard-form-section + .wizard-form-section::before {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
-}
-
 :root .wizard-page .form-input,
 :root .wizard-page .form-textarea,
 :root .wizard-page .form-select {
@@ -1037,27 +1015,7 @@
 }
 
 :root .wizard-page .wizard-nav-container {
-  position: relative;
   border-top: none;
-  padding-top: var(--space-5);
-}
-
-:root .wizard-page .wizard-nav-container::before {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
 }
 
 :root .wizard-page .wizard-nav-primary,
@@ -1315,8 +1273,7 @@
    editors, point-pool allocation, portrait controls, image review,
    slot meters and the inline confirm alert — a structural treatment
    so they read as part of the design rather than one default widget
-   recolored: dense 4px chrome, dotted radial-gradient separators,
-   compact square cells, monospace labels.
+   recolored: dense 4px chrome, compact square cells, monospace labels.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── Shared layout (theme-neutral) ─── */
@@ -1730,27 +1687,7 @@
 
 :root .wizard-page .wizard-review-card-detail,
 :root .wizard-page .wizard-skill-level {
-  position: relative;
-  padding-top: var(--space-3);
   gap: var(--space-2);
-}
-
-:root .wizard-page .wizard-review-card-detail::before,
-:root .wizard-page .wizard-skill-level::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 8px 4px;
-  background-repeat: repeat-x;
-  opacity: 0.6;
 }
 
 :root .wizard-page .wizard-skill-attr-option {
@@ -1981,8 +1918,7 @@
   color: var(--color-text-primary);
 }
 
-/* DS3 — dotted radial-gradient divider above the nav row, mirroring the
-   .wizard-progress-connector pattern at line 1147. */
+/* DS3 - Guided first-time creation modal. */
 
 :root .component-guided-first-time {
   border-radius: var(--radius-md);
@@ -2011,15 +1947,6 @@
 
 :root .component-guided-first-time-nav {
   border-top: none;
-  background-image: radial-gradient(
-    circle,
-    var(--color-text-muted) 1.5px,
-    transparent 1.5px
-  );
-  background-size: 12px 4px;
-  background-repeat: repeat-x;
-  background-position: top left;
-  padding-top: var(--space-5);
 }
 
 :root .component-guided-first-time-error {

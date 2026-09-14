@@ -84,7 +84,7 @@ components:
 
 # Narraitor Design
 
-> **Note:** Narraitor ships a single design system, DS3 ("The Mechanical Manuscript") — see [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md), which collapsed the three-system architecture described in [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md). Colors, typography, and the drafting-marks vocabulary below are verified against [ds3.css](src/lib/theme/themes/ds3.css) and [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) as of 2026-08-09 (`develop` @ `44fc072d`). Those two files stay the literal source of truth going forward — if a token value here and in the CSS ever disagree, the CSS is right and this doc is stale.
+> **Note:** Narraitor ships a single design system, DS3 ("The Mechanical Manuscript") — see [ADR-013](public_docs/architecture/ADR-013-collapse-to-single-design-system-ds3.md), which collapsed the three-system architecture described in [ADR-011](public_docs/architecture/ADR-011-three-design-systems.md). Colors, typography, and the drafting-marks vocabulary below are verified against [ds3.css](src/lib/theme/themes/ds3.css) and [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css) as of 2026-09-14 (`develop` @ `e353451a`, post-v1.8 design foundations #2081–#2087). Those two files stay the literal source of truth going forward — if a token value here and in the CSS ever disagree, the CSS is right and this doc is stale.
 
 ## Overview
 
@@ -281,38 +281,36 @@ DS3's radius scale — tight, drafted: `--radius-sm: 4px`, `--radius-md: 6px`, `
 
 ## Drafting Marks
 
-DS3's decorative vocabulary is one family of ink marks, not a set of unrelated ornaments. Five members:
+The family is one mark, a perforated dotted rule in `--color-text-muted` drawn once under each section heading across the content column; corner brackets are allowed only on a card with no border of its own.
 
 | Mark | What it is | Where it goes |
 |---|---|---|
-| Corner bracket | L-shaped mark(s) in one or both corners | List cards get two, top-left and bottom-right; detail-page data cards, detail sections, and the play surface's left-gutter outcome mark get one, top-left only |
-| Registration cross | A bracket promoted to a full trim mark | One per surface, in accent |
-| Dimension ticks | 1px ticks tiled along a top edge at 12px pitch | Detail-section top edge only |
-| Perforated dotted rule | `radial-gradient` dots at `12px 4px` | Section dividers, under headings |
-| Data eyebrow | Compact data label | Above or beside genuine data values (World, Character, Last Played, metrics), never headings |
+| Perforated dotted rule | `radial-gradient` dots at `12px 4px` | Drawn once under each approved section heading across the content column |
+| Corner bracket | L-shaped mark(s) in muted ink | Permitted only on cards or cells with no border of their own |
 
-The brackets are the root. A corner bracket and a registration cross are the same referent, which is why the family grew out of them rather than being invented beside them. The bracket isn't drawn the same everywhere, though: list cards (`.component-world-card`, `.component-character-card`, the dashboard cards) get the full two-corner treatment, `::before` (top-left) paired with `::after` (bottom-right) in [app-shell.css](src/app/app-shell.css) and [dashboard.css](src/app/dashboard.css). Detail-page data cards (`.world-detail-npc`, `.world-detail-stat`, `.world-detail-meta-grid .component-data-field`) and detail sections (`.world-detail-section`, `.character-detail-section`) get a single top-left `::before` bracket only — their `::after` is spent on dimension ticks instead of a second bracket (see below), so a detail section carries one corner mark plus a tick band, not two corner marks. The play surface's `.choice-outcome-callout`, carved into the left page gutter at >=1280px ([manuscript-session.css](src/styles/manuscript-session.css)), is the same single top-left bracket applied to marginalia rather than a card — it identifies the mark as annotation rather than decoration, matching the weight rule below rather than the DS3 card chrome (border, fill, shadow) the callout carries in its in-flow, sub-1280px form.
+Corner brackets are the narrow exception. On bordered cards with a radius, a square corner bracket sits on the curve and reads as a rendering glitch. On borderless surfaces - the dashboard cards (`.component-dashboard-*-card`), the About step cards (`.component-about-step`), and borderless detail cells (`.world-detail-npc`, `.character-detail-derived-stat`, etc.) - corner brackets read as deliberate trim marks framing the content.
+
+Data eyebrows are compact data labels (above or beside genuine data values, never headings) rather than decorative marks. Functional UI like the wizard's dotted step connectors (`.wizard-progress-connector`) indicates progress and sits outside the decorative drafting-mark family.
 
 ### The weight rule
 
-Every mark is drawn in `--color-text-muted` — roughly 4.65:1 against the card in light mode and 4.61:1 in dark, close enough that the family reads at one weight in both modes. Two colors it is deliberately not:
+Every mark is drawn in `--color-text-muted` - roughly 4.65:1 against the card in light mode and 4.61:1 in dark, close enough that the family reads at one weight in both modes. Two colors it is deliberately not:
 
-- **Not accent.** With a bracket on every card, accent stops reading as emphasis. Accent buys at most one focal mark per surface — per surface, not per card, and not per register. The About page follows the same rule the dashboard does.
-- **Not a border token.** `--color-border-strong` sits about 0.2:1 above a card's own border, so the mark would read as a slightly darker edge rather than as a mark — which is what 20 dotted-rule sites were doing before this vocabulary was named.
+- **Not accent.** Accent is reserved for interactive actions. Muted ink keeps the rule quiet and structural.
+- **Not a border token.** `--color-border-strong` sits about 0.2:1 above a card's own border, so the mark would read as a slightly darker edge rather than as an ink mark.
 
-Marks with arms share `--mark-arm-length` (`10px`, [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css)) — one dial, defined once.
+Marks with arms share `--mark-arm-length` (`10px`, [_shared-tokens.css](src/lib/theme/themes/_shared-tokens.css)) - one dial, defined once.
 
 ### The attachment rule
 
-- Marks attach to **cards and detail sections**.
-- **Never the wizard.** It already carries ten dotted rules — the most decorated surface in the app. A fourth family there is noise.
+- Dotted rules attach **only beneath section headings**.
+- Never standalone dividers, toolbar lines, card footers, or paragraph separators.
+- **Never the wizard.** Wizard progress connectors are functional step UI; decorative radial separators are not permitted.
 - **Never full-bleed.** Marks are figure and the dot grid is ground. A mark that tiles the page stops being figure and becomes a second ground.
-- **Ticks are section-only.** A tick band repeated across a dense card grid drowns the dot grid.
-- Any mark that offsets past its element's edge must check for `overflow: hidden` on that element first. The dashboard continue card clips to contain its world-image background layer, so its registration cross sits inside the corner rather than straddling it.
 
 ### Pitch
 
-The dot grid tiles at `24px` (see [Colors](#colors)). The dotted rule and the dimension ticks both tile at `12px`, half the grid — a deliberate sibling pitch. Nothing lands at an in-between value, which would read as grid noise.
+The dot grid tiles at `24px` (see [Colors](#colors)). The perforated dotted rule tiles at `12px`, half the grid - a deliberate sibling pitch. Nothing lands at an in-between value, which would read as grid noise.
 
 ### Not part of the family
 
@@ -320,7 +318,7 @@ Anything without a drafting referent: no decorative squiggles, no handwritten-fo
 
 ### Reference
 
-The canon rendering is the "Drafting Marks" section in [DesignSystemShowcase.stories.tsx](src/stories/00-foundation/DesignSystemShowcase.stories.tsx) — it renders the production classes rather than copies, so it can't drift from the app.
+The canon rendering is the "Drafting Marks" section in [DesignSystemShowcase.stories.tsx](src/stories/00-foundation/DesignSystemShowcase.stories.tsx) - it renders the production classes rather than copies, so it can't drift from the app.
 
 ## Components
 
@@ -381,6 +379,11 @@ The don'ts here come from real failures during the design-system migration. They
 - **Don't put a bordered element inside a bordered element.** Box-in-box was the loudest "generated" signal in the app. Group inner content with spacing, a dotted rule, or a tint.
 - **Don't introduce a third chrome.** A new page picks app or manuscript. The last time a surface was added to differentiate one part of the product, the two shells drifted until the same three links looked like two different apps (#1655). To make part of the app surface look different, reach for a register, not a shell.
 - **Don't put an element rule in `_register-brand.css`.** It's a token layer. The moment it starts styling elements it's a shell in disguise, and the drift starts again.
+- **Don't use eyebrow labels on headings.** Eyebrows are compact data labels for genuine data values, never headings. A heading already provides typographic hierarchy; adding an eyebrow bullet or label above it is redundant noise (#2085).
+- **Don't use registration crosses, dimension ticks, or bordered-card corner brackets.** The drafting-mark family is strictly one mark (the section-heading dotted rule) plus corner brackets on genuinely borderless cards (#2087).
+- **Don't attach dotted rules anywhere except beneath section headings.** Never standalone dividers, toolbar lines, card footers, paragraph separators, or in the wizard (#2087).
+- **Don't attach corner brackets to bordered surfaces.** Brackets on a bordered card sit awkwardly on the corner radius and look like rendering artifacts. Only borderless cards (dashboard cards, About step cards, detail cells) permit them (#2087).
+- **Don't use italic for headings.** Page titles are upright Newsreader; section headings are upright DM Sans semibold. Italic is reserved for emphasis inside prose (#2084).
 
 ### Do's
 
