@@ -27,7 +27,7 @@ const captureFullStep = async (page: Page, name: string): Promise<void> => {
     `,
   });
   await page.waitForTimeout(50);
-  await expect.soft(page).toHaveScreenshot(name, { fullPage: true });
+  await expect(page).toHaveScreenshot(name, { fullPage: true });
 };
 
 /**

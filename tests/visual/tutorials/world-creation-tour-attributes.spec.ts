@@ -54,6 +54,6 @@ test('World creation tour: Review Attributes (tour steps 11-14)', async ({ page 
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect.soft(page).toHaveScreenshot(`tutorial-world-creation-attributes-${zeroPad(stepIndex)}.png`, { clip });
+    await expect(page).toHaveScreenshot(`tutorial-world-creation-attributes-${zeroPad(stepIndex)}.png`, { clip });
   }
 });

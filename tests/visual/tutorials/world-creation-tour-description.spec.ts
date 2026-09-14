@@ -49,6 +49,6 @@ test('World creation tour: World Description (tour steps 8-10)', async ({ page }
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect.soft(page).toHaveScreenshot(`tutorial-world-creation-description-${zeroPad(stepIndex)}.png`, { clip });
+    await expect(page).toHaveScreenshot(`tutorial-world-creation-description-${zeroPad(stepIndex)}.png`, { clip });
   }
 });
