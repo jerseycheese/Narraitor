@@ -1165,16 +1165,6 @@
     "actions"
     "content";
   gap: var(--space-3);
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--color-text-primary) 14%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: calc(var(--space-6) + var(--space-2)) calc(var(--space-6) + var(--space-2));
-  background-repeat: repeat;
 }
 
 :root .component-world-creation-wizard > .component-wizard-progress,
@@ -1232,14 +1222,12 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-1_5) var(--space-2);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-canvas);
 }
 
 :root .component-world-creation-wizard .wizard-progress-step-active,
 :root .component-character-creation-wizard .wizard-progress-step-active {
-  border-color: var(--color-accent);
   background: var(--color-accent);
   color: var(--color-on-accent);
 }
@@ -1274,10 +1262,6 @@
 :root .component-world-creation-wizard .wizard-form-section,
 :root .component-character-creation-wizard .wizard-form-section {
   margin: 0;
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
 }
 
 :root .component-world-creation-wizard .wizard-form-section + .wizard-form-section,
@@ -2098,10 +2082,9 @@
   align-items: flex-start;
   gap: var(--space-2_5);
   padding: var(--space-3);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
-  transition: border-color 120ms ease, background 120ms ease;
+  background: var(--color-canvas);
+  transition: background 120ms ease;
 }
 
 /* Native radios inherit .form-input's width:100% from the shared Input
@@ -2113,7 +2096,6 @@
 }
 
 .component-world-creation-wizard .wizard-radio-option:has(input:checked) {
-  border-color: var(--color-accent);
   background: var(--color-accent-soft);
 }
 
@@ -2230,7 +2212,9 @@
 
 /* ─── F18 — provider key disclosure (#2044) ─── */
 
+/* Sits inside the bordered step panel, so it groups by tint alone. */
 .component-world-creation-wizard .wizard-byok-disclosure {
+  border: none;
   margin-top: var(--space-3);
   margin-bottom: var(--space-3);
 }

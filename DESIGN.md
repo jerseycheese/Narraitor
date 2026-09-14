@@ -258,6 +258,16 @@ Two shadow tokens:
 
 Depth is conveyed primarily through **borders and tonal shifts**, not shadows. Cards sit on `surface` over a `canvas` background; the contrast does the work. Shadows are reserved for genuinely elevated UI (modals, drawers, dropdowns).
 
+### One border deep
+
+**No bordered element inside a bordered element.** The border belongs to the outer layer. Anything grouped inside it uses spacing, a perforated dotted rule, or a background tint (`canvas` on a `surface` parent, `accent-soft` for a selected option), never a second border. Two levels isn't a compromise; two levels is where most of the old clutter lived.
+
+- **Wizards:** the progress, step and nav panels are the one bordered layer. The wizard frame around them has no border. Form sections, step chips, radio options and the provider-key disclosure inside a panel are borderless.
+- **Detail sections and `SectionWrapper`:** the section keeps its border. The NPC, stat, data-field, background and achievement cells inside it are `canvas`-tinted, and attribute and skill cards keep their own `surface-hover` and `accent-soft` fills. None of them is outlined.
+- **Controls are exempt.** Inputs, selects, textareas, buttons and the stepper's number circles have borders because they're controls, not grouping.
+
+There's no static guard for this, because nesting is too contextual to lint. The design-system-cop review and the screenshot review catch it.
+
 ## Shapes
 
 DS3's radius scale — tight, drafted: `--radius-sm: 4px`, `--radius-md: 6px`, `--radius-lg: 8px`, `--radius-full: 9999px`.
@@ -330,6 +340,7 @@ Component rules apply to DS3. The token references resolve automatically.
 
 - Background `surface`, border `1px solid var(--color-border)`, radius `var(--radius-md)` (6px), padding `var(--space-md)` (16px).
 - No drop shadows. Depth comes from the surface contrast against `canvas`.
+- Never inside another bordered element. A card-like cell inside a bordered section drops the border and takes a `canvas` tint instead (see [One border deep](#one-border-deep)).
 
 ### Input
 
@@ -367,6 +378,7 @@ The don'ts here come from real failures during the design-system migration. They
 - **Don't add per-world theming.** DS3 is fixed, not genre-driven, and was never meant to flex per world. Adding a `world.theme` field is scope creep with no demand.
 - **Don't write new color tokens for one-off shades.** If a shade is needed once, it doesn't deserve a token. If it's needed twice, the existing token is probably the right answer.
 - **Don't use drop shadows for general elevation.** Borders and tonal contrast first; shadows only for modals, drawers, and dropdowns.
+- **Don't put a bordered element inside a bordered element.** Box-in-box was the loudest "generated" signal in the app. Group inner content with spacing, a dotted rule, or a tint.
 - **Don't introduce a third chrome.** A new page picks app or manuscript. The last time a surface was added to differentiate one part of the product, the two shells drifted until the same three links looked like two different apps (#1655). To make part of the app surface look different, reach for a register, not a shell.
 - **Don't put an element rule in `_register-brand.css`.** It's a token layer. The moment it starts styling elements it's a shell in disguise, and the drift starts again.
 
