@@ -367,8 +367,9 @@ export default function AttributeReviewStep({
                         type="button"
                         data-testid={`attribute-toggle-${index}`}
                         onClick={() => handleToggleAttribute(index)}
-                        variant={suggestion.accepted ? 'default' : 'outline'}
+                        variant="outline"
                         size="sm"
+                        aria-pressed={suggestion.accepted}
                       >
                         {suggestion.accepted ? 'Selected' : 'Excluded'}
                       </Button>
@@ -446,6 +447,7 @@ export default function AttributeReviewStep({
               <Button
                 type="button"
                 onClick={handleAddCustomAttribute}
+                variant="outline"
                 size="sm"
                 data-testid="add-custom-attribute-button"
                 disabled={acceptedCount >= 6}

@@ -9,13 +9,11 @@ import {
   WizardTextField,
   WizardSelect,
   WizardFormSection,
-  wizardStyles
 } from '@/components/shared/wizard';
 import Link from 'next/link';
 import { useProviderStore } from '@/state/providerStore';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { GENRES, type GenreValue } from '@/lib/constants/genres';
 import { getWorldGuidance } from '@/lib/constants/worldGuidance';
 
@@ -41,12 +39,6 @@ export default function BasicInfoStep({
 
   return (
     <div className="component-basic-info-step" data-testid="basic-info-step">
-      {/* Main step header */}
-      <div>
-        <h2 className={wizardStyles.step.title}>Basic Information</h2>
-        <p className={wizardStyles.step.description}>Let&apos;s start with some basic information about your world and configure how stories will be told.</p>
-      </div>
-
       {!hasConfiguredKey && (
         <Alert
           variant="info"
@@ -100,60 +92,59 @@ export default function BasicInfoStep({
             error={combinedErrors.relationship}
             helpText="Pick how closely this world should track an existing setting. The choice controls whether your world invents new canon or leans on established material."
           >
-            <div className="wizard-radio-group">
-              <div className="wizard-radio-option">
-                <Input
-                  type="radio"
+            <RadioGroup
+              value={worldData.relationship || 'original'}
+              onValueChange={(val: string) => {
+                if (val === 'original') {
+                  onUpdate({ ...worldData, relationship: undefined, reference: '' });
+                } else {
+                  onUpdate({ ...worldData, relationship: val as 'inspired_by' | 'set_within' });
+                }
+              }}
+              className="wizard-radio-group"
+            >
+              <label className="wizard-radio-option" htmlFor="relationship-none">
+                <RadioGroupItem
+                  value="original"
                   id="relationship-none"
-                  name="relationship"
-                  value=""
-                  checked={!worldData.relationship}
-                  onChange={() => onUpdate({ ...worldData, relationship: undefined, reference: '' })}
+                  data-testid="relationship-none-radio"
                 />
                 <div className="wizard-radio-option-text">
-                  <Label htmlFor="relationship-none">Original World</Label>
+                  <span className="wizard-radio-option-title">Original World</span>
                   <p className="wizard-radio-option-desc">
                     Create a completely original world from your imagination
                   </p>
                 </div>
-              </div>
+              </label>
 
-              <div className="wizard-radio-option">
-                <Input
-                  type="radio"
+              <label className="wizard-radio-option" htmlFor="relationship-based-on">
+                <RadioGroupItem
+                  value="inspired_by"
                   id="relationship-based-on"
-                  name="relationship"
-                  value="based_on"
-                  checked={worldData.relationship === 'inspired_by'}
-                  onChange={() => onUpdate({ ...worldData, relationship: 'inspired_by' })}
                   data-testid="relationship-based-on-radio"
                 />
                 <div className="wizard-radio-option-text">
-                  <Label htmlFor="relationship-based-on">Inspired By</Label>
+                  <span className="wizard-radio-option-title">Inspired By</span>
                   <p className="wizard-radio-option-desc">
                     Create an original world inspired by an existing fictional universe or real setting
                   </p>
                 </div>
-              </div>
+              </label>
 
-              <div className="wizard-radio-option">
-                <Input
-                  type="radio"
+              <label className="wizard-radio-option" htmlFor="relationship-set-in">
+                <RadioGroupItem
+                  value="set_within"
                   id="relationship-set-in"
-                  name="relationship"
-                  value="set_in"
-                  checked={worldData.relationship === 'set_within'}
-                  onChange={() => onUpdate({ ...worldData, relationship: 'set_within' })}
                   data-testid="relationship-set-in-radio"
                 />
                 <div className="wizard-radio-option-text">
-                  <Label htmlFor="relationship-set-in">Set Within</Label>
+                  <span className="wizard-radio-option-title">Set Within</span>
                   <p className="wizard-radio-option-desc">
                     Place your world directly within an existing fictional universe or real setting
                   </p>
                 </div>
-              </div>
-            </div>
+              </label>
+            </RadioGroup>
           </WizardFormGroup>
         </div>
 

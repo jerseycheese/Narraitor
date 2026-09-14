@@ -8,6 +8,7 @@ import { PortraitSubject } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PortraitCustomizationSection } from '@/components/shared';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ImageUploadPicker,
@@ -195,20 +196,20 @@ export function PortraitStep({
               moving on without that leaves the character as it was.
             </p>
             <div className="portrait-step-actions">
-              <button
+              <Button
                 type="button"
-                className="portrait-step-button"
+                variant="outline"
                 onClick={handleUsePreview}
               >
                 Use this portrait
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className="portrait-step-button"
+                variant="ghost"
                 onClick={() => setPreviewPortrait(null)}
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -220,13 +221,13 @@ export function PortraitStep({
               Portrait saved to this character
             </p>
             <div className="portrait-step-actions">
-              <button
+              <Button
                 type="button"
-                className="portrait-step-button"
+                variant="outline"
                 onClick={handleRemovePortrait}
               >
                 Remove Portrait
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -255,9 +256,9 @@ export function PortraitStep({
               environmentHint={environmentHint}
               setEnvironmentHint={setEnvironmentHint}
             />
-            <button
+            <Button
               type="button"
-              className="portrait-step-button"
+              variant="outline"
               onClick={handleGeneratePortrait}
               disabled={isGenerating}
               data-tutorial="portrait-generator-action"
@@ -265,7 +266,7 @@ export function PortraitStep({
               {savedPortrait.type === 'ai-generated' && savedPortrait.url
                 ? 'Regenerate Portrait'
                 : 'Generate Portrait'}
-            </button>
+            </Button>
           </TabsContent>
 
           <TabsContent value="presets">

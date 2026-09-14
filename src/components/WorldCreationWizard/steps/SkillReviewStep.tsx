@@ -512,8 +512,9 @@ export default function SkillReviewStep({
                         type="button"
                         data-testid={`skill-toggle-${index}`}
                         onClick={() => handleToggleSkill(index)}
-                        variant={suggestion.accepted ? 'default' : 'outline'}
+                        variant="outline"
                         size="sm"
+                        aria-pressed={suggestion.accepted}
                       >
                         {suggestion.accepted ? 'Selected' : 'Excluded'}
                       </Button>
@@ -680,6 +681,7 @@ export default function SkillReviewStep({
               <Button
                 type="button"
                 onClick={handleAddCustomSkill}
+                variant="outline"
                 size="sm"
                 data-testid="add-custom-skill-button"
                 disabled={acceptedCount >= 12}

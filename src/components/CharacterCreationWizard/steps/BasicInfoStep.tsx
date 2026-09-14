@@ -68,14 +68,6 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         title="Basic Information"
         description="Create your character by providing their name and basic details."
       >
-      {/* Helpful tip */}
-      <div>
-        <p className="form-help-text">
-          Choose a unique name for your character. The name should be between 2 and 50 characters
-          and must be unique within this world.
-        </p>
-      </div>
-
       <div className="component-basic-info-layout">
         {/* Portrait placeholder */}
         <div>
@@ -97,6 +89,9 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               maxLength={50}
               placeholder="Enter character name"
             />
+            <p className="form-help-text">
+              Between 2 and 50 characters, unique within this world.
+            </p>
           </div>
 
           <div>

@@ -17,3 +17,12 @@ export const Default: Story = {
     children: <p>Step content goes here.</p>,
   },
 };
+
+export const WithSubtitleAndMeta: Story = {
+  args: {
+    title: 'Create Character',
+    subtitle: 'in Eldoria',
+    headerMeta: <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Saved just now</span>,
+    children: <p>Step content goes here.</p>,
+  },
+};

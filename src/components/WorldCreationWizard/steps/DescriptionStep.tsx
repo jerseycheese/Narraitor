@@ -188,6 +188,7 @@ export default function DescriptionStep({
           <div className="wizard-suggestion-actions">
             <Button
               type="button"
+              variant="outline"
               onClick={() => {
                 void onGenerateSuggestions();
               }}
@@ -201,13 +202,11 @@ export default function DescriptionStep({
                   ? 'Regenerate suggestions'
                   : 'Generate suggestions'}
             </Button>
-            <span className="wizard-suggestion-hint">
-              {hasAISuggestions && suggestionMeta?.source
-                ? SUGGESTION_SOURCE_LABELS[suggestionMeta.source]
-                : meetsAIMinimumLength
-                  ? 'Suggestions need a detailed description to stay accurate.'
-                  : 'Once the description reaches 50+ characters, suggestions can help with ideas.'}
-            </span>
+            {hasAISuggestions && suggestionMeta?.source && (
+              <span className="wizard-suggestion-hint">
+                {SUGGESTION_SOURCE_LABELS[suggestionMeta.source]}
+              </span>
+            )}
           </div>
 
           {errors.ai && (

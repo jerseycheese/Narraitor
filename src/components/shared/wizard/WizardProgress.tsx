@@ -18,52 +18,91 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
   currentStep,
   className = '',
 }) => {
+  const currentStepData = steps[currentStep] || steps[0];
+
   return (
-    <div
+    <nav
+      aria-label="Progress"
       className={clsx(
         'component-wizard-progress',
         wizardStyles.progress.container,
         className
       )}
     >
-      <div className="wizard-progress-row">
-        {steps.map((step, index) => (
-          <React.Fragment key={step.id}>
+      {/* Mobile view: current label, step count, and segmented progress */}
+      <div className="wizard-progress-mobile" aria-hidden="true">
+        <div className="wizard-progress-mobile-header">
+          <span className="wizard-progress-mobile-count">
+            Step {currentStep + 1} of {steps.length}
+          </span>
+          <span className="wizard-progress-mobile-current">
+            {currentStepData?.label}
+          </span>
+        </div>
+        <div className="wizard-progress-segments">
+          {steps.map((step, index) => (
             <div
+              key={`segment-${step.id}`}
               className={clsx(
-                'wizard-progress-step-wrapper',
-                wizardStyles.progress.step,
-                index === currentStep && wizardStyles.progress.stepActive,
-                index < currentStep && wizardStyles.progress.stepCompleted
+                'wizard-progress-segment',
+                index <= currentStep && 'wizard-progress-segment-active',
+                index === currentStep && 'wizard-progress-segment-current'
               )}
-            >
-              <div
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop view: compact 5-step ledger with ordered list semantics */}
+      <ol className="wizard-progress-row wizard-progress-desktop" role="list">
+        {steps.map((step, index) => {
+          const isCurrent = index === currentStep;
+          const isCompleted = index < currentStep;
+
+          return (
+            <React.Fragment key={step.id}>
+              <li
                 className={clsx(
-                  wizardStyles.progress.circle,
-                  index === currentStep
-                    ? wizardStyles.progress.circleActive
-                    : index < currentStep
-                    ? wizardStyles.progress.circleCompleted
-                    : wizardStyles.progress.circleInactive
+                  'wizard-progress-step-wrapper',
+                  wizardStyles.progress.step,
+                  isCurrent && wizardStyles.progress.stepActive,
+                  isCompleted && wizardStyles.progress.stepCompleted
                 )}
+                aria-current={isCurrent ? 'step' : undefined}
               >
-                {index + 1}
-              </div>
-              <span className={wizardStyles.progress.label}>{step.label}</span>
-            </div>
-            {index < steps.length - 1 && (
-              <div className="wizard-progress-connector-wrapper">
                 <div
                   className={clsx(
-                    wizardStyles.progress.connector,
-                    index < currentStep && wizardStyles.progress.connectorActive
+                    wizardStyles.progress.circle,
+                    isCurrent
+                      ? wizardStyles.progress.circleActive
+                      : isCompleted
+                      ? wizardStyles.progress.circleCompleted
+                      : wizardStyles.progress.circleInactive
                   )}
-                />
-              </div>
-            )}
-          </React.Fragment>
-        ))}
-      </div>
-    </div>
+                  aria-hidden="true"
+                >
+                  {index + 1}
+                </div>
+                <span className={wizardStyles.progress.label}>{step.label}</span>
+              </li>
+              {index < steps.length - 1 && (
+                <li
+                  className="wizard-progress-connector-wrapper"
+                  aria-hidden="true"
+                  role="presentation"
+                >
+                  <div
+                    className={clsx(
+                      wizardStyles.progress.connector,
+                      index < currentStep && wizardStyles.progress.connectorActive
+                    )}
+                  />
+                </li>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </ol>
+    </nav>
   );
 };

@@ -74,14 +74,6 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
         title="Character Background"
         description="Provide details about your character's history, personality, and motivations."
       >
-      {/* Helpful tip */}
-      <div>
-        <p className="form-help-text">
-          A compelling backstory helps bring your character to life and
-          provides context for their actions and decisions in the game.
-        </p>
-      </div>
-
       <div>
         <Label htmlFor="character-history">
           Character History <span>*</span>
