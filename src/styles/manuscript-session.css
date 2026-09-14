@@ -3692,11 +3692,7 @@ body.manuscript-overlay-open {
     -webkit-backdrop-filter: none;
     border-radius: 0;
 
-    /* Top padding only: clears the corner bracket the way a padded card's
-       padding does for the same bracket elsewhere (world-detail-npc etc.),
-       without padding the sides of what's meant to read as a mark, not a
-       card. Zero padding put the label flush against the bracket's arm. */
-    padding: calc(var(--mark-arm-length) + var(--space-1)) 0 0;
+    padding: 0;
     margin: 0;
     color: var(--color-text-muted);
 
@@ -3723,21 +3719,6 @@ body.manuscript-overlay-open {
      unchanged; this is presentation only, scoped to the carved lane. */
   :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-text {
     display: none;
-  }
-
-  /* Corner bracket (DESIGN.md drafting-mark vocabulary): top-left L-shape,
-     same arm length and color as world-detail-npc / world-detail-stat. */
-  :root .narrative-history-container:has(.choice-outcome-callout) .choice-outcome-callout::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: var(--mark-arm-length);
-    height: var(--mark-arm-length);
-    border-top: 1px solid var(--color-text-muted);
-    border-left: 1px solid var(--color-text-muted);
-    background: none;
-    border-radius: 0;
   }
 
   /* Outcome label: lose the accent-soft pill; step up to the type-scale
