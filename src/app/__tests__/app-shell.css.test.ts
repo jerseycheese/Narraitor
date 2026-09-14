@@ -15,13 +15,33 @@ const sharedTokensCss = fs.readFileSync(
   'utf-8'
 );
 
-const ALL_STYLES = [
-  { file: 'app-shell.css', css: appShellCss },
-  { file: 'dashboard.css', css: dashboardCss },
-  { file: 'about.css', css: aboutCss },
-  { file: 'wizard.css', css: wizardCss },
-  { file: 'manuscript-session.css', css: manuscriptSessionCss },
-];
+function getCssFiles(dirs: string[]): string[] {
+  const files: string[] = [];
+  for (const dir of dirs) {
+    if (!fs.existsSync(dir)) continue;
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        files.push(...getCssFiles([fullPath]));
+      } else if (entry.isFile() && entry.name.endsWith('.css')) {
+        files.push(fullPath);
+      }
+    }
+  }
+  return files;
+}
+
+const targetCssFiles = getCssFiles([
+  path.join(__dirname, '..'),
+  path.join(__dirname, '../../styles'),
+  path.join(__dirname, '../../components'),
+]);
+
+const ALL_STYLES = targetCssFiles.map((filepath) => ({
+  file: path.relative(path.join(__dirname, '../../..'), filepath),
+  css: fs.readFileSync(filepath, 'utf-8'),
+}));
 
 const APPROVED_BRACKET_SELECTORS = new Set([
   ':root .world-detail-npc::before',
@@ -59,8 +79,8 @@ const EXEMPTED_FUNCTIONAL_PROGRESS_SELECTORS = new Set([
 
 function extractMatchingSelectors(
   predicate: (rule: Rule, decls: { prop: string; value: string }[]) => boolean
-): { file: string; selector: string }[] {
-  const matches: { file: string; selector: string }[] = [];
+): { file: string; selector: string; decls: { prop: string; value: string }[] }[] {
+  const matches: { file: string; selector: string; decls: { prop: string; value: string }[] }[] = [];
   for (const { file, css } of ALL_STYLES) {
     const root = postcss.parse(css, { from: file });
     root.walkRules((rule) => {
@@ -73,6 +93,7 @@ function extractMatchingSelectors(
           matches.push({
             file,
             selector: sel.replace(/\s+/g, ' ').trim(),
+            decls,
           });
         }
       }
@@ -148,17 +169,13 @@ describe('drafting-mark family', () => {
   });
 
   it('draws dotted rules at ink weight, not at border weight', () => {
-    for (const { file, selector } of extractMatchingSelectors((_rule, decls) =>
+    for (const { selector, decls } of extractMatchingSelectors((_rule, decls) =>
       decls.some((d) => d.prop === 'background-image' && d.value.includes('radial-gradient'))
     )) {
       if (APPROVED_HEADING_RADIAL_SELECTORS.has(selector)) {
         // Assert heading radial-gradients never use border-strong
-        const fileContent = ALL_STYLES.find((s) => s.file === file)?.css ?? '';
-        expect(fileContent).not.toMatch(
-          new RegExp(
-            `${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^}]*--color-border-strong`
-          )
-        );
+        const usesBorderStrong = decls.some((d) => d.value.includes('--color-border-strong'));
+        expect(usesBorderStrong).toBe(false);
       }
     }
   });
@@ -407,29 +424,7 @@ function findMonoUppercaseHeadingRules(
   return [];
 }
 
-function getCssFiles(dirs: string[]): string[] {
-  const files: string[] = [];
-  for (const dir of dirs) {
-    if (!fs.existsSync(dir)) continue;
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        files.push(...getCssFiles([fullPath]));
-      } else if (entry.isFile() && entry.name.endsWith('.css')) {
-        files.push(fullPath);
-      }
-    }
-  }
-  return files;
-}
-
 describe('heading typography static guards', () => {
-  const targetCssFiles = getCssFiles([
-    path.join(__dirname, '..'),
-    path.join(__dirname, '../../styles'),
-    path.join(__dirname, '../../components'),
-  ]);
 
   it('does not declare font-style: italic on heading selectors in app, styles, or components css', () => {
     const rootDir = path.join(__dirname, '../../..');
