@@ -6,7 +6,7 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ## v1.8.0 - 2026-09-14
 
-v1.8 is a design release with no gameplay changes. It sets the shared visual rules that keep the app from looking generated: one filled button per screen, one set of font roles, labels only on data, no border inside a border, and a single decorative mark. The milestone closes 8 issues across 8 commits since [v1.7.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.7.0), two of which are docs.
+v1.8 is a design release with no gameplay changes. It sets the shared visual rules that keep the app from looking generated: one filled button per screen, one set of font roles, labels only on data, no border inside a border, and a single decorative mark. The milestone closes 7 issues, plus [#2099](https://github.com/jerseycheese/Narraitor/issues/2099) fixed along the way, across 8 commits since [v1.7.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.7.0), two of which are docs.
 
 **What's in this release**
 

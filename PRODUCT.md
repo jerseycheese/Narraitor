@@ -2,7 +2,7 @@
 
 <!-- impeccable:product-schema 1 -->
 
-*Verified against the tree on 2026-09-11, at v1.7.0. Every claim below is checkable from a
+*Verified against the tree on 2026-09-14, at v1.8.0. Every claim below is checkable from a
 path in this file. When one stops matching the code, fix it here rather than working around
 it, and re-date this line.*
 
@@ -124,7 +124,8 @@ Real, usable:
 - The product itself. Every route runs locally, and the story loop works end to end with a key.
   Captures of actual play are the strongest proof material on hand.
 - Three current screenshots at `public_docs/images/readme-{landing,play,world-creation}.png`,
-  embedded in README. These show the shipped DS3 surface.
+  embedded in README. Landing and play show the shipped DS3 surface. World creation predates
+  v1.8 and still shows italic headings and nested borders, so don't use it as design reference.
 - Architecture decisions of record at `public_docs/architecture/` (ADR-001 through ADR-014).
 - Seven images under `public/visual-assets/`. Four world illustrations sit in `worlds/` as
   `.webp` (`debt-court`, `normandy`, `port-city`, `survey-ship`), which the landing page
