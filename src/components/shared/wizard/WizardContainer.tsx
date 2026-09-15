@@ -4,6 +4,8 @@ import { wizardStyles } from './styles/wizardStyles';
 
 interface WizardContainerProps {
   title: string | React.ReactNode;
+  subtitle?: React.ReactNode;
+  headerMeta?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   /**
@@ -16,6 +18,8 @@ interface WizardContainerProps {
 
 export const WizardContainer: React.FC<WizardContainerProps> = ({
   title,
+  subtitle,
+  headerMeta,
   children,
   className = '',
   titleElement: TitleElement = 'h1',
@@ -28,11 +32,19 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
         className
       )}
     >
-      <div className={wizardStyles.header}>
-        {typeof title === 'string' ? (
-          <TitleElement className={wizardStyles.title}>{title}</TitleElement>
-        ) : (
-          <div className={wizardStyles.title}>{title}</div>
+      <div className={clsx('wizard-header', wizardStyles.header)}>
+        <div className="wizard-header-title-group">
+          {typeof title === 'string' ? (
+            <TitleElement className={wizardStyles.title}>{title}</TitleElement>
+          ) : (
+            <div className={wizardStyles.title}>{title}</div>
+          )}
+          {subtitle && (
+            <div className="wizard-header-subtitle">{subtitle}</div>
+          )}
+        </div>
+        {headerMeta && (
+          <div className="wizard-header-meta">{headerMeta}</div>
         )}
       </div>
       {children}

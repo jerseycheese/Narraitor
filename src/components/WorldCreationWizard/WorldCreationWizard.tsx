@@ -576,14 +576,13 @@ export default function WorldCreationWizard({
           currentStep={wizard.state.currentStep}
         />
         
-        <WizardStep error={currentError}>
-          <div key="wizard-content" data-testid="wizard-content">
-            {renderCurrentStep()}
-          </div>
-        </WizardStep>
-        
-        {/* Hide main navigation on the finalize step (4) since it has its own navigation */}
-        {wizard.state.currentStep < WIZARD_STEPS.length - 1 && (
+        <div className="wizard-surface">
+          <WizardStep error={currentError}>
+            <div key="wizard-content" data-testid="wizard-content">
+              {renderCurrentStep()}
+            </div>
+          </WizardStep>
+
           <WizardNavigation
             onCancel={handleCancel}
             onBack={wizard.canGoBack ? handleBack : undefined}
@@ -592,10 +591,12 @@ export default function WorldCreationWizard({
             currentStep={wizard.state.currentStep}
             totalSteps={WIZARD_STEPS.length}
             completeLabel="Create World"
+            completeTestId="step-complete-button"
+            completeDataTutorial="finalize-world"
             disabled={!canProceedToNext()}
             isLoading={wizard.state.isProcessing || false}
           />
-        )}
+        </div>
       </div>
 
       {/* Cancel Confirmation Dialog */}

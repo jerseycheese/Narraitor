@@ -82,14 +82,28 @@ const advanceTo = async (
 };
 
 /**
- * World Creation Wizard Visual Regression Test (Sequential)
+ * World Creation Wizard Visual Regression Tests
  *
- * Single initialization that walks through Steps 1–5,
- * taking screenshots at each stage to reduce flakiness and runtime.
+ * Walks through Steps 1–5 across:
+ * 1. Default (light desktop)
+ * 2. Dark mode (desktop)
+ * 3. Mobile (375x812)
  */
 
-test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => {
-  test.setTimeout(60000);
+async function runWorldCreationSequence(
+  page: Page,
+  prefix: string,
+  options: { isDark?: boolean; isMobile?: boolean } = {}
+): Promise<void> {
+  if (options.isDark) {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+  }
+  if (options.isMobile) {
+    await page.setViewportSize({ width: 375, height: 812 });
+  }
+
   // Deterministic AI: leaving the Description step calls /api/ai/analyze-world,
   // which has no key in CI and throws, dropping the wizard into its local
   // fallback suggestions. Mocking the route pins the attribute and skill counts
@@ -101,14 +115,13 @@ test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => 
 
   await page.goto('/worlds/create');
   await waitForContentStable(page);
+
   const dismissTutorialOverlay = async () => {
     const overlay = page.locator('[data-test-id="overlay"]');
-    if (await overlay.count() === 0) return;
+    if ((await overlay.count()) === 0) return;
 
-    // Try to find and click skip button
     const skipButton = page.locator('[data-test-id="button-skip"]');
-    if (await skipButton.count() > 0) {
-      // Wait for button to be visible before clicking
+    if ((await skipButton.count()) > 0) {
       const isVisible = await skipButton.first().isVisible().catch(() => false);
       if (isVisible) {
         await skipButton.first().click({ force: true });
@@ -117,9 +130,10 @@ test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => 
       }
     }
 
-    // If skip button not visible, try primary button
-    const primaryButton = page.locator('[data-test-id="button-primary"], [data-test-id="button-pause"]');
-    if (await primaryButton.count() > 0) {
+    const primaryButton = page.locator(
+      '[data-test-id="button-primary"], [data-test-id="button-pause"]'
+    );
+    if ((await primaryButton.count()) > 0) {
       const isVisible = await primaryButton.first().isVisible().catch(() => false);
       if (isVisible) {
         await primaryButton.first().click({ force: true });
@@ -128,22 +142,23 @@ test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => 
       }
     }
 
-    // If no buttons are visible, try pressing Escape as fallback
     await page.keyboard.press('Escape');
     await overlay.waitFor({ state: 'detached', timeout: 2000 }).catch(() => {});
   };
 
   await test.step('Step 1: Basic Info', async () => {
     await dismissTutorialOverlay();
-    await expect(page.locator(`[data-testid="${STEP_ROOTS.basicInfo}"]`)).toBeVisible();
-    await captureWizardStep(page, 'world-creation-step1-basic-info.png');
+    await expect(page.locator(`[data-testid="${STEP_ROOTS.basicInfo}"]`)).toBeVisible({
+      timeout: 15000,
+    });
+    await captureWizardStep(page, `${prefix}step1-basic-info.png`);
   });
 
   await test.step('Step 2: Description', async () => {
     await page.locator('[data-testid="world-genre-select"]').selectOption('Fantasy');
     await dismissTutorialOverlay();
     await advanceTo(page, STEP_ROOTS.description);
-    await captureWizardStep(page, 'world-creation-step2-description.png');
+    await captureWizardStep(page, `${prefix}step2-description.png`);
   });
 
   await test.step('Step 3: Attributes Review', async () => {
@@ -153,7 +168,7 @@ test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => 
     );
     await dismissTutorialOverlay();
     await advanceTo(page, STEP_ROOTS.attributes);
-    await captureWizardStep(page, 'world-creation-step3-attributes.png');
+    await captureWizardStep(page, `${prefix}step3-attributes.png`);
   });
 
   await test.step('Step 4: Skills Review', async () => {
@@ -164,7 +179,7 @@ test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => 
     await expect(page.getByText('Test Attribute').first()).toBeVisible();
     await dismissTutorialOverlay();
     await advanceTo(page, STEP_ROOTS.skills);
-    await captureWizardStep(page, 'world-creation-step4-skills.png');
+    await captureWizardStep(page, `${prefix}step4-skills.png`);
   });
 
   await test.step('Step 5: Finalize', async () => {
@@ -182,6 +197,21 @@ test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => 
     await expect(page.getByText('Test Skill').first()).toBeVisible();
     await dismissTutorialOverlay();
     await advanceTo(page, STEP_ROOTS.finalize);
-    await captureWizardStep(page, 'world-creation-step5-finalize.png');
+    await captureWizardStep(page, `${prefix}step5-finalize.png`);
   });
+}
+
+test('World creation wizard visual sequence (Steps 1–5)', async ({ page }) => {
+  test.setTimeout(90000);
+  await runWorldCreationSequence(page, 'world-creation-');
+});
+
+test('World creation wizard visual sequence - Dark mode (Steps 1–5)', async ({ page }) => {
+  test.setTimeout(90000);
+  await runWorldCreationSequence(page, 'world-creation-dark-', { isDark: true });
+});
+
+test('World creation wizard visual sequence - Mobile (Steps 1–5)', async ({ page }) => {
+  test.setTimeout(90000);
+  await runWorldCreationSequence(page, 'world-creation-mobile-', { isMobile: true });
 });

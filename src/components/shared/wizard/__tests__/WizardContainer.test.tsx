@@ -42,4 +42,20 @@ describe('WizardContainer', () => {
     ).toBeInTheDocument();
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
   });
+
+  it('renders subtitle and headerMeta when provided', () => {
+    render(
+      <WizardContainer
+        title="Create Character"
+        subtitle={<span data-testid="test-subtitle">in Cyberpunk 2077</span>}
+        headerMeta={<div data-testid="test-meta">Saved just now</div>}
+      >
+        <div>Step body</div>
+      </WizardContainer>
+    );
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Create Character' })).toBeInTheDocument();
+    expect(screen.getByTestId('test-subtitle')).toHaveTextContent('in Cyberpunk 2077');
+    expect(screen.getByTestId('test-meta')).toHaveTextContent('Saved just now');
+  });
 });

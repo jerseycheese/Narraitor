@@ -22,4 +22,12 @@ export const MiddleStep: Story = { args: { currentStep: 1 } };
 export const LastStep: Story = {
   args: { currentStep: 3, onComplete: () => {}, onNext: undefined },
 };
+export const CompleteStep: Story = {
+  args: {
+    currentStep: 3,
+    totalSteps: 4,
+    completeLabel: 'Create World',
+    onComplete: () => {},
+  },
+};
 export const Loading: Story = { args: { currentStep: 1, isLoading: true } };

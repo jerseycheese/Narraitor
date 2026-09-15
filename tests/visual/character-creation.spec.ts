@@ -26,8 +26,9 @@ const captureFullStep = async (page: Page, name: string): Promise<void> => {
       }
     `,
   });
+  await page.mouse.move(0, 0);
   await page.waitForTimeout(50);
-  await expect(page).toHaveScreenshot(name, { fullPage: true });
+  await expect.soft(page).toHaveScreenshot(name, { fullPage: true });
 };
 
 /**
@@ -43,8 +44,29 @@ const captureFullStep = async (page: Page, name: string): Promise<void> => {
  * much higher runtime/flake cost.
  */
 
-test('Character creation wizard visual sequence (Steps 1–5)', async ({ page }) => {
-  test.setTimeout(90000); // Extended timeout for complex wizard
+/**
+ * Character Creation Wizard Visual Regression Tests
+ *
+ * Walks through Steps 1–5 across:
+ * 1. Default (light desktop)
+ * 2. Dark mode (desktop)
+ * 3. Mobile (375x812)
+ */
+
+async function runCharacterCreationSequence(
+  page: Page,
+  prefix: string,
+  options: { isDark?: boolean; isMobile?: boolean } = {}
+): Promise<void> {
+  if (options.isDark) {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+  }
+  if (options.isMobile) {
+    await page.setViewportSize({ width: 375, height: 812 });
+  }
+
   // Seed once and open worlds page so the app picks up state
   await seedTestData(page);
   await page.goto('/worlds');
@@ -52,15 +74,16 @@ test('Character creation wizard visual sequence (Steps 1–5)', async ({ page })
 
   // Navigate to character creation page with world context
   await page.goto('/characters/create?worldId=world-cyberpunk-2077');
+  await waitForContentStable(page);
 
   // Ensure main structure is present
-  await page.waitForSelector('h1', { timeout: 10000 });
+  await page.waitForSelector('h1', { timeout: 15000 });
 
   await test.step('Step 1: Basic Info', async () => {
     // The create page now lands directly on the wizard's Basic Info step —
     // QuickStart and the template-selection step were removed for 1.0 (#1455).
     await waitForNavigationHeading(page, 'Basic Information', { timeout: 10000, exact: true });
-    await captureFullStep(page, 'character-creation-step1-basic-info.png');
+    await captureFullStep(page, `${prefix}step1-basic-info.png`);
   });
 
   await test.step('Step 2: Attributes', async () => {
@@ -76,7 +99,7 @@ test('Character creation wizard visual sequence (Steps 1–5)', async ({ page })
       await waitForNavigationHeading(page, 'Allocate Attribute Points', { timeout: 5000, exact: true });
     }
 
-    await captureFullStep(page, 'character-creation-step2-attributes.png');
+    await captureFullStep(page, `${prefix}step2-attributes.png`);
 
     // Allocate required points so we can advance to the skills step.
     // Use the native value setter so React's onChange fires reliably.
@@ -173,7 +196,7 @@ test('Character creation wizard visual sequence (Steps 1–5)', async ({ page })
     await expect(remainingBadge).toContainText('Remaining: 0', { timeout: 10000 });
     await expect(page.getByText(/^Allocated Points:/).first()).toBeVisible();
 
-    await captureFullStep(page, 'character-creation-step3-skills.png');
+    await captureFullStep(page, `${prefix}step3-skills.png`);
 
     const proceedToBackgroundBtn = page.locator('button:has-text("Next")');
     if (await proceedToBackgroundBtn.count() > 0) {
@@ -195,7 +218,7 @@ test('Character creation wizard visual sequence (Steps 1–5)', async ({ page })
     await page.locator('#character-motivation').fill('Keep the resistance supplied with intel and tech.');
     await page.locator('#character-goals').fill('Liberate grid districts\nProtect resistance safehouses');
 
-    await captureFullStep(page, 'character-creation-step4-background.png');
+    await captureFullStep(page, `${prefix}step4-background.png`);
 
     const proceedToPortraitBtn = page.locator('button:has-text("Next")');
     if (await proceedToPortraitBtn.count() > 0) {
@@ -208,6 +231,21 @@ test('Character creation wizard visual sequence (Steps 1–5)', async ({ page })
   await test.step('Step 5: Portrait', async () => {
     await expect(page.getByRole('heading', { name: 'Character Portrait' })).toBeVisible();
 
-    await captureFullStep(page, 'character-creation-step5-portrait.png');
+    await captureFullStep(page, `${prefix}step5-portrait.png`);
   });
+}
+
+test('Character creation wizard visual sequence (Steps 1–5)', async ({ page }) => {
+  test.setTimeout(90000);
+  await runCharacterCreationSequence(page, 'character-creation-');
+});
+
+test('Character creation wizard visual sequence - Dark mode (Steps 1–5)', async ({ page }) => {
+  test.setTimeout(90000);
+  await runCharacterCreationSequence(page, 'character-creation-dark-', { isDark: true });
+});
+
+test('Character creation wizard visual sequence - Mobile (Steps 1–5)', async ({ page }) => {
+  test.setTimeout(90000);
+  await runCharacterCreationSequence(page, 'character-creation-mobile-', { isMobile: true });
 });

@@ -25,9 +25,12 @@
 
 .tabs-trigger {
   appearance: none;
+  position: relative;
   padding: var(--space-2) var(--space-3);
   border: none;
+  border-radius: 0;
   border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
   background: transparent;
   font-family: var(--font-interface);
   font-size: var(--font-size-sm);
@@ -44,6 +47,7 @@
 .tabs-trigger-active {
   color: var(--color-accent);
   border-bottom-color: var(--color-accent);
+  z-index: 1;
 }
 
 .tabs-content {

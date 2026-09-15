@@ -35,6 +35,7 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
       disabled={disabled}
       title={title}
       aria-label={resolvedAriaLabel}
+      aria-pressed={isActive}
       className={`component-toggle-button ${wizardStyles.toggle.button} ${
         isActive ? wizardStyles.toggle.active : wizardStyles.toggle.inactive
       } ${className}`.trim()}

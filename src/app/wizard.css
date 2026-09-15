@@ -15,8 +15,29 @@
 
 .wizard-header {
   display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.wizard-header-title-group {
+  display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-1);
+}
+
+.wizard-header-meta {
+  display: flex;
+  align-items: center;
+  align-self: center;
+}
+
+.wizard-header-subtitle {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
 }
 
 .wizard-title {
@@ -340,41 +361,6 @@
   gap: var(--space-2);
 }
 
-.component-portrait-step .portrait-step-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-start;
-  padding: var(--space-2) var(--space-4);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  font-family: var(--font-interface);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 120ms ease;
-}
-
-.component-portrait-step .portrait-step-button:hover:not(:disabled) {
-  background: var(--color-accent-hover);
-
-  /* Hover darkens the accent (in dark mode too), so white clears AA here even
-   * though the base state uses dark ink on the lighter base accent. */
-  color: var(--color-text-inverse);
-}
-
-.component-portrait-step .portrait-step-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.component-portrait-step .portrait-step-button:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
 /* ─── Navigation Buttons ─── */
 
 .wizard-nav-container {
@@ -648,22 +634,19 @@
 }
 
 .wizard-toggle-active {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  border-color: var(--color-accent);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
 }
 
 .wizard-toggle-active:hover {
-  background: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
-
-  /* Hover darkens the accent (in dark mode too), so white clears AA here even
-   * though the base state uses dark ink on the lighter base accent. */
-  color: var(--color-text-inverse);
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 .wizard-toggle-inactive {
-  background: var(--color-surface);
+  background: transparent;
   color: var(--color-text-muted);
 }
 
@@ -742,13 +725,6 @@
   margin: 0;
 }
 
-.wizard-page-subtitle {
-  font-family: var(--font-interface);
-  font-size: var(--font-size-base);
-  color: var(--color-text-secondary);
-  margin: 0;
-}
-
 /* ─── Step Headers / Sections ─── */
 
 .wizard-form-section {
@@ -774,6 +750,9 @@
   justify-content: space-between;
   gap: var(--space-2);
   width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .wizard-progress-step-wrapper {
@@ -793,16 +772,7 @@
   padding-top: var(--space-4);
 }
 
-/* ─── Button rows ─── */
-
-.wizard-button-row {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  margin-top: var(--space-6);
-}
+/* ─── Badge rows ─── */
 
 .wizard-badge-row {
   display: flex;
@@ -1078,77 +1048,70 @@
    DS3 — Command Strip: compact top controls + dense field stacking.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ─── Shared wizard flow hooks ─── */
-
-/* The character wizard renders its auto-save indicator as an unclassed first
-   grid child, so there's no class to hook. Right-aligning it keeps it reading
-   as status chrome instead of the first row of the form. */
-:root .component-character-creation-wizard > :not(.wizard-header) > :first-child:not(.component-wizard-progress) {
-  justify-self: end;
-}
-
-/* ─── DS3 — Command Strip ─── */
+/* ─── DS3 — Unified Wizard Surface & Progress ─── */
 
 :root .component-create-world-page > .wizard-container,
-:root .component-create-character-page .component-character-creation-wizard {
+:root .component-create-character-page .component-character-creation-wizard,
+:root .component-world-creation-wizard,
+:root .component-character-creation-wizard {
   max-width: calc(var(--space-8) * 44);
   margin: 0 auto;
-}
-
-:root .component-world-creation-wizard,
-:root .component-character-creation-wizard > :not(.wizard-header) {
   width: 100%;
-
-  /* No global border-box reset in this app, so width: 100% + the padding and
-     border below rendered 18px past the mobile content column (#1541). */
   box-sizing: border-box;
   min-width: 0;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "progress"
-    "actions"
-    "content";
-  gap: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
-:root .component-world-creation-wizard > .component-wizard-progress,
-:root .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress,
-:root .component-world-creation-wizard > .wizard-nav-container,
-:root .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container,
-:root .component-world-creation-wizard > .wizard-step-content,
-:root .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
+.wizard-surface {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+  box-sizing: border-box;
 }
 
-:root .component-world-creation-wizard > .component-wizard-progress,
-:root .component-character-creation-wizard > :not(.wizard-header) > .component-wizard-progress {
-  grid-area: progress;
+.wizard-surface > .wizard-step-content {
+  background: transparent;
+  border: none;
+  padding: 0;
   min-width: 0;
-  padding: var(--space-2);
+}
+
+.wizard-surface > .wizard-nav-container {
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-4) 0 0;
+  margin-top: 0;
+}
+
+.component-wizard-progress {
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
   overflow-x: auto;
 }
 
-:root .component-world-creation-wizard > .wizard-nav-container,
-:root .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
-  grid-area: actions;
-  margin-top: 0;
-  padding: var(--space-2) var(--space-3);
-  align-items: center;
+.wizard-progress-mobile {
+  display: none;
 }
 
-:root .component-world-creation-wizard > .wizard-step-content,
-:root .component-character-creation-wizard > :not(.wizard-header) > .wizard-step-content {
-  grid-area: content;
-  gap: var(--space-3);
-  min-width: 0;
-  padding: var(--space-4);
+.wizard-progress-desktop {
+  display: flex;
 }
 
 :root .component-world-creation-wizard .wizard-progress-row,
 :root .component-character-creation-wizard .wizard-progress-row {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   flex-flow: row nowrap;
   align-items: stretch;
   justify-content: flex-start;
@@ -1228,33 +1191,79 @@
   padding: var(--space-1_5) var(--space-2_5);
 }
 
-@media (width < 768px) {
-  :root .component-world-creation-wizard,
-  :root .component-character-creation-wizard > :not(.wizard-header) {
-    padding: var(--space-2);
-
-    /* Move the action bar below the form on narrow screens so Next/Back are
-       reachable after a long mobile form (desktop keeps the command-strip top). */
-    grid-template-areas:
-      "progress"
-      "content"
-      "actions";
+@media (width <= 768px) {
+  .wizard-surface {
+    padding: var(--space-4);
+    gap: var(--space-4);
   }
 
-  :root .component-world-creation-wizard > .wizard-nav-container,
-  :root .component-character-creation-wizard > :not(.wizard-header) > .wizard-nav-container {
+  .wizard-surface > .wizard-nav-container {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--space-3);
   }
 
-  :root .component-world-creation-wizard .wizard-nav-group,
-  :root .component-character-creation-wizard .wizard-nav-group {
+  .wizard-surface .wizard-nav-group {
     justify-content: stretch;
+    width: 100%;
   }
 
-  :root .component-world-creation-wizard .wizard-nav-group > *,
-  :root .component-character-creation-wizard .wizard-nav-group > * {
+  .wizard-surface .wizard-nav-group > * {
     flex: 1 1 auto;
+  }
+
+  .wizard-progress-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-1) 0;
+  }
+
+  .wizard-progress-mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .wizard-progress-mobile-count {
+    font-family: var(--font-interface);
+    font-size: var(--font-size-xs_5);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .wizard-progress-mobile-current {
+    font-family: var(--font-interface);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .wizard-progress-segments {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-1);
+    width: 100%;
+  }
+
+  .wizard-progress-segment {
+    flex: 1;
+    height: 4px;
+    border-radius: var(--radius-full);
+    background: var(--color-border);
+    transition: background-color 150ms ease;
+  }
+
+  .wizard-progress-segment-active {
+    background: var(--color-accent);
+  }
+
+  .wizard-progress-desktop {
+    display: none;
   }
 }
 
@@ -1579,15 +1588,24 @@
 
 /* ─── Skill allocation (character) ─── */
 
-.wizard-skill-summary-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
+.wizard-skill-ledger {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-8);
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.wizard-skill-ledger-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 @media (width <= 768px) {
-  .wizard-skill-summary-row {
-    grid-template-columns: 1fr;
+  .wizard-skill-ledger {
+    flex-direction: column;
+    gap: var(--space-4);
   }
 }
 
@@ -1721,7 +1739,7 @@
   border-radius: var(--radius-sm);
 }
 
-:root .wizard-page .component-portrait-step button {
+:root .wizard-page .component-portrait-step button:not(.tabs-trigger) {
   border-radius: var(--radius-sm);
   padding: var(--space-1_5) var(--space-3);
 }
@@ -1953,30 +1971,6 @@
    to overflow. Stacking the character wizard's much shorter chips would
    cost ~176px of height and push the form down for no gain.
    ═══════════════════════════════════════════════════════════════ */
-
-/* ─── F8 + F13 — DS3: vertical step-nav, Back/Next moved to the bottom ─── */
-
-:root .component-world-creation-wizard {
-  grid-template-areas:
-    "progress"
-    "content"
-    "actions";
-}
-
-:root .component-world-creation-wizard > .component-wizard-progress {
-  overflow-x: visible;
-}
-
-:root .component-world-creation-wizard .wizard-progress-row {
-  flex-flow: column nowrap;
-  align-items: stretch;
-  gap: var(--space-1_5);
-  min-width: 0;
-}
-
-:root .component-world-creation-wizard > .wizard-nav-container {
-  padding: var(--space-3);
-}
 
 /* ─── F10 — world-type radio controls ─── */
 

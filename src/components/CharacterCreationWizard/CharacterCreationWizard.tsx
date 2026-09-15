@@ -349,36 +349,40 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   return (
     <>
-      <WizardContainer title={`Create Character in ${world.name}`} titleElement="h2" className="component-character-creation-wizard">
-        <div>
-          {/* Auto-save status indicator */}
-          <div>
-            <SaveIndicator
-              status={saveStatus}
-              lastSaveTime={data?.lastSaved}
-              compact={true}
-            />
-          </div>
-
+      <WizardContainer
+        title="Create Character"
+        subtitle={<span className="wizard-world-context">in {world.name}</span>}
+        headerMeta={
+          <SaveIndicator
+            status={saveStatus}
+            lastSaveTime={data?.lastSaved}
+            compact={true}
+          />
+        }
+        className="component-character-creation-wizard"
+      >
+        <div className="component-character-creation-wizard-body" data-testid="wizard-container">
           <WizardProgress 
             steps={steps} 
             currentStep={wizard.state.currentStep} 
           />
           
-          <WizardStep error={error}>
-            {renderStep()}
-          </WizardStep>
-          
-          <WizardNavigation
-            onCancel={handleCancel}
-            onBack={wizard.canGoBack ? handleBack : undefined}
-            onNext={!wizard.isLastStep ? handleNext : undefined}
-            onComplete={wizard.isLastStep ? handleCreate : undefined}
-            currentStep={wizard.state.currentStep}
-            totalSteps={steps.length}
-            completeLabel="Create Character"
-            disabled={wizard.state.isProcessing}
-          />
+          <div className="wizard-surface">
+            <WizardStep error={error}>
+              {renderStep()}
+            </WizardStep>
+
+            <WizardNavigation
+              onCancel={handleCancel}
+              onBack={wizard.canGoBack ? handleBack : undefined}
+              onNext={!wizard.isLastStep ? handleNext : undefined}
+              onComplete={wizard.isLastStep ? handleCreate : undefined}
+              currentStep={wizard.state.currentStep}
+              totalSteps={steps.length}
+              completeLabel="Create Character"
+              disabled={wizard.state.isProcessing}
+            />
+          </div>
         </div>
       </WizardContainer>
 

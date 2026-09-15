@@ -192,5 +192,20 @@ describe('BasicInfoStep', () => {
 
     expect(screen.queryByTestId('provider-key-disclosure')).not.toBeInTheDocument();
   });
-});
 
+  test('groups world type radio options under shared name for keyboard navigation', () => {
+    render(
+      <BasicInfoStep
+        worldData={mockWorldData}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    const radios = screen.getAllByRole('radio');
+    expect(radios.length).toBeGreaterThanOrEqual(3);
+    radios.forEach(radio => {
+      expect(radio).toHaveAttribute('name', 'world-type');
+    });
+  });
+});

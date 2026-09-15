@@ -86,22 +86,15 @@ export default function CharacterCreatePage() {
   }
 
   return (
-    <div className="component-create-character-page wizard-page">
-      <div className={wizardStyles.step.content}>
-        <div className="wizard-page-header">
-          <h1 className="wizard-page-title">Create New Character</h1>
-          <p className="wizard-page-subtitle">
-            Build your character from scratch with full customization
-          </p>
-        </div>
-        <div>
-          <CharacterCreationWizard
-            key={`new-character-${effectiveWorldId}`}
-            worldId={effectiveWorldId}
-            initialStep={0}
-          />
-        </div>
-      </div>
-    </div>
+    <section
+      className="component-create-character-page wizard-page"
+      aria-label="Create New Character"
+    >
+      <CharacterCreationWizard
+        key={`new-character-${effectiveWorldId}`}
+        worldId={effectiveWorldId}
+        initialStep={0}
+      />
+    </section>
   );
 }
