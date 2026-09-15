@@ -269,6 +269,14 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
 
       <div className={`${wizardStyles.card.base} wizard-skill-ledger`}>
         <div className="wizard-skill-ledger-section">
+          <h3 className={wizardStyles.subheading}>Skill Selection</h3>
+          <div className="wizard-badge-row">
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>Selected: {selectedSkills.length}</span>
+            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>Maximum: {maxSelectable}</span>
+          </div>
+        </div>
+
+        <div className="wizard-skill-ledger-section">
           <h3 className={wizardStyles.subheading}>Skill Points</h3>
           <div className="wizard-badge-row">
             <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>Total: {totalSkillPoints}</span>
@@ -281,14 +289,6 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                 Cap: {totalCapacity}
               </span>
             )}
-          </div>
-        </div>
-
-        <div className="wizard-skill-ledger-section">
-          <h3 className={wizardStyles.subheading}>Skill Selection</h3>
-          <div className="wizard-badge-row">
-            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>Selected: {selectedSkills.length}</span>
-            <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>Maximum: {maxSelectable}</span>
           </div>
         </div>
       </div>

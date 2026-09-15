@@ -750,6 +750,9 @@
   justify-content: space-between;
   gap: var(--space-2);
   width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .wizard-progress-step-wrapper {
@@ -1106,6 +1109,9 @@
 
 :root .component-world-creation-wizard .wizard-progress-row,
 :root .component-character-creation-wizard .wizard-progress-row {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   flex-flow: row nowrap;
   align-items: stretch;
   justify-content: flex-start;
@@ -1585,8 +1591,8 @@
 .wizard-skill-ledger {
   display: flex;
   flex-flow: row wrap;
-  gap: var(--space-6);
-  justify-content: space-between;
+  gap: var(--space-8);
+  justify-content: flex-start;
   align-items: flex-start;
 }
 
