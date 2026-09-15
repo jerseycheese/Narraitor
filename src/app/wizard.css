@@ -1739,7 +1739,7 @@
   border-radius: var(--radius-sm);
 }
 
-:root .wizard-page .component-portrait-step button {
+:root .wizard-page .component-portrait-step button:not(.tabs-trigger) {
   border-radius: var(--radius-sm);
   padding: var(--space-1_5) var(--space-3);
 }
