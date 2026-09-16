@@ -3057,6 +3057,11 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 :root .component-character-card {
   display: grid;
   grid-template-columns: 8rem 1fr auto;
+
+  /* The flexible rows above and below the text absorb the portrait's extra
+     height, so name, meta and description center as one block beside it
+     instead of the portrait stretching the name's row on its own. */
+  grid-template-rows: 1fr auto auto auto 1fr;
   column-gap: var(--space-4);
   align-items: center;
   padding: var(--space-3);
@@ -3090,6 +3095,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
    generated portrait nearly invisible on the roster players browse most. */
 :root .component-character-card .character-card-portrait {
   grid-column: 1;
+  grid-row: 1 / -1;
   align-self: center;
   padding: 0;
   width: 7rem;
@@ -3099,6 +3105,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 :root .component-character-card .character-card-name {
   grid-column: 2;
+  grid-row: 2;
   margin: 0;
   padding: 0;
   font-family: var(--font-interface);
@@ -3108,6 +3115,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 :root .component-character-card .character-card-meta {
   grid-column: 2;
+  grid-row: 3;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
@@ -3120,6 +3128,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 :root .component-character-card .character-card-description {
   grid-column: 2;
+  grid-row: 4;
   margin: var(--space-1) 0 0;
   padding: 0;
   font-family: var(--font-interface);
@@ -3138,6 +3147,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 :root .component-character-card .character-card-footer {
   grid-column: 3;
+  grid-row: 1 / -1;
   align-self: center;
   padding: 0;
   border-top: 0;
