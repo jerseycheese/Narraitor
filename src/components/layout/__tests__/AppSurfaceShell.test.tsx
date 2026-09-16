@@ -104,7 +104,7 @@ describe('AppSurfaceShell', () => {
     );
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText(/Storage is unavailable/i)).toBeInTheDocument();
+    expect(screen.getByText(/can't save to this browser/i)).toBeInTheDocument();
   });
 });
 

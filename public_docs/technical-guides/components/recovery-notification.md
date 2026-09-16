@@ -241,9 +241,6 @@ return (
 ┌─────────────────────────────────────────────┐
 │ [!] Character Creation Progress Found    [×] │
 │                                             │
-│ Found saved character creation progress     │
-│ from a previous session.                    │
-│                                             │
 │ [!] Warning (if hasCurrentData is true)     │
 │                                             │
 │ ┌─────────────────────────────────────────┐ │

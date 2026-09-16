@@ -52,10 +52,7 @@ export default function BasicInfoStep({
         </Alert>
       )}
 
-      <WizardFormSection
-        title="World Details"
-        description="Essential information about your world."
-      >
+      <WizardFormSection title="World Details">
         <WizardFormGroup
           label="World Name (optional)"
           error={combinedErrors.name}
@@ -90,7 +87,7 @@ export default function BasicInfoStep({
           <WizardFormGroup
             label="World Type"
             error={combinedErrors.relationship}
-            helpText="Pick how closely this world should track an existing setting. The choice controls whether your world invents new canon or leans on established material."
+            helpText="Pick how closely this world should follow an existing setting."
           >
             <RadioGroup
               name="world-type"

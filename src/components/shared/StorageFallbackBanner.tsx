@@ -38,9 +38,11 @@ export function StorageFallbackBanner({ className }: StorageFallbackBannerProps)
     return null;
   }
 
-  const message = notice?.message
-    ? `Storage is unavailable (${notice.message}). Progress will not be saved.`
-    : 'Storage is unavailable. Progress will not be saved.';
+  // ResilientStorageMiddleware already logs the underlying failure (blocked
+  // IndexedDB, quota, read/write error), so the banner stays on what the
+  // player can actually do about it.
+  const message =
+    "Narraitor can't save to this browser right now. Keep this tab open, and export your data from Settings so you don't lose your progress.";
 
   return (
     <aside

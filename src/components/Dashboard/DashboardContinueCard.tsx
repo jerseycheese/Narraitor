@@ -113,8 +113,8 @@ export function DashboardContinueCard({
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDelete}
-        title="Delete Campaign"
-        description="This will permanently delete all data for this campaign, including narrative progress and journal entries. This action cannot be undone."
+        title="Delete Session"
+        description="Removes the story progress and journal entries for this session. This action cannot be undone."
         itemName={`${world.name} - ${character.name}`}
         isDeleting={isDeleting}
       />

@@ -139,7 +139,7 @@ export function WorldTypeSelector({
             <Label htmlFor="additional-details">
               {selectedOption.additionalDetailsLabel}{' '}
               {value.worldType === 'set_within' ? (
-                <span>(optional - will be inferred from your reference)</span>
+                <span>(optional - picked from the setting you named)</span>
               ) : (
                 <span>*</span>
               )}
