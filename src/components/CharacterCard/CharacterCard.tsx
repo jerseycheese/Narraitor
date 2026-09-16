@@ -81,7 +81,8 @@ export function CharacterCard({
   return (
     <ActiveStateCard
       isActive={isActive}
-      activeText="Currently Active Character"
+      showActiveIndicator={false}
+      onClick={!isActive ? onMakeActive : undefined}
       className="component-character-card"
     >
       <div className="character-card-body">
@@ -112,6 +113,15 @@ export function CharacterCard({
           </h3>
           <div className="character-card-meta">
             <span className="character-card-level">Level {character.level || 1}</span>
+            {isActive && (
+              <Badge
+                variant="default-static"
+                icon={<CheckCircle aria-hidden="true" />}
+                data-testid="character-card-active-badge"
+              >
+                Active
+              </Badge>
+            )}
             {character?.background?.isKnownFigure !== undefined && (
               <Badge
                 icon={
@@ -133,22 +143,25 @@ export function CharacterCard({
               </Badge>
             )}
           </div>
-          <p className="character-card-description">
-            {(() => {
-              const text = (character?.background?.history ||
-                character?.background?.personality ||
-                'No description provided') as string;
-              const sentences = text.split(/[.!?]+/);
-              let result = '';
-              for (const sentence of sentences) {
-                const trimmed = safeTrim(sentence);
-                if (!trimmed) continue;
-                if ((result + trimmed + '.').length > 280) break;
-                result += (result ? ' ' : '') + trimmed + '.';
-              }
-              return result || truncate(text, 280);
-            })()}
-          </p>
+          {(() => {
+            const text = (character?.background?.history ||
+              character?.background?.personality ||
+              '') as string;
+            const trimmedText = safeTrim(text);
+            if (!trimmedText) return null;
+            const sentences = trimmedText.split(/[.!?]+/);
+            let result = '';
+            for (const sentence of sentences) {
+              const trimmed = safeTrim(sentence);
+              if (!trimmed) continue;
+              if ((result + trimmed + '.').length > 280) break;
+              result += (result ? ' ' : '') + trimmed + '.';
+            }
+            const description = result || truncate(trimmedText, 280);
+            return description ? (
+              <p className="character-card-description">{description}</p>
+            ) : null;
+          })()}
           {context?.relationships && context.relationships.length > 0 && (
             <div className="character-card-connections">
               <h4>Connections</h4>
@@ -184,28 +197,19 @@ export function CharacterCard({
         </div>
 
         {/* Footer with buttons - always at bottom */}
-        <footer className="character-card-footer">
+        <footer
+          className="character-card-footer"
+          onClick={(e) => e.stopPropagation()}
+        >
           <CardActionGroup
             primaryActions={[
-              // Add Make Active button as first primary action for inactive characters
-              ...(isActive
-                ? []
-                : [
-                    {
-                      key: 'make-active',
-                      text: 'Make Active',
-                      onClick: onMakeActive,
-                      variant: 'secondary' as const,
-                      flex: true,
-                      icon: <CheckCircle aria-hidden="true" />,
-                    },
-                  ]),
               {
                 key: 'play',
                 text: 'Play',
                 onClick: onPlay,
                 variant: 'secondary',
                 flex: true,
+                testId: 'character-card-actions-play-button',
                 icon: <Play aria-hidden="true" />,
               },
             ]}
@@ -215,6 +219,7 @@ export function CharacterCard({
                 text: 'View',
                 onClick: onView,
                 variant: 'secondary',
+                testId: 'character-card-actions-view-button',
                 icon: <Eye aria-hidden="true" />,
               },
               {
@@ -222,6 +227,7 @@ export function CharacterCard({
                 text: 'Edit',
                 onClick: onEdit,
                 variant: 'secondary',
+                testId: 'character-card-actions-edit-button',
                 icon: <Pencil aria-hidden="true" />,
               },
               {
@@ -229,6 +235,7 @@ export function CharacterCard({
                 text: 'Delete',
                 onClick: onDelete,
                 variant: 'danger',
+                testId: 'character-card-actions-delete-button',
                 icon: <Trash aria-hidden="true" />,
               },
             ]}

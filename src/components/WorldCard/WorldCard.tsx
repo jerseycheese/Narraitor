@@ -65,11 +65,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
 }) => {
   const router = useRouter();
 
-  const handleMakeActive = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSelect(world.id);
-  };
-
   const handleDeleteClick = () => {
     onDelete(world.id);
   };
@@ -116,8 +111,8 @@ const WorldCard: React.FC<WorldCardProps> = ({
   return (
     <ActiveStateCard
       isActive={isActive}
-      activeText="Currently Active World"
-      showActiveIndicator={isActive}
+      showActiveIndicator={false}
+      onClick={!isActive ? () => onSelect(world.id) : undefined}
       testId="world-card"
       hasImage={true}
       className="component-world-card"
@@ -140,11 +135,22 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 title={world.name}
                 image={heroImage}
                 badge={
-                  world.genre && (
-                    <span data-testid="world-card-genre">
-                      {getGenreLabel(world.genre)}
-                    </span>
-                  )
+                  <div className="world-card-badges">
+                    {isActive && (
+                      <Badge
+                        variant="default-static"
+                        icon={<CheckCircle aria-hidden="true" />}
+                        data-testid="world-card-active-badge"
+                      >
+                        Active
+                      </Badge>
+                    )}
+                    {world.genre && (
+                      <span data-testid="world-card-genre">
+                        {getGenreLabel(world.genre)}
+                      </span>
+                    )}
+                  </div>
                 }
                 titleTestId="world-card-name"
                 titleElement="h2"
@@ -220,7 +226,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
         </div>
 
         {/* Footer with buttons - always at bottom */}
-        <footer>
+        <footer onClick={(e) => e.stopPropagation()}>
           <div className="world-card-footer-meta">
             <time data-testid="world-card-createdAt">
               Created: {formatDate(world.createdAt)}
@@ -229,29 +235,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
           <div className="world-card-footer-actions">
             <CardActionGroup
               primaryActions={[
-                // Add Make Active button as first primary action for inactive worlds
-                ...(isActive
-                  ? []
-                  : [
-                      {
-                        key: 'make-active',
-                        text: 'Make Active',
-                        onClick: handleMakeActive,
-                        variant: 'secondary' as const,
-                        flex: true,
-                        icon: <CheckCircle aria-hidden="true" />,
-                      },
-                    ]),
-                {
-                  key: 'manage-characters',
-                  text: 'Manage Characters',
-                  onClick: (e) => {
-                    e.stopPropagation();
-                    router.push(`/characters?worldId=${world.id}`);
-                  },
-                  variant: 'secondary',
-                  flex: true,
-                },
                 {
                   key: 'play',
                   text: 'Play',
@@ -263,6 +246,15 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 },
               ]}
               secondaryActions={[
+                {
+                  key: 'characters',
+                  text: 'Characters',
+                  onClick: (e) => {
+                    e.stopPropagation();
+                    router.push(`/characters?worldId=${world.id}`);
+                  },
+                  variant: 'secondary',
+                },
                 {
                   key: 'edit',
                   text: 'Edit',
@@ -276,6 +268,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   text: 'Delete',
                   onClick: handleDeleteClick,
                   variant: 'danger',
+                  testId: 'world-card-actions-delete-button',
                   icon: <Trash aria-hidden="true" />,
                 },
               ]}

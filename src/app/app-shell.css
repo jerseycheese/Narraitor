@@ -662,7 +662,7 @@
 }
 
 .active-state-card-active {
-  border-color: hsl(var(--success-border));
+  border-color: var(--color-accent);
 }
 
 .active-state-card-inactive {
@@ -2955,6 +2955,8 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   min-height: inherit;
   height: 100%;
   overflow: hidden;
+  border: none;
+  border-radius: var(--radius-sm);
 }
 
 :root .component-world-card .component-hero-image {
@@ -3008,9 +3010,10 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   overflow-wrap: break-word;
 }
 
-:root .component-world-card > div:first-child > div:nth-child(2):has(.active-state-indicator) {
-  grid-column: 1 / -1;
-  margin-top: var(--space-2);
+:root .world-card-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 :root .component-world-card .world-card-body {
@@ -3058,17 +3061,29 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   align-items: center;
   padding: var(--space-3);
   border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: var(--color-surface);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+:root .component-character-card:hover {
+  border-color: var(--color-border-strong);
+}
+
+:root .component-world-card.active-state-card-active,
+:root .component-character-card.active-state-card-active {
+  border-color: var(--color-accent);
+  background: color-mix(in oklab, var(--color-accent) 2%, var(--color-surface));
+}
+
+:root .component-world-card.active-state-card-inactive,
+:root .component-character-card.active-state-card-inactive {
+  cursor: pointer;
 }
 
 :root .component-character-card .character-card-body,
 :root .component-character-card .character-card-inner {
   display: contents;
-}
-
-:root .component-character-card .active-state-indicator {
-  grid-column: 1 / -1;
-  margin-bottom: var(--space-1);
 }
 
 /* Same reasoning as the world card's hero panel: a 4rem thumbnail made the
