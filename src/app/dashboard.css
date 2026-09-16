@@ -669,8 +669,17 @@
 }
 
 :root .world-card-description-block p {
-  font-family: var(--font-system);
+  font-family: var(--font-interface);
   font-size: var(--font-size-sm_5);
+}
+
+:root .world-card-type {
+  font-family: var(--font-system);
+  font-size: var(--font-size-2xs_5);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 :root .world-card-footer-meta time {

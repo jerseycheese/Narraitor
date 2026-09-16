@@ -14,10 +14,11 @@ export interface ActiveStateToggleProps {
 /**
  * ActiveStateToggle - The one control on a list card that makes its item active
  *
- * Inactive, it reads "Make Active". Active, it reads "Active" and does nothing
- * when pressed. It stays the same button in both states, so keyboard focus
- * survives the switch, and the live region reads the new label out to screen
- * readers.
+ * Inactive, it reads "Make Active" and looks like a link, because it's an
+ * action. Active, it reads "Active" as a tinted pill, because it's state, and
+ * does nothing when pressed. It stays the same button in both states, so
+ * keyboard focus survives the switch, and the live region reads the new label
+ * out to screen readers.
  *
  * @example
  * <ActiveStateToggle
@@ -32,25 +33,16 @@ export const ActiveStateToggle: React.FC<ActiveStateToggleProps> = ({
 }) => (
   <button
     type="button"
-    className="active-state-toggle"
+    className={clsx(
+      'active-state-toggle',
+      isActive && 'active-state-toggle-active'
+    )}
     aria-disabled={isActive}
     aria-live="polite"
     onClick={isActive ? undefined : onActivate}
     data-testid={testId}
   >
-    <span
-      className={clsx(
-        'badge',
-        'badge-md',
-        isActive ? 'badge-default-static' : 'badge-secondary-static'
-      )}
-    >
-      {isActive && (
-        <span className="badge-icon">
-          <CheckCircle aria-hidden="true" />
-        </span>
-      )}
-      {isActive ? 'Active' : 'Make Active'}
-    </span>
+    {isActive && <CheckCircle aria-hidden="true" />}
+    {isActive ? 'Active' : 'Make Active'}
   </button>
 );

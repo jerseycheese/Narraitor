@@ -11,10 +11,7 @@ import {
   ActiveStateToggle,
   CardActionGroup,
 } from '@/components/shared/cards';
-import { Badge } from '@/components/ui/badge';
 import {
-  Plus,
-  Star,
   Play,
   Eye,
   Pencil,
@@ -109,31 +106,16 @@ export function CharacterCard({
           </h3>
           <div className="character-card-meta">
             <span className="character-card-level">Level {character.level || 1}</span>
+            {character?.background?.isKnownFigure !== undefined && (
+              <span className="character-card-type">
+                {character.background.isKnownFigure ? 'Known Figure' : 'Original'}
+              </span>
+            )}
             <ActiveStateToggle
               isActive={isActive}
               onActivate={onMakeActive}
               testId="character-card-active-toggle"
             />
-            {character?.background?.isKnownFigure !== undefined && (
-              <Badge
-                icon={
-                  character?.background?.isKnownFigure ? (
-                    <Star aria-hidden="true" />
-                  ) : (
-                    <Plus aria-hidden="true" />
-                  )
-                }
-                variant={
-                  character?.background?.isKnownFigure
-                    ? 'warning-static'
-                    : 'default-static'
-                }
-              >
-                {character?.background?.isKnownFigure
-                  ? 'Known Figure'
-                  : 'Original'}
-              </Badge>
-            )}
           </div>
           {(() => {
             const text = (character?.background?.history ||

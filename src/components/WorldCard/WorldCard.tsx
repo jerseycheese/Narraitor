@@ -12,7 +12,6 @@ import {
   ActiveStateToggle,
   CardActionGroup,
 } from '@/components/shared/cards';
-import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
 import { Play, Pencil, Trash } from 'lucide-react';
@@ -193,30 +192,16 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
             {/* World type badge */}
             <div className="world-card-type-badge">
+              <span className="world-card-type" data-testid="world-card-type">
+                {world.reference
+                  ? `${world.relationship === 'set_within' ? 'Set in' : 'Inspired by'} ${world.reference}`
+                  : 'Original World'}
+              </span>
               <ActiveStateToggle
                 isActive={isActive}
                 onActivate={() => onSelect(world.id)}
                 testId="world-card-active-toggle"
               />
-              {world.reference ? (
-                <Badge
-                  variant={
-                    world.relationship === 'set_within'
-                      ? 'info-static'
-                      : 'success-static'
-                  }
-                  data-testid="world-card-type"
-                >
-                  {world.relationship === 'set_within'
-                    ? 'Set in'
-                    : 'Inspired by'}{' '}
-                  {world.reference}
-                </Badge>
-              ) : (
-                <Badge variant="default-static" data-testid="world-card-type">
-                  Original World
-                </Badge>
-              )}
             </div>
           </div>
         </div>

@@ -669,30 +669,59 @@
   border-color: var(--color-border);
 }
 
+/* "Make Active" is an action, so it reads as a link in the interface face.
+   "Active" is state, so it reads as a tinted pill in the data face, apart
+   from the plain-text type labels beside it. */
 .active-state-toggle {
   display: inline-flex;
   align-items: center;
+  gap: var(--space-1);
   min-height: 1.5rem;
   padding: 0;
   border: 0;
   background: none;
-  font: inherit;
-  color: inherit;
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs_5);
+  font-weight: 500;
+  letter-spacing: normal;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
   cursor: pointer;
 }
 
-.active-state-toggle[aria-disabled='true'] {
+.active-state-toggle:hover {
+  color: var(--color-accent-hover);
+}
+
+.active-state-toggle-active {
+  min-height: 0;
+  padding: var(--space-0_5) var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-accent-soft);
+  font-family: var(--font-system);
+  font-size: var(--font-size-2xs_5);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
   cursor: default;
 }
 
-.active-state-toggle:not([aria-disabled='true']):hover .badge {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+/* Accent-strong, not accent: plain accent misses AA over accent-soft. */
+.active-state-toggle-active,
+.active-state-toggle-active:hover {
+  color: var(--color-accent-strong);
 }
 
-/* The pill stays small on screen, but a finger needs the full 44px row. */
+.active-state-toggle svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* The link stays small on screen, but a finger needs the full 44px row. */
 @media (pointer: coarse) {
-  .active-state-toggle {
+  .active-state-toggle:not(.active-state-toggle-active) {
     min-height: 2.75rem;
   }
 }
@@ -984,7 +1013,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-2) var(--space-3);
 }
 
 .world-card-footer-meta {
