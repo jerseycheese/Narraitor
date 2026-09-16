@@ -1,5 +1,5 @@
 import type { PersistOptions } from 'zustand/middleware';
-import { createIndexedDBStorage } from './persistence';
+import { createIndexedDBStorage, createPreserveMigrate } from './persistence';
 import { getInitialState } from './inventoryStore.state';
 import type { InventoryStore } from './inventoryStore.types';
 
@@ -19,16 +19,11 @@ export const inventoryPersistOptions: PersistOptions<
 > = {
   name: 'narraitor-inventory-store',
   storage: createIndexedDBStorage(),
-  version: 3, // Incremented to clear old migrated data
+  version: 3,
   partialize: (state) => ({
     items: state.items,
     entities: state.entities,
     characterInventories: state.characterInventories,
   }),
-  // Preserve data, only clear if null. Cast is needed because persistedState
-  // is `unknown` at this boundary — same runtime behavior as the inline
-  // `migrate` used by loreStore/characterStore/goalStore/npcStore, just made
-  // explicit now that this config has its own PersistOptions<T, U> type.
-  migrate: (persistedState) =>
-    (persistedState || getInitialState()) as PersistedInventoryState,
+  migrate: createPreserveMigrate<PersistedInventoryState>(getInitialState),
 };

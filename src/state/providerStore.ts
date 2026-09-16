@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { generateUniqueId, getTimestamp } from '@/lib/utils';
 import { createProviderStorage } from '@/lib/storage/providerStorage';
+import { createPreserveMigrate } from './persistence';
 import {
   clearEncryptionKey,
   decryptSecret,
@@ -239,6 +240,14 @@ export const useProviderStore = create<ProviderStore>()(
         activeProviderId: state.activeProviderId,
         validationStatus: state.validationStatus,
       }),
+      // This record holds the player's encrypted provider key. Without a
+      // migrate, a version bump here would drop it and send them back to the
+      // key screen with no warning, so preserve is the only safe default.
+      migrate: createPreserveMigrate(() => ({
+        providers: INITIAL_STATE.providers,
+        activeProviderId: INITIAL_STATE.activeProviderId,
+        validationStatus: INITIAL_STATE.validationStatus,
+      })),
     }
   )
 );

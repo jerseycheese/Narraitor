@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { createIndexedDBStorage } from './persistence';
+import { createIndexedDBStorage, createPreserveMigrate } from './persistence';
 import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 import { getInitialState } from './loreStore.state';
 import {
@@ -35,7 +35,7 @@ export const useLoreStore = create<LoreStore>()(
         factHistory: state.factHistory,
         mergeAuditLog: state.mergeAuditLog,
       }),
-      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
+      migrate: createPreserveMigrate(getInitialState),
     }
   )
 );

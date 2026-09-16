@@ -154,3 +154,33 @@ export const createIndexedDBStorage = <T = unknown>(): PersistStorage<T> => ({
     }
   }
 });
+
+/**
+ * Builds a `migrate` that keeps whatever was in storage, falling back to
+ * defaults only when the browser had nothing stored under that key.
+ *
+ * Preserving is the deliberate choice here, not an accident. An earlier pass
+ * had these stores return initial state unconditionally on a version mismatch,
+ * which wiped a player's worlds and characters out from under them on
+ * rehydration, so they were changed to hand the persisted object straight back.
+ * The consequence is worth stating plainly: bumping `version` on a store that
+ * uses this helper clears nothing for anyone who already has data. It only
+ * produces a clean slate for a browser that had none.
+ *
+ * Which means reaching for this helper is a claim that the old persisted shape
+ * is still safe to load as-is. When that stops being true, the store needs its
+ * own version-gated `migrate` that transforms or drops the specific fields that
+ * changed - worldStore and sessionStore are the worked examples. Discarding
+ * data is something a migrate has to say out loud; a version bump on its own
+ * won't do it.
+ *
+ * Leaving `migrate` off entirely is the trap this replaces. Zustand logs a
+ * console error on a version mismatch and drops the whole record, so a store
+ * with no migrate loses its data the first time someone bumps its version.
+ *
+ * @param getFallbackState Returns the defaults to use when storage was empty.
+ */
+export const createPreserveMigrate =
+  <T>(getFallbackState: () => T) =>
+  (persistedState: unknown): T =>
+    (persistedState || getFallbackState()) as T;

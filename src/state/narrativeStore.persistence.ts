@@ -1,7 +1,8 @@
 import type { PersistOptions } from 'zustand/middleware';
 import { NarrativeSegment, PromptDebugInfo } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
-import { createIndexedDBStorage } from './persistence';
+import { createIndexedDBStorage, createPreserveMigrate } from './persistence';
+import { getInitialState } from './narrativeStore.state';
 import type { NarrativeStore } from './narrativeStore.types';
 
 /**
@@ -74,6 +75,7 @@ export const narrativePersistOptions: PersistOptions<NarrativeStore, PersistedNa
       currentEnding: state.currentEnding,
     };
   },
+  migrate: createPreserveMigrate<PersistedNarrativeState>(getInitialState),
   onRehydrateStorage: () => (state) => {
     if (state) {
       // Deserialize Date objects in debugInfo after rehydration
