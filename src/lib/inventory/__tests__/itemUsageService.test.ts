@@ -3,10 +3,12 @@
 
 import {
   processItemUsage,
-  generateItemUsageNarrative,
   isNarrativelySignificant,
   buildUsageNarrative,
 } from '../itemUsageService';
+import { generateItemUsageNarrative } from '../itemUsageNarrative';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -259,15 +261,18 @@ describe('Item Usage Service', () => {
       };
 
       const narrative = await generateItemUsageNarrative(
-        item,
-        characterId,
-        worldId,
-        sessionId,
         {
-          wasConsumed: false,
-          remainingQuantity: item.quantity,
-          previousQuantity: item.quantity,
-        }
+          item,
+          characterId,
+          worldId,
+          sessionId,
+          usageDetails: {
+            wasConsumed: false,
+            remainingQuantity: item.quantity,
+            previousQuantity: item.quantity,
+          },
+        },
+        new NarrativeGenerator(createDefaultGeminiClient())
       );
 
       expect(narrative.content).toBeTruthy();
@@ -277,9 +282,6 @@ describe('Item Usage Service', () => {
 
     it('should handle AI generation failures gracefully', async () => {
       // Mock failure
-      const { createDefaultGeminiClient } = await import(
-        '@/lib/ai/defaultGeminiClient'
-      );
       (createDefaultGeminiClient as jest.Mock).mockReturnValueOnce({
         generateContent: jest
           .fn()
@@ -310,15 +312,18 @@ describe('Item Usage Service', () => {
       };
 
       const narrative = await generateItemUsageNarrative(
-        item,
-        characterId,
-        worldId,
-        sessionId,
         {
-          wasConsumed: true,
-          remainingQuantity: 0,
-          previousQuantity: 1,
-        }
+          item,
+          characterId,
+          worldId,
+          sessionId,
+          usageDetails: {
+            wasConsumed: true,
+            remainingQuantity: 0,
+            previousQuantity: 1,
+          },
+        },
+        new NarrativeGenerator(createDefaultGeminiClient())
       );
 
       // Should return fallback narrative

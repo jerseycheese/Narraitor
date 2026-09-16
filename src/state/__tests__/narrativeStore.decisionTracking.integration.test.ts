@@ -238,11 +238,11 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
 
         useNarrativeStore.getState().selectDecisionOption(decisionId, `lawful-${i}`, TEST_CHARACTER);
 
-        // recordDecision sanitizes stored text by stripping `<>'"&` — match
-        // what actually lands, not the pre-sanitized source string.
+        // recordDecision cleans stored text by stripping `<>` — quotes, apostrophes,
+        // and ampersands are preserved (Finding 4).
         const [latest] = playerDecisionTracker.getSessionDecisions(TEST_SESSION);
         expect(latest).toMatchObject({
-          choiceText: choiceText.replace(/[<>'"&]/g, ''),
+          choiceText: choiceText.replace(/[<>]/g, ''),
           choiceType: 'diplomatic'
         });
       });
