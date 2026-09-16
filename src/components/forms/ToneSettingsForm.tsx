@@ -60,9 +60,6 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
       {showHeader && (
         <div>
           <h3>Tone Settings</h3>
-          <p>
-            Configure the narrative style, content rating, and language complexity for generated content.
-          </p>
         </div>
       )}
       <div className="component-tone-settings-form">
@@ -71,12 +68,10 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           {/* Content Rating */}
           <div className="form-group">
             <Label htmlFor="content-rating">Content Rating</Label>
-            <p id="content-rating-description" className="form-help-text">Set the age-appropriate content level for generated narratives</p>
             <Select
               id="content-rating"
               value={toneSettings.contentRating}
               onChange={(e) => formUpdater.updateField('contentRating', e.target.value as ContentRating)}
-              aria-describedby="content-rating-description"
               data-tutorial="tone-content-rating"
             >
               {contentRatingOptions.map((option) => (
@@ -90,12 +85,10 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           {/* Narrative Style */}
           <div className="form-group">
             <Label htmlFor="narrative-style">Narrative Style</Label>
-            <p id="narrative-style-description" className="form-help-text">Choose how the story will be told and presented</p>
             <Select
               id="narrative-style"
               value={toneSettings.narrativeStyle}
               onChange={(e) => formUpdater.updateField('narrativeStyle', e.target.value as NarrativeStyle)}
-              aria-describedby="narrative-style-description"
               data-tutorial="tone-narrative-style"
             >
               {narrativeStyleOptions.map((option) => (
@@ -109,12 +102,10 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           {/* Language Complexity */}
           <div className="form-group">
             <Label htmlFor="language-complexity">Language Complexity</Label>
-            <p id="language-complexity-description" className="form-help-text">Set the vocabulary and sentence complexity level</p>
             <Select
               id="language-complexity"
               value={toneSettings.languageComplexity}
               onChange={(e) => formUpdater.updateField('languageComplexity', e.target.value as LanguageComplexity)}
-              aria-describedby="language-complexity-description"
               data-tutorial="tone-language-complexity"
             >
               {languageComplexityOptions.map((option) => (

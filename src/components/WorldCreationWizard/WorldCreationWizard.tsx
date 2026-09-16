@@ -618,7 +618,6 @@ export default function WorldCreationWizard({
         recoveryData={recoveryPreview}
         hasCurrentData={autoSaveHasCurrentData}
         title="World Creation Progress Found"
-        description="Found saved world creation progress from a previous session."
         stepNames={[
           'Basic Information',
           'World Description',
