@@ -5,7 +5,7 @@ import { UserFriendlyError, ErrorType, createStoreError } from '@/lib/utils/erro
 import { NPC } from '../types/npc.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
-import { createIndexedDBStorage } from './persistence';
+import { createIndexedDBStorage, createPreserveMigrate } from './persistence';
 import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 import { CrudStore } from './crudStore.types';
 import { shouldExposeStoreOnWindow } from '@/lib/utils/shouldExposeStoreOnWindow';
@@ -228,12 +228,12 @@ export const useNPCStore = create<NPCStore>()(
     {
       name: 'narraitor-npc-store',
       storage: createIndexedDBStorage(),
-      version: 2, // Incremented to clear old migrated data
+      version: 2,
       partialize: (state) => ({
         npcs: state.npcs,
         worldNpcs: state.worldNpcs,
       }),
-      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
+      migrate: createPreserveMigrate(getInitialState),
     }
   )
 );

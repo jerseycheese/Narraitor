@@ -11,7 +11,7 @@ import { persist } from 'zustand/middleware';
 import { JournalEntry, JournalEntryType } from '../types/journal.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
-import { createIndexedDBStorage } from './persistence';
+import { createIndexedDBStorage, createPreserveMigrate } from './persistence';
 import { safeTrim, getTimestamp } from '@/lib/utils';
 import { UserFriendlyError, createStoreError } from '@/lib/utils/errorUtils';
 import { shouldExposeStoreOnWindow } from '@/lib/utils/shouldExposeStoreOnWindow';
@@ -252,6 +252,7 @@ export const useJournalStore = create<JournalStore>()(
     entries: state.entries,
     sessionEntries: state.sessionEntries,
   }),
+  migrate: createPreserveMigrate(() => ({ ...initialState })),
 }
 ));
 

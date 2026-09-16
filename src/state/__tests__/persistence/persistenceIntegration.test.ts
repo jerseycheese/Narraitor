@@ -30,7 +30,10 @@ jest.mock('../../persistence', () => {
     return storage;
   };
 
+  // Only the storage adapter is faked here; the rest of the module (the
+  // migrate helper the stores call at import time) stays real.
   return {
+    ...jest.requireActual('../../persistence'),
     createIndexedDBStorage: createMockStorage,
   };
 });

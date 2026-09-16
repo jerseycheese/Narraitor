@@ -13,7 +13,7 @@ import type { WorldThreadExtractionInput, WorldThreadExtractionResult } from '..
 import type { WorldCostExtractionInput, WorldCostExtractionResult } from '../types/worldCost.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
-import { createIndexedDBStorage } from './persistence';
+import { createIndexedDBStorage, createPreserveMigrate } from './persistence';
 import { storeEvents, StoreEventTypes, type WorldDeletedEvent } from '@/lib/state/storePubSub';
 import { extractGoalsFromNarrative } from '../lib/ai/goalExtractor';
 import { CrudStore } from './crudStore.types';
@@ -385,13 +385,13 @@ export const useGoalStore = create<GoalStore>()(
     {
       name: 'narraitor-goal-store',
       storage: createIndexedDBStorage(),
-      version: 2, // Incremented to clear old migrated data
+      version: 2,
       partialize: (state) => ({
         goals: state.goals,
         sessionGoals: state.sessionGoals,
         activeGoalIds: state.activeGoalIds,
       }),
-      migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
+      migrate: createPreserveMigrate(getInitialState),
     }
   )
 );

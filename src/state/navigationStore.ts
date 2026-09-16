@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { createPreserveMigrate } from './persistence';
 import { isStorageAvailable } from '@/utils/storageHelpers';
 import Logger from '@/lib/utils/logger';
 import { getTimestamp } from '@/lib/utils/timestamp';
@@ -404,11 +405,19 @@ export const useNavigationStore = create<NavigationState>()(
     }),
     {
       name: 'narraitor-navigation-store',
+      // localStorage on purpose, unlike the siblings on IndexedDB: history is
+      // a few recent paths, capped at preferences.maxRecentPages. Zustand
+      // already defaulted here, so naming it changes nothing but the reading.
+      storage: createJSONStorage(() => localStorage),
       version: 1,
       partialize: (state) => ({
         history: state.history,
         preferences: state.preferences,
       }),
+      migrate: createPreserveMigrate(() => ({
+        history: [] as NavigationHistoryEntry[],
+        preferences: defaultPreferences,
+      })),
     }
   )
 );

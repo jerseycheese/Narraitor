@@ -5,7 +5,7 @@ import { EntityID } from '../types/common.types';
 import { DerivedStat } from '../types/character.types';
 import { DerivedStatFormula } from '../types/world.types';
 import { generateUniqueId } from '../lib/utils/generateId';
-import { createIndexedDBStorage } from './persistence';
+import { createIndexedDBStorage, createPreserveMigrate } from './persistence';
 import { useWorldStore } from './worldStore';
 import {
   safeTrim,
@@ -764,7 +764,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
       {
         name: 'narraitor-character-store',
         storage: createIndexedDBStorage(),
-        version: 3, // Incremented to clear old migrated data
+        version: 3,
         onRehydrateStorage: () => (state, error) => {
           if (error) {
             logger.error('[CharacterStore] Failed to rehydrate state', error);
@@ -772,7 +772,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
           }
           state?.syncDerivedState?.();
         },
-        migrate: (persistedState) => persistedState || getInitialState(), // Preserve data, only clear if null
+        migrate: createPreserveMigrate(getInitialState),
       }
     )
   );
