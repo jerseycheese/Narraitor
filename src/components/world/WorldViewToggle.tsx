@@ -28,19 +28,21 @@ export function WorldViewToggle({ mode, onModeChange }: WorldViewToggleProps) {
     <div className="view-mode-toggle" role="group" aria-label="View mode toggle">
       <Button
         variant={mode === 'grid' ? 'default' : 'outline'}
-        size="sm"
+        size="icon"
         onClick={() => onModeChange('grid')}
         aria-label="Grid view"
         aria-pressed={mode === 'grid'}
+        className={mode === 'grid' ? 'active' : ''}
       >
         <Grid3x3 />
       </Button>
       <Button
         variant={mode === 'table' ? 'default' : 'outline'}
-        size="sm"
+        size="icon"
         onClick={() => onModeChange('table')}
         aria-label="Table view"
         aria-pressed={mode === 'table'}
+        className={mode === 'table' ? 'active' : ''}
       >
         <Table />
       </Button>

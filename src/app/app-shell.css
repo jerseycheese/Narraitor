@@ -2265,6 +2265,33 @@
   color: var(--color-text-muted);
 }
 
+/* On the characters page the world is context, not the subject, so its
+   banner shrinks to a strip: the art as a thumbnail, the name beside it. */
+:root .characters-world-banner .component-hero,
+:root .characters-world-banner .component-hero:has(.component-hero-image) {
+  min-height: 0;
+}
+
+:root .characters-world-banner .component-hero:has(.component-hero-image) {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  align-items: center;
+}
+
+:root .characters-world-banner .component-hero-image {
+  position: static;
+  height: 5rem;
+}
+
+:root .characters-world-banner .component-hero::after {
+  display: none;
+}
+
+:root .characters-world-banner .component-hero-overlay {
+  margin-top: 0;
+  background: transparent;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    SectionWrapper (shared component)
    Bare divs since #1051 Tailwind cleanup — adds card chrome that

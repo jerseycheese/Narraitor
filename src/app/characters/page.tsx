@@ -488,18 +488,20 @@ export default function CharactersPage() {
       {!headerTitle && <h1 className="sr-only">My Characters</h1>}
 
       {mounted && currentWorld && (
-        <Hero
-          title={currentWorld.name}
-          image={
-            currentWorld.image?.url
-              ? { url: currentWorld.image.url, alt: currentWorld.name }
-              : undefined
-          }
-          subtitle={
-            currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined
-          }
-          titleElement="h2"
-        />
+        <div className="characters-world-banner">
+          <Hero
+            title={currentWorld.name}
+            image={
+              currentWorld.image?.url
+                ? { url: currentWorld.image.url, alt: currentWorld.name }
+                : undefined
+            }
+            subtitle={
+              currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined
+            }
+            titleElement="h2"
+          />
+        </div>
       )}
 
       {/* An empty roster has nothing to switch views on, and the empty state
