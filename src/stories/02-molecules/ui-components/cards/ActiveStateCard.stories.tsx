@@ -109,23 +109,9 @@ export const ActiveWithImage: Story = {
   },
 };
 
-export const Clickable: Story = {
-  args: {
-    isActive: false,
-    onClick: () => alert('Card clicked!'),
-    children: (
-      <div>
-        <h3>Clickable Card</h3>
-        <p>Click anywhere on this card to trigger an action.</p>
-      </div>
-    ),
-  },
-};
-
 export const Grid: Story = {
   args: {
     isActive: false,
-    onClick: () => console.log('Card clicked'),
     children: <div>Default content</div>,
   },
   render: () => (

@@ -669,6 +669,34 @@
   border-color: var(--color-border);
 }
 
+.active-state-toggle {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.active-state-toggle[aria-disabled='true'] {
+  cursor: default;
+}
+
+.active-state-toggle:not([aria-disabled='true']):hover .badge {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* The pill stays small on screen, but a finger needs the full 44px row. */
+@media (pointer: coarse) {
+  .active-state-toggle {
+    min-height: 2.75rem;
+  }
+}
+
 .active-state-indicator {
   display: flex;
   align-items: center;
@@ -955,6 +983,7 @@
 .world-card-type-badge {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-2);
 }
 
@@ -1281,12 +1310,21 @@
   font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
-  cursor: pointer;
   margin: var(--space-2) 0 var(--space-1);
   padding: 0 var(--space-4);
 }
 
-.component-character-card h3:hover {
+.character-card-name-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.character-card-name-button:hover {
   color: var(--color-accent);
 }
 
@@ -3081,11 +3119,6 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   background: color-mix(in oklab, var(--color-accent) 2%, var(--color-surface));
 }
 
-:root .component-world-card.active-state-card-inactive,
-:root .component-character-card.active-state-card-inactive {
-  cursor: pointer;
-}
-
 :root .component-character-card .character-card-body,
 :root .component-character-card .character-card-inner {
   display: contents;
@@ -3118,6 +3151,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   grid-row: 3;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-2);
   margin-top: var(--space-1);
   font-family: var(--font-system);

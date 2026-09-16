@@ -6,12 +6,15 @@ type StoreCharacter = ReturnType<
   typeof useCharacterStore.getState
 >['characters'][string];
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
+import {
+  ActiveStateCard,
+  ActiveStateToggle,
+  CardActionGroup,
+} from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import {
   Plus,
   Star,
-  CheckCircle,
   Play,
   Eye,
   Pencil,
@@ -82,18 +85,11 @@ export function CharacterCard({
     <ActiveStateCard
       isActive={isActive}
       showActiveIndicator={false}
-      onClick={!isActive ? onMakeActive : undefined}
       className="component-character-card"
     >
       <div className="character-card-body">
         <div className="character-card-inner">
-          <div
-            className="character-card-portrait"
-            onClick={(e) => {
-              e.stopPropagation();
-              onView();
-            }}
-          >
+          <div className="character-card-portrait" onClick={onView}>
             <CharacterPortrait
               portrait={
                 character.portrait || { type: 'placeholder', url: null }
@@ -102,26 +98,22 @@ export function CharacterCard({
               size="large"
             />
           </div>
-          <h3
-            className="character-card-name"
-            onClick={(e) => {
-              e.stopPropagation();
-              onView();
-            }}
-          >
-            {character.name}
+          <h3 className="character-card-name">
+            <button
+              type="button"
+              className="character-card-name-button"
+              onClick={onView}
+            >
+              {character.name}
+            </button>
           </h3>
           <div className="character-card-meta">
             <span className="character-card-level">Level {character.level || 1}</span>
-            {isActive && (
-              <Badge
-                variant="default-static"
-                icon={<CheckCircle aria-hidden="true" />}
-                data-testid="character-card-active-badge"
-              >
-                Active
-              </Badge>
-            )}
+            <ActiveStateToggle
+              isActive={isActive}
+              onActivate={onMakeActive}
+              testId="character-card-active-toggle"
+            />
             {character?.background?.isKnownFigure !== undefined && (
               <Badge
                 icon={
@@ -196,10 +188,7 @@ export function CharacterCard({
         </div>
 
         {/* Footer with buttons - always at bottom */}
-        <footer
-          className="character-card-footer"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <footer className="character-card-footer">
           <CardActionGroup
             primaryActions={[
               {

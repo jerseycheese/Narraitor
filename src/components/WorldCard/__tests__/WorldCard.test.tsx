@@ -185,6 +185,17 @@ describe('WorldCard', () => {
     expect(heroImage?.getAttribute('src')).not.toBe(WHITE_PLACEHOLDER);
   });
 
+  test('opening a world from its image does not also make it active', () => {
+    const onSelect = jest.fn();
+    render(<WorldCard world={mockWorld} onSelect={onSelect} onDelete={jest.fn()} />);
+
+    fireEvent.click(screen.getByRole('link'));
+    expect(onSelect).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Make Active' }));
+    expect(onSelect).toHaveBeenCalledWith(mockWorld.id);
+  });
+
   // Test for Edit functionality
   test('navigates to edit page when Edit is clicked', () => {
     render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);

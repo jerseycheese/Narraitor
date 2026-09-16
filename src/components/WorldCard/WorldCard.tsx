@@ -7,11 +7,15 @@ import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { getGenreLabel } from '@/lib/constants/genres';
-import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
+import {
+  ActiveStateCard,
+  ActiveStateToggle,
+  CardActionGroup,
+} from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
-import { CheckCircle, Play, Pencil, Trash } from 'lucide-react';
+import { Play, Pencil, Trash } from 'lucide-react';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('WorldCard');
@@ -112,7 +116,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
     <ActiveStateCard
       isActive={isActive}
       showActiveIndicator={false}
-      onClick={!isActive ? () => onSelect(world.id) : undefined}
       testId="world-card"
       hasImage={true}
       className="component-world-card"
@@ -136,15 +139,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 image={heroImage}
                 badge={
                   <div className="world-card-badges">
-                    {isActive && (
-                      <Badge
-                        variant="default-static"
-                        icon={<CheckCircle aria-hidden="true" />}
-                        data-testid="world-card-active-badge"
-                      >
-                        Active
-                      </Badge>
-                    )}
                     {world.genre && (
                       <span data-testid="world-card-genre">
                         {getGenreLabel(world.genre)}
@@ -171,10 +165,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   <button
                     key={char.id}
                     className="world-card-character-pill"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/characters/${char.id}`);
-                    }}
+                    onClick={() => router.push(`/characters/${char.id}`)}
                     title={`Play as ${char.name} - Level ${char.level}`}
                   >
                     {/* Character portrait or placeholder */}
@@ -202,6 +193,11 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
             {/* World type badge */}
             <div className="world-card-type-badge">
+              <ActiveStateToggle
+                isActive={isActive}
+                onActivate={() => onSelect(world.id)}
+                testId="world-card-active-toggle"
+              />
               {world.reference ? (
                 <Badge
                   variant={
@@ -226,7 +222,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
         </div>
 
         {/* Footer with buttons - always at bottom */}
-        <footer onClick={(e) => e.stopPropagation()}>
+        <footer>
           <div className="world-card-footer-meta">
             <time data-testid="world-card-createdAt">
               Created: {formatDate(world.createdAt)}
@@ -249,10 +245,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 {
                   key: 'characters',
                   text: 'Characters',
-                  onClick: (e) => {
-                    e.stopPropagation();
-                    router.push(`/characters?worldId=${world.id}`);
-                  },
+                  onClick: () => router.push(`/characters?worldId=${world.id}`),
                   variant: 'secondary',
                 },
                 {

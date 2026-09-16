@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { CharacterCard } from '../CharacterCard';
 import type { useCharacterStore } from '@/state/characterStore';
 
@@ -85,7 +86,7 @@ describe('CharacterCard', () => {
     expect(screen.queryByText('No description provided')).not.toBeInTheDocument();
   });
 
-  it('renders a clean active badge when character is active and omits loud green banner', () => {
+  it('marks the active character without the loud green banner', () => {
     render(
       <CharacterCard
         character={mockCharacter}
@@ -98,9 +99,13 @@ describe('CharacterCard', () => {
       />
     );
 
-    expect(screen.getByTestId('character-card-active-badge')).toBeInTheDocument();
-    expect(screen.getByTestId('character-card-active-badge')).toHaveTextContent('Active');
+    const toggle = screen.getByTestId('character-card-active-toggle');
+    expect(toggle).toHaveTextContent('Active');
+    expect(toggle).toHaveAttribute('aria-disabled', 'true');
     expect(screen.queryByText('Currently Active Character')).not.toBeInTheDocument();
+
+    fireEvent.click(toggle);
+    expect(onMakeActive).not.toHaveBeenCalled();
   });
 
   it('provides streamlined buttons (Play, View, Edit, Delete) with Play as secondary variant', () => {
@@ -126,12 +131,9 @@ describe('CharacterCard', () => {
     expect(viewBtn).toBeInTheDocument();
     expect(editBtn).toBeInTheDocument();
     expect(deleteBtn).toBeInTheDocument();
-
-    // No Make Active clutter button in action group
-    expect(screen.queryByText('Make Active')).not.toBeInTheDocument();
   });
 
-  it('handles user interactions for actions and card click selection', () => {
+  it('handles user interactions for the card actions and the name', () => {
     render(
       <CharacterCard
         character={mockCharacter}
@@ -156,8 +158,29 @@ describe('CharacterCard', () => {
     fireEvent.click(screen.getByTestId('character-card-actions-delete-button'));
     expect(onDelete).toHaveBeenCalledTimes(1);
 
-    // Clicking inactive card triggers onMakeActive
+    fireEvent.click(screen.getByRole('button', { name: 'Aragorn' }));
+    expect(onView).toHaveBeenCalledTimes(2);
+  });
+
+  it('makes the character active from the keyboard, not from a stray card click', async () => {
+    const user = userEvent.setup();
+    render(
+      <CharacterCard
+        character={mockCharacter}
+        isActive={false}
+        onMakeActive={onMakeActive}
+        onView={onView}
+        onPlay={onPlay}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    );
+
     fireEvent.click(screen.getByTestId('active-state-card'));
+    expect(onMakeActive).not.toHaveBeenCalled();
+
+    screen.getByRole('button', { name: 'Make Active' }).focus();
+    await user.keyboard('{Enter}');
     expect(onMakeActive).toHaveBeenCalledTimes(1);
   });
 });

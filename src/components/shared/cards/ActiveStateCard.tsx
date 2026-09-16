@@ -8,8 +8,6 @@ export interface ActiveStateCardProps {
   activeText?: string;
   /** Icon for the active state indicator */
   activeIcon?: React.ReactNode;
-  /** Click handler for the card */
-  onClick?: () => void;
   /** Base CSS classes for the card */
   className?: string;
   /** Classes to apply when active */
@@ -32,7 +30,6 @@ export interface ActiveStateCardProps {
  * @example Basic usage
  * <ActiveStateCard 
  *   isActive={isActive}
- *   onClick={() => handleSelect(id)}
  *   activeText="Currently Active World"
  * >
  *   <CardContent />
@@ -50,7 +47,6 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
   isActive,
   activeText = 'Currently Active',
   activeIcon,
-  onClick,
   className = '',
   activeClassName,
   inactiveClassName,
@@ -71,7 +67,6 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
   return (
     <article
       data-testid={testId}
-      onClick={onClick}
       className={`active-state-card ${stateClasses} ${className}`}
     >
       {/* Image section with overlay if present */}

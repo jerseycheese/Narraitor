@@ -524,10 +524,10 @@ export default function CharactersPage() {
               gap="sm"
               actions={[
                 {
-                  label: isGenerating
-                    ? generatingStatus || 'Generating...'
-                    : 'Generate Character',
-                  onClick: handleGenerateCharacter,
+                  // Opens the same dialog as the toolbar, so a failed
+                  // generation has somewhere visible to report its error.
+                  label: 'Generate Character',
+                  onClick: () => setShowGenerateDialog(true),
                   variant: 'secondary',
                   disabled: isGenerating,
                   size: 'lg',
