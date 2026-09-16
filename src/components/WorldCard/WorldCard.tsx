@@ -19,6 +19,9 @@ import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('WorldCard');
 
+/** Pills shown before the rest collapse into a "+N more" roster link. */
+const MAX_CHARACTER_PILLS = 3;
+
 interface WorldCardProps {
   /** The world data to display */
   world: World;
@@ -160,7 +163,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
           <div className="world-card-meta">
             {characters.length > 0 && (
               <div className="world-card-character-pills">
-                {characters.map((char) => (
+                {characters.slice(0, MAX_CHARACTER_PILLS).map((char) => (
                   <button
                     key={char.id}
                     className="world-card-character-pill"
@@ -183,6 +186,16 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     <span>{char.name}</span>
                   </button>
                 ))}
+                {characters.length > MAX_CHARACTER_PILLS && (
+                  <Link
+                    href={`/characters?worldId=${world.id}`}
+                    className="world-card-character-pills-more"
+                    data-testid="world-card-character-pills-more"
+                  >
+                    +{characters.length - MAX_CHARACTER_PILLS} more
+                    <span className="sr-only"> characters in {world.name}</span>
+                  </Link>
+                )}
               </div>
             )}
           </div>

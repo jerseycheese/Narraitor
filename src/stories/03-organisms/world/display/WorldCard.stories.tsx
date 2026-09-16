@@ -153,7 +153,12 @@ type Story = StoryObj<typeof WorldCard>;
 export const Default: Story = {
   args: {
     world: mockWorld,
-    characters: mockCharacters,
+    // Five characters, so the pill list collapses past three into "+2 more"
+    characters: [
+      ...mockCharacters,
+      { ...mockCharacters[2], id: 'char4', name: 'Tobin Ashvale' },
+      { ...mockCharacters[2], id: 'char5', name: 'Mira Quell' },
+    ],
     onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },

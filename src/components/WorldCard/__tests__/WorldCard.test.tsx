@@ -152,6 +152,40 @@ describe('WorldCard', () => {
     expect(characterButton).toHaveClass('world-card-character-pill');
   });
 
+  test('caps character pills and links the rest to the filtered roster', () => {
+    const characters = ['Aria', 'Bram', 'Cato', 'Dune', 'Esk'].map((name, i) => ({
+      id: `char-${i}`,
+      worldId: mockWorld.id,
+      name,
+      description: '',
+      portrait: { type: 'placeholder' as const, url: null },
+      level: 1,
+      isPlayer: true,
+      attributes: [],
+      skills: [],
+      derivedStats: [],
+      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+      status: { conditions: [] },
+      inventory: { characterId: `char-${i}`, items: [], capacity: 10, categories: [], itemOrder: [] },
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+    }));
+
+    const { container } = render(
+      <WorldCard
+        world={mockWorld}
+        onSelect={jest.fn()}
+        onDelete={jest.fn()}
+        characters={characters}
+      />
+    );
+
+    expect(container.querySelectorAll('.world-card-character-pill')).toHaveLength(3);
+    const more = screen.getByTestId('world-card-character-pills-more');
+    expect(more).toHaveTextContent('+2 more');
+    expect(more).toHaveAttribute('href', `/characters?worldId=${mockWorld.id}`);
+  });
+
   // Regression test for #1113 - no white placeholder image in the no-image case
   test('renders no placeholder image when the world has no image', () => {
     const worldWithoutImage = createMockWorld({ image: undefined });

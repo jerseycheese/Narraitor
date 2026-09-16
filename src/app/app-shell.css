@@ -799,7 +799,7 @@
 }
 
 .card-action-group button {
-  min-height: 2.5rem;
+  min-height: var(--control-height-touch);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -989,6 +989,25 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+}
+
+/* Past a few pills the list pushes Play off a phone screen, so the rest
+   collapse into a link to the filtered roster. */
+.world-card-character-pills-more {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height-touch);
+  padding: 0 var(--space-1);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs_5);
+  font-weight: 500;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.world-card-character-pills-more:hover {
+  color: var(--color-accent-hover);
 }
 
 .world-card-description-block {
