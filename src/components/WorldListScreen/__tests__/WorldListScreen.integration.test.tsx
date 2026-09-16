@@ -123,7 +123,7 @@ describe('WorldListScreen integration (#347)', () => {
     const worldId = useWorldStore.getState().createWorld(worldData());
 
     render(<WorldListScreen />);
-    expect(screen.queryByText('Currently Active World')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('world-card-active-badge')).not.toBeInTheDocument();
 
     // No re-render triggered by the test itself — this call comes from
     // outside the component, the way another screen or store action would.
@@ -131,7 +131,7 @@ describe('WorldListScreen integration (#347)', () => {
       useWorldStore.getState().setCurrentWorld(worldId);
     });
 
-    expect(screen.getByText('Currently Active World')).toBeInTheDocument();
+    expect(screen.getByTestId('world-card-active-badge')).toBeInTheDocument();
   });
 
   // AC: Tests validate proper routing behavior when selecting worlds
