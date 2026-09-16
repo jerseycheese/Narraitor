@@ -158,7 +158,6 @@ export function RecoveryNotification({
       title={title || "Character Creation Progress Found"}
       description={description}
       showCloseButton={true}
-      ariaDescribedBy="recovery-notification-content"
     >
       <div id="recovery-notification-content">
         <div

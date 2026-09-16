@@ -43,6 +43,20 @@ describe('RecoveryNotification', () => {
       expect(icon).toHaveAttribute('height', '48');
       expect(icon).toHaveClass('recovery-notification-icon');
     });
+
+    test('opts out of a dialog description when no custom description is provided', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      render(<RecoveryNotification {...defaultProps} />);
+
+      expect(screen.getByRole('dialog')).not.toHaveAttribute('aria-describedby');
+      expect(
+        warnSpy.mock.calls.filter((call) =>
+          String(call[0]).includes('Missing `Description`'),
+        ),
+      ).toHaveLength(0);
+      warnSpy.mockRestore();
+    });
   });
 
   describe('user interactions', () => {
