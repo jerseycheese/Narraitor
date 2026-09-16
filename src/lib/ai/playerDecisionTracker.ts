@@ -162,10 +162,10 @@ export class PlayerDecisionTracker {
       throw new Error(`Invalid choice type: ${input.choiceType}`);
     }
 
-    // Sanitize string inputs
-    const sanitizeString = (str: string, maxLength: number = 500): string => {
+    // Clean string inputs while preserving quotes, apostrophes, and ampersands
+    const cleanDecisionText = (str: string, maxLength: number = 500): string => {
       return str
-        .replace(/[<>'"&]/g, '') // Remove potentially dangerous characters
+        .replace(/[<>]/g, '')
         .substring(0, maxLength)
         .trim();
     };
@@ -179,19 +179,19 @@ export class PlayerDecisionTracker {
 
     if (input.context) {
       if (input.context.location && typeof input.context.location === 'string') {
-        const sanitized = sanitizeString(input.context.location, 100);
+        const sanitized = cleanDecisionText(input.context.location, 100);
         if (sanitized) sanitizedContext.location = sanitized;
       }
 
       if (input.context.situation && typeof input.context.situation === 'string') {
-        const sanitized = sanitizeString(input.context.situation, 200);
+        const sanitized = cleanDecisionText(input.context.situation, 200);
         if (sanitized) sanitizedContext.situation = sanitized;
       }
 
       if (Array.isArray(input.context.charactersPresent)) {
         const sanitizedCharacters = input.context.charactersPresent
           .filter(char => typeof char === 'string')
-          .map(char => sanitizeString(char, 50))
+          .map(char => cleanDecisionText(char, 50))
           .filter(char => char.length > 0)
           .slice(0, 10); // Limit to 10 characters
         
@@ -202,11 +202,11 @@ export class PlayerDecisionTracker {
     }
 
     return {
-      prompt: sanitizeString(input.prompt, 500),
-      choiceText: sanitizeString(input.choiceText, 300),
+      prompt: cleanDecisionText(input.prompt, 500),
+      choiceText: cleanDecisionText(input.choiceText, 300),
       choiceType: input.choiceType,
-      sessionId: sanitizeString(input.sessionId, 50),
-      worldId: sanitizeString(input.worldId, 50),
+      sessionId: cleanDecisionText(input.sessionId, 50),
+      worldId: cleanDecisionText(input.worldId, 50),
       context: sanitizedContext
     };
   }

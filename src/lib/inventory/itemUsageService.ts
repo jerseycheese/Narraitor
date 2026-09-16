@@ -7,12 +7,7 @@ import type {
   ItemUsageResult,
   StandardInventoryCategory,
 } from '@/types/inventory.types';
-import type { NarrativeGenerationResult } from '@/types/narrative.types';
 import type { ItemUseTurnCommand } from '@/types/turnResolver.types';
-import {
-  generateItemUsageNarrative as generateResolverManagedItemNarrative,
-  type ItemUsageNarrativeDetails,
-} from './itemUsageNarrative';
 import { createItemUsageJournalEntry } from './itemUsageJournalIntegration';
 
 export { buildUsageNarrative } from './itemUsageNarrative';
@@ -29,23 +24,6 @@ export function isNarrativelySignificant(item: InventoryItem): boolean {
   ];
 
   return significantCategories.includes(item.categoryId);
-}
-
-/**
- * Generates item-use prose with the default provider client.
- * TurnResolver injects its existing generator through the lower-level helper.
- */
-export function generateItemUsageNarrative(
-  item: InventoryItem,
-  characterId: ItemUseTurnCommand['characterId'],
-  worldId: ItemUseTurnCommand['worldId'],
-  sessionId: ItemUseTurnCommand['sessionId'],
-  usageDetails: ItemUsageNarrativeDetails
-): Promise<NarrativeGenerationResult> {
-  return generateResolverManagedItemNarrative(
-    { item, characterId, worldId, sessionId, usageDetails },
-    new NarrativeGenerator(createDefaultGeminiClient())
-  );
 }
 
 /**

@@ -135,8 +135,8 @@ describe('PlayerDecisionTracker - MVP Tests', () => {
 
     test('sanitizes malicious input', () => {
       const decision = tracker.recordDecision(
-        'Prompt with <script>alert("xss")</script>',
-        'Choice with "quotes" & symbols',
+        'Prompt with <script>alert("xss")</script> & innkeeper\'s choice',
+        'Choice with "quotes", innkeeper\'s & symbols',
         'helpful',
         'session-1',
         'world-1',
@@ -147,12 +147,25 @@ describe('PlayerDecisionTracker - MVP Tests', () => {
         }
       );
 
-      expect(decision.prompt).not.toContain('<script>');
-      expect(decision.choiceText).not.toContain('"');
-      expect(decision.choiceText).not.toContain('&');
-      expect(decision.context.location).not.toContain('<script>');
-      expect(decision.context.situation).not.toContain('&');
-      expect(decision.context.charactersPresent?.[1]).not.toContain('<script>');
+      // Strips dangerous HTML angle brackets
+      expect(decision.prompt).not.toContain('<');
+      expect(decision.prompt).not.toContain('>');
+      expect(decision.choiceText).not.toContain('<');
+      expect(decision.choiceText).not.toContain('>');
+      expect(decision.context.location).not.toContain('<');
+      expect(decision.context.location).not.toContain('>');
+      expect(decision.context.charactersPresent?.[1]).not.toContain('<');
+      expect(decision.context.charactersPresent?.[1]).not.toContain('>');
+
+      // Preserves quotes, apostrophes, and ampersands
+      expect(decision.prompt).toContain('"');
+      expect(decision.prompt).toContain("'");
+      expect(decision.prompt).toContain('&');
+      expect(decision.choiceText).toContain('"');
+      expect(decision.choiceText).toContain("'");
+      expect(decision.choiceText).toContain('&');
+      expect(decision.context.situation).toContain('&');
+      expect(decision.context.situation).toContain('"');
       
       // Should still contain safe content
       expect(decision.prompt).toContain('Prompt with');
