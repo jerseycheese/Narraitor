@@ -19,6 +19,11 @@ describe('PROVIDER_PRESETS', () => {
     expect(available).toEqual(['gemini', 'openrouter', 'ollama', 'openai']);
   });
 
+  it('notes that OpenRouter covers dozens of models with one key', () => {
+    const openrouter = PROVIDER_PRESETS.find((preset) => preset.id === 'openrouter');
+    expect(openrouter?.note).toBe('one key, dozens of models');
+  });
+
   it('asks OpenAI for max_completion_tokens, which is the only name it accepts', () => {
     const openai = PROVIDER_PRESETS.find((preset) => preset.id === 'openai');
     expect(openai?.maxOutputTokensParam).toBe('max_completion_tokens');
