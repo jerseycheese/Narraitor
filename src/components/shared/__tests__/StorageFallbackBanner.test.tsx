@@ -32,9 +32,10 @@ describe('StorageFallbackBanner', () => {
     const alert = screen.getByRole('alert');
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveClass('storage-fallback-banner');
-    expect(screen.getByText(/Storage is unavailable/i)).toBeInTheDocument();
-    expect(screen.getByText(/Progress will not be saved/i)).toBeInTheDocument();
-    expect(screen.getByText(/IndexedDB not available in this environment/i)).toBeInTheDocument();
+    expect(screen.getByText(/can't save to this browser/i)).toBeInTheDocument();
+    expect(screen.getByText(/export your data from Settings/i)).toBeInTheDocument();
+    // The raw failure belongs in the log, not in the player's alert.
+    expect(screen.queryByText(/IndexedDB/i)).not.toBeInTheDocument();
   });
 
   it('renders fallback warning when unavailable without a detailed notice message', () => {
@@ -43,7 +44,11 @@ describe('StorageFallbackBanner', () => {
     render(<StorageFallbackBanner />);
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText('Storage is unavailable. Progress will not be saved.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Narraitor can't save to this browser right now. Keep this tab open, and export your data from Settings so you don't lose your progress."
+      )
+    ).toBeInTheDocument();
   });
 
   it('reacts dynamically to storage status change events', () => {
@@ -57,7 +62,7 @@ describe('StorageFallbackBanner', () => {
     });
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText(/Quota exceeded/i)).toBeInTheDocument();
+    expect(screen.getByText(/can't save to this browser/i)).toBeInTheDocument();
 
     act(() => {
       _setStorageStatusForTesting(null, null);

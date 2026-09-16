@@ -326,7 +326,7 @@ export function GuidedFirstTimeExperience() {
             <div>
               <Label htmlFor="world-genre">
                 Genre{' '}
-                <span>(optional - will be inferred from your reference)</span>
+                <span>(optional - picked from the setting you named)</span>
               </Label>
               <select
                 id="world-genre"
@@ -477,7 +477,7 @@ export function GuidedFirstTimeExperience() {
           }
           onConfirm={handleConfirmGenreChange}
           title="Clear Genre?"
-          message="Changing the world type will clear your selected genre, as it will be inferred from the reference. Do you want to continue?"
+          message="Changing the world type will clear your selected genre, since it comes from the existing setting you name. Do you want to continue?"
           variant="warning"
           confirmText="Yes, change type"
         />

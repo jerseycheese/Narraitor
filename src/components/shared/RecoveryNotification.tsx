@@ -156,7 +156,7 @@ export function RecoveryNotification({
       isOpen={isVisible}
       onClose={onDismiss}
       title={title || "Character Creation Progress Found"}
-      description={description || "Found saved character creation progress from a previous session."}
+      description={description}
       showCloseButton={true}
       ariaDescribedBy="recovery-notification-content"
     >

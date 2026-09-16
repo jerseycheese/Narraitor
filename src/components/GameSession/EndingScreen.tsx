@@ -174,9 +174,6 @@ export function EndingScreen() {
       <div role="main" aria-live="polite">
         <div>
           <LoadingState message="Loading your story ending..." />
-          <p>
-            Please wait while we craft the perfect conclusion to your journey...
-          </p>
         </div>
       </div>
     );

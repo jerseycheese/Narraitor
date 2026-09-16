@@ -122,7 +122,7 @@ describe('DashboardContinueCard', () => {
     await user.click(deleteButton);
 
     // Confirmation dialog should appear
-    expect(screen.getByText(/permanently delete/i)).toBeInTheDocument();
+    expect(screen.getByText(/cannot be undone/i)).toBeInTheDocument();
   });
 
   it('displays character portrait', () => {
