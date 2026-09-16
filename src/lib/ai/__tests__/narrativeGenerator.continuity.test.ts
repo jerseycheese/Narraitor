@@ -13,7 +13,6 @@ import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { useLoreStore } from '@/state/loreStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { extractStructuredLore } from '../structuredLoreExtractor';
 import { setupDecisionConsequencesMocks } from './narrativeGenerator.decisionConsequences.testHelpers';
 import type { AIClient } from '../types';
 import type { NarrativeGenerationRequest } from '@/types/narrative.types';
@@ -51,9 +50,6 @@ jest.mock('../../promptTemplates/narrativeTemplateManager', () => ({
 jest.mock('../loreContextHelper', () => ({
   getLoreContextForPrompt: jest.fn(),
   checkAndRecordLoreMentions: jest.fn(),
-}));
-jest.mock('../structuredLoreExtractor', () => ({
-  extractStructuredLore: jest.fn(),
 }));
 jest.mock('../toneSettingsGuidance', () => ({
   getDetailedToneInstructions: jest.fn(),
@@ -228,13 +224,6 @@ describe('NarrativeGenerator - continuity guardrail', () => {
       issues: [{ type: 'relationship-tone', entity: 'Mira' }],
     });
 
-    // Lore extraction ran on the corrected prose, not the contradicted draft.
-    expect(extractStructuredLore).toHaveBeenCalledWith(
-      CORRECTED_PROSE,
-      expect.anything(),
-      expect.anything()
-    );
-
     // DevTools feed got the full validation record.
     const recorded = useContinuityStore.getState().results;
     expect(recorded).toHaveLength(1);
@@ -285,7 +274,7 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     expect(recorded[0].remainingIssues).toHaveLength(1);
   });
 
-  it('activates on a ledger-only contract and hands topics to the extractor', async () => {
+  it('activates on a ledger-only contract', async () => {
     // No relationships and no dead/destroyed lore: before the ledger this
     // contract was vacuous and the guardrail sat out the turn.
     (useWorldStore.getState as jest.Mock).mockImplementation(() => ({
@@ -330,11 +319,6 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     expect(generationPrompt).toContain('CONTINUITY REQUIREMENTS');
     expect(generationPrompt).toContain('mill debt (Aunt Carol)');
     expect(result.metadata.continuity).toEqual({ status: 'clean' });
-    expect(extractStructuredLore).toHaveBeenCalledWith(
-      CLEAN_PROSE,
-      expect.anything(),
-      { continuityTopics: ['mill debt'], playerCharacterName: 'Hero' }
-    );
   });
 
   it('keeps a decisions-only contract so the recent-decision lines reach the prompt', async () => {
@@ -395,7 +379,7 @@ describe('NarrativeGenerator - continuity guardrail', () => {
 
   // #1857: the player refers to a private conversation the story never told.
   // Co-presence on the session's segments is what makes the void assertable.
-  it('asserts the co-presence record, corrects an invention, and marks a flagged speaker unattested', async () => {
+  it('asserts the co-presence record and corrects an invention', async () => {
     (useNPCStore.getState as jest.Mock).mockImplementation(() => ({
       getNPCsByWorld: jest.fn().mockReturnValue([
         { id: 'npc-mira', name: 'Mira', worldId: 'world-1' },
@@ -459,26 +443,14 @@ describe('NarrativeGenerator - continuity guardrail', () => {
       issues: [{ type: 'invented-exchange', entity: 'Davies' }],
     });
 
-    // A corrected turn tags normally: nothing to reserve.
-    expect(extractStructuredLore).toHaveBeenLastCalledWith(
-      REFUSED_PROSE,
-      expect.anything(),
-      expect.not.objectContaining({ unattestedSpeakers: expect.anything() })
-    );
-
-    // Same bait, but the correction keeps the invention: the lore backstop
-    // takes over and the speaker's canon annotations get reserved.
+    // Same bait, but the correction keeps the invention: the turn ships
+    // flagged rather than silently accepting it.
     const stubbornClient = createRoutedClient(INVENTED_PROSE, INVENTED_PROSE);
     const flagged = await new NarrativeGenerator(
       stubbornClient
     ).generateSegment(baitRequest);
 
     expect(flagged.metadata.continuity?.status).toBe('flagged');
-    expect(extractStructuredLore).toHaveBeenLastCalledWith(
-      INVENTED_PROSE,
-      expect.anything(),
-      expect.objectContaining({ unattestedSpeakers: ['Davies'] })
-    );
   });
 
   it('does not treat solo co-presence as proof that the claimed exchange happened', async () => {
@@ -532,11 +504,6 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     );
     expect(correctionPromptsOf(client)).toHaveLength(1);
     expect(result.content).toBe(refusedProse);
-    expect(extractStructuredLore).toHaveBeenLastCalledWith(
-      refusedProse,
-      expect.anything(),
-      expect.not.objectContaining({ unattestedSpeakers: expect.anything() })
-    );
   });
 
   it('leaves the guard off when a private exchange was narrated', async () => {
@@ -646,12 +613,5 @@ describe('NarrativeGenerator - continuity guardrail', () => {
     expect(result.metadata.continuity?.remainingIssues).toEqual([
       { type: 'invented-exchange', entity: 'Davies' },
     ]);
-
-    // So the lore backstop still runs, on that speaker only.
-    expect(extractStructuredLore).toHaveBeenLastCalledWith(
-      HALF_FIXED,
-      expect.anything(),
-      expect.objectContaining({ unattestedSpeakers: ['Davies'] })
-    );
   });
 });

@@ -898,8 +898,7 @@ describe('TurnResolver', () => {
 
       expect(outcome.success).toBe(true);
       expect(generator.generateSegment).toHaveBeenCalledWith(
-        expect.any(Object),
-        { resolverManaged: true }
+        expect.any(Object)
       );
       expect(generator.generatePlayerChoices).toHaveBeenCalledTimes(1);
       expect(
@@ -1232,27 +1231,6 @@ describe('TurnResolver', () => {
       ).toEqual([
         expect.objectContaining({ prompt: 'Existing decision' }),
       ]);
-    });
-  });
-
-  describe('resolverManaged guard', () => {
-    it('passes resolverManaged to the generator call', async () => {
-      const generator = makeMockGenerator();
-      await resolveTurn(makeCommand(), generator);
-
-      const genCall = (generator.generateSegment as jest.Mock).mock.calls[0];
-      expect(genCall[1]).toEqual(
-        expect.objectContaining({ resolverManaged: true })
-      );
-    });
-
-    it('is call-scoped, not session-scoped', () => {
-      // The guard is now a pure function check on the options object.
-      // No session-wide state to leak.
-      expect(isResolverManaged({ resolverManaged: true })).toBe(true);
-      expect(isResolverManaged({ resolverManaged: false })).toBe(false);
-      expect(isResolverManaged(undefined)).toBe(false);
-      expect(isResolverManaged({})).toBe(false);
     });
   });
 

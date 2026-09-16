@@ -7,28 +7,18 @@ import {
   NarrativeContext,
   NarrativeGenerationRequest,
   NarrativeGenerationResult,
-  NarrativeSegment,
-  GeneratedCharacterMetadata,
   GenerationParameters,
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import type { SessionSnapshot } from '@/types/turnResolver.types';
 import { generateChoices } from './choiceGenerator';
-import { getLoreContextForPrompt, checkAndRecordLoreMentions } from './loreContextHelper';
-import { extractStructuredLore } from './structuredLoreExtractor';
+import { checkAndRecordLoreMentions } from './loreContextHelper';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
-import { processAcquiredItems } from '@/lib/narrative/itemAcquisitionProcessor';
-import { processLostItems } from '@/lib/narrative/itemLossProcessor';
 import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
 import { logger } from '@/lib/utils/logger';
 import { useInventoryStore } from '@/state/inventoryStore';
-import {
-  buildPromptDebugInfo,
-  isDebugInfoEnabled,
-  type DebugInfoContext,
-} from './debugInfoBuilder';
 import {
   recordRequestCalibration,
 } from './narrativeGenerator.calibration';
@@ -47,17 +37,13 @@ import {
 } from './narrativeGenerator.prompt';
 import { formatNarrativeResponse } from './narrativeGenerator.response';
 import { getCarryForwardLocation } from './narrativeGenerator.response.helpers';
-import { getActiveProviderModel } from '@/state/providerStore';
-import { DEFAULT_TEXT_MODEL } from './config';
 import { enforceLanguageComplexity } from './narrativeGenerator.languageComplexity';
-import { buildNpcRoster, syncNpcMetadata } from './narrativeGenerator.npc';
+import { buildNpcRoster } from './narrativeGenerator.npc';
 import {
   applyContinuityGuardrail,
   buildContinuityContractFromStores,
-  collectContinuityTopicsFromStores,
   enhancePromptWithContinuityExpectations,
 } from './narrativeGenerator.continuity';
-import { isResolverManaged } from '@/lib/narrative/resolverGuard';
 import { WORLD_CLOCK_TRANSITION_TAG } from '@/lib/narrative/turnTags';
 import {
   buildKnownNameTokens,
@@ -96,7 +82,7 @@ export class NarrativeGenerator {
    */
   async generateSegment(
     request: NarrativeGenerationRequest,
-    options?: { signal?: AbortSignal; onChunk?: (delta: string) => void; resolverManaged?: boolean }
+    options?: { signal?: AbortSignal; onChunk?: (delta: string) => void }
   ): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
@@ -105,8 +91,6 @@ export class NarrativeGenerator {
 
       const context = buildNarrativeContext(world, request);
       const prompt = template(context);
-
-      const loreContext = getLoreContextForPrompt(request.worldId, request.sessionId, { recordUsage: false });
 
       const toneEnhancedPrompt = enhancePromptWithToneSettings(
         prompt,
@@ -217,160 +201,9 @@ export class NarrativeGenerator {
           },
         };
       }
-      // Re-check before the store-mutating tail (lore extraction, item
-      // acquisition/loss, NPC sync) in case the caller aborted mid-pipeline.
+      // Re-check after the guardrail round-trips: a caller that aborted
+      // mid-pipeline should not get a result back.
       throwIfAborted(options?.signal);
-
-      // When the TurnResolver drives this call, it handles inventory, NPC
-      // sync, and lore extraction itself, so skip the fire-and-forget tails
-      // here to avoid duplicate writers. Only this specific call is
-      // suppressed; concurrent calls from other paths run normally.
-      if (isResolverManaged(options)) {
-        return result;
-      }
-
-      // Lore extraction runs on the final (possibly corrected) prose so a
-      // contradicted draft never pollutes the lore store. Deferred off the
-      // per-turn path — it's a full extra Gemini round-trip that only
-      // enriches later prompts, nothing in this turn's UI reads it.
-      if (result.content) {
-        if (process.env.NODE_ENV !== 'production') {
-          logger.info('[NarrativeGenerator] EXTRACTION: Post-segment', {
-            worldId: request.worldId,
-            sessionId: request.sessionId,
-            contentLength: result.content.length,
-          });
-        }
-
-        const existingLoreContext = getLoreContextForPrompt(request.worldId, request.sessionId, {
-          recordUsage: false,
-        });
-        // Keyed on the invented-exchange issues that actually survived into the
-        // shipped prose, not on the aggregate status: a segment whose
-        // correction fixed a different issue reports 'corrected' with the
-        // invention still in it. Quarantine only those speakers, nobody else.
-        const unattestedSpeakers = (
-          result.metadata.continuity?.remainingIssues ?? []
-        )
-          .filter((issue) => issue.type === 'invented-exchange')
-          .map((issue) => issue.entity);
-
-        void extractStructuredLore(result.content, existingLoreContext, {
-          continuityTopics: collectContinuityTopicsFromStores(request),
-          playerCharacterName: context.playerCharacterName,
-          ...(unattestedSpeakers.length > 0 ? { unattestedSpeakers } : {}),
-        })
-          .then(async (structuredLore) => {
-            const { useLoreStore } = await import('@/state/loreStore');
-            const { addStructuredLore } = useLoreStore.getState();
-            addStructuredLore(structuredLore, request.worldId, request.sessionId);
-
-            if (process.env.NODE_ENV !== 'production') {
-              logger.info('[NarrativeGenerator] Extracted and stored lore:', {
-                worldId: request.worldId,
-                sessionId: request.sessionId,
-                factCount:
-                  structuredLore.characters.length +
-                  structuredLore.locations.length +
-                  structuredLore.events.length +
-                  structuredLore.rules.length,
-                characters: structuredLore.characters.map((c) => c.name),
-                locations: structuredLore.locations.map((l) => l.name),
-                events: structuredLore.events.length,
-                rules: structuredLore.rules.length,
-              });
-            }
-          })
-          .catch((error) => {
-            logger.error('[NarrativeGenerator] Failed to extract lore:', error);
-          });
-      }
-
-      if (
-        (!result.metadata.itemsLost || result.metadata.itemsLost.length === 0) &&
-        result.content
-      ) {
-        const inferredLosses = inferItemsLostFromNarrative(
-          result.content,
-          characterInventory
-        );
-
-        if (inferredLosses.length > 0) {
-          logger.info(
-            `Inferred ${inferredLosses.length} item losses from narrative in generateSegment`,
-            {
-              items: inferredLosses.map((i) => i.name),
-            }
-          );
-          result = {
-            ...result,
-            metadata: {
-              ...result.metadata,
-              itemsLost: inferredLosses,
-            },
-          };
-        }
-      }
-
-      try {
-        checkAndRecordLoreMentions(request.worldId, request.sessionId, result.content ?? '', 'narrative');
-      } catch (error) {
-        logger.warn('Failed to record lore mentions:', error);
-      }
-
-      if (isDebugInfoEnabled()) {
-        const previousSegments = request.narrativeContext?.previousSegments || [];
-        const previousSegment = previousSegments[previousSegments.length - 1];
-        const templateType = 'scene';
-
-        const debugInfoContext: DebugInfoContext = {
-          fullPrompt: finalPrompt,
-          templateName: this.getTemplateName(templateType),
-          world,
-          toneSettings,
-          loreContext,
-          characterIds: request.characterIds,
-          previousSegmentContent: previousSegment?.content,
-          previousSegmentType: previousSegment?.type,
-          tokenUsage: result.tokenUsage,
-          modelUsed: getActiveProviderModel() ?? DEFAULT_TEXT_MODEL,
-        };
-
-        result.metadata.debugInfo = buildPromptDebugInfo(debugInfoContext);
-      }
-
-      if (
-        !request.generationParameters?.disableItemAcquisitionProcessing &&
-        result.metadata.itemsAcquired &&
-        result.metadata.itemsAcquired.length > 0
-      ) {
-        const characterId = request.characterIds?.[0];
-        if (characterId && request.sessionId) {
-          void processAcquiredItems(
-            result.metadata.itemsAcquired,
-            characterId,
-            request.sessionId
-          );
-        }
-      }
-
-      // Process item losses (parallel to acquisition processing)
-      if (
-        !request.generationParameters?.disableItemLossProcessing &&
-        result.metadata.itemsLost &&
-        result.metadata.itemsLost.length > 0
-      ) {
-        const characterId = request.characterIds?.[0];
-        if (characterId && request.sessionId) {
-          void processLostItems(
-            result.metadata.itemsLost,
-            characterId,
-            request.sessionId
-          );
-        }
-      }
-
-      this.syncNpcMetadata(request.worldId, result.metadata.characters);
 
       return result;
     } catch (error) {
@@ -389,7 +222,6 @@ export class NarrativeGenerator {
       generationParameters?: GenerationParameters;
       signal?: AbortSignal;
       onChunk?: (delta: string) => void;
-      resolverManaged?: boolean;
     }
   ): Promise<NarrativeGenerationResult> {
     try {
@@ -513,124 +345,11 @@ export class NarrativeGenerator {
         logger.warn('Failed to record lore mentions:', error);
       }
 
-      // Resolver guard: skip lore extraction, item processing, and NPC
-      // sync when the resolver drives this call (it handles those itself).
-      if (isResolverManaged(options)) {
-        return result;
-      }
-
-      // Lore extraction runs on the final (possibly corrected) prose, after
-      // the resolver guard, so resolver-driven calls don't double-extract.
-      if (result.content) {
-        if (process.env.NODE_ENV !== 'production') {
-          logger.info('[NarrativeGenerator] EXTRACTION: Initial scene', {
-            worldId,
-            sessionId,
-            contentLength: result.content.length,
-          });
-        }
-
-        const existingLoreContext = getLoreContextForPrompt(worldId, sessionId, {
-          recordUsage: false,
-        });
-        void extractStructuredLore(result.content, existingLoreContext, {
-          playerCharacterName: playerCharacter?.name,
-        })
-          .then(async (structuredLore) => {
-            const { useLoreStore } = await import('@/state/loreStore');
-            const { addStructuredLore } = useLoreStore.getState();
-            addStructuredLore(structuredLore, worldId, sessionId);
-
-            if (process.env.NODE_ENV !== 'production') {
-              logger.info(
-                '[NarrativeGenerator] Extracted and stored lore from initial scene:',
-                {
-                  worldId,
-                  sessionId,
-                  factCount:
-                    structuredLore.characters.length +
-                    structuredLore.locations.length +
-                    structuredLore.events.length +
-                    structuredLore.rules.length,
-                  characters: structuredLore.characters.map((c) => c.name),
-                  locations: structuredLore.locations.map((l) => l.name),
-                  events: structuredLore.events.length,
-                  rules: structuredLore.rules.length,
-                }
-              );
-            }
-          })
-          .catch((error) => {
-            logger.error(
-              '[NarrativeGenerator] Failed to extract lore from initial scene:',
-              error
-            );
-          });
-      }
-
-      if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
-        const characterId = characterIds[0];
-        if (characterId && sessionId) {
-          void processAcquiredItems(
-            result.metadata.itemsAcquired,
-            characterId,
-            sessionId
-          );
-        }
-      }
-
-      if (
-        !options?.generationParameters?.disableItemLossProcessing &&
-        result.metadata.itemsLost &&
-        result.metadata.itemsLost.length > 0
-      ) {
-        const characterId = characterIds[0];
-        if (characterId && sessionId) {
-          void processLostItems(
-            result.metadata.itemsLost,
-            characterId,
-            sessionId
-          );
-        }
-      }
-
-      this.syncNpcMetadata(worldId, result.metadata.characters);
-
       return result;
     } catch (error) {
       logger.error('Failed to generate initial scene', { error });
       throw new Error('Failed to generate initial scene');
     }
-  }
-
-  async generateTransition(
-    from: NarrativeSegment,
-    to: NarrativeGenerationRequest
-  ): Promise<NarrativeGenerationResult> {
-    const world = this.getWorld(to.worldId);
-    const template = this.getTemplate('transition');
-
-    const context = {
-      previousContent: from.content,
-      previousType: from.type,
-      worldName: world.name,
-      genre: world.genre,
-      tone: 'default',
-      newLocation: to.narrativeContext?.currentLocation,
-    };
-
-    const prompt = template(context);
-    const response = await this.geminiClient.generateContent(prompt);
-
-    const result = await formatNarrativeResponse(
-      response,
-      'transition',
-      this.geminiClient,
-      // A transition is heading somewhere named; without one, it stays put.
-      to.narrativeContext?.currentLocation || from.metadata?.location
-    );
-    this.syncNpcMetadata(to.worldId, result.metadata.characters);
-    return result;
   }
 
   private getWorld(worldId: string): World {
@@ -647,165 +366,6 @@ export class NarrativeGenerator {
   private getTemplate(segmentType: string) {
     const templateKey = `narrative/${segmentType}`;
     return getNarrativeTemplate(templateKey);
-  }
-
-  private getTemplateName(segmentType: string): string {
-    const names: Record<string, string> = {
-      scene: 'Scene Template',
-      dialogue: 'Dialogue Template',
-      action: 'Action Template',
-      transition: 'Transition Template',
-      initial: 'Initial Scene Template',
-    };
-    return names[segmentType] || 'Unknown Template';
-  }
-
-  async generateSkillAcknowledgment(
-    worldId: string,
-    narrativeContext: NarrativeContext,
-    characterIds: string[],
-    skillUsed?: {
-      skillId: string;
-      skillName: string;
-      success: boolean;
-      difficulty: number;
-    },
-    customAction?: {
-      action: string;
-      implicitSkills?: string[];
-    },
-    options?: { generationParameters?: GenerationParameters }
-  ): Promise<NarrativeGenerationResult> {
-    try {
-      const world = this.getWorld(worldId);
-      const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
-      const template = this.getTemplate('skillAcknowledgment');
-
-      const { characters } = useCharacterStore.getState();
-      const playerCharacterId = characterIds[0];
-      const playerCharacter = playerCharacterId
-        ? characters[playerCharacterId]
-        : null;
-
-      const context = {
-        worldName: world.name,
-        genre: world.genre,
-        narrativeContext,
-        playerCharacterName: playerCharacter?.name,
-        skillUsed,
-        customAction,
-      };
-
-      const prompt = template(context);
-      const toneEnhancedPrompt = enhancePromptWithToneSettings(
-        prompt,
-        world,
-        this.staticContentCache
-      );
-      const loreEnhancedPrompt = enhancePromptWithLore(
-        toneEnhancedPrompt,
-        worldId,
-        narrativeContext.sessionId
-      );
-      const inventoryEnhancedPrompt = enhancePromptWithInventory(
-        loreEnhancedPrompt,
-        characterIds
-      );
-
-      // Fetch character inventory for loss context
-      const characterIdForLoss = characterIds[0];
-      const characterInventory = characterIdForLoss
-        ? useInventoryStore.getState().getCharacterItems(characterIdForLoss)
-        : [];
-
-      const acquisitionEnhancedPrompt = enhancePromptWithItemAcquisitionInstructions(
-        inventoryEnhancedPrompt,
-        this.staticContentCache
-      );
-
-      const fullyEnhancedPrompt = enhancePromptWithItemLossInstructions(
-        acquisitionEnhancedPrompt,
-        this.staticContentCache,
-        characterInventory
-      );
-
-      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
-      recordRequestCalibration(fullyEnhancedPrompt, response);
-
-      let result = await formatNarrativeResponse(
-        response,
-        inferSegmentType(response.content || ''),
-        this.geminiClient,
-        getCarryForwardLocation(narrativeContext)
-      );
-
-      result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);
-
-      if (
-        (!result.metadata.itemsLost || result.metadata.itemsLost.length === 0) &&
-        result.content
-      ) {
-        const characterIdForLoss = characterIds[0];
-        const currentInventory = characterIdForLoss
-          ? useInventoryStore.getState().getCharacterItems(characterIdForLoss)
-          : [];
-        const inferredLosses = inferItemsLostFromNarrative(
-          result.content,
-          currentInventory
-        );
-
-        if (inferredLosses.length > 0) {
-          logger.info(
-            `Inferred ${inferredLosses.length} item losses from narrative in generateSkillAcknowledgment`,
-            {
-              items: inferredLosses.map((i) => i.name),
-            }
-          );
-          result = {
-            ...result,
-            metadata: {
-              ...result.metadata,
-              itemsLost: inferredLosses,
-            },
-          };
-        }
-      }
-
-      if (result.metadata.itemsAcquired && result.metadata.itemsAcquired.length > 0) {
-        const characterId = characterIds[0];
-        const sessionId = narrativeContext.sessionId;
-        if (characterId && sessionId) {
-          void processAcquiredItems(
-            result.metadata.itemsAcquired,
-            characterId,
-            sessionId
-          );
-        }
-      }
-
-      if (
-        !options?.generationParameters?.disableItemLossProcessing &&
-        result.metadata.itemsLost &&
-        result.metadata.itemsLost.length > 0
-      ) {
-        const characterId = characterIds[0];
-        const sessionId = narrativeContext.sessionId;
-        if (characterId && sessionId) {
-          void processLostItems(
-            result.metadata.itemsLost,
-            characterId,
-            sessionId
-          );
-        }
-      }
-
-      return result;
-    } catch (error) {
-      logger.error('Failed to generate skill acknowledgment narrative', {
-        error,
-      });
-      throw new Error('Failed to generate skill acknowledgment narrative');
-    }
   }
 
   async generatePlayerChoices(
@@ -857,12 +417,5 @@ export class NarrativeGenerator {
         }, ${narrativeContext.currentSituation || 'making a decision'}.`,
       };
     }
-  }
-
-  private syncNpcMetadata(
-    worldId: string,
-    characters?: GeneratedCharacterMetadata[]
-  ) {
-    syncNpcMetadata(worldId, characters);
   }
 }

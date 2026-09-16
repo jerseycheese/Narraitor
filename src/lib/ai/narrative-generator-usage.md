@@ -31,18 +31,6 @@ const nextSegment = await narrativeGenerator.generateSegment({
     includedTopics: ['danger', 'exploration']
   }
 });
-
-// Generate a transition between scenes
-const transition = await narrativeGenerator.generateTransition(
-  previousSegment, // The last segment
-  {
-    worldId: 'world-123',
-    sessionId: 'session-456',
-    narrativeContext: {
-      currentLocation: 'Mountain Peak'
-    }
-  }
-);
 ```
 
 ## Key Methods
@@ -84,19 +72,8 @@ The `request` object needs these properties:
 
 **Returns:** A Promise that resolves to a `NarrativeGenerationResult` object
 
-### generateTransition()
-
-Generates smooth transitions between narrative segments. Useful when you need to move the story from one scene to another.
-
-```typescript
-generateTransition(from: NarrativeSegment, to: NarrativeGenerationRequest): Promise<NarrativeGenerationResult>
-```
-
-**Parameters:**
-- `from` - The source segment to transition from
-- `to` - A `NarrativeGenerationRequest` with details about where you're going
-
-**Returns:** A Promise that resolves to a `NarrativeGenerationResult` object
+To generate a scene transition, set `generationParameters.segmentType` to
+`'transition'` on a normal `generateSegment` call.
 
 ## Response Format
 

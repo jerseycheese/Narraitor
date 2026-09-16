@@ -372,18 +372,6 @@ export interface GenerationParameters {
   excludedTopics?: string[];
   decisionWeight?: DecisionWeight;
   desiredTone?: EndingTone;
-  /**
-   * When true, skips the post-processing step that turns AI metadata.itemsAcquired
-   * into actual inventory entries. Useful for narrative beats that reference
-   * existing items (e.g., item usage) where no new pickups should be recorded.
-   */
-  disableItemAcquisitionProcessing?: boolean;
-  /**
-   * When true, skips the post-processing step that turns AI metadata.itemsLost
-   * into actual inventory removals. Useful when generating narrative that mentions
-   * items but shouldn't trigger removal.
-   */
-  disableItemLossProcessing?: boolean;
 }
 
 /**
