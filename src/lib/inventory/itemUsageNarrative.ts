@@ -175,11 +175,8 @@ export async function generateItemUsageNarrative(
           segmentType: 'action',
           desiredLength: 'short',
           includedTopics,
-          disableItemAcquisitionProcessing: true,
-          disableItemLossProcessing: true,
         },
-      },
-      { resolverManaged: true }
+      }
     );
   } catch {
     return {

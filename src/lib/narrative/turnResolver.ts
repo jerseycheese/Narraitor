@@ -156,7 +156,7 @@ function awaitGeneration<T>(
  * picked a choice" and "the next Decision can safely read state":
  *
  * 1. Acquire per-session lock
- * 2. Call the generator with resolverManaged flag (skips its side effects)
+ * 2. Call the generator for the prose
  * 3. Build and commit the NarrativeSegment
  * 4. Await core reconciliation (world clock, world state threads, inventory)
  * 5. Stamp fatal-outcome tags from reconciliation
@@ -243,8 +243,6 @@ async function resolveTurnInner(
     skillCheckContext = ` [Skill checks: ${descriptions.join(', ')}]`;
   }
 
-  // Call the generator with resolverManaged so it skips its own
-  // fire-and-forget side effects (lore, inventory, NPC sync).
   const result = await awaitGeneration(
     () => generator.generateSegment(
       {
@@ -275,7 +273,7 @@ async function resolveTurnInner(
             : {}),
         },
       },
-      { signal: command.signal, onChunk: command.onChunk, resolverManaged: true }
+      { signal: command.signal, onChunk: command.onChunk }
     ),
     command.signal
   );
@@ -333,7 +331,7 @@ async function resolveInitialTurnInner(
       worldId,
       characterId ? [characterId] : [],
       sessionId,
-      { signal: command.signal, onChunk: command.onChunk, resolverManaged: true }
+      { signal: command.signal, onChunk: command.onChunk }
     ),
     command.signal
   );

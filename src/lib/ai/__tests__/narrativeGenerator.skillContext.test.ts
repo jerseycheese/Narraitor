@@ -26,9 +26,6 @@ jest.mock('@/state/loreStore', () => ({
     getState: jest.fn()
   }
 }));
-jest.mock('../structuredLoreExtractor', () => ({
-  extractStructuredLore: jest.fn()
-}));
 jest.mock('../loreContextHelper', () => ({
   getLoreContextForPrompt: jest.fn().mockReturnValue(''),
   checkAndRecordLoreMentions: jest.fn()
@@ -42,7 +39,6 @@ import { useAiContextStore } from '@/state/aiContextStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useNPCStore } from '@/state/npcStore';
 import { useLoreStore } from '@/state/loreStore';
-import { extractStructuredLore } from '../structuredLoreExtractor';
 import { createMockWorldStore, createMockCharacterStore } from '@/lib/test-utils';
 
 describe('NarrativeGenerator - Skill Context Integration', () => {
@@ -85,13 +81,6 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
       recordLoreMentions: jest.fn(),
       recordLoreUsage: jest.fn(),
       addStructuredLore: jest.fn()
-    });
-
-    (extractStructuredLore as jest.Mock).mockResolvedValue({
-      characters: [],
-      locations: [],
-      events: [],
-      rules: []
     });
 
     mockAIClient = createMockAIClient();
@@ -144,67 +133,5 @@ describe('NarrativeGenerator - Skill Context Integration', () => {
     expect(calledPrompt).toContain('Strength (Exceptional)');
     expect(calledPrompt).toContain('Intelligence (High)');
     expect(calledPrompt).not.toContain('Dexterity (');
-  });
-
-  // Lore extraction is a full extra Gemini round-trip that only enriches
-  // later prompts — generateSegment must not block on it.
-  test('resolves before lore extraction settles, then stores lore once it does', async () => {
-    const mockResponse = {
-      content: 'You press onward through the fog.',
-      finishReason: 'stop' as const,
-      promptTokens: 50,
-      completionTokens: 50
-    };
-    mockAIClient.generateContent.mockResolvedValue(mockResponse);
-
-    let resolveLoreExtraction: (value: {
-      characters: never[];
-      locations: never[];
-      events: never[];
-      rules: never[];
-    }) => void = () => {};
-    (extractStructuredLore as jest.Mock).mockReturnValue(
-      new Promise((resolve) => {
-        resolveLoreExtraction = resolve;
-      })
-    );
-
-    const addStructuredLore = jest.fn();
-    (useLoreStore.getState as jest.Mock).mockReturnValue({
-      getLoreContext: jest.fn().mockReturnValue({ factIds: [] }),
-      recordLoreMentions: jest.fn(),
-      recordLoreUsage: jest.fn(),
-      addStructuredLore
-    });
-
-    await narrativeGenerator.generateSegment({
-      worldId: 'skill-world',
-      sessionId: 'session-1',
-      characterIds: ['char-1'],
-      narrativeContext: {
-        worldId: 'skill-world',
-        currentSceneId: 'scene-4',
-        characterIds: ['char-1'],
-        sessionId: 'session-1',
-        previousSegments: [],
-        currentTags: []
-      }
-    });
-
-    // The segment resolved even though lore extraction is still pending.
-    expect(addStructuredLore).not.toHaveBeenCalled();
-
-    const resolvedLore = { characters: [], locations: [], events: [], rules: [] };
-    resolveLoreExtraction(resolvedLore);
-    // Flush the microtask queue so the deferred .then() chain (which
-    // includes an `await import(...)`) has a chance to run.
-    await Promise.resolve();
-    await Promise.resolve();
-    await Promise.resolve();
-
-    // Check the actual payload reaches the store, not just that some call
-    // happened — a call with the wrong world/session/lore shape should still
-    // fail this.
-    expect(addStructuredLore).toHaveBeenCalledWith(resolvedLore, 'skill-world', 'session-1');
   });
 });

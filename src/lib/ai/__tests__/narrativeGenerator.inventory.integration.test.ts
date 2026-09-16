@@ -8,8 +8,7 @@ import { useInventoryStore } from '@/state/inventoryStore';
 import {
   createMockGeminiClient,
   setupTestWorldAndCharacter,
-  createMockItem,
-  createTestNarrativeContext
+  createMockItem
 } from './narrativeGenerator.inventory.testHelpers';
 
 describe('NarrativeGenerator - Inventory Integration', () => {
@@ -40,27 +39,6 @@ describe('NarrativeGenerator - Inventory Integration', () => {
       .calls[0][0] as string;
 
     expect(generatedPrompt).toContain('## Inventory Summary');
-    expect(generatedPrompt).toContain('Adventure Pack');
-  });
-
-  test('should include inventory in skill acknowledgment generation', async () => {
-    const context = createTestNarrativeContext(worldId, characterId);
-    await generator.generateSkillAcknowledgment(
-      worldId,
-      context,
-      [characterId],
-      {
-        skillId: 'skill-1',
-        skillName: 'Climbing',
-        success: true,
-        difficulty: 5,
-      }
-    );
-
-    expect(mockGeminiClient.generateContent).toHaveBeenCalled();
-    const generatedPrompt = (mockGeminiClient.generateContent as jest.Mock).mock
-      .calls[0][0] as string;
-
     expect(generatedPrompt).toContain('Adventure Pack');
   });
 });

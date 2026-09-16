@@ -11,7 +11,6 @@ import { useNPCStore } from '@/state/npcStore';
 import { getNarrativeTemplate } from '../../promptTemplates/narrativeTemplateManager';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { useLoreStore } from '@/state/loreStore';
-import { extractStructuredLore } from '../structuredLoreExtractor';
 import { getDetailedToneInstructions } from '../toneSettingsGuidance';
 import { PlayerDecision } from '@/types/personalization.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
@@ -177,13 +176,6 @@ export function setupDecisionConsequencesMocks(
     recordLoreMentions: jest.fn(),
     recordLoreUsage: jest.fn(),
     addStructuredLore: jest.fn()
-  });
-
-  (extractStructuredLore as jest.Mock).mockResolvedValue({
-    characters: [],
-    locations: [],
-    events: [],
-    rules: []
   });
 
   // Mock tone settings guidance

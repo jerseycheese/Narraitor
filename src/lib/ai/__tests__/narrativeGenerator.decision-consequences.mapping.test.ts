@@ -49,9 +49,6 @@ jest.mock('../loreContextHelper', () => ({
   getLoreContextForPrompt: jest.fn(),
   checkAndRecordLoreMentions: jest.fn()
 }));
-jest.mock('../structuredLoreExtractor', () => ({
-  extractStructuredLore: jest.fn()
-}));
 jest.mock('../toneSettingsGuidance', () => ({
   getDetailedToneInstructions: jest.fn()
 }));
