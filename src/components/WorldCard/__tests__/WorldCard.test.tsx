@@ -148,7 +148,7 @@ describe('WorldCard', () => {
       />
     );
 
-    const characterButton = screen.getByTitle('Play as Aragorn - Level 5');
+    const characterButton = screen.getByTitle('View Aragorn - Level 5');
     expect(characterButton).toHaveClass('world-card-character-pill');
   });
 
@@ -183,7 +183,9 @@ describe('WorldCard', () => {
     expect(container.querySelectorAll('.world-card-character-pill')).toHaveLength(3);
     const more = screen.getByTestId('world-card-character-pills-more');
     expect(more).toHaveTextContent('+2 more');
-    expect(more).toHaveAttribute('href', `/characters?worldId=${mockWorld.id}`);
+    // The count is not a link: the card's Characters action is the one route
+    // to the filtered roster.
+    expect(more).not.toHaveAttribute('href');
   });
 
   // Regression test for #1113 - no white placeholder image in the no-image case

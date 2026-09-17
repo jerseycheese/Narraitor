@@ -251,12 +251,11 @@ export default function CharactersPage() {
     setMounted(true);
   }, []);
 
-  const headerTitle =
-    mounted && currentWorld?.image?.url ? undefined : 'My Characters';
+  // The world band below is context, not the page header, so the page keeps
+  // its own title whether or not the world has art.
+  const headerTitle = 'My Characters';
   const headerDescription =
-    mounted && currentWorld?.image?.url
-      ? undefined
-      : 'Create unique characters for your interactive narrative adventures.';
+    'Create unique characters for your interactive narrative adventures.';
 
   const handleCreateCharacter = () => {
     router.push('/characters/create');
@@ -479,10 +478,6 @@ export default function CharactersPage() {
 
   return (
     <PageLayout title={headerTitle} description={headerDescription}>
-      {/* When the world hero replaces the visible page header, PageLayout
-          renders no h1, so keep a screen-reader page heading (#1530). */}
-      {!headerTitle && <h1 className="sr-only">My Characters</h1>}
-
       {mounted && currentWorld && (
         <div className="characters-world-banner">
           <Hero

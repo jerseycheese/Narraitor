@@ -2,7 +2,6 @@ import React from 'react';
 import { World } from '@/types/world.types';
 import WorldCard from '@/components/WorldCard/WorldCard';
 import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
-import { Globe } from 'lucide-react';
 
 interface WorldListProps {
   worlds: World[];
@@ -32,42 +31,45 @@ const WorldList: React.FC<WorldListProps> = ({
         data-testid="world-list-empty-message"
         className="world-list-empty"
       >
-        <div className="world-list-empty-icon">
-          <Globe aria-hidden="true" />
-        </div>
-        <h2 className="world-list-empty-title">Welcome to Narraitor!</h2>
-        <p className="world-list-empty-lede">
-          Begin your storytelling journey by creating your first world.
-        </p>
-        <p className="world-list-empty-description">
-          Each world is a unique setting with its own rules, attributes, and
-          possibilities.
-        </p>
-        <div className="world-list-empty-guide">
-          <p className="world-list-empty-guide-heading">
-            Getting Started Guide:
+        <div className="world-list-empty-lead">
+          <h2 className="world-list-empty-title">
+            Every story starts with a world.
+          </h2>
+          <p className="world-list-empty-lede">
+            A world holds the setting, the rules your characters are measured
+            by, and the tone the story is told in. Build one and the rest of
+            Narraitor has somewhere to happen.
           </p>
-          <ol className="world-list-empty-guide-steps">
-            <li>
-              <strong>Create a World</strong> - Define your setting, theme, and
-              game rules
-            </li>
-            <li>
-              <strong>Build Characters</strong> - Populate your world with
-              unique personalities
-            </li>
-            <li>
-              <strong>Start Playing</strong> - Begin your interactive narrative
-              experience
-            </li>
-          </ol>
-          <div className="world-list-empty-tip">
-            <p>
-              <strong>Tip:</strong> You can create multiple worlds and switch
-              between them anytime!
-            </p>
-          </div>
+          <p className="world-list-empty-description">
+            You can keep as many worlds as you like and switch between them
+            whenever you want.
+          </p>
         </div>
+
+        <ol className="world-list-empty-steps">
+          <li>
+            <span className="world-list-empty-step-title">Create a world</span>
+            <span className="world-list-empty-step-body">
+              Set the theme, the attributes characters are built from, and the
+              rules play runs on.
+            </span>
+          </li>
+          <li>
+            <span className="world-list-empty-step-title">
+              Build characters
+            </span>
+            <span className="world-list-empty-step-body">
+              Write them yourself or have one generated from the world you just
+              described.
+            </span>
+          </li>
+          <li>
+            <span className="world-list-empty-step-title">Start playing</span>
+            <span className="world-list-empty-step-body">
+              Choose what happens next, and the story keeps the consequences.
+            </span>
+          </li>
+        </ol>
       </section>
     );
   }

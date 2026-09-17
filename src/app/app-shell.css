@@ -769,6 +769,11 @@
 .card-action-group button svg {
   width: 0.875rem;
   height: 0.875rem;
+
+  /* Flex centering puts the icon box on the line box, whose middle sits above
+     the label's cap line, so the icon reads high next to its text. The nudge
+     drops it back onto the cap. */
+  transform: translateY(0.12em);
 }
 
 /* Card action variant overrides — applied via CardActionGroup variant prop.
@@ -966,8 +971,8 @@
   gap: var(--space-2);
 }
 
-/* Past a few pills the list pushes Play off a phone screen, so the rest
-   collapse into a link to the filtered roster. */
+/* Past a few pills the rest are a count, not a second route to the roster:
+   the card's Characters action already goes there. */
 .world-card-character-pills-more {
   display: inline-flex;
   align-items: center;
@@ -976,13 +981,17 @@
   font-family: var(--font-interface);
   font-size: var(--font-size-xs_5);
   font-weight: 500;
-  color: var(--color-accent);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  color: var(--color-text-muted);
 }
 
-.world-card-character-pills-more:hover {
-  color: var(--color-accent-hover);
+@media (width <= 640px) {
+  .world-card-character-pill-name {
+    display: none;
+  }
+
+  .world-card-character-pill {
+    padding-inline: var(--space-1);
+  }
 }
 
 .world-card-description-block {
@@ -1006,7 +1015,7 @@
 .world-card-type-badge {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
   gap: var(--space-2) var(--space-3);
 }
 
@@ -1024,38 +1033,36 @@
 
 /* Empty state */
 
+/* First run has nothing to list, so the page itself is the content: a spread
+   across the full width rather than one narrow card marooned in the canvas.
+   The steps sit in the right column like marginalia beside the lead. */
 .world-list-empty {
+  display: grid;
+  gap: var(--space-8);
+  padding: var(--space-8) 0 var(--space-10);
+}
+
+@media (width >= 60rem) {
+  .world-list-empty {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: var(--space-10);
+    align-items: start;
+  }
+}
+
+.world-list-empty-lead {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: var(--space-3);
-  padding: var(--space-8) var(--space-5);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-}
-
-.world-list-empty-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 4rem;
-  height: 4rem;
-  border-radius: var(--radius-full, 9999px);
-  background: var(--color-surface-hover);
-  color: var(--color-accent);
-}
-
-.world-list-empty-icon svg {
-  width: 2rem;
-  height: 2rem;
+  gap: var(--space-4);
+  max-width: 34rem;
 }
 
 .world-list-empty-title {
   font-family: var(--font-narrative);
-  font-size: var(--font-size-xl);
-  font-weight: 600;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1.1;
+  text-wrap: balance;
   color: var(--color-text-primary);
   margin: 0;
 }
@@ -1063,85 +1070,57 @@
 .world-list-empty-lede {
   font-family: var(--font-interface);
   font-size: var(--font-size-base);
+  line-height: 1.6;
   color: var(--color-text-secondary);
   margin: 0;
-  max-width: 36rem;
 }
 
 .world-list-empty-description {
   font-family: var(--font-interface);
   font-size: var(--font-size-sm_5);
+  line-height: 1.6;
   color: var(--color-text-muted);
   margin: 0;
-  max-width: 36rem;
 }
 
-.world-list-empty-guide {
-  margin-top: var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-canvas);
-  text-align: left;
-  width: 100%;
-  max-width: 36rem;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+/* Numbered because first run is a sequence: the world has to exist before a
+   character can live in it. */
+.world-list-empty-steps {
+  margin: 0;
+  padding-left: var(--space-8);
+  list-style: decimal-leading-zero outside;
 }
 
-.world-list-empty-guide-heading {
+.world-list-empty-steps li {
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.world-list-empty-steps li:last-child {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.world-list-empty-steps li::marker {
+  font-family: var(--font-system);
+  font-size: var(--font-size-sm);
+  color: var(--color-accent);
+}
+
+.world-list-empty-step-title {
+  display: block;
+  margin-bottom: var(--space-1);
   font-family: var(--font-interface);
   font-size: var(--font-size-sm_5);
   font-weight: 600;
   color: var(--color-text-primary);
-  margin: 0;
 }
 
-.world-list-empty-guide-steps {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding-left: var(--space-5);
-  margin: 0;
-  color: var(--color-text-secondary);
+.world-list-empty-step-body {
+  display: block;
   font-family: var(--font-interface);
   font-size: var(--font-size-sm_5);
   line-height: 1.5;
-}
-
-.world-list-empty-guide-steps li::marker {
-  color: var(--color-accent);
-  font-weight: 600;
-}
-
-.world-list-empty-guide-steps strong {
-  color: var(--color-text-primary);
-  font-weight: 600;
-}
-
-.world-list-empty-tip {
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  background: var(--color-accent-soft);
-  border-radius: var(--radius-sm);
-}
-
-.world-list-empty-tip p {
-  margin: 0;
-  font-family: var(--font-interface);
-  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-}
-
-@media (width < 768px) {
-  .world-list-empty {
-    padding: var(--space-6) var(--space-4);
-  }
-
-  .world-list-empty-guide {
-    padding: var(--space-3) var(--space-4);
-  }
 }
 
 /* ─── World detail page ─── */
@@ -2259,37 +2238,44 @@
   color: var(--color-text-muted);
 }
 
-/* On the characters page the world is context, not the subject, so its
-   banner shrinks to a strip: the art as a thumbnail, the name beside it. */
-:root .characters-world-banner .component-hero,
+/* On the characters page the world is context rather than the subject, so its
+   banner is a plate: a shallow band of the world's own art with the name on a
+   paper bar, under the page title. Shorter than the full hero, still enough
+   image to carry the world. */
 :root .characters-world-banner .component-hero:has(.component-hero-image) {
+  min-height: clamp(9rem, 16vw, 11rem);
+}
+
+/* Without an image there is no art to show, so the band collapses to the name
+   on paper instead of a tall empty gradient. */
+:root .characters-world-banner .component-hero:not(:has(.component-hero-image)) {
   min-height: 0;
 }
 
-:root .characters-world-banner .component-hero:has(.component-hero-image) {
-  display: grid;
-  grid-template-columns: 8rem 1fr;
-  align-items: center;
-}
-
-:root .characters-world-banner .component-hero-image {
-  position: static;
-  height: 5rem;
-}
-
-:root .characters-world-banner .component-hero::after {
-  display: none;
+/* The full hero feathers 6rem into its overlay, which on a band this short
+   washes out most of the art. */
+:root .characters-world-banner .component-hero:has(.component-hero-image)::after {
+  height: 3rem;
 }
 
 :root .characters-world-banner .component-hero-overlay {
-  margin-top: 0;
-  background: transparent;
+  padding: var(--space-3) var(--space-5);
 }
 
-/* With no surface fill behind it, the subtitle sits on the hero's accent
-   gradient, where muted text drops under AA. Secondary clears it. */
-:root .characters-world-banner .component-hero-subtitle {
-  color: var(--color-text-secondary);
+:root .characters-world-banner .component-hero-title {
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+}
+
+/* On a phone the band competes with the first card for the one screen the
+   player sees, so it gives back enough height to keep Play in view. */
+@media (width <= 640px) {
+  :root .characters-world-banner .component-hero:has(.component-hero-image) {
+    min-height: 7rem;
+  }
+
+  :root .characters-world-banner .component-hero-overlay {
+    padding: var(--space-2) var(--space-4);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3266,6 +3252,21 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   :root .component-character-card .character-card-portrait {
     width: 4rem;
     height: 4rem;
+  }
+
+  /* Stacked action rows cost a phone about 50px per card, which is what pushes
+     the first Play under the fold. Play now hugs its label, so the primary and
+     secondary rows collapse into one line of buttons. */
+  :root .component-character-card .character-card-footer .card-action-group,
+  :root .world-card-footer-actions .card-action-group {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  :root .component-character-card .character-card-footer .card-action-row,
+  :root .world-card-footer-actions .card-action-row {
+    display: contents;
   }
 }
 

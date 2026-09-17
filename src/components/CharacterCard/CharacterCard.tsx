@@ -168,7 +168,6 @@ export function CharacterCard({
                 ariaLabel: `Play as ${character.name}`,
                 onClick: onPlay,
                 variant: 'accent',
-                flex: true,
                 testId: 'character-card-actions-play-button',
                 icon: <Play aria-hidden="true" />,
               },

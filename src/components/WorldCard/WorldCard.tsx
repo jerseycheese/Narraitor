@@ -163,7 +163,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     key={char.id}
                     className="world-card-character-pill"
                     onClick={() => router.push(`/characters/${char.id}`)}
-                    title={`Play as ${char.name} - Level ${char.level}`}
+                    title={`View ${char.name} - Level ${char.level}`}
                   >
                     {/* Character portrait or placeholder */}
                     {char.portrait?.url ? (
@@ -178,18 +178,19 @@ const WorldCard: React.FC<WorldCardProps> = ({
                         <span>{char.name.charAt(0).toUpperCase()}</span>
                       </div>
                     )}
-                    <span>{char.name}</span>
+                    <span className="world-card-character-pill-name">
+                      {char.name}
+                    </span>
                   </button>
                 ))}
                 {characters.length > MAX_CHARACTER_PILLS && (
-                  <Link
-                    href={`/characters?worldId=${world.id}`}
+                  <span
                     className="world-card-character-pills-more"
                     data-testid="world-card-character-pills-more"
                   >
                     +{characters.length - MAX_CHARACTER_PILLS} more
                     <span className="sr-only"> characters in {world.name}</span>
-                  </Link>
+                  </span>
                 )}
               </div>
             )}
@@ -229,7 +230,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   ariaLabel: `Play ${world.name}`,
                   onClick: handlePlayClick,
                   variant: 'accent',
-                  flex: true,
                   testId: 'world-card-actions-play-button',
                   icon: <Play aria-hidden="true" />,
                 },

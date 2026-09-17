@@ -389,6 +389,13 @@ body > * {
   height: 1rem;
 }
 
+/* An icon sharing a button with a label centers on the line box, which sits
+   above the label's cap line, so it reads high. Icon-only buttons have no cap
+   line to meet and keep their true centering. */
+.button:not(.button-size-icon) > svg {
+  transform: translateY(0.12em);
+}
+
 /* DataTable primitive layout (src/components/ui/data-table.tsx).
  * Lives in production so the real CharacterTable / WorldTable get the same
  * search/table/pagination layout the living style guide shows — not skinned
@@ -413,6 +420,16 @@ body > * {
 .data-table-pagination-controls {
   display: flex;
   gap: var(--space-2);
+}
+
+/* Outline buttons are transparent, which on the dot-grid canvas leaves the
+   grid running through Previous and Next. Paper fill stops it. */
+.data-table-pagination-controls .button {
+  background: var(--color-surface);
+}
+
+.data-table-pagination-controls .button:hover:not(:disabled) {
+  background: var(--color-surface-hover);
 }
 
 /* Color Scheme Toggle */
