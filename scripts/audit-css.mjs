@@ -80,7 +80,6 @@ const SAFELIST = {
     'wizard-card-selected',
     'selected-template',
     'active-state-card',
-    'active-state-indicator',
   ],
 };
 

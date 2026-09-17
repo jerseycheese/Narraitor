@@ -654,11 +654,7 @@
   border-radius: var(--radius-md);
   background: var(--color-surface);
   overflow: hidden;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-
-.active-state-card:hover {
-  border-color: var(--color-border-strong);
+  transition: border-color 120ms ease, background-color 120ms ease;
 }
 
 .active-state-card-active {
@@ -724,25 +720,6 @@
   .active-state-toggle:not(.active-state-toggle-active) {
     min-height: 2.75rem;
   }
-}
-
-.active-state-indicator {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background: hsl(var(--success-background));
-  color: hsl(var(--success-text));
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.active-state-indicator svg {
-  width: 0.875rem;
-  height: 0.875rem;
 }
 
 .card-action-group,
@@ -3038,8 +3015,6 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   column-gap: var(--space-4);
   align-items: center;
   padding: var(--space-3) var(--space-3);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
 }
 
 /* Flatten only as far as the hero link, which becomes the media cell itself —
@@ -3178,19 +3153,12 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   column-gap: var(--space-4);
   align-items: center;
   padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  transition: border-color 150ms ease, background-color 150ms ease;
 }
 
-:root .component-character-card:hover {
-  border-color: var(--color-border-strong);
-}
-
+/* The accent border comes from .active-state-card-active; the row adds a
+   faint wash so the active card still reads at a glance. */
 :root .component-world-card.active-state-card-active,
 :root .component-character-card.active-state-card-active {
-  border-color: var(--color-accent);
   background: color-mix(in oklab, var(--color-accent) 2%, var(--color-surface));
 }
 

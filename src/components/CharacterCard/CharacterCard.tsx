@@ -81,7 +81,6 @@ export function CharacterCard({
   return (
     <ActiveStateCard
       isActive={isActive}
-      showActiveIndicator={false}
       className="component-character-card"
     >
       <div className="character-card-body">

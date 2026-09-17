@@ -13,14 +13,6 @@ const meta = {
       control: 'boolean',
       description: 'Whether the card is in active state',
     },
-    activeText: {
-      control: 'text',
-      description: 'Text to show in the active state indicator',
-    },
-    showActiveIndicator: {
-      control: 'boolean',
-      description: 'Whether to show the active state indicator banner',
-    },
     hasImage: {
       control: 'boolean',
       description: 'Whether the card has an image at the top',
@@ -55,15 +47,6 @@ export const Default: Story = {
 export const Active: Story = {
   args: {
     isActive: true,
-    activeText: 'Currently Active',
-    children: <SampleContent />,
-  },
-};
-
-export const ActiveWithoutIndicator: Story = {
-  args: {
-    isActive: true,
-    showActiveIndicator: false,
     children: <SampleContent />,
   },
 };
@@ -73,7 +56,6 @@ export const WithCustomStyling: Story = {
     isActive: true,
     activeClassName: '',
     inactiveClassName: '',
-    activeText: 'Primary Selection',
     children: <SampleContent />,
   },
 };
@@ -97,7 +79,6 @@ export const ActiveWithImage: Story = {
   args: {
     isActive: true,
     hasImage: true,
-    activeText: 'Featured Item',
     children: (
       <>
         <div>
@@ -116,7 +97,7 @@ export const Grid: Story = {
   },
   render: () => (
     <div>
-      <ActiveStateCard isActive={true} activeText="Active Item">
+      <ActiveStateCard isActive={true}>
         <div>
           <h4>Card 1</h4>
           <p>This card is active</p>

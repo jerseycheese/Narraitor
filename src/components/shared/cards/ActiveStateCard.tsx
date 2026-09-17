@@ -1,21 +1,14 @@
 import React from 'react';
-import { ActiveStateIndicator } from './ActiveStateIndicator';
 
 export interface ActiveStateCardProps {
   /** Whether the card is in active state */
   isActive: boolean;
-  /** Text to show in the active state indicator */
-  activeText?: string;
-  /** Icon for the active state indicator */
-  activeIcon?: React.ReactNode;
   /** Base CSS classes for the card */
   className?: string;
   /** Classes to apply when active */
   activeClassName?: string;
   /** Classes to apply when inactive */
   inactiveClassName?: string;
-  /** Whether to show the active state indicator banner */
-  showActiveIndicator?: boolean;
   /** Children to render inside the card */
   children: React.ReactNode;
   /** Test ID for testing */
@@ -26,31 +19,26 @@ export interface ActiveStateCardProps {
 
 /**
  * ActiveStateCard - A wrapper component for cards with active state
- * 
+ *
+ * The card only styles the state; it isn't clickable. Pair it with
+ * ActiveStateToggle for the control that makes the item active.
+ *
  * @example Basic usage
- * <ActiveStateCard 
- *   isActive={isActive}
- *   activeText="Currently Active World"
- * >
+ * <ActiveStateCard isActive={isActive}>
  *   <CardContent />
  * </ActiveStateCard>
- * 
- * @example With custom styling
- * <ActiveStateCard 
- *   isActive={isActive}
- *   showActiveIndicator={false}
- * >
+ *
+ * @example With an image
+ * <ActiveStateCard isActive={isActive} hasImage>
+ *   <CardImage />
  *   <CardContent />
  * </ActiveStateCard>
  */
 export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
   isActive,
-  activeText = 'Currently Active',
-  activeIcon,
   className = '',
   activeClassName,
   inactiveClassName,
-  showActiveIndicator = true,
   children,
   testId = 'active-state-card',
   hasImage = false
@@ -69,35 +57,8 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
       data-testid={testId}
       className={`active-state-card ${stateClasses} ${className}`}
     >
-      {/* Image section with overlay if present */}
-      {hasImage ? (
-        <div>
-          {imageChild}
-          {/* Active state indicator overlay */}
-          {isActive && showActiveIndicator && (
-            <div>
-              <ActiveStateIndicator 
-                text={activeText}
-                icon={activeIcon}
-              />
-            </div>
-          )}
-        </div>
-      ) : (
-        <>
-          {/* Active state indicator for cards without images */}
-          {isActive && showActiveIndicator && (
-            <ActiveStateIndicator 
-              text={activeText}
-              icon={activeIcon}
-            />
-          )}
-        </>
-      )}
-      
-      {/* Card content */}
+      {hasImage && <div>{imageChild}</div>}
       {contentChildren}
     </article>
   );
 };
-

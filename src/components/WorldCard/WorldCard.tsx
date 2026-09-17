@@ -14,7 +14,7 @@ import {
 } from '@/components/shared/cards';
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
-import { Play, Pencil, Trash } from 'lucide-react';
+import { Play, Pencil, Trash, Users } from 'lucide-react';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('WorldCard');
@@ -117,7 +117,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
   return (
     <ActiveStateCard
       isActive={isActive}
-      showActiveIndicator={false}
       testId="world-card"
       hasImage={true}
       className="component-world-card"
@@ -245,6 +244,8 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   text: 'Characters',
                   onClick: () => router.push(`/characters?worldId=${world.id}`),
                   variant: 'secondary',
+                  testId: 'world-card-actions-characters-button',
+                  icon: <Users aria-hidden="true" />,
                 },
                 {
                   key: 'edit',

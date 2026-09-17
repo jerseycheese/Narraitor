@@ -41,10 +41,12 @@ export interface CardActionGroupProps {
  * pages the page-level Create action is that primary; per-card Play is secondary.
  * On detail pages Play is primary and Edit is secondary.
  *
+ * Making an item active isn't a card action; that's ActiveStateToggle, beside
+ * the item's type label.
+ *
  * @example List page (worlds list, characters list)
  * <CardActionGroup
  *   primaryActions={[
- *     { key: 'make-active', text: 'Make Active', onClick: handleMakeActive, variant: 'secondary', flex: true },
  *     { key: 'play', text: 'Play', onClick: handlePlay, variant: 'secondary', flex: true }
  *   ]}
  *   secondaryActions={[
