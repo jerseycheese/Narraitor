@@ -348,10 +348,6 @@ export default function CharactersPage() {
     }
   };
 
-  const handleSelectCharacter = (characterId: string) => {
-    setCurrentCharacter(characterId);
-  };
-
   const handleViewCharacter = (characterId: string) => {
     router.push(`/characters/${characterId}`);
   };
@@ -549,7 +545,6 @@ export default function CharactersPage() {
           <CharacterTable
             characters={worldCharacters as StoreCharacter[]}
             currentCharacterId={currentCharacterId}
-            onMakeActive={handleSelectCharacter}
             onView={handleViewCharacter}
             onPlay={handleCharacterPlay}
             onEdit={handleEditCharacter}
@@ -562,7 +557,6 @@ export default function CharactersPage() {
                 key={character.id}
                 character={character}
                 isActive={currentCharacterId === character.id}
-                onMakeActive={() => handleSelectCharacter(character.id)}
                 onView={() => handleViewCharacter(character.id)}
                 onPlay={() => handleCharacterPlay(character.id)}
                 onEdit={() => handleEditCharacter(character.id)}

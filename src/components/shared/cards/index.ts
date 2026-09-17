@@ -1,6 +1,6 @@
 // Card Components
 export { ActiveStateCard } from './ActiveStateCard';
-export { ActiveStateToggle } from './ActiveStateToggle';
+export { ActiveStateLabel } from './ActiveStateLabel';
 
 
 export { CardActionGroup } from './CardActionGroup';

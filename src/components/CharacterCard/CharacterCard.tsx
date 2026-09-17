@@ -8,15 +8,10 @@ type StoreCharacter = ReturnType<
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import {
   ActiveStateCard,
-  ActiveStateToggle,
+  ActiveStateLabel,
   CardActionGroup,
 } from '@/components/shared/cards';
-import {
-  Play,
-  Eye,
-  Pencil,
-  Trash,
-} from 'lucide-react';
+import { Play, Pencil, Trash } from 'lucide-react';
 import { truncate, safeTrim } from '@/lib/utils';
 
 interface CharacterContextSummary {
@@ -33,8 +28,6 @@ interface CharacterCardProps {
   character: StoreCharacter;
   /** Whether this character is currently active */
   isActive: boolean;
-  /** Callback when user wants to make this character active */
-  onMakeActive: () => void;
   /** Callback when user wants to view character details */
   onView: () => void;
   /** Callback when user wants to play with this character */
@@ -51,8 +44,8 @@ interface CharacterCardProps {
  * CharacterCard - Display card for a character with actions
  *
  * Shows character information including portrait, name, level, type badges,
- * and description. Provides action buttons for viewing, playing, editing,
- * and deleting the character. Active characters get special styling.
+ * and description. The name opens the character; Play, Edit and Delete sit in
+ * the footer. The active character is marked, not selected here: Play sets it.
  *
  * @param props - Character card configuration and event handlers
  * @returns A formatted character card with portrait and action buttons
@@ -61,7 +54,6 @@ interface CharacterCardProps {
  * <CharacterCard
  *   character={character}
  *   isActive={character.id === currentCharacterId}
- *   onMakeActive={() => setActiveCharacter(character.id)}
  *   onView={() => router.push(`/characters/${character.id}`)}
  *   onPlay={() => startGame(character)}
  *   onEdit={() => router.push(`/characters/${character.id}/edit`)}
@@ -71,7 +63,6 @@ interface CharacterCardProps {
 export function CharacterCard({
   character,
   isActive,
-  onMakeActive,
   onView,
   onPlay,
   onEdit,
@@ -110,10 +101,9 @@ export function CharacterCard({
                 {character.background.isKnownFigure ? 'Known Figure' : 'Original'}
               </span>
             )}
-            <ActiveStateToggle
+            <ActiveStateLabel
               isActive={isActive}
-              onActivate={onMakeActive}
-              testId="character-card-active-toggle"
+              testId="character-card-active-label"
             />
           </div>
           {(() => {
@@ -175,8 +165,9 @@ export function CharacterCard({
               {
                 key: 'play',
                 text: 'Play',
+                ariaLabel: `Play as ${character.name}`,
                 onClick: onPlay,
-                variant: 'secondary',
+                variant: 'accent',
                 flex: true,
                 testId: 'character-card-actions-play-button',
                 icon: <Play aria-hidden="true" />,
@@ -184,26 +175,20 @@ export function CharacterCard({
             ]}
             secondaryActions={[
               {
-                key: 'view',
-                text: 'View',
-                onClick: onView,
-                variant: 'secondary',
-                testId: 'character-card-actions-view-button',
-                icon: <Eye aria-hidden="true" />,
-              },
-              {
                 key: 'edit',
                 text: 'Edit',
+                ariaLabel: `Edit ${character.name}`,
                 onClick: onEdit,
-                variant: 'secondary',
+                variant: 'quiet',
                 testId: 'character-card-actions-edit-button',
                 icon: <Pencil aria-hidden="true" />,
               },
               {
                 key: 'delete',
                 text: 'Delete',
+                ariaLabel: `Delete ${character.name}`,
                 onClick: onDelete,
-                variant: 'danger',
+                variant: 'quiet-danger',
                 testId: 'character-card-actions-delete-button',
                 icon: <Trash aria-hidden="true" />,
               },

@@ -95,10 +95,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
     }
   }, []);
 
-  const handleSelectWorld = (worldId: string) => {
-    useWorldStore.getState().setCurrentWorld(worldId);
-  };
-
   const handleDeleteClick = (worldId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setWorldToDeleteId(worldId);
@@ -160,7 +156,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
         <WorldList
           worlds={worlds}
           currentWorldId={currentWorldId}
-          onSelectWorld={handleSelectWorld}
           onDeleteWorld={(id) => handleDeleteClick(id)}
         />
       )}

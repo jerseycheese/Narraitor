@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { CharacterCard } from '../CharacterCard';
 import type { useCharacterStore } from '@/state/characterStore';
 
@@ -31,7 +30,6 @@ const mockCharacter: StoreCharacter = {
 };
 
 describe('CharacterCard', () => {
-  const onMakeActive = jest.fn();
   const onView = jest.fn();
   const onPlay = jest.fn();
   const onEdit = jest.fn();
@@ -46,7 +44,6 @@ describe('CharacterCard', () => {
       <CharacterCard
         character={mockCharacter}
         isActive={false}
-        onMakeActive={onMakeActive}
         onView={onView}
         onPlay={onPlay}
         onEdit={onEdit}
@@ -74,7 +71,6 @@ describe('CharacterCard', () => {
       <CharacterCard
         character={emptyDescChar}
         isActive={false}
-        onMakeActive={onMakeActive}
         onView={onView}
         onPlay={onPlay}
         onEdit={onEdit}
@@ -86,12 +82,11 @@ describe('CharacterCard', () => {
     expect(screen.queryByText('No description provided')).not.toBeInTheDocument();
   });
 
-  it('marks the active character without the loud green banner', () => {
+  it('marks the active character with a label, not a control', () => {
     render(
       <CharacterCard
         character={mockCharacter}
         isActive={true}
-        onMakeActive={onMakeActive}
         onView={onView}
         onPlay={onPlay}
         onEdit={onEdit}
@@ -99,21 +94,15 @@ describe('CharacterCard', () => {
       />
     );
 
-    const toggle = screen.getByTestId('character-card-active-toggle');
-    expect(toggle).toHaveTextContent('Active');
-    expect(toggle).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.queryByText('Currently Active Character')).not.toBeInTheDocument();
-
-    fireEvent.click(toggle);
-    expect(onMakeActive).not.toHaveBeenCalled();
+    expect(screen.getByTestId('character-card-active-label')).toHaveTextContent('Active');
+    expect(screen.queryByRole('button', { name: /active/i })).not.toBeInTheDocument();
   });
 
-  it('provides streamlined buttons (Play, View, Edit, Delete) with Play as secondary variant', () => {
+  it('names every action after the character, with Play as the accent action', () => {
     render(
       <CharacterCard
         character={mockCharacter}
         isActive={false}
-        onMakeActive={onMakeActive}
         onView={onView}
         onPlay={onPlay}
         onEdit={onEdit}
@@ -121,16 +110,12 @@ describe('CharacterCard', () => {
       />
     );
 
-    const playBtn = screen.getByTestId('character-card-actions-play-button');
-    const viewBtn = screen.getByTestId('character-card-actions-view-button');
-    const editBtn = screen.getByTestId('character-card-actions-edit-button');
-    const deleteBtn = screen.getByTestId('character-card-actions-delete-button');
-
-    expect(playBtn).toBeInTheDocument();
-    expect(playBtn).toHaveClass('card-action-variant-secondary');
-    expect(viewBtn).toBeInTheDocument();
-    expect(editBtn).toBeInTheDocument();
-    expect(deleteBtn).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Play as Aragorn' })).toHaveClass(
+      'card-action-variant-accent'
+    );
+    expect(screen.getByRole('button', { name: 'Edit Aragorn' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Delete Aragorn' })).toBeInTheDocument();
+    expect(screen.queryByTestId('character-card-actions-view-button')).not.toBeInTheDocument();
   });
 
   it('handles user interactions for the card actions and the name', () => {
@@ -138,7 +123,6 @@ describe('CharacterCard', () => {
       <CharacterCard
         character={mockCharacter}
         isActive={false}
-        onMakeActive={onMakeActive}
         onView={onView}
         onPlay={onPlay}
         onEdit={onEdit}
@@ -149,9 +133,6 @@ describe('CharacterCard', () => {
     fireEvent.click(screen.getByTestId('character-card-actions-play-button'));
     expect(onPlay).toHaveBeenCalledTimes(1);
 
-    fireEvent.click(screen.getByTestId('character-card-actions-view-button'));
-    expect(onView).toHaveBeenCalledTimes(1);
-
     fireEvent.click(screen.getByTestId('character-card-actions-edit-button'));
     expect(onEdit).toHaveBeenCalledTimes(1);
 
@@ -159,28 +140,6 @@ describe('CharacterCard', () => {
     expect(onDelete).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByRole('button', { name: 'Aragorn' }));
-    expect(onView).toHaveBeenCalledTimes(2);
-  });
-
-  it('makes the character active from the keyboard, not from a stray card click', async () => {
-    const user = userEvent.setup();
-    render(
-      <CharacterCard
-        character={mockCharacter}
-        isActive={false}
-        onMakeActive={onMakeActive}
-        onView={onView}
-        onPlay={onPlay}
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />
-    );
-
-    fireEvent.click(screen.getByTestId('active-state-card'));
-    expect(onMakeActive).not.toHaveBeenCalled();
-
-    screen.getByRole('button', { name: 'Make Active' }).focus();
-    await user.keyboard('{Enter}');
-    expect(onMakeActive).toHaveBeenCalledTimes(1);
+    expect(onView).toHaveBeenCalledTimes(1);
   });
 });

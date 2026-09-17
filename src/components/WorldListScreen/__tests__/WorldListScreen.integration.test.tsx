@@ -123,7 +123,7 @@ describe('WorldListScreen integration (#347)', () => {
     const worldId = useWorldStore.getState().createWorld(worldData());
 
     render(<WorldListScreen />);
-    expect(screen.getByTestId('world-card-active-toggle')).toHaveTextContent('Make Active');
+    expect(screen.queryByTestId('world-card-active-label')).not.toBeInTheDocument();
 
     // No re-render triggered by the test itself — this call comes from
     // outside the component, the way another screen or store action would.
@@ -131,25 +131,7 @@ describe('WorldListScreen integration (#347)', () => {
       useWorldStore.getState().setCurrentWorld(worldId);
     });
 
-    expect(screen.getByTestId('world-card-active-toggle')).toHaveTextContent('Active');
-    expect(screen.getByTestId('world-card-active-toggle')).toHaveAttribute('aria-disabled', 'true');
-  });
-
-  it('keeps the card order when another world is made active', async () => {
-    const user = userEvent.setup();
-    const firstId = useWorldStore.getState().createWorld(worldData());
-    useWorldStore.getState().createWorld(worldData({ name: 'Neon City' }));
-    useWorldStore.getState().setCurrentWorld(firstId);
-
-    render(<WorldListScreen />);
-    const names = () =>
-      screen.getAllByTestId('world-card-name').map((el) => el.textContent);
-    expect(names()).toEqual(['Fantasy Realm', 'Neon City']);
-
-    await user.click(screen.getByRole('button', { name: 'Make Active' }));
-
-    expect(useWorldStore.getState().currentWorldId).not.toBe(firstId);
-    expect(names()).toEqual(['Fantasy Realm', 'Neon City']);
+    expect(screen.getByTestId('world-card-active-label')).toHaveTextContent('Active');
   });
 
   // AC: Tests validate proper routing behavior when selecting worlds

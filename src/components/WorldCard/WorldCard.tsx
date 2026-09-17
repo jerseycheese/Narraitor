@@ -9,7 +9,7 @@ import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { getGenreLabel } from '@/lib/constants/genres';
 import {
   ActiveStateCard,
-  ActiveStateToggle,
+  ActiveStateLabel,
   CardActionGroup,
 } from '@/components/shared/cards';
 import { formatDate } from '@/lib/utils';
@@ -27,8 +27,6 @@ interface WorldCardProps {
   world: World;
   /** Whether this world is currently active */
   isActive?: boolean;
-  /** Callback when user selects this world */
-  onSelect: (worldId: string) => void;
   /** Callback when user wants to delete this world */
   onDelete: (worldId: string) => void;
   /** Characters in this world */
@@ -47,8 +45,8 @@ interface WorldCardProps {
  * - World image display if available
  * - Genre and world type badges
  * - Character count with navigation to characters list
- * - Smart play button that handles session resume
- * - Make active button for non-active worlds
+ * - Smart play button that handles session resume, and sets the active world
+ * - Active label on the current world
  * - Action buttons
  *
  * @param props - World card configuration and event handlers
@@ -58,14 +56,12 @@ interface WorldCardProps {
  * <WorldCard
  *   world={world}
  *   isActive={world.id === currentWorldId}
- *   onSelect={(id) => setCurrentWorld(id)}
  *   onDelete={(id) => deleteWorld(id)}
  * />
  */
 const WorldCard: React.FC<WorldCardProps> = ({
   world,
   isActive = false,
-  onSelect,
   onDelete,
   characters = [],
 }) => {
@@ -209,10 +205,9 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   ? `${world.relationship === 'set_within' ? 'Set in' : 'Inspired by'} ${world.reference}`
                   : 'Original World'}
               </span>
-              <ActiveStateToggle
+              <ActiveStateLabel
                 isActive={isActive}
-                onActivate={() => onSelect(world.id)}
-                testId="world-card-active-toggle"
+                testId="world-card-active-label"
               />
             </div>
           </div>
@@ -231,8 +226,9 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 {
                   key: 'play',
                   text: 'Play',
+                  ariaLabel: `Play ${world.name}`,
                   onClick: handlePlayClick,
-                  variant: 'secondary',
+                  variant: 'accent',
                   flex: true,
                   testId: 'world-card-actions-play-button',
                   icon: <Play aria-hidden="true" />,
@@ -242,24 +238,27 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 {
                   key: 'characters',
                   text: 'Characters',
+                  ariaLabel: `Characters in ${world.name}`,
                   onClick: () => router.push(`/characters?worldId=${world.id}`),
-                  variant: 'secondary',
+                  variant: 'quiet',
                   testId: 'world-card-actions-characters-button',
                   icon: <Users aria-hidden="true" />,
                 },
                 {
                   key: 'edit',
                   text: 'Edit',
+                  ariaLabel: `Edit ${world.name}`,
                   onClick: handleEditClick,
-                  variant: 'secondary',
+                  variant: 'quiet',
                   testId: 'world-card-actions-edit-button',
                   icon: <Pencil aria-hidden="true" />,
                 },
                 {
                   key: 'delete',
                   text: 'Delete',
+                  ariaLabel: `Delete ${world.name}`,
                   onClick: handleDeleteClick,
-                  variant: 'danger',
+                  variant: 'quiet-danger',
                   testId: 'world-card-actions-delete-button',
                   icon: <Trash aria-hidden="true" />,
                 },

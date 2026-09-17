@@ -140,8 +140,8 @@ export const WorldsPageExample: Story = {
             <h3>{world}</h3>
             <p>A sample world description...</p>
             <div>
-              <Button variant="success" size="sm">
-                Make Active
+              <Button variant="outline" size="sm">
+                Play
               </Button>
               <Button variant="default" size="sm">
                 Edit
@@ -158,7 +158,7 @@ export const CharactersPageExample: Story = {
   args: {
     title: 'Fantasy Realm Characters',
     description:
-      'Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.',
+      'Create unique characters for your interactive narrative adventures.',
     actions: (
       <ActionButtonGroup
         actions={[

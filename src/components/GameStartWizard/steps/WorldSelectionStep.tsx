@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useWorldStore } from '@/state/worldStore';
 import WorldCard from '@/components/WorldCard/WorldCard';
+import { Button } from '@/components/ui/button';
 
 export interface WorldSelectionStepProps {
   onNext: (worldId: string) => void;
@@ -40,13 +41,15 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
       
       <div>
         {worldList.map(world => (
-          <div key={world.id} >
-            <WorldCard 
+          <div key={world.id} className="world-selection-step-option">
+            <WorldCard
               world={world}
               isActive={false}
-              onSelect={onNext}
               onDelete={() => {/* No delete in wizard */}}
             />
+            <Button onClick={() => onNext(world.id)}>
+              Choose {world.name}
+            </Button>
           </div>
         ))}
       </div>
@@ -59,7 +62,7 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
           Create New World
         </Link>
         <p>
-          Click a world to continue
+          Choose a world to continue
         </p>
       </div>
     </div>

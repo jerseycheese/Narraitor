@@ -28,7 +28,7 @@ describe('WorldCard', () => {
 
   // Test case for displaying world data (updated to address all acceptance criteria)
   test('displays all required world information', () => {
-    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+    render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
     
     // Verify name is displayed prominently (should be a heading)
     expect(screen.getByRole('heading', { name: mockWorld.name })).toBeInTheDocument();
@@ -45,7 +45,7 @@ describe('WorldCard', () => {
 
   // Test case for visual presentation
   test('presents information in a clean, readable format', () => {
-    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+    render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
     
     // Verify header contains the name prominently
     const header = screen.getByRole('heading', { name: mockWorld.name });
@@ -66,7 +66,7 @@ describe('WorldCard', () => {
       genre: 'fantasy',
     });
     
-    render(<WorldCard world={incompleteWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+    render(<WorldCard world={incompleteWorld} onDelete={jest.fn()} />);
     
     // Should still render the world name and not crash
     expect(screen.getByRole('heading', { name: incompleteWorld.name })).toBeInTheDocument();
@@ -77,7 +77,7 @@ describe('WorldCard', () => {
 
   // Test case for world name navigation
   test('world name links to world detail page', () => {
-    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+    render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
     
     // World name should be accessible as a heading and the hero link should navigate to detail page
     const worldTitle = screen.getByRole('heading', { name: mockWorld.name });
@@ -95,7 +95,7 @@ describe('WorldCard', () => {
       'setCurrentWorld'
     );
 
-    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+    render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
 
     // Find and click the Play button
     fireEvent.click(screen.getByTestId('world-card-actions-play-button'));
@@ -109,14 +109,14 @@ describe('WorldCard', () => {
     setCurrentWorldSpy.mockRestore();
   });
 
-  // One-primary-per-state: page-level Create is the primary on the worlds list;
-  // per-card Play must be secondary so it doesn't compete.
-  test('Play button is not the green success variant — page Create is the primary', () => {
-    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+  // One-primary-per-state: page-level Create is the filled primary on the
+  // worlds list, so per-card Play is the unfilled accent action.
+  test('Play is the unfilled accent action and names its world', () => {
+    render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
 
-    const playButton = screen.getByTestId('world-card-actions-play-button');
-    expect(playButton).toHaveClass('card-action-variant-secondary');
-    expect(playButton).not.toHaveClass('card-action-variant-success');
+    const playButton = screen.getByRole('button', { name: `Play ${mockWorld.name}` });
+    expect(playButton).toHaveClass('card-action-variant-accent');
+    expect(playButton).not.toHaveClass('card-action-variant-primary');
   });
 
   // Test for character avatar pill styling
@@ -142,7 +142,7 @@ describe('WorldCard', () => {
     render(
       <WorldCard
         world={mockWorld}
-        onSelect={jest.fn()}
+       
         onDelete={jest.fn()}
         characters={[mockCharacter]}
       />
@@ -174,7 +174,7 @@ describe('WorldCard', () => {
     const { container } = render(
       <WorldCard
         world={mockWorld}
-        onSelect={jest.fn()}
+       
         onDelete={jest.fn()}
         characters={characters}
       />
@@ -191,7 +191,7 @@ describe('WorldCard', () => {
     const worldWithoutImage = createMockWorld({ image: undefined });
 
     const { container } = render(
-      <WorldCard world={worldWithoutImage} onSelect={jest.fn()} onDelete={jest.fn()} />
+      <WorldCard world={worldWithoutImage} onDelete={jest.fn()} />
     );
 
     // The themed empty-state hero renders (tokenized background via CSS), but
@@ -211,7 +211,7 @@ describe('WorldCard', () => {
     });
 
     const { container } = render(
-      <WorldCard world={worldWithImage} onSelect={jest.fn()} onDelete={jest.fn()} />
+      <WorldCard world={worldWithImage} onDelete={jest.fn()} />
     );
 
     const heroImage = container.querySelector('.component-hero-image');
@@ -219,20 +219,9 @@ describe('WorldCard', () => {
     expect(heroImage?.getAttribute('src')).not.toBe(WHITE_PLACEHOLDER);
   });
 
-  test('opening a world from its image does not also make it active', () => {
-    const onSelect = jest.fn();
-    render(<WorldCard world={mockWorld} onSelect={onSelect} onDelete={jest.fn()} />);
-
-    fireEvent.click(screen.getByRole('link'));
-    expect(onSelect).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Make Active' }));
-    expect(onSelect).toHaveBeenCalledWith(mockWorld.id);
-  });
-
   // Test for Edit functionality
   test('navigates to edit page when Edit is clicked', () => {
-    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
+    render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
 
     // Find and click the Edit button
     fireEvent.click(screen.getByTestId('world-card-actions-edit-button'));

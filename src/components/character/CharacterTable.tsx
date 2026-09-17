@@ -12,12 +12,12 @@ import {
   Eye,
   Pencil,
   Trash2,
-  CheckCircle,
   Play,
   Star,
   Plus,
 } from 'lucide-react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
+import { ActiveStateLabel } from '@/components/shared/cards';
 import type { StoreCharacter } from '@/state/characterStore';
 import type { EntityID } from '@/types/common.types';
 import { formatDate } from '@/lib/utils';
@@ -25,7 +25,6 @@ import { formatDate } from '@/lib/utils';
 interface CharacterTableProps {
   characters: StoreCharacter[];
   currentCharacterId: EntityID | null;
-  onMakeActive: (characterId: EntityID) => void;
   onView: (characterId: EntityID) => void;
   onPlay: (characterId: EntityID) => void;
   onEdit: (characterId: EntityID) => void;
@@ -41,7 +40,6 @@ interface CharacterTableProps {
  * @param props - Component properties
  * @param props.characters - Array of Character objects to display in the table
  * @param props.currentCharacterId - ID of the currently active character
- * @param props.onMakeActive - Callback to make a character active
  * @param props.onView - Callback to view character details
  * @param props.onPlay - Callback to start playing as character
  * @param props.onEdit - Callback to edit character
@@ -50,7 +48,6 @@ interface CharacterTableProps {
 export function CharacterTable({
   characters,
   currentCharacterId,
-  onMakeActive,
   onView,
   onPlay,
   onEdit,
@@ -87,14 +84,6 @@ export function CharacterTable({
     [onDelete]
   );
 
-  const handleMakeActive = React.useCallback(
-    (characterId: EntityID, e: React.MouseEvent) => {
-      e.stopPropagation();
-      onMakeActive(characterId);
-    },
-    [onMakeActive]
-  );
-
   const columns: ColumnDef<StoreCharacter>[] = React.useMemo(
     () => [
       {
@@ -115,6 +104,10 @@ export function CharacterTable({
               />
             </span>
             <span>{row.getValue('name') as string}</span>
+            <ActiveStateLabel
+              isActive={currentCharacterId === row.original.id}
+              testId="character-table-active-label"
+            />
           </div>
         ),
         enableSorting: true,
@@ -159,21 +152,8 @@ export function CharacterTable({
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => {
-          const isActive = currentCharacterId === row.original.id;
-
           return (
             <div>
-              {!isActive && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => handleMakeActive(row.original.id, e)}
-                  aria-label={`Make ${row.original.name} active`}
-                  title="Make active"
-                >
-                  <CheckCircle />
-                </Button>
-              )}
               <Button
                 variant="ghost"
                 size="icon"
@@ -222,7 +202,6 @@ export function CharacterTable({
       handlePlayCharacter,
       handleEditCharacter,
       handleDeleteCharacter,
-      handleMakeActive,
     ]
   );
 

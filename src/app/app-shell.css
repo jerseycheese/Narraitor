@@ -665,61 +665,27 @@
   border-color: var(--color-border);
 }
 
-/* "Make Active" is an action, so it reads as a link in the interface face.
-   "Active" is state, so it reads as a tinted pill in the data face, apart
-   from the plain-text type labels beside it. */
-.active-state-toggle {
+/* "Active" is state, not a control, so it reads as a tinted pill in the data
+   face, apart from the plain-text type labels beside it. Accent-strong, not
+   accent: plain accent misses AA over accent-soft. */
+.active-state-label {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  min-height: 1.5rem;
-  padding: 0;
-  border: 0;
-  background: none;
-  font-family: var(--font-interface);
-  font-size: var(--font-size-xs_5);
-  font-weight: 500;
-  letter-spacing: normal;
-  color: var(--color-accent);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  cursor: pointer;
-}
-
-.active-state-toggle:hover {
-  color: var(--color-accent-hover);
-}
-
-.active-state-toggle-active {
-  min-height: 0;
   padding: var(--space-0_5) var(--space-2);
   border-radius: var(--radius-full);
   background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
   font-family: var(--font-system);
   font-size: var(--font-size-2xs_5);
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  text-decoration: none;
-  cursor: default;
 }
 
-/* Accent-strong, not accent: plain accent misses AA over accent-soft. */
-.active-state-toggle-active,
-.active-state-toggle-active:hover {
-  color: var(--color-accent-strong);
-}
-
-.active-state-toggle svg {
+.active-state-label svg {
   width: 0.75rem;
   height: 0.75rem;
-}
-
-/* The link stays small on screen, but a finger needs the full 44px row. */
-@media (pointer: coarse) {
-  .active-state-toggle:not(.active-state-toggle-active) {
-    min-height: 2.75rem;
-  }
 }
 
 .card-action-group,
@@ -844,6 +810,38 @@
 }
 
 .card-action-group button.card-action-variant-danger:hover {
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+  color: var(--color-danger-hover);
+}
+
+/* List cards: Play is the one bordered action, in accent but unfilled so the
+   page's Create stays the only filled button. Everything else is a quiet text
+   action, and Delete only turns red once it's pointed at. */
+.card-action-group button.card-action-variant-accent {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.card-action-group button.card-action-variant-accent:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent-hover);
+  color: var(--color-accent-strong);
+}
+
+.card-action-group button.card-action-variant-quiet,
+.card-action-group button.card-action-variant-quiet-danger {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.card-action-group button.card-action-variant-quiet:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+.card-action-group button.card-action-variant-quiet-danger:hover,
+.card-action-group button.card-action-variant-quiet-danger:focus-visible {
   background: color-mix(in srgb, var(--color-danger) 8%, transparent);
   color: var(--color-danger-hover);
 }
@@ -2288,6 +2286,12 @@
   background: transparent;
 }
 
+/* With no surface fill behind it, the subtitle sits on the hero's accent
+   gradient, where muted text drops under AA. Secondary clears it. */
+:root .characters-world-banner .component-hero-subtitle {
+  color: var(--color-text-secondary);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    SectionWrapper (shared component)
    Bare divs since #1051 Tailwind cleanup — adds card chrome that
@@ -3153,13 +3157,6 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   column-gap: var(--space-4);
   align-items: center;
   padding: var(--space-3);
-}
-
-/* The accent border comes from .active-state-card-active; the row adds a
-   faint wash so the active card still reads at a glance. */
-:root .component-world-card.active-state-card-active,
-:root .component-character-card.active-state-card-active {
-  background: color-mix(in oklab, var(--color-accent) 2%, var(--color-surface));
 }
 
 :root .component-character-card .character-card-body,

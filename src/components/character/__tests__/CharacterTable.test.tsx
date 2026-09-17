@@ -124,7 +124,6 @@ const mockCharacters: StoreCharacter[] = [
 ];
 
 describe('CharacterTable', () => {
-  const mockOnMakeActive = jest.fn();
   const mockOnView = jest.fn();
   const mockOnPlay = jest.fn();
   const mockOnEdit = jest.fn();
@@ -133,7 +132,6 @@ describe('CharacterTable', () => {
   const defaultProps = {
     characters: mockCharacters,
     currentCharacterId: 'char-1' as EntityID,
-    onMakeActive: mockOnMakeActive,
     onView: mockOnView,
     onPlay: mockOnPlay,
     onEdit: mockOnEdit,
@@ -222,28 +220,13 @@ describe('CharacterTable', () => {
     expect(mockOnDelete).toHaveBeenCalledWith('char-1');
   });
 
-  it('calls onMakeActive when Make Active button clicked', () => {
+  it('marks only the current character as active, with no Make Active control', () => {
     render(<CharacterTable {...defaultProps} />);
 
-    // Only non-active characters should have Make Active button
-    const makeActiveButton = screen.getByLabelText('Make Legolas active');
-    fireEvent.click(makeActiveButton);
-
-    expect(mockOnMakeActive).toHaveBeenCalledTimes(1);
-    expect(mockOnMakeActive).toHaveBeenCalledWith('char-2');
-  });
-
-  it('does not show Make Active button for current character', () => {
-    render(<CharacterTable {...defaultProps} />);
-
-    // Aragorn is the current character, should not have Make Active button
-    expect(
-      screen.queryByLabelText('Make Aragorn active')
-    ).not.toBeInTheDocument();
-
-    // But other characters should have it
-    expect(screen.getByLabelText('Make Legolas active')).toBeInTheDocument();
-    expect(screen.getByLabelText('Make Gimli active')).toBeInTheDocument();
+    const labels = screen.getAllByTestId('character-table-active-label');
+    expect(labels).toHaveLength(1);
+    expect(labels[0].closest('tr')).toHaveTextContent('Aragorn');
+    expect(screen.queryByLabelText(/active$/)).not.toBeInTheDocument();
   });
 
   it('filters characters by name search', () => {

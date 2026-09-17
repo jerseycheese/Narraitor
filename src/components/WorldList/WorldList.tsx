@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { World } from '@/types/world.types';
 import WorldCard from '@/components/WorldCard/WorldCard';
 import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
@@ -7,14 +7,12 @@ import { Globe } from 'lucide-react';
 interface WorldListProps {
   worlds: World[];
   currentWorldId?: string | null;
-  onSelectWorld: (worldId: string) => void;
   onDeleteWorld: (worldId: string) => void;
 }
 
 const WorldList: React.FC<WorldListProps> = ({
   worlds,
   currentWorldId,
-  onSelectWorld,
   onDeleteWorld,
 }) => {
   // Get character counts and character data for each world using proper hook
@@ -28,15 +26,6 @@ const WorldList: React.FC<WorldListProps> = ({
     {} as Record<string, StoreCharacter[]>
   );
 
-  // The active world goes first, but only in the order the list first loaded
-  // with. Re-sorting on every change would jump a newly activated world's
-  // card to the top and take the keyboard focus on its button with it.
-  const [pinnedWorldId, setPinnedWorldId] = useState<string | null | undefined>(
-    worlds.length > 0 ? (currentWorldId ?? null) : undefined
-  );
-  if (pinnedWorldId === undefined && worlds.length > 0) {
-    setPinnedWorldId(currentWorldId ?? null);
-  }
   if (worlds.length === 0) {
     return (
       <section
@@ -84,8 +73,8 @@ const WorldList: React.FC<WorldListProps> = ({
   }
 
   const sortedWorlds = [...worlds].sort((a, b) => {
-    if (a.id === pinnedWorldId) return -1;
-    if (b.id === pinnedWorldId) return 1;
+    if (a.id === currentWorldId) return -1;
+    if (b.id === currentWorldId) return 1;
     return 0;
   });
 
@@ -98,7 +87,6 @@ const WorldList: React.FC<WorldListProps> = ({
             world={world}
             isActive={world.id === currentWorldId}
             characters={charactersByWorld[world.id] || []}
-            onSelect={onSelectWorld}
             onDelete={onDeleteWorld}
           />
         ))}

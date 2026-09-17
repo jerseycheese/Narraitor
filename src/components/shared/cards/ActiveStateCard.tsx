@@ -21,7 +21,7 @@ export interface ActiveStateCardProps {
  * ActiveStateCard - A wrapper component for cards with active state
  *
  * The card only styles the state; it isn't clickable. Pair it with
- * ActiveStateToggle for the control that makes the item active.
+ * ActiveStateLabel to mark the active item in text.
  *
  * @example Basic usage
  * <ActiveStateCard isActive={isActive}>
