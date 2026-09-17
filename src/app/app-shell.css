@@ -1039,13 +1039,13 @@
 .world-list-empty {
   display: grid;
   gap: var(--space-8);
-  padding: var(--space-8) 0 var(--space-10);
+  padding: var(--space-8) 0;
 }
 
 @media (width >= 60rem) {
   .world-list-empty {
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: var(--space-10);
+    gap: var(--space-8);
     align-items: start;
   }
 }

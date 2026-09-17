@@ -691,7 +691,7 @@
 
 :root .world-list-empty {
   border-radius: var(--radius-md);
-  padding: var(--space-8) var(--space-7);
+  padding: var(--space-8) var(--space-6);
   background: var(--color-surface);
   backdrop-filter: blur(6px);
 }
