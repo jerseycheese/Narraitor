@@ -31,6 +31,9 @@ test('World generation tour snapshots (steps 0-3)', async ({ page }) => {
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-generation-step${zeroPad(stepIndex)}.png`, { clip });
+    // TEMP: expect.soft so the loop doesn't abort at the first stale baseline
+    // and every step gets captured for adoption in one CI run. Revert to a
+    // hard expect in the same push once the baselines are adopted.
+    await expect.soft(page).toHaveScreenshot(`tutorial-world-generation-step${zeroPad(stepIndex)}.png`, { clip });
   }
 });
