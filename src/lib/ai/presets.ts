@@ -12,9 +12,9 @@ import { KEYLESS_PROVIDER_KEY } from './providerKeyHeader';
  * keeps them out of reach until someone runs a live check against each.
  *
  * Order is deliberate. Gemini leads because it's the longest-proven. OpenRouter
- * comes next because it's the only other option a player can reach without a
- * credit card, and one key there covers dozens of models. Everything below it
- * needs prepaid billing before it generates a single word.
+ * comes next because one key covers dozens of models across providers through
+ * a single OpenAI-compatible integration, whereas services below it need
+ * prepaid billing with each provider.
  *
  * TODO(#895): flip a preset to `available: true` only after
  * scripts/verify-openai-compatible-stream.mjs passes against it with a real
@@ -67,7 +67,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://openrouter.ai/keys',
     available: true,
-    note: 'free tier, no card',
+    note: 'one key, dozens of models',
     privacyNote:
       'OpenRouter routes your prompts to whichever upstream model you pick, and each of those has its own data-retention terms. Their free models in particular may allow training on your prompts.',
   },

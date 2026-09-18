@@ -15,7 +15,8 @@
   "project": ["src/**/*.{ts,tsx,js,jsx}!", "scripts/**/*.{js,cjs,mjs}"],
   "ignoreExportsUsedInFile": true,
   "ignoreIssues": {
-    "src/lib/ai/types.ts": ["types"]
+    "src/lib/ai/types.ts": ["types"],
+    "src/state/persistence.ts": ["exports"]
   },
   // These entries exist for `--production` and the default run reports them as
   // redundant hints — that's expected, don't delete them. Excluding the same files via
@@ -29,7 +30,8 @@
     "**/*.testHelpers.{ts,tsx}",
     "**/*.stories.helpers.{ts,tsx}",
     "src/lib/test-utils/**",
-    "src/stories/**/*StoryData.ts"
+    "src/stories/**/*StoryData.ts",
+    "src/app/api/__tests__/**"
   ],
   "ignoreDependencies": [
     "@storybook/addon-essentials",

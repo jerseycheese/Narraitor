@@ -25,7 +25,6 @@ import type { GeneratedCharacterData } from '@/lib/generators/characterGenerator
 import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useToast } from '@/components/ui/toast';
-import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import type { GeneratedImage } from '@/types/common.types';
 import { generatePortrait } from '@/lib/api/generatePortrait';
@@ -251,12 +250,6 @@ export default function CharactersPage() {
     setMounted(true);
   }, []);
 
-  // The world band below is context, not the page header, so the page keeps
-  // its own title whether or not the world has art.
-  const headerTitle = 'My Characters';
-  const headerDescription =
-    'Create unique characters for your interactive narrative adventures.';
-
   const handleCreateCharacter = () => {
     router.push('/characters/create');
   };
@@ -477,22 +470,20 @@ export default function CharactersPage() {
   ];
 
   return (
-    <PageLayout title={headerTitle} description={headerDescription}>
-      {mounted && currentWorld && (
-        <div className="characters-world-banner">
-          <Hero
-            title={currentWorld.name}
-            image={
-              currentWorld.image?.url
-                ? { url: currentWorld.image.url, alt: currentWorld.name }
-                : undefined
-            }
-            subtitle={
-              currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined
-            }
-            titleElement="h2"
-          />
-        </div>
+    <PageLayout
+      title="My Characters"
+      description="Create unique characters for your interactive narrative adventures."
+    >
+      {/* Decorative world-art banner, the same one the detail pages carry. The
+          world switcher above already names the world, so the band repeats
+          neither its name nor its genre. */}
+      {mounted && currentWorld?.image?.url && (
+        <Hero
+          image={{
+            url: currentWorld.image.url,
+            alt: `${currentWorld.name} world`,
+          }}
+        />
       )}
 
       {/* An empty roster has nothing to switch views on, and the empty state

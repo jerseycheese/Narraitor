@@ -320,6 +320,18 @@ Anything without a drafting referent: no decorative squiggles, no handwritten-fo
 
 The canon rendering is the "Drafting Marks" section in [DesignSystemShowcase.stories.tsx](src/stories/00-foundation/DesignSystemShowcase.stories.tsx) - it renders the production classes rather than copies, so it can't drift from the app.
 
+## World Art
+
+World art prints in ink. Generated art swings wildly in lightness, chroma and hue from one world to the next, so in colour it fights the paper-and-ink page it sits on. The ink treatment puts it in the same register as everything around it.
+
+- **The plate.** The art becomes a normalised greyscale plate ([src/lib/plates/](src/lib/plates/)), and the theme supplies its two colours. Light maps it between the world's ink and paper; dark maps it between the page and a light ink. One plate serves both modes. The layers live in `.plate-inked` in [app-shell.css](src/app/app-shell.css).
+- **Screen or continuous, by area.** Frames at or above 56,000 CSS px² (about 240x240) get a 2px AM halftone. Smaller frames get continuous tone, because a screen that fine on a small frame has too few cells to hold detail. Area, not height: a 346x176 band reads as print, a 176px square doesn't.
+- **Ink per world.** The world's art picks the hue and nothing else, read from the whole image so every surface agrees. Lightness and chroma are fixed, so contrast against paper holds by construction. A hue within 30° of the accent rotates away, so a plate never reads as a giant link. Art with no usable hue falls back to the text ink.
+- **Derived, not stored.** Plates are made in the browser on demand ([usePlate](src/hooks/usePlate.ts)) and cached per session. Storing them would double every world's image in IndexedDB.
+- **The one exception.** The world detail hero stays in colour (`treatment="colour"` on `Hero`), because that's the one place seeing the generated colour is the point.
+
+`Hero` and the world table thumbnail both take the treatment. Art has to be same-origin: a cross-origin image can't be read back from the canvas, so it falls back to the untreated colour art.
+
 ## Components
 
 Component rules apply to DS3. The token references resolve automatically.
