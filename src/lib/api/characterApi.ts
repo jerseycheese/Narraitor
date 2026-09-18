@@ -17,10 +17,17 @@ export interface GenerateCharacterParams {
  */
 export const characterApi = {
   async generateCharacter(params: GenerateCharacterParams): Promise<GeneratedCharacterData> {
+    const { world, ...restParams } = params;
+    const worldPayload =
+      world && 'image' in world
+        ? (({ image: _image, ...rest }) => rest)(world)
+        : world;
+    const body = world !== undefined ? { ...restParams, world: worldPayload } : restParams;
+
     const response = await aiFetch('/api/generate-character', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {

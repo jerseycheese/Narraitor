@@ -18,10 +18,18 @@ export interface PortraitResponse {
 export async function generatePortrait(
   payload: PortraitRequest
 ): Promise<PortraitResponse> {
+  const worldPayload =
+    payload.world && typeof payload.world === 'object' && 'image' in payload.world
+      ? (({ image: _image, ...rest }: Record<string, unknown>) => rest)(
+          payload.world as Record<string, unknown>
+        )
+      : payload.world;
+  const body = payload.world !== undefined ? { ...payload, world: worldPayload } : payload;
+
   const response = await aiFetch('/api/generate-portrait', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
