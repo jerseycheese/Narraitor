@@ -103,10 +103,19 @@ export const Hero: React.FC<HeroProps> = ({
       });
     };
 
-    measure();
-    window.addEventListener('resize', measure);
+    // Observe the frame, not the window. A card's size often settles after
+    // mount (fonts, sibling content, grid tracks), and a plate made for the
+    // first measurement would otherwise stick at the wrong size and treatment.
+    // No initial-fire guard is needed: the callback only stores a bucketed
+    // size, and swapping the plate never resizes the frame.
+    const frame = frameRef.current;
+    if (!frame) return;
 
-    return () => window.removeEventListener('resize', measure);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(frame);
+
+    return () => observer.disconnect();
   }, [inked]);
 
   const { plate, pending } = usePlate(inked ? image?.url : undefined, {
