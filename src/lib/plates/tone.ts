@@ -76,6 +76,32 @@ function sortedCopy(lum: Float32Array): Float32Array {
   return Float32Array.from(lum).sort();
 }
 
+/** Percentiles that bound the range a plate is stretched over. */
+const LEVELS_LO_PERCENT = 1;
+const LEVELS_HI_PERCENT = 99;
+
+/** Span below which an image has no range to stretch. */
+const FLAT_SPAN = 1e-3;
+
+/**
+ * Whether the image carries no tonal range at all.
+ *
+ * A flat source (a blank placeholder, a solid fill) has nothing to print: the
+ * tone pass leaves it as it is, and the ink treatment then turns it into a
+ * solid slab of paper.
+ *
+ * @param lum - Luminance in [0, 1].
+ */
+export function isFlat(lum: Float32Array): boolean {
+  const sorted = sortedCopy(lum);
+
+  return (
+    percentileOfSorted(sorted, LEVELS_HI_PERCENT) -
+      percentileOfSorted(sorted, LEVELS_LO_PERCENT) <
+    FLAT_SPAN
+  );
+}
+
 /**
  * Stretches the image's own range to full black-to-white.
  *
@@ -88,15 +114,15 @@ function sortedCopy(lum: Float32Array): Float32Array {
  */
 export function autolevels(
   lum: Float32Array,
-  loPercent = 1,
-  hiPercent = 99
+  loPercent = LEVELS_LO_PERCENT,
+  hiPercent = LEVELS_HI_PERCENT
 ): Float32Array {
   const sorted = sortedCopy(lum);
   const lo = percentileOfSorted(sorted, loPercent);
   const hi = percentileOfSorted(sorted, hiPercent);
 
   // A flat image has nothing to stretch, and dividing by the span would blow up.
-  if (hi - lo < 1e-3) return Float32Array.from(lum);
+  if (hi - lo < FLAT_SPAN) return Float32Array.from(lum);
 
   const span = hi - lo;
   const out = new Float32Array(lum.length);

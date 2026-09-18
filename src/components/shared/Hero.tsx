@@ -118,15 +118,16 @@ export const Hero: React.FC<HeroProps> = ({
     return () => observer.disconnect();
   }, [inked]);
 
-  const { plate, pending } = usePlate(inked ? image?.url : undefined, {
+  const { plate, pending, blank } = usePlate(inked ? image?.url : undefined, {
     width: box?.width ?? 0,
     height: box?.height ?? 0,
   });
 
   // Until a plate exists the art renders as it is, so the banner is never a
-  // gap and a browser with no canvas simply keeps the original.
+  // gap and a browser with no canvas simply keeps the original. Flat art has
+  // nothing to show, so it drops out and the themed empty state takes over.
   const showPlate = inked && Boolean(plate);
-  const displayed = showPlate && plate ? plate.source : image?.url;
+  const displayed = blank ? undefined : showPlate && plate ? plate.source : image?.url;
 
   return (
     <div
