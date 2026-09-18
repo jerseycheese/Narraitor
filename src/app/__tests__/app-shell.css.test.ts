@@ -63,6 +63,8 @@ const APPROVED_BRACKET_SELECTORS = new Set([
   ':root .component-dashboard-getting-started::after',
   ':root .component-about-step::before',
   ':root .component-about-step::after',
+  '.component-world-card .component-hero:not(:has(.component-hero-image))::before',
+  '.component-world-card .component-hero:not(:has(.component-hero-image))::after',
 ]);
 
 const APPROVED_HEADING_RADIAL_SELECTORS = new Set([

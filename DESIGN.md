@@ -288,7 +288,7 @@ The family is one mark, a perforated dotted rule in `--color-text-muted` drawn o
 | Perforated dotted rule | `radial-gradient` dots at `12px 4px` | Drawn once under each approved section heading across the content column |
 | Corner bracket | L-shaped mark(s) in muted ink | Permitted only on cards or cells with no border of their own |
 
-Corner brackets are the narrow exception. On bordered cards with a radius, a square corner bracket sits on the curve and reads as a rendering glitch. On borderless surfaces - the dashboard cards (`.component-dashboard-*-card`), the About step cards (`.component-about-step`), and borderless detail cells (`.world-detail-npc`, `.character-detail-derived-stat`, etc.) - corner brackets read as deliberate trim marks framing the content.
+Corner brackets are the narrow exception. On bordered cards with a radius, a square corner bracket sits on the curve and reads as a rendering glitch. On borderless surfaces - the dashboard cards (`.component-dashboard-*-card`), the About step cards (`.component-about-step`), borderless detail cells (`.world-detail-npc`, `.character-detail-derived-stat`, etc.), and a world card's empty art cell (an unprinted plate) - corner brackets read as deliberate trim marks framing the content.
 
 Data eyebrows are compact data labels (above or beside genuine data values, never headings) rather than decorative marks. Functional UI like the wizard's dotted step connectors (`.wizard-progress-connector`) indicates progress and sits outside the decorative drafting-mark family.
 
