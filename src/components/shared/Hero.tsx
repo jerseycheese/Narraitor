@@ -4,20 +4,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
-import { usePlate } from '@/hooks/usePlate';
+import { plateInkStyle, usePlate } from '@/hooks/usePlate';
 
 /**
- * Which register the art renders in.
+ * How the art is printed.
  *
- * `ink` is the manuscript register: a normalised greyscale plate the theme
- * colours, screened or continuous depending on how large it is reproduced.
- * `colour` is the art as generated.
- *
- * The default is `colour` only because surfaces are being converted one at a
- * time; the register is meant to be the rule, and the default flips once every
- * surface has moved.
+ * `ink` is the rule: a normalised greyscale plate the theme colours, screened
+ * or continuous depending on how large it is reproduced. `colour` is the art as
+ * generated, and is reserved for the world detail hero, the one surface where
+ * seeing the generated colour is the point.
  */
-export type HeroRegister = 'ink' | 'colour';
+export type HeroTreatment = 'ink' | 'colour';
 
 /**
  * Measured sizes are bucketed before a plate is rendered.
@@ -49,8 +46,8 @@ interface HeroProps {
   titleTestId?: string;
   /** Optional title element type (h1, h2, etc.) */
   titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-  /** Which register the art renders in. See {@link HeroRegister}. */
-  register?: HeroRegister;
+  /** How the art is printed. See {@link HeroTreatment}. */
+  treatment?: HeroTreatment;
 }
 
 /**
@@ -70,8 +67,8 @@ interface HeroProps {
  *   subtitle="Fantasy Adventure"
  * />
  *
- * @example In the ink register
- * <Hero title="My World" image={{ url, alt }} register="ink" />
+ * @example The colour exception
+ * <Hero image={{ url, alt }} treatment="colour" />
  */
 export const Hero: React.FC<HeroProps> = ({
   title,
@@ -80,12 +77,12 @@ export const Hero: React.FC<HeroProps> = ({
   badge,
   titleTestId,
   titleElement: TitleElement = 'h1',
-  register = 'colour',
+  treatment = 'ink',
 }) => {
   const frameRef = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState<{ width: number; height: number } | null>(null);
 
-  const inked = register === 'ink';
+  const inked = treatment === 'ink';
 
   useEffect(() => {
     if (!inked) return;
@@ -112,7 +109,7 @@ export const Hero: React.FC<HeroProps> = ({
     return () => window.removeEventListener('resize', measure);
   }, [inked]);
 
-  const plate = usePlate(inked ? image?.url : undefined, {
+  const { plate, pending } = usePlate(inked ? image?.url : undefined, {
     width: box?.width ?? 0,
     height: box?.height ?? 0,
   });
@@ -122,19 +119,12 @@ export const Hero: React.FC<HeroProps> = ({
   const showPlate = inked && Boolean(plate);
   const displayed = showPlate && plate ? plate.source : image?.url;
 
-  const inkStyle =
-    showPlate && plate?.ink
-      ? ({
-          '--plate-ink': plate.ink.light,
-          '--plate-ink-dark': plate.ink.dark,
-        } as React.CSSProperties)
-      : undefined;
-
   return (
     <div
       ref={frameRef}
-      className={clsx('component-hero', showPlate && 'component-hero-ink')}
-      style={inkStyle}
+      className={clsx('component-hero', showPlate && 'plate-inked')}
+      style={showPlate ? plateInkStyle(plate) : undefined}
+      data-plate={pending ? 'pending' : undefined}
     >
       {image && displayed && (
         <Image

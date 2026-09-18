@@ -1,5 +1,5 @@
 /**
- * Turns world art into an ink-register plate.
+ * Turns world art into an ink-treatment plate.
  *
  * The plate is normalised GREYSCALE. The theme supplies its two colours, so one
  * plate serves light and dark: light maps it between the world's ink and paper,
@@ -32,6 +32,15 @@ const SCREEN_PITCH_CSS_PX = 2;
  */
 const SCREEN_MIN_AREA_CSS_PX2 = 56_000;
 
+/**
+ * Long side, in pixels, of the sample the ink hue is read from.
+ *
+ * The ink belongs to the world, not to the frame, so it is read from the whole
+ * art at one fixed size. Reading it from the cropped plate let the same world
+ * land on a slightly different ink per surface and per viewport.
+ */
+const INK_SAMPLE_PX = 64;
+
 /** Contrast applied after the median move, per treatment. */
 const SCREENED_GAIN = 1.1;
 const CONTINUOUS_GAIN = 1.06;
@@ -62,6 +71,33 @@ function shouldScreen(width: number, height: number): boolean {
   return width * height >= SCREEN_MIN_AREA_CSS_PX2;
 }
 
+/**
+ * Reads the world's ink from the whole art, uncropped, at a fixed size.
+ *
+ * @returns The ink, or null when the art carries no usable hue or the canvas
+ * cannot be read back.
+ */
+function sampleInk(image: HTMLImageElement): WorldInk | null {
+  const scale = INK_SAMPLE_PX / Math.max(image.naturalWidth, image.naturalHeight);
+  const width = Math.max(1, Math.round(image.naturalWidth * scale));
+  const height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+
+  const context = canvas.getContext('2d');
+  if (!context) return null;
+
+  context.drawImage(image, 0, 0, width, height);
+
+  try {
+    return deriveWorldInk(context.getImageData(0, 0, width, height).data);
+  } catch {
+    return null;
+  }
+}
+
 function loadImage(source: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const image = new Image();
@@ -78,8 +114,8 @@ function loadImage(source: string): Promise<HTMLImageElement | null> {
  * browser cannot decode the source, so callers fall back to the art itself
  * rather than showing a gap — the same shape `downscalePortraitDataUrl` uses.
  *
- * The ink is derived in the same pass, from the colour pixels before they are
- * flattened, so a plate and its ink never cost two decodes.
+ * The ink is read from the same decode, but from the whole art rather than the
+ * cropped plate, so every surface showing a world agrees on its ink.
  *
  * @param source - The art, as a URL or data URL.
  * @param box - Where the plate will be displayed.
@@ -135,8 +171,7 @@ export async function toPlate(
     return null;
   }
 
-  // Read the hue while the pixels are still in colour.
-  const ink = deriveWorldInk(pixels.data);
+  const ink = sampleInk(image);
 
   const screened = shouldScreen(width, height);
   const tone = normaliseTone(toLuminance(pixels.data), {

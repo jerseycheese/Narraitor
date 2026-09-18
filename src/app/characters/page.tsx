@@ -499,7 +499,6 @@ export default function CharactersPage() {
             currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined
           }
           titleElement="h2"
-          register="ink"
         />
       )}
 

@@ -1,5 +1,5 @@
 /**
- * The halftone screen for ink-register plates.
+ * The halftone screen for ink-treatment plates.
  *
  * A real amplitude-modulated halftone on a rotated screen: each cell carries a
  * dot whose AREA tracks the local tone. That is what makes a screen read as

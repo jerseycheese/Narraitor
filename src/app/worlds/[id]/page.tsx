@@ -119,6 +119,7 @@ export default function WorldViewPage() {
               url: world.image.url,
               alt: `${world.name} world`
             }}
+            treatment="colour"
           />
         </div>
       )}

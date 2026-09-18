@@ -70,6 +70,8 @@ export async function waitForContentStable(page: Page): Promise<void> {
     console.log(`Scoped loading indicator wait failed: ${(error as Error).message}`);
   }
   
+  await waitForPlates(page);
+
   // Final stabilization wait - enough time for data seeding to complete
   await page.waitForTimeout(500);
 }
@@ -93,6 +95,25 @@ export async function waitForNavigationHeading(
 }
 
 /**
+ * Wait until every ink plate on the page has been made.
+ *
+ * World art renders as a plate made after mount. Until it lands the frame shows
+ * the colour art, so a capture taken early is a different image. Frames mark
+ * themselves `data-plate="pending"` while theirs is being made.
+ */
+export async function waitForPlates(page: Page, timeout: number = 10000): Promise<void> {
+  try {
+    await page.waitForFunction(
+      () => document.querySelectorAll('[data-plate="pending"]').length === 0,
+      undefined,
+      { timeout }
+    );
+  } catch (error) {
+    console.log(`Ink plates still pending: ${(error as Error).message}`);
+  }
+}
+
+/**
  * Wait until all images on the page have finished loading.
  */
 export async function waitForImagesLoaded(page: Page, timeout: number = 5000): Promise<void> {
@@ -108,6 +129,7 @@ export async function waitForImagesLoaded(page: Page, timeout: number = 5000): P
   } catch (error) {
     console.log(`Image loading wait failed: ${(error as Error).message}`);
   }
+  await waitForPlates(page);
 }
 
 /**
@@ -151,6 +173,7 @@ export async function waitForImagesLoadedIn(
   } catch (error) {
     console.log(`Scoped image wait failed for ${selector}: ${(error as Error).message}`);
   }
+  await waitForPlates(page);
 }
 
 /**

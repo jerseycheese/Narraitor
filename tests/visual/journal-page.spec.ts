@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
+import { waitForPlates } from './utils/wait-helpers';
 
 /**
  * Journal Page Visual Test
@@ -49,6 +50,7 @@ test.describe('Journal Page', () => {
     ).toBeVisible();
 
     // Take screenshot of journal page
+    await waitForPlates(page);
     await page.waitForTimeout(500); // Let layout settle
     await expect(page).toHaveScreenshot('journal-page.png', {
       fullPage: true,

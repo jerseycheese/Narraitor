@@ -1,5 +1,5 @@
 /**
- * Tone normalisation for ink-register plates.
+ * Tone normalisation for ink-treatment plates.
  *
  * World art is generated, not chosen, and most of it is night scenes. Raw, a
  * cyberpunk street sits almost entirely in the bottom third of the range, so a

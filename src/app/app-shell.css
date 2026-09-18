@@ -2116,7 +2116,7 @@
   z-index: 0;
 }
 
-/* The ink register.
+/* The ink treatment.
 
    The plate arrives as normalised greyscale and these two layers give it the
    theme's colours: the art is screened over the shadow end, then multiplied by
@@ -2129,21 +2129,26 @@
    so raising it pins the highlights against the ceiling instead of lifting the
    shadows, and flattens a fifth of the plate.
 
-   --plate-ink and --plate-ink-dark are set per world from its own art, and fall
-   back to the text ink when the art carries no usable hue. */
+   Any frame holding a plate takes .plate-inked: the hero, the world table
+   thumbnail. --plate-ink and --plate-ink-dark are set per world from its own
+   art, and fall back to the text ink when the art carries no usable hue. A
+   frame with its own background reads --plate-shadow for it, so the ink
+   treatment wins without a specificity fight. */
 
-.component-hero-ink {
+.plate-inked {
   --plate-shadow: var(--plate-ink, var(--color-text-primary));
   --plate-paper: var(--color-surface-opaque);
 
+  position: relative;
+  isolation: isolate;
   background: var(--plate-shadow);
 }
 
-.component-hero-ink .component-hero-image {
+.plate-inked img {
   mix-blend-mode: screen;
 }
 
-.component-hero-ink::before {
+.plate-inked::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -2153,7 +2158,7 @@
   pointer-events: none;
 }
 
-:root.dark .component-hero-ink {
+:root.dark .plate-inked {
   --plate-shadow: var(--color-canvas);
   --plate-paper: var(--plate-ink-dark, var(--color-text-primary));
 }
@@ -2757,7 +2762,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   height: var(--space-8);
   overflow: hidden;
   border-radius: var(--radius-sm, 0.25rem);
-  background: var(--color-surface-hover);
+  background: var(--plate-shadow, var(--color-surface-hover));
   color: var(--color-text-muted);
 }
 

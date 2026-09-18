@@ -120,7 +120,7 @@ const mockWorld: World = {
   },
   image: {
     type: 'ai-generated',
-    url: 'https://picsum.photos/800/400?random=100',
+    url: '/visual-assets/worlds/port-city.webp',
     generatedAt: '2023-01-01T10:00:00Z',
     prompt:
       'A mystical fantasy landscape with floating islands and magical forests',

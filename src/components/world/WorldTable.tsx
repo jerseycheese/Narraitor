@@ -11,11 +11,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Eye, Pencil, Trash2, Globe } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import clsx from 'clsx';
 import { useCharacterStore } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
 import { formatDate } from '@/lib/utils';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { plateInkStyle, usePlate } from '@/hooks/usePlate';
 
 interface WorldTableProps {
   worlds: World[];
@@ -36,15 +38,35 @@ interface WorldThumbnailProps {
   url?: string | null;
 }
 
-const WorldThumbnail: React.FC<WorldThumbnailProps> = ({ url }) => (
-  <span className="component-world-table-thumb" aria-hidden="true">
-    {url ? (
-      <Image src={url} alt="" width={32} height={32} unoptimized />
-    ) : (
-      <Globe />
-    )}
-  </span>
-);
+/** Thumbnail edge in CSS pixels; matches `--space-8` in the thumb's CSS. */
+const THUMBNAIL_PX = 32;
+
+const THUMBNAIL_BOX = { width: THUMBNAIL_PX, height: THUMBNAIL_PX };
+
+const WorldThumbnail: React.FC<WorldThumbnailProps> = ({ url }) => {
+  const { plate, pending } = usePlate(url ?? undefined, THUMBNAIL_BOX);
+
+  return (
+    <span
+      className={clsx('component-world-table-thumb', plate && 'plate-inked')}
+      style={plateInkStyle(plate)}
+      data-plate={pending ? 'pending' : undefined}
+      aria-hidden="true"
+    >
+      {url ? (
+        <Image
+          src={plate?.source ?? url}
+          alt=""
+          width={THUMBNAIL_PX}
+          height={THUMBNAIL_PX}
+          unoptimized
+        />
+      ) : (
+        <Globe />
+      )}
+    </span>
+  );
+};
 
 /**
  * WorldTable - A data table component for managing multiple worlds
