@@ -143,7 +143,7 @@ describe('WorldListScreen integration (#347)', () => {
 
     await user.click(screen.getByTestId('world-card-actions-play-button'));
 
-    expect(mockPush).toHaveBeenCalledWith(`/characters?worldId=${worldId}`);
+    expect(mockPush).toHaveBeenCalledWith(`/characters/create?worldId=${worldId}`);
   });
 
   // AC: Tests ensure error boundaries work correctly (no ErrorBoundary

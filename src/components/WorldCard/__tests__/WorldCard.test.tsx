@@ -4,6 +4,8 @@ import WorldCard from '../WorldCard';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { formatDate } from '@/lib/utils';
 import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 
 const mockRouterPush = jest.fn();
 jest.mock('next/navigation', () => ({
@@ -87,8 +89,8 @@ describe('WorldCard', () => {
     expect(screen.getByRole('article', { name: mockWorld.name })).toBeInTheDocument();
   });
 
-  // New test for Play functionality (navigates to characters when no characters exist)
-  test('sets current world and navigates to characters when Play is clicked', () => {
+  // With no one to play as, the primary action says so and goes to creation.
+  test('sets current world and sends a world with no characters to character creation', () => {
     const setCurrentWorldSpy = jest.spyOn(
       useWorldStore.getState(),
       'setCurrentWorld'
@@ -96,16 +98,43 @@ describe('WorldCard', () => {
 
     render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
 
-    // Find and click the Play button
-    fireEvent.click(screen.getByTestId('world-card-actions-play-button'));
+    fireEvent.click(
+      screen.getByRole('button', { name: `Create a character for ${mockWorld.name}` })
+    );
 
     // Verify world is set as current world via the store
     expect(setCurrentWorldSpy).toHaveBeenCalledWith(mockWorld.id);
 
-    // Verify navigation to characters page (since no characters exist in the world)
-    expect(mockRouterPush).toHaveBeenCalledWith(`/characters?worldId=${mockWorld.id}`);
+    expect(mockRouterPush).toHaveBeenCalledWith(`/characters/create?worldId=${mockWorld.id}`);
 
     setCurrentWorldSpy.mockRestore();
+  });
+
+  // Continue only shows when Play will resume: the saved session must belong to
+  // the character the play screen will pick, here the current character.
+  test('offers Continue and the last-played date when the session will resume', () => {
+    const lastPlayed = '2024-03-02T10:00:00.000Z';
+    useCharacterStore.setState({
+      characters: {
+        first: { id: 'first', worldId: mockWorld.id, name: 'First' },
+        current: { id: 'current', worldId: mockWorld.id, name: 'Current' },
+      } as unknown as ReturnType<typeof useCharacterStore.getState>['characters'],
+      currentCharacterId: 'current',
+    });
+    useSessionStore.setState({
+      savedSessions: {
+        s1: { id: 's1', worldId: mockWorld.id, characterId: 'current', lastPlayed, narrativeCount: 3 },
+      },
+    });
+
+    render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
+
+    fireEvent.click(screen.getByRole('button', { name: `Continue ${mockWorld.name}` }));
+    expect(mockRouterPush).toHaveBeenCalledWith(`/worlds/${mockWorld.id}/play?autoResume=true`);
+    expect(screen.getByText(`Last played: ${formatDate(lastPlayed)}`)).toBeInTheDocument();
+
+    useCharacterStore.setState(useCharacterStore.getInitialState(), true);
+    useSessionStore.setState(useSessionStore.getInitialState(), true);
   });
 
   // One-primary-per-state: page-level Create is the filled primary on the
@@ -113,7 +142,8 @@ describe('WorldCard', () => {
   test('Play is the unfilled accent action and names its world', () => {
     render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
 
-    const playButton = screen.getByRole('button', { name: `Play ${mockWorld.name}` });
+    const playButton = screen.getByTestId('world-card-actions-play-button');
+    expect(playButton).toHaveAccessibleName(expect.stringContaining(mockWorld.name));
     expect(playButton).toHaveClass('card-action-variant-accent');
     expect(playButton).not.toHaveClass('card-action-variant-primary');
   });

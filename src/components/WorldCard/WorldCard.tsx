@@ -15,7 +15,8 @@ import {
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pencil, Trash, Users } from 'lucide-react';
+import { resolveSessionCharacterId } from '@/lib/session/sessionCharacter';
+import { Play, Pencil, Trash, UserPlus, Users } from 'lucide-react';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('WorldCard');
@@ -74,6 +75,15 @@ const WorldCard: React.FC<WorldCardProps> = ({
   const router = useRouter();
   const titleId = useId();
 
+  // Resolved the same way the play screen resolves it, so "Continue" only
+  // shows when Play will actually resume that session.
+  const sessionCharacterId = useCharacterStore((state) =>
+    resolveSessionCharacterId(state.characters, state.currentCharacterId, world.id)
+  );
+  const savedSession = useSessionStore((state) =>
+    sessionCharacterId ? state.getSavedSession(world.id, sessionCharacterId) : undefined
+  );
+
   const handleDeleteClick = () => {
     onDelete(world.id);
   };
@@ -82,28 +92,16 @@ const WorldCard: React.FC<WorldCardProps> = ({
     try {
       useWorldStore.getState().setCurrentWorld(world.id);
 
-      // Check for characters in this world
-      const characterState = useCharacterStore.getState();
-      const worldCharacters = (
-        Object.values(characterState.characters) as StoreCharacter[]
-      ).filter((char) => char.worldId === world.id);
-
-      if (worldCharacters.length === 0) {
-        // No characters exist - redirect to characters page
-        router.push(`/characters?worldId=${world.id}`);
+      if (!sessionCharacterId) {
+        router.push(`/characters/create?worldId=${world.id}`);
         return;
       }
 
-      // Check for saved session
-      const savedSession = useSessionStore
-        .getState()
-        .getSavedSession(world.id, worldCharacters[0]?.id);
-
-      // Add query parameter to auto-resume if there's a saved session
-      const url = savedSession
-        ? `/worlds/${world.id}/play?autoResume=true`
-        : `/worlds/${world.id}/play`;
-      router.push(url);
+      router.push(
+        savedSession
+          ? `/worlds/${world.id}/play?autoResume=true`
+          : `/worlds/${world.id}/play`
+      );
     } catch (error) {
       logger.error('handlePlayClick', 'Failed to navigate to play world', error);
     }
@@ -122,6 +120,13 @@ const WorldCard: React.FC<WorldCardProps> = ({
   // from assistive tech; the title link carries the name.
   const heroImage = world.image?.url ? { url: world.image.url, alt: '' } : undefined;
   const detailHref = `/worlds/${world.id}`;
+
+  // Play says what it will do: resume, start, or send you to make someone first.
+  const playLabel = !sessionCharacterId
+    ? 'Create a character'
+    : savedSession
+      ? 'Continue'
+      : 'Play';
 
   return (
     <ActiveStateCard
@@ -222,21 +227,29 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
         <footer>
           <div className="world-card-footer-meta">
-            <time data-testid="world-card-createdAt">
-              Created: {formatDate(world.createdAt)}
-            </time>
+            {savedSession ? (
+              <time data-testid="world-card-lastPlayed" dateTime={savedSession.lastPlayed}>
+                Last played: {formatDate(savedSession.lastPlayed)}
+              </time>
+            ) : (
+              <time data-testid="world-card-createdAt" dateTime={world.createdAt}>
+                Created: {formatDate(world.createdAt)}
+              </time>
+            )}
           </div>
           <div className="world-card-footer-actions">
             <CardActionGroup
               primaryActions={[
                 {
                   key: 'play',
-                  text: 'Play',
-                  ariaLabel: `Play ${world.name}`,
+                  text: playLabel,
+                  ariaLabel: sessionCharacterId
+                    ? `${playLabel} ${world.name}`
+                    : `Create a character for ${world.name}`,
                   onClick: handlePlayClick,
                   variant: 'accent',
                   testId: 'world-card-actions-play-button',
-                  icon: <Play aria-hidden="true" />,
+                  icon: sessionCharacterId ? <Play aria-hidden="true" /> : <UserPlus aria-hidden="true" />,
                 },
               ]}
               secondaryActions={[
