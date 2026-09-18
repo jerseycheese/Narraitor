@@ -2116,6 +2116,53 @@
   z-index: 0;
 }
 
+/* The ink treatment.
+
+   The plate arrives as normalised greyscale and these two layers give it the
+   theme's colours: the art is screened over the shadow end, then multiplied by
+   the light end. Light maps it between the world's ink and paper; dark swaps
+   which token feeds which layer, because the ramp inverts and ink-as-shadow
+   becomes paper-as-shadow.
+
+   Deliberately no filter. The tone was normalised when the plate was made,
+   which is the one part of this CSS cannot do — brightness() is a multiplier,
+   so raising it pins the highlights against the ceiling instead of lifting the
+   shadows, and flattens a fifth of the plate.
+
+   Any frame holding a plate takes .plate-inked: the hero, the world table
+   thumbnail. --plate-ink and --plate-ink-dark are set per world from its own
+   art, and fall back to the text ink when the art carries no usable hue. A
+   frame with its own background reads --plate-shadow for it, so the ink
+   treatment wins without a specificity fight. */
+
+.plate-inked {
+  --plate-shadow: var(--plate-ink, var(--color-text-primary));
+  --plate-paper: var(--color-surface-opaque);
+
+  position: relative;
+  isolation: isolate;
+  background: var(--plate-shadow);
+}
+
+.plate-inked img {
+  mix-blend-mode: screen;
+}
+
+.plate-inked::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--plate-paper);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+:root.dark .plate-inked {
+  --plate-shadow: var(--color-canvas);
+  --plate-paper: var(--plate-ink-dark, var(--color-text-primary));
+}
+
 /* Top feather — pseudo-element softens the join between image and the solid
    overlay bar below. Sits above the image but below the overlay content. */
 
@@ -2715,7 +2762,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   height: var(--space-8);
   overflow: hidden;
   border-radius: var(--radius-sm, 0.25rem);
-  background: var(--color-surface-hover);
+  background: var(--plate-shadow, var(--color-surface-hover));
   color: var(--color-text-muted);
 }
 

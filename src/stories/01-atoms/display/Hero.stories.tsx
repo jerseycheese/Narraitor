@@ -23,23 +23,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// Same-origin art only. A cross-origin image taints the canvas, no plate can
+// be read back, and the hero falls back to the art untreated.
 const sampleImage = {
-  url: 'https://picsum.photos/800/400?random=1',
-  alt: 'Fantasy landscape'
+  url: '/visual-assets/worlds/normandy.webp',
+  alt: 'A hedgerow lane in Normandy'
 };
 
 // Image-based variants
 export const WithImage: Story = {
   args: {
-    title: 'The Enchanted Realm',
+    title: 'Normandy',
     image: sampleImage,
   },
 };
 
 export const WithImageAndSubtitle: Story = {
   args: {
-    title: 'The Enchanted Realm',
-    subtitle: 'High Fantasy Adventure',
+    title: 'Normandy',
+    subtitle: 'Historical',
     image: sampleImage,
   },
 };
@@ -49,7 +51,7 @@ export const WithImageAndBadge: Story = {
     title: 'Cyberpunk 2077',
     subtitle: 'Dystopian Future',
     image: {
-      url: 'https://picsum.photos/800/400?random=2',
+      url: '/visual-assets/world-cyberpunk.png',
       alt: 'Cyberpunk cityscape'
     },
     badge: (
@@ -68,3 +70,14 @@ export const WithoutImage: Story = {
   },
 };
 
+/**
+ * The colour treatment: the art as generated. Reserved for the world detail
+ * hero; everywhere else world art prints in ink, which is the default and what
+ * every other story here shows. Check both themes with the toolbar switcher.
+ */
+export const ColourTreatment: Story = {
+  args: {
+    image: sampleImage,
+    treatment: 'colour',
+  },
+};

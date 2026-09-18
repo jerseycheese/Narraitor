@@ -25,7 +25,6 @@ import type { GeneratedCharacterData } from '@/lib/generators/characterGenerator
 import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { useToast } from '@/components/ui/toast';
-import { getGenreLabel } from '@/lib/constants/genres';
 import { GameSessionConfirmationDialog } from '@/components/GameSession/GameSessionConfirmationDialog';
 import type { GeneratedImage } from '@/types/common.types';
 import { generatePortrait } from '@/lib/api/generatePortrait';
@@ -251,13 +250,6 @@ export default function CharactersPage() {
     setMounted(true);
   }, []);
 
-  const headerTitle =
-    mounted && currentWorld?.image?.url ? undefined : 'My Characters';
-  const headerDescription =
-    mounted && currentWorld?.image?.url
-      ? undefined
-      : 'Create unique characters for your interactive narrative adventures.';
-
   const handleCreateCharacter = () => {
     router.push('/characters/create');
   };
@@ -482,23 +474,19 @@ export default function CharactersPage() {
   ];
 
   return (
-    <PageLayout title={headerTitle} description={headerDescription}>
-      {/* When the world hero replaces the visible page header, PageLayout
-          renders no h1, so keep a screen-reader page heading (#1530). */}
-      {!headerTitle && <h1 className="sr-only">My Characters</h1>}
-
-      {mounted && currentWorld && (
+    <PageLayout
+      title="My Characters"
+      description="Create unique characters for your interactive narrative adventures."
+    >
+      {/* Decorative world-art banner, the same one the detail pages carry. The
+          world switcher above already names the world, so the band repeats
+          neither its name nor its genre. */}
+      {mounted && currentWorld?.image?.url && (
         <Hero
-          title={currentWorld.name}
-          image={
-            currentWorld.image?.url
-              ? { url: currentWorld.image.url, alt: currentWorld.name }
-              : undefined
-          }
-          subtitle={
-            currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined
-          }
-          titleElement="h2"
+          image={{
+            url: currentWorld.image.url,
+            alt: `${currentWorld.name} world`,
+          }}
         />
       )}
 
