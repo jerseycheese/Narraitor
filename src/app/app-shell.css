@@ -1241,61 +1241,6 @@
   padding-top: var(--space-4);
 }
 
-/* ─── CharacterCard ─── */
-
-.component-character-card {
-  display: flex;
-  flex-direction: column;
-}
-
-.component-character-card > div {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.component-character-card h3 {
-  font-family: var(--font-interface);
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: var(--space-2) 0 var(--space-1);
-  padding: 0 var(--space-4);
-}
-
-.character-card-name-button {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: inherit;
-  text-align: start;
-  cursor: pointer;
-}
-
-.character-card-name-button:hover {
-  color: var(--color-accent);
-}
-
-.component-character-card > div > div:first-child {
-  padding: var(--space-4);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.component-character-card > div > div:first-child > p {
-  font-family: var(--font-interface);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-  margin: var(--space-2) 0;
-}
-
-.component-character-card footer {
-  padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--color-border);
-}
 
 /* ─── PageLayout ─── */
 
@@ -1413,14 +1358,8 @@
 
 .characters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-  gap: var(--space-4);
-}
-
-@media (width <= 640px) {
-  .characters-grid {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
 }
 
 .characters-empty {
@@ -3169,74 +3108,147 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   gap: var(--space-2);
 }
 
-/* DS3 character list — dense row */
 
-:root .characters-grid {
-  grid-template-columns: 1fr;
-  gap: var(--space-1);
-}
 
-:root .component-character-card {
+.component-character-card {
   display: grid;
-  grid-template-columns: 8rem 1fr auto;
-
-  /* The flexible rows above and below the text absorb the portrait's extra
-     height, so name, meta and description center as one block beside it
-     instead of the portrait stretching the name's row on its own. */
-  grid-template-rows: 1fr auto auto auto 1fr;
+  grid-template-columns: 7rem 1fr auto;
+  grid-template-rows: auto auto;
   column-gap: var(--space-4);
   align-items: center;
   padding: var(--space-3);
 }
 
-:root .component-character-card .character-card-body,
-:root .component-character-card .character-card-inner {
+.component-character-card .character-card-body,
+.component-character-card footer {
   display: contents;
 }
 
-/* Same reasoning as the world card's hero panel: a 4rem thumbnail made the
-   generated portrait nearly invisible on the roster players browse most. */
-:root .component-character-card .character-card-portrait {
+.character-card-portrait {
+  position: relative;
   grid-column: 1;
   grid-row: 1 / -1;
   align-self: center;
-  padding: 0;
   width: 7rem;
   height: 7rem;
   overflow: hidden;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
 }
 
-:root .component-character-card .character-card-name {
+/* A character with no portrait is an unprinted plate: a canvas cell with trim
+   marks and the name's initial as a drop cap, matching the world card plate. */
+.component-character-card .character-card-portrait:not(:has(img)) {
+  background: var(--color-canvas);
+}
+
+.component-character-card .character-card-portrait:not(:has(img))::before,
+.component-character-card .character-card-portrait:not(:has(img))::after {
+  content: "";
+  position: absolute;
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border: 0 solid var(--color-text-muted);
+  pointer-events: none;
+}
+
+.component-character-card .character-card-portrait:not(:has(img))::before {
+  top: var(--space-2);
+  left: var(--space-2);
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+
+.component-character-card .character-card-portrait:not(:has(img))::after {
+  right: var(--space-2);
+  bottom: var(--space-2);
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+
+.character-card-plate-initial {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-narrative);
+  font-size: var(--font-size-2xl);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.character-card-portrait:has(img) .character-card-plate-initial {
+  display: none;
+}
+
+.character-card-content {
   grid-column: 2;
-  grid-row: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.character-card-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
+.character-card-title {
   margin: 0;
   padding: 0;
   font-family: var(--font-interface);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
 }
 
-:root .component-character-card .character-card-meta {
-  grid-column: 2;
-  grid-row: 3;
+.character-card-name-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.character-card-name-button:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.character-card-name-button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.character-card-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
-  margin-top: var(--space-1);
   font-family: var(--font-system);
   font-size: var(--font-size-2xs_5);
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--color-text-muted);
 }
 
-:root .component-character-card .character-card-description {
-  grid-column: 2;
-  grid-row: 4;
-  margin: var(--space-1) 0 0;
+.character-card-description {
+  margin: 0;
   padding: 0;
   font-family: var(--font-interface);
   font-size: var(--font-size-xs_5);
+  line-height: 1.5;
   color: var(--color-text-secondary);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -3244,25 +3256,40 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   overflow: hidden;
 }
 
-:root .component-character-card .character-card-connections,
-:root .component-character-card .character-card-recent {
-  display: none;
+.character-card-footer-meta {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-system);
+  font-size: var(--font-size-2xs_5);
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
 }
 
-:root .component-character-card .character-card-footer {
+.character-card-footer-meta time {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.character-card-footer-actions {
   grid-column: 3;
-  grid-row: 1 / -1;
+  grid-row: 1 / span 2;
   align-self: center;
   padding: 0;
   border-top: 0;
 }
 
 @media (width <= 640px) {
-  :root .component-character-card {
+  .component-character-card {
     grid-template-columns: 4rem 1fr;
+    grid-template-rows: auto auto auto;
+    row-gap: var(--space-2);
   }
+
   :root .world-card-footer-actions,
-  :root .component-character-card .character-card-footer {
+  .component-character-card .character-card-footer-actions {
     grid-column: 1 / -1;
     grid-row: auto;
     padding-top: var(--space-2);
@@ -3292,23 +3319,31 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
     grid-row: 3;
   }
 
-  /* A 7rem portrait would swallow a phone row. */
-  :root .component-character-card .character-card-portrait {
+  /* A 7rem portrait would swallow a phone row. Keep it on row 1 beside the
+     content so the timestamp and actions stack cleanly underneath. */
+  .component-character-card .character-card-portrait {
+    grid-row: 1;
+    align-self: start;
     width: 4rem;
     height: 4rem;
+  }
+
+  .character-card-footer-meta {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 
   /* Stacked action rows cost a phone about 50px per card, which is what pushes
      the first Play under the fold. Play now hugs its label, so the primary and
      secondary rows collapse into one line of buttons. */
-  :root .component-character-card .character-card-footer .card-action-group,
+  .component-character-card .character-card-footer-actions .card-action-group,
   :root .world-card-footer-actions .card-action-group {
     flex-flow: row wrap;
     align-items: center;
     gap: var(--space-2);
   }
 
-  :root .component-character-card .character-card-footer .card-action-row,
+  .component-character-card .character-card-footer-actions .card-action-row,
   :root .world-card-footer-actions .card-action-row {
     display: contents;
   }
