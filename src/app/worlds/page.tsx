@@ -74,7 +74,6 @@ export default function WorldsPage() {
   );
   const [worldName, setWorldName] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [viewToggle, setViewToggle] = useState<React.ReactNode>(null);
 
   const handleCreateWorld = () => {
     router.push('/worlds/create');
@@ -160,10 +159,7 @@ export default function WorldsPage() {
       title="My Worlds"
       description="Create unique story worlds, then manage characters and play through interactive narratives."
       actions={
-        <>
-          {viewToggle}
-          <ActionButtonGroup actions={actionButtons} layout="horizontal" gap="sm" />
-        </>
+        <ActionButtonGroup actions={actionButtons} layout="horizontal" gap="sm" />
       }
     >
       {/* World Generation Prompt */}
@@ -234,7 +230,7 @@ export default function WorldsPage() {
         </div>
       </SimpleModal>
 
-      <WorldListScreen onViewToggleRender={setViewToggle} />
+      <WorldListScreen />
     </PageLayout>
   );
 }
