@@ -95,6 +95,18 @@ export default function WorldViewPage() {
   ];
 
 
+  const headerBackground = world.image?.url ? (
+    <div className="characters-header-vignette world-detail-vignette" aria-hidden="true">
+      <Hero
+        image={{
+          url: world.image.url,
+          alt: `${world.name} world`,
+        }}
+        treatment="colour"
+      />
+    </div>
+  ) : null;
+
   return (
     <PageLayout
       title={world.name}
@@ -109,21 +121,9 @@ export default function WorldViewPage() {
           gap="sm"
         />
       }
+      headerBackground={headerBackground}
+      headerClassName="characters-world-masthead world-detail-masthead"
     >
-      {/* Decorative image banner; the page h1 above already carries the world
-          name, so the hero repeats neither title nor genre (#1542) */}
-      {world.image?.url && (
-        <div className="world-detail-hero">
-          <Hero
-            image={{
-              url: world.image.url,
-              alt: `${world.name} world`
-            }}
-            treatment="colour"
-          />
-        </div>
-      )}
-
       <section className="world-detail-body" aria-label="World details">
         <WorldDetailsDisplay world={world} />
       </section>

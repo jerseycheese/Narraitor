@@ -245,6 +245,7 @@ Rules that hold across both surfaces:
 - **Prose caps at `70ch`.** Tables, grids, and cards use the full column; paragraphs don't stretch with them.
 - **One contextual CTA, suppressed where the page owns the action.** A screen that already has a Play button doesn't get a second one in the header.
 - **Breadcrumbs are for nested product routes.** The whole brand register is breadcrumb-free, and `/dashboard`, `/worlds`, `/characters` and `/settings` are top-level destinations that suppress them too.
+- **World surfaces (`/worlds/[id]`, `/characters`, `/characters/[id]`)** integrate the world's artwork directly into the page header as a vignette masthead (full-colour on `/worlds/[id]`, inked plate on character child surfaces), rather than dropping a separate 22rem boxed hero card in the content column. This keeps the reading and action hierarchy compact, pulling lore and roster above the 768px fold line.
 - Canon is the `04-Templates/layouts/AppShell` story, which shows the four header states side by side.
 
 This collapsed a three-surface split (#1655). The retired third surface — a 288px "workshop" rail on `/worlds*`, `/characters*`, and `/settings*` — existed so three design systems could feel like three products; ADR-013 deleted two of them. It reverses [#1432](https://github.com/jerseycheese/Narraitor/issues/1432) F7, which kept the rail on differentiation grounds that no longer apply, and supersedes the archived Workshop layout pattern in `public_docs/design-system/archive/redesign-planning/design-system.html`.

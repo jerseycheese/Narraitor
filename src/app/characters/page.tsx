@@ -3,7 +3,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Plus, Sparkles, Globe } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { getGenreLabel } from '@/lib/constants/genres';
 import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -469,22 +471,53 @@ export default function CharactersPage() {
     },
   ];
 
-  return (
-    <PageLayout
-      title="My Characters"
-      description="Create unique characters for your interactive narrative adventures."
-    >
-      {/* Decorative world-art banner, the same one the detail pages carry. The
-          world switcher above already names the world, so the band repeats
-          neither its name nor its genre. */}
-      {mounted && currentWorld?.image?.url && (
+  const characterCount = worldCharacters.length;
+  const pageDescription = currentWorld
+    ? `${characterCount} ${characterCount === 1 ? 'character' : 'characters'} in this realm`
+    : 'Create unique characters for your interactive narrative adventures.';
+
+  const worldKicker = currentWorld ? (
+    <div className="characters-world-kicker" data-testid="characters-world-kicker">
+      <Link
+        href={`/worlds/${currentWorld.id}`}
+        className="characters-world-kicker-link"
+      >
+        <span>WORLD: {currentWorld.name}</span>
+      </Link>
+      {currentWorld.genre && (
+        <>
+          <span className="characters-kicker-dot" aria-hidden="true">
+            ·
+          </span>
+          <span className="characters-kicker-genre">
+            {getGenreLabel(currentWorld.genre)}
+          </span>
+        </>
+      )}
+    </div>
+  ) : null;
+
+  const headerBackground =
+    mounted && currentWorld?.image?.url ? (
+      <div className="characters-header-vignette" aria-hidden="true">
         <Hero
           image={{
             url: currentWorld.image.url,
-            alt: `${currentWorld.name} world`,
+            alt: '',
           }}
+          treatment="ink"
         />
-      )}
+      </div>
+    ) : null;
+
+  return (
+    <PageLayout
+      title="My Characters"
+      kicker={worldKicker}
+      description={pageDescription}
+      headerBackground={headerBackground}
+      headerClassName="characters-world-masthead"
+    >
 
       {/* An empty roster has nothing to switch views on, and the empty state
           below already offers both Create and Generate, so the toolbar would

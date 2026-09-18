@@ -3,10 +3,16 @@ import React from 'react';
 export interface PageLayoutProps {
   /** The main page title */
   title?: string;
+  /** Optional kicker or eyebrow above title (e.g. folio context) */
+  kicker?: React.ReactNode;
   /** Optional description text below the title */
-  description?: string;
+  description?: React.ReactNode;
   /** Optional action buttons to display in the header */
   actions?: React.ReactNode;
+  /** Optional background art or vignette inside the header */
+  headerBackground?: React.ReactNode;
+  /** Additional CSS classes for the header container */
+  headerClassName?: string;
   /** The main page content */
   children: React.ReactNode;
   /** Additional CSS classes for the main container */
@@ -50,36 +56,48 @@ export interface PageLayoutProps {
  */
 export function PageLayout({ 
   title, 
+  kicker,
   description, 
   actions, 
+  headerBackground,
+  headerClassName = '',
   children, 
   className = '' 
 }: PageLayoutProps) {
   // Only render header if there's content for it
-  const hasHeaderContent = title || actions || description;
+  const hasHeaderContent = title || actions || description || kicker || headerBackground;
+  const headerClasses = ['page-layout-header', headerClassName].filter(Boolean).join(' ');
 
   return (
     <div className="component-page-layout">
       <div className={`${className}`}>
         {hasHeaderContent && (
-          <header className="page-layout-header">
-            <div className="page-layout-header-top">
-              {title && (
-                <h1 className="page-layout-title">
-                  {title}
-                </h1>
-              )}
-              {actions && (
-                <div className="page-layout-actions">
-                  {actions}
+          <header className={headerClasses}>
+            {headerBackground}
+            <div className="page-layout-header-content">
+              {kicker && (
+                <div className="page-layout-kicker">
+                  {kicker}
                 </div>
               )}
+              <div className="page-layout-header-top">
+                {title && (
+                  <h1 className="page-layout-title">
+                    {title}
+                  </h1>
+                )}
+                {actions && (
+                  <div className="page-layout-actions">
+                    {actions}
+                  </div>
+                )}
+              </div>
+              {description && (
+                <p className="page-layout-description">
+                  {description}
+                </p>
+              )}
             </div>
-            {description && (
-              <p className="page-layout-description">
-                {description}
-              </p>
-            )}
           </header>
         )}
 
