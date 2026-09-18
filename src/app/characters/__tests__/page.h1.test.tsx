@@ -60,8 +60,7 @@ const mockWorldWithImage = {
   id: 'world-1',
   name: 'Fantasy Realm',
   genre: 'fantasy',
-  // A world image suppresses the visible PageLayout header — the populated
-  // state that previously rendered with no page-level <h1> (#1530).
+  // A world with art gets the decorative banner above the roster.
   image: { url: 'https://example.test/world.png', type: 'ai-generated' },
 };
 
@@ -104,11 +103,13 @@ describe('CharactersPage heading hierarchy (#1530)', () => {
     const h1s = await screen.findAllByRole('heading', { level: 1 });
     expect(h1s).toHaveLength(1);
     expect(h1s[0]).toHaveTextContent('My Characters');
+    expect(h1s[0]).not.toHaveClass('sr-only');
 
-    // The world hero stays a section heading under the page heading.
+    // The banner is decorative: the world switcher already names the world,
+    // so the band carries no heading of its own.
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Fantasy Realm' })
-    ).toBeInTheDocument();
+      screen.queryByRole('heading', { name: 'Fantasy Realm' })
+    ).not.toBeInTheDocument();
   });
 
   it('renders exactly one page-level h1 in the empty no-world state', async () => {
