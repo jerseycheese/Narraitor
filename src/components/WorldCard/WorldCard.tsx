@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -22,6 +22,11 @@ const logger = new Logger('WorldCard');
 
 /** Pills shown before the rest collapse into a "+N more" roster link. */
 const MAX_CHARACTER_PILLS = 3;
+
+/** First character as the reader sees it, so an emoji isn't split in half. */
+function initialOf(name: string): string {
+  return (Array.from(name)[0] ?? '').toUpperCase();
+}
 
 interface WorldCardProps {
   /** The world data to display */
@@ -67,6 +72,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
   characters = [],
 }) => {
   const router = useRouter();
+  const titleId = useId();
 
   const handleDeleteClick = () => {
     onDelete(world.id);
@@ -122,6 +128,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       isActive={isActive}
       testId="world-card"
       className="component-world-card"
+      labelledBy={titleId}
     >
       {/* The art is a second, pointer-only way into the world. Keyboard and
           screen-reader users reach it once, through the title. */}
@@ -133,14 +140,14 @@ const WorldCard: React.FC<WorldCardProps> = ({
       >
         <Hero image={heroImage} />
         <span className="world-card-plate-initial">
-          {world.name.charAt(0).toUpperCase()}
+          {initialOf(world.name)}
         </span>
       </Link>
 
       <div className="world-card-body">
         <div className="world-card-content">
           <div className="world-card-heading">
-            <h2 className="world-card-title" data-testid="world-card-name">
+            <h2 id={titleId} className="world-card-title" data-testid="world-card-name">
               <Link href={detailHref}>{world.name}</Link>
             </h2>
             {world.genre && (
@@ -150,9 +157,11 @@ const WorldCard: React.FC<WorldCardProps> = ({
             )}
           </div>
 
-          <p className="world-card-description" data-testid="world-card-description">
-            {world.description}
-          </p>
+          {world.description && (
+            <p className="world-card-description" data-testid="world-card-description">
+              {world.description}
+            </p>
+          )}
 
           <div className="world-card-meta">
             {characters.length > 0 && (
@@ -163,18 +172,21 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     className="world-card-character-pill"
                     onClick={() => router.push(`/characters/${char.id}`)}
                     title={`View ${char.name} - Level ${char.level}`}
+                    // The visible name hides on phones, so the button carries
+                    // it in a label rather than relying on its contents.
+                    aria-label={`${char.name}, level ${char.level}`}
                   >
                     {/* Character portrait or placeholder */}
                     {char.portrait?.url ? (
                       <Image
                         src={char.portrait.url}
-                        alt={`${char.name} portrait`}
+                        alt=""
                         width={40}
                         height={40}
                       />
                     ) : (
                       <div className="world-card-character-pill-initial">
-                        <span>{char.name.charAt(0).toUpperCase()}</span>
+                        <span>{initialOf(char.name)}</span>
                       </div>
                     )}
                     <span className="world-card-character-pill-name">

@@ -15,6 +15,8 @@ export interface ActiveStateCardProps {
   testId?: string;
   /** Whether the card has an image at the top */
   hasImage?: boolean;
+  /** Id of the element that names the card, usually its title */
+  labelledBy?: string;
 }
 
 /**
@@ -41,7 +43,8 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
   inactiveClassName,
   children,
   testId = 'active-state-card',
-  hasImage = false
+  hasImage = false,
+  labelledBy,
 }) => {
   const defaultActiveClass = 'active-state-card-active';
   const defaultInactiveClass = 'active-state-card-inactive';
@@ -56,6 +59,7 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
     <article
       data-testid={testId}
       className={`active-state-card ${stateClasses} ${className}`}
+      aria-labelledby={labelledBy}
     >
       {hasImage && <div>{imageChild}</div>}
       {contentChildren}

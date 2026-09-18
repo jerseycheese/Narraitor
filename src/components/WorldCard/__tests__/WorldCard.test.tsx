@@ -84,6 +84,7 @@ describe('WorldCard', () => {
     const worldTitle = screen.getByRole('heading', { name: mockWorld.name });
     expect(within(worldTitle).getByRole('link')).toHaveAttribute('href', `/worlds/${mockWorld.id}`);
     expect(screen.getAllByRole('link', { name: mockWorld.name })).toHaveLength(1);
+    expect(screen.getByRole('article', { name: mockWorld.name })).toBeInTheDocument();
   });
 
   // New test for Play functionality (navigates to characters when no characters exist)
@@ -148,6 +149,8 @@ describe('WorldCard', () => {
 
     const characterButton = screen.getByTitle('View Aragorn - Level 5');
     expect(characterButton).toHaveClass('world-card-character-pill');
+    // The visible name hides on phones, so the accessible name can't depend on it.
+    expect(screen.getByRole('button', { name: 'Aragorn, level 5' })).toBe(characterButton);
   });
 
   test('caps character pills and links the rest to the filtered roster', () => {
