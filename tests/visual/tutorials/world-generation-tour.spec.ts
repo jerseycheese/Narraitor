@@ -31,6 +31,6 @@ test('World generation tour snapshots (steps 0-3)', async ({ page }) => {
     await waitForTooltip(page);
     await hideTourOverlay(page);
     const clip = await getVisibleTutorialClip(page);
-    await expect(page).toHaveScreenshot(`tutorial-world-generation-step${zeroPad(stepIndex)}.png`, { clip });
+    await expect.soft(page).toHaveScreenshot(`tutorial-world-generation-step${zeroPad(stepIndex)}.png`, { clip });
   }
 });
