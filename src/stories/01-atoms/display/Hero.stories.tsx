@@ -68,3 +68,23 @@ export const WithoutImage: Story = {
   },
 };
 
+/**
+ * The ink register. The art is rendered as a normalised greyscale plate and
+ * the theme supplies its two colours, so the same plate serves light and dark.
+ * Check both with the toolbar switcher.
+ *
+ * The art has to be same-origin: a cross-origin image taints the canvas, no
+ * plate can be read back, and the hero falls back to the art untreated.
+ */
+export const InkRegister: Story = {
+  args: {
+    title: 'Normandy',
+    subtitle: 'Historical',
+    image: {
+      url: '/visual-assets/worlds/normandy.webp',
+      alt: 'A hedgerow lane in Normandy',
+    },
+    register: 'ink',
+  },
+};
+

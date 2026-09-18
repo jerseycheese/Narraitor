@@ -1,11 +1,40 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import clsx from 'clsx';
 import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
+import { usePlate } from '@/hooks/usePlate';
+
+/**
+ * Which register the art renders in.
+ *
+ * `ink` is the manuscript register: a normalised greyscale plate the theme
+ * colours, screened or continuous depending on how large it is reproduced.
+ * `colour` is the art as generated.
+ *
+ * The default is `colour` only because surfaces are being converted one at a
+ * time; the register is meant to be the rule, and the default flips once every
+ * surface has moved.
+ */
+export type HeroRegister = 'ink' | 'colour';
+
+/**
+ * Measured sizes are bucketed before a plate is rendered.
+ *
+ * A plate is keyed by its display size, so reacting to every pixel of a drag
+ * would render a new one per frame and fill the cache with near-duplicates.
+ */
+const SIZE_BUCKET_PX = 32;
+
+function bucket(value: number): number {
+  return Math.max(SIZE_BUCKET_PX, Math.round(value / SIZE_BUCKET_PX) * SIZE_BUCKET_PX);
+}
 
 interface HeroProps {
   /** The title to display over the image. Omit (with no subtitle/badge) to
    * render a purely decorative banner — detail pages do this so the entity
-   * name isn't repeated below the page-level h1 (#1542). */
+   * name isn't repeated below the page-level h1. */
   title?: string;
   /** The image to display (optional) */
   image?: {
@@ -20,20 +49,16 @@ interface HeroProps {
   titleTestId?: string;
   /** Optional title element type (h1, h2, etc.) */
   titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  /** Which register the art renders in. See {@link HeroRegister}. */
+  register?: HeroRegister;
 }
 
 /**
  * Hero - Display a large hero section with image or themed background
  *
- * Creates a hero section with either an image background or a themed gradient 
- * background when no image is provided. Includes a gradient overlay containing 
+ * Creates a hero section with either an image background or a themed gradient
+ * background when no image is provided. Includes a gradient overlay containing
  * the title, optional subtitle, and badge content.
- *
- * Features:
- * - Optional responsive image display
- * - Themed background colors for different genres
- * - Gradient overlay for text readability
- * - Optional subtitle and badge support
  *
  * @param props - Hero configuration
  * @returns A hero section with overlaid content
@@ -45,11 +70,8 @@ interface HeroProps {
  *   subtitle="Fantasy Adventure"
  * />
  *
- * @example With themed background (no image)
- * <Hero
- *   title="Fantasy World"
- *   subtitle="A magical realm"
- * />
+ * @example In the ink register
+ * <Hero title="My World" image={{ url, alt }} register="ink" />
  */
 export const Hero: React.FC<HeroProps> = ({
   title,
@@ -58,24 +80,78 @@ export const Hero: React.FC<HeroProps> = ({
   badge,
   titleTestId,
   titleElement: TitleElement = 'h1',
+  register = 'colour',
 }) => {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState<{ width: number; height: number } | null>(null);
+
+  const inked = register === 'ink';
+
+  useEffect(() => {
+    if (!inked) return;
+
+    const measure = () => {
+      const frame = frameRef.current;
+      if (!frame) return;
+
+      const { width, height } = frame.getBoundingClientRect();
+      if (width <= 0 || height <= 0) return;
+
+      setBox((current) => {
+        const next = { width: bucket(width), height: bucket(height) };
+        if (current?.width === next.width && current?.height === next.height) {
+          return current;
+        }
+        return next;
+      });
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+
+    return () => window.removeEventListener('resize', measure);
+  }, [inked]);
+
+  const plate = usePlate(inked ? image?.url : undefined, {
+    width: box?.width ?? 0,
+    height: box?.height ?? 0,
+  });
+
+  // Until a plate exists the art renders as it is, so the banner is never a
+  // gap and a browser with no canvas simply keeps the original.
+  const showPlate = inked && Boolean(plate);
+  const displayed = showPlate && plate ? plate.source : image?.url;
+
+  const inkStyle =
+    showPlate && plate?.ink
+      ? ({
+          '--plate-ink': plate.ink.light,
+          '--plate-ink-dark': plate.ink.dark,
+        } as React.CSSProperties)
+      : undefined;
+
   return (
-    <div className="component-hero">
-      {image && (
+    <div
+      ref={frameRef}
+      className={clsx('component-hero', showPlate && 'component-hero-ink')}
+      style={inkStyle}
+    >
+      {image && displayed && (
         <Image
           className="component-hero-image"
-          src={image.url}
+          src={displayed}
           alt={image.alt}
           width={800}
           height={400}
 
           // Skip Next's optimization proxy for data URLs and under Playwright.
           // The on-demand optimizer cold-starts slowly on CI and leaves the
-          // banner blank past the visual-test image wait (#1346); serving the
-          // raw file keeps the banner deterministic in tests.
+          // banner blank past the visual-test image wait; serving the raw file
+          // keeps the banner deterministic in tests. A plate is always a data
+          // URL, so it never goes through the optimizer either.
           unoptimized={
             isPlaywrightEnv() ||
-            (typeof image.url === 'string' && image.url.startsWith('data:'))
+            (typeof displayed === 'string' && displayed.startsWith('data:'))
           }
         />
       )}
