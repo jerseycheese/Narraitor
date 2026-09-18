@@ -488,7 +488,6 @@
   gap: var(--space-3);
   background: var(--color-surface);
   border: none;
-  backdrop-filter: blur(6px);
 }
 
 /* Corner brackets - top-left + bottom-right L-marks, drawn in muted ink.
@@ -648,52 +647,10 @@
 
 /* ─── DS3 ─── */
 
-:root .world-list-grid {
-  gap: var(--space-4);
-}
-
-:root .component-world-card {
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  backdrop-filter: blur(6px);
-}
-
-:root .world-card-content {
-  padding: var(--space-5);
-  gap: var(--space-3);
-}
-
-:root .component-world-card footer {
-  padding: var(--space-3) var(--space-5);
-  border-top: 1px dotted var(--color-border);
-}
-
-:root .world-card-description-block p {
-  font-family: var(--font-interface);
-  font-size: var(--font-size-sm_5);
-}
-
-:root .world-card-type {
-  font-family: var(--font-system);
-  font-size: var(--font-size-2xs_5);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-:root .world-card-footer-meta time {
-  font-family: var(--font-system);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: var(--font-size-2xs_5);
-}
-
 :root .world-list-empty {
   border-radius: var(--radius-md);
   padding: var(--space-8) var(--space-6);
   background: var(--color-surface);
-  backdrop-filter: blur(6px);
 }
 
 /* The lead paragraph is the one piece of prose on a page with no worlds yet,

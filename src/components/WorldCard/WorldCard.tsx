@@ -14,6 +14,7 @@ import {
 } from '@/components/shared/cards';
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
+import { Badge } from '@/components/ui/badge';
 import { Play, Pencil, Trash, Users } from 'lucide-react';
 import Logger from '@/lib/utils/logger';
 
@@ -110,49 +111,36 @@ const WorldCard: React.FC<WorldCardProps> = ({
     }
   };
 
+  // When a world has no image, render no <img> at all and let Hero fall back to
+  // its tokenized themed background. The themed empty-state is deterministic
+  // CSS, so it stays stable under visual tests too.
+  const heroImage = world.image?.url
+    ? { url: world.image.url, alt: `${world.name} world` }
+    : undefined;
+
   return (
     <ActiveStateCard
       isActive={isActive}
       testId="world-card"
-      hasImage={true}
       className="component-world-card"
     >
-      {/* Always show Hero component - with image or themed background */}
-      <div>
-        <Link href={`/worlds/${world.id}`}>
-          {(() => {
-            // When a world has no image, render no <img> at all and let Hero
-            // fall back to its tokenized themed background (see .component-hero
-            // in app-shell.css). A previous white 1x1 placeholder rendered as a
-            // bright rectangle in dark mode (#1113). The themed empty-state is
-            // deterministic CSS, so it stays stable under visual tests too.
-            const heroImage = world.image?.url
-              ? { url: world.image.url, alt: `${world.name} world` }
-              : undefined;
-
-            return (
-              <Hero
-                title={world.name}
-                image={heroImage}
-                badge={
-                  <div className="world-card-badges">
-                    {world.genre && (
-                      <span data-testid="world-card-genre">
-                        {getGenreLabel(world.genre)}
-                      </span>
-                    )}
-                  </div>
-                }
-                titleTestId="world-card-name"
-                titleElement="h2"
-              />
-            );
-          })()}
-        </Link>
-      </div>
+      <Link href={`/worlds/${world.id}`} className="world-card-hero-link">
+        <Hero
+          title={world.name}
+          image={heroImage}
+          badge={
+            world.genre && (
+              <Badge variant="secondary" data-testid="world-card-genre">
+                {getGenreLabel(world.genre)}
+              </Badge>
+            )
+          }
+          titleTestId="world-card-name"
+          titleElement="h2"
+        />
+      </Link>
 
       <div className="world-card-body">
-        {/* Content area that grows to fill space */}
         <div className="world-card-content">
           {/* Character badges and manage link */}
           <div className="world-card-meta">
@@ -214,7 +202,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
           </div>
         </div>
 
-        {/* Footer with buttons - always at bottom */}
         <footer>
           <div className="world-card-footer-meta">
             <time data-testid="world-card-createdAt">

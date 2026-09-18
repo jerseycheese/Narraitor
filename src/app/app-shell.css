@@ -853,31 +853,6 @@
 
 /* ─── WorldCard ─── */
 
-.component-world-card {
-  display: flex;
-  flex-direction: column;
-}
-
-.component-world-card > div:first-child {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.component-world-card footer {
-  padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.component-world-card footer time {
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-}
-
 /* WorldCard character avatar pill */
 
 .world-card-character-pill {
@@ -934,29 +909,8 @@
 
 .world-list-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--space-4);
-}
-
-@media (width < 768px) {
-  .world-list-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-3);
-  }
-}
-
-.world-card-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.world-card-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  flex: 1;
 }
 
 .world-card-meta {
@@ -1017,18 +971,6 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--space-2) var(--space-3);
-}
-
-.world-card-footer-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.world-card-footer-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
 }
 
 /* Empty state */
@@ -3040,39 +2982,36 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   font-feature-settings: "tnum";
 }
 
-:root .world-list-grid {
-  grid-template-columns: 1fr;
-  gap: var(--space-1);
-}
-
-:root .component-world-card {
+.component-world-card {
   display: grid;
   grid-template-columns: 16rem 1fr auto;
   grid-template-rows: auto auto;
   column-gap: var(--space-4);
   align-items: center;
-  padding: var(--space-3) var(--space-3);
+  padding: var(--space-3);
 }
 
-/* Flatten only as far as the hero link, which becomes the media cell itself —
-   it keeps a real box so keyboard focus still has something to ring. The hero
-   inside it holds the generated art at row scale (a 144x72 corner thumbnail
-   made the image nearly invisible on the surface players browse most) and
-   keeps its themed gradient, so a world with no image isn't a hole. */
-:root .component-world-card > div:first-child,
-:root .component-world-card > div:first-child > div:first-child {
-  display: contents;
-}
-
-:root .component-world-card > div:first-child > div:first-child > a {
+/* The hero link is the media cell itself, and keeps a real box so keyboard
+   focus still has something to ring. The hero inside it holds the generated
+   art at row scale and keeps its themed gradient, so a world with no image
+   isn't a hole. The link is a wrapper, not running text, so it drops the
+   global link colour and underline, which otherwise bleed into the title. */
+.world-card-hero-link {
   grid-column: 1;
   grid-row: 1 / -1;
   display: block;
   align-self: stretch;
   min-height: 9rem;
+  color: inherit;
+  text-decoration: none;
 }
 
-:root .component-world-card .component-hero {
+.world-card-hero-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.component-world-card .component-hero {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -3084,7 +3023,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   border-radius: var(--radius-sm);
 }
 
-:root .component-world-card .component-hero-image {
+.component-world-card .component-hero-image {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -3092,10 +3031,16 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   object-fit: cover;
 }
 
+/* The hero's feather is sized for a page banner. At row scale it covers two
+   thirds of the art, and the title bar holds its contrast without it. */
+.component-world-card .component-hero::after {
+  content: none;
+}
+
 /* At row scale the hero's own themed wash is too faint to read as a panel and
    an imageless world looks like a rendering failure. Deepen it only where
    there's no art to sit under. */
-:root .component-world-card .component-hero:not(:has(.component-hero-image)) {
+.component-world-card .component-hero:not(:has(.component-hero-image)) {
   background: linear-gradient(
     135deg,
     color-mix(in oklab, var(--color-accent) 22%, var(--color-surface)) 0%,
@@ -3103,9 +3048,10 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   );
 }
 
-/* Title rides the art on the hero's own solid bar, so contrast holds whatever
-   the generator produced. */
-:root .component-world-card .component-hero-overlay {
+/* Title rides the art on the hero's own bar, so contrast holds whatever the
+   generator produced. Scoped through the hero so it also outranks the base
+   rule that clears the bar on an imageless hero. */
+.component-world-card .component-hero .component-hero-overlay {
   position: relative;
   z-index: 2;
   box-sizing: border-box;
@@ -3115,61 +3061,68 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   background: var(--color-surface);
 }
 
-:root .component-world-card .component-hero-content {
+.component-world-card .component-hero-content {
   background: transparent;
   padding: 0;
   margin: 0;
 }
 
-:root .component-world-card > div:first-child > div:first-child > a:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: -2px;
-}
-
-:root .component-world-card .component-hero-title {
+/* One step above the description, so the world's name leads the row. */
+.component-world-card .component-hero-title {
   font-family: var(--font-interface);
-  font-size: var(--font-size-sm_5);
+  font-size: var(--font-size-md);
   font-weight: 600;
 
   /* Long unbroken names break instead of bleeding into the next column */
   overflow-wrap: break-word;
 }
 
-:root .world-card-badges {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-:root .component-world-card .world-card-body {
+.component-world-card .world-card-body,
+.component-world-card footer {
   display: contents;
 }
 
-:root .component-world-card .world-card-content {
+.world-card-content {
   grid-column: 2;
   grid-row: 1;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
-:root .component-world-card footer {
-  display: contents;
+.world-card-type {
+  font-family: var(--font-system);
+  font-size: var(--font-size-2xs_5);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
-:root .world-card-footer-meta {
+.world-card-footer-meta {
   grid-column: 2;
   grid-row: 2;
-  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-family: var(--font-system);
   font-size: var(--font-size-2xs_5);
   letter-spacing: 0.08em;
   color: var(--color-text-muted);
-  border-top: 0;
 }
 
-:root .world-card-footer-actions {
+.world-card-footer-meta time {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.world-card-footer-actions {
   grid-column: 3;
   grid-row: 1 / span 2;
   align-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 /* DS3 character list — dense row */
@@ -3274,23 +3227,23 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   /* A side-by-side image panel and text column don't both fit on a phone, so
      the hero takes the full width as a band and everything else stacks under
      it. Keeps the art large rather than shrinking it back to a strip. */
-  :root .component-world-card {
+  .component-world-card {
     grid-template-columns: 1fr;
   }
 
-  :root .component-world-card > div:first-child > div:first-child > a {
+  .world-card-hero-link {
     grid-column: 1 / -1;
     grid-row: 1;
     min-height: 8rem;
   }
 
-  :root .component-world-card .world-card-content {
+  .world-card-content {
     grid-column: 1 / -1;
     grid-row: 2;
     padding-top: var(--space-2);
   }
 
-  :root .world-card-footer-meta {
+  .world-card-footer-meta {
     grid-column: 1 / -1;
     grid-row: 3;
   }

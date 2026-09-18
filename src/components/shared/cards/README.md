@@ -7,7 +7,7 @@ The pieces the worlds and characters list cards are built from. `WorldCard` and 
 The card wrapper. It only styles the state: an accent border and a faint wash when active. It isn't clickable, so nothing inside it needs to stop propagation.
 
 ```tsx
-<ActiveStateCard isActive={isActive} hasImage className="component-world-card">
+<ActiveStateCard isActive={isActive} hasImage className="component-example-card">
   <CardImage />
   <CardContent />
 </ActiveStateCard>
