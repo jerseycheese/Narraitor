@@ -112,11 +112,10 @@ const WorldCard: React.FC<WorldCardProps> = ({
   };
 
   // When a world has no image, render no <img> at all and let Hero fall back to
-  // its tokenized themed background. The themed empty-state is deterministic
-  // CSS, so it stays stable under visual tests too.
-  const heroImage = world.image?.url
-    ? { url: world.image.url, alt: `${world.name} world` }
-    : undefined;
+  // its themed empty state. The alt is empty because the art link is hidden
+  // from assistive tech; the title link carries the name.
+  const heroImage = world.image?.url ? { url: world.image.url, alt: '' } : undefined;
+  const detailHref = `/worlds/${world.id}`;
 
   return (
     <ActiveStateCard
@@ -124,25 +123,37 @@ const WorldCard: React.FC<WorldCardProps> = ({
       testId="world-card"
       className="component-world-card"
     >
-      <Link href={`/worlds/${world.id}`} className="world-card-hero-link">
-        <Hero
-          title={world.name}
-          image={heroImage}
-          badge={
-            world.genre && (
-              <Badge variant="secondary" data-testid="world-card-genre">
-                {getGenreLabel(world.genre)}
-              </Badge>
-            )
-          }
-          titleTestId="world-card-name"
-          titleElement="h2"
-        />
+      {/* The art is a second, pointer-only way into the world. Keyboard and
+          screen-reader users reach it once, through the title. */}
+      <Link
+        href={detailHref}
+        className="world-card-hero-link"
+        tabIndex={-1}
+        aria-hidden="true"
+      >
+        <Hero image={heroImage} />
+        <span className="world-card-plate-initial">
+          {world.name.charAt(0).toUpperCase()}
+        </span>
       </Link>
 
       <div className="world-card-body">
         <div className="world-card-content">
-          {/* Character badges and manage link */}
+          <div className="world-card-heading">
+            <h2 className="world-card-title" data-testid="world-card-name">
+              <Link href={detailHref}>{world.name}</Link>
+            </h2>
+            {world.genre && (
+              <Badge variant="secondary" data-testid="world-card-genre">
+                {getGenreLabel(world.genre)}
+              </Badge>
+            )}
+          </div>
+
+          <p className="world-card-description" data-testid="world-card-description">
+            {world.description}
+          </p>
+
           <div className="world-card-meta">
             {characters.length > 0 && (
               <div className="world-card-character-pills">
@@ -184,21 +195,16 @@ const WorldCard: React.FC<WorldCardProps> = ({
             )}
           </div>
 
-          <div className="world-card-description-block">
-            <p data-testid="world-card-description">{world.description}</p>
-
-            {/* World type badge */}
-            <div className="world-card-type-badge">
-              <span className="world-card-type" data-testid="world-card-type">
-                {world.reference
-                  ? `${world.relationship === 'set_within' ? 'Set in' : 'Inspired by'} ${world.reference}`
-                  : 'Original World'}
-              </span>
-              <ActiveStateLabel
-                isActive={isActive}
-                testId="world-card-active-label"
-              />
-            </div>
+          <div className="world-card-type-badge">
+            <span className="world-card-type" data-testid="world-card-type">
+              {world.reference
+                ? `${world.relationship === 'set_within' ? 'Set in' : 'Inspired by'} ${world.reference}`
+                : 'Original World'}
+            </span>
+            <ActiveStateLabel
+              isActive={isActive}
+              testId="world-card-active-label"
+            />
           </div>
         </div>
 

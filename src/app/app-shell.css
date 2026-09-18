@@ -948,13 +948,7 @@
   }
 }
 
-.world-card-description-block {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.world-card-description-block p {
+.world-card-description {
   color: var(--color-text-secondary);
   font-family: var(--font-interface);
   font-size: var(--font-size-sm_5);
@@ -2991,24 +2985,15 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   padding: var(--space-3);
 }
 
-/* The hero link is the media cell itself, and keeps a real box so keyboard
-   focus still has something to ring. The hero inside it holds the generated
-   art at row scale and keeps its themed gradient, so a world with no image
-   isn't a hole. The link is a wrapper, not running text, so it drops the
-   global link colour and underline, which otherwise bleed into the title. */
+/* The art cell is all plate: the name lives in the content column, so no
+   title bar covers the art. */
 .world-card-hero-link {
+  position: relative;
   grid-column: 1;
   grid-row: 1 / -1;
   display: block;
   align-self: stretch;
   min-height: 9rem;
-  color: inherit;
-  text-decoration: none;
-}
-
-.world-card-hero-link:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: -2px;
 }
 
 .component-world-card .component-hero {
@@ -3037,44 +3022,54 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   content: none;
 }
 
-/* At row scale the hero's own themed wash is too faint to read as a panel and
-   an imageless world looks like a rendering failure. Deepen it only where
-   there's no art to sit under. */
+/* A world with no art is an unprinted plate, not a failed load: a canvas cell
+   with trim marks and the name's initial as a drop cap. A gradient here read
+   as a broken image. The cell has no border of its own, so the corner
+   brackets are allowed. */
 .component-world-card .component-hero:not(:has(.component-hero-image)) {
-  background: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--color-accent) 22%, var(--color-surface)) 0%,
-    var(--color-surface) 100%
-  );
+  background: var(--color-canvas);
 }
 
-/* Title rides the art on the hero's own bar, so contrast holds whatever the
-   generator produced. Scoped through the hero so it also outranks the base
-   rule that clears the bar on an imageless hero. */
-.component-world-card .component-hero .component-hero-overlay {
-  position: relative;
-  z-index: 2;
-  box-sizing: border-box;
-  width: 100%;
-  margin: 0;
-  padding: var(--space-2);
-  background: var(--color-surface);
+.component-world-card .component-hero:not(:has(.component-hero-image))::before,
+.component-world-card .component-hero:not(:has(.component-hero-image))::after {
+  content: "";
+  position: absolute;
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border: 0 solid var(--color-text-muted);
+  pointer-events: none;
 }
 
-.component-world-card .component-hero-content {
-  background: transparent;
-  padding: 0;
-  margin: 0;
+.component-world-card .component-hero:not(:has(.component-hero-image))::before {
+  top: var(--space-2);
+  left: var(--space-2);
+  border-top-width: 1px;
+  border-left-width: 1px;
 }
 
-/* One step above the description, so the world's name leads the row. */
-.component-world-card .component-hero-title {
-  font-family: var(--font-interface);
-  font-size: var(--font-size-md);
-  font-weight: 600;
+.component-world-card .component-hero:not(:has(.component-hero-image))::after {
+  right: var(--space-2);
+  bottom: var(--space-2);
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
 
-  /* Long unbroken names break instead of bleeding into the next column */
-  overflow-wrap: break-word;
+.world-card-plate-initial {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-narrative);
+  font-size: var(--font-size-3xl);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+/* The plate prints over it once art arrives. */
+.world-card-hero-link:has(.component-hero-image) .world-card-plate-initial {
+  display: none;
 }
 
 .component-world-card .world-card-body,
@@ -3087,7 +3082,45 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   grid-row: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
+}
+
+.world-card-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
+/* One step above the description, so the world's name leads the row. */
+.world-card-title {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+
+  /* Long unbroken names break instead of bleeding into the next column */
+  overflow-wrap: anywhere;
+}
+
+/* The name is the card's one way into the world for keyboard and screen
+   readers, so it reads as a title first and shows it's a link on hover. */
+.world-card-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.world-card-title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.world-card-title a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .world-card-type {

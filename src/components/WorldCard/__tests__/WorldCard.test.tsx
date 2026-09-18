@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import WorldCard from '../WorldCard';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { formatDate } from '@/lib/utils';
@@ -79,13 +79,11 @@ describe('WorldCard', () => {
   test('world name links to world detail page', () => {
     render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
     
-    // World name should be accessible as a heading and the hero link should navigate to detail page
+    // The name is the card's one accessible link into the world; the art link
+    // beside it is hidden from assistive tech so the name isn't read twice.
     const worldTitle = screen.getByRole('heading', { name: mockWorld.name });
-    expect(worldTitle).toBeInTheDocument();
-    
-    // The hero link should navigate to the world detail page
-    const heroLink = worldTitle.closest('a');
-    expect(heroLink).toHaveAttribute('href', `/worlds/${mockWorld.id}`);
+    expect(within(worldTitle).getByRole('link')).toHaveAttribute('href', `/worlds/${mockWorld.id}`);
+    expect(screen.getAllByRole('link', { name: mockWorld.name })).toHaveLength(1);
   });
 
   // New test for Play functionality (navigates to characters when no characters exist)
