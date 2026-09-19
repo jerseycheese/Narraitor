@@ -1462,6 +1462,18 @@
   margin-bottom: var(--space-4);
 }
 
+/* The ghost button's own padding pushed the arrow off the page gutter. */
+:root .character-detail-back button {
+  padding-inline-start: 0;
+}
+
+/* Delete is a quiet text action here, as it is on the list cards, so it
+   stops competing with Play for weight and no longer fills the row. */
+:root .character-detail-masthead .button-destructive-outline {
+  flex: 0 0 auto;
+  border-color: transparent;
+}
+
 .character-detail-body {
   display: flex;
   flex-direction: column;
@@ -2221,6 +2233,7 @@
   overflow: hidden;
   min-height: 5.5rem;
   margin-bottom: var(--space-4);
+  padding-top: var(--space-3);
   padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--color-border);
 }
@@ -2228,6 +2241,7 @@
 :root .world-detail-masthead {
   min-height: 6.5rem;
   margin-bottom: var(--space-4);
+  padding-top: var(--space-3);
   padding-bottom: var(--space-3);
 }
 

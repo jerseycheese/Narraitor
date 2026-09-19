@@ -118,7 +118,7 @@ export default function CharacterViewPage() {
     <PageLayout
       title={character.name}
       kicker={worldKicker}
-      description={`${character.level ? `Level ${character.level} • ` : ''}${world.name}${world.genre ? ` • ${getGenreLabel(world.genre)}` : ''}`}
+      description={character.level ? `Level ${character.level}` : undefined}
       actions={
         <ActionButtonGroup 
           actions={actionButtons.map(btn => ({
@@ -137,7 +137,7 @@ export default function CharacterViewPage() {
       </div>
 
       <div className="character-detail-body">
-        <CharacterHeader character={character} world={world} />
+        <CharacterHeader character={character} />
         <CharacterDetailsDisplay character={character} world={world} />
       </div>
 
