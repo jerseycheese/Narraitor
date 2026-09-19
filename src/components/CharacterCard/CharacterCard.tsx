@@ -14,15 +14,6 @@ import {
 import { Play, Pencil, Trash } from 'lucide-react';
 import { truncate, safeTrim, formatDate } from '@/lib/utils';
 
-interface CharacterContextSummary {
-  recentEvent?: string;
-  relationships?: Array<{
-    characterId: string;
-    characterName: string;
-    portraitUrl?: string | null;
-  }>;
-}
-
 interface CharacterCardProps {
   /** The character data to display */
   character: StoreCharacter;
@@ -36,8 +27,6 @@ interface CharacterCardProps {
   onEdit: () => void;
   /** Callback when user wants to delete this character */
   onDelete: () => void;
-  /** Optional context describing the character's ongoing storyline */
-  context?: CharacterContextSummary;
 }
 
 /** First character as the reader sees it, so an emoji isn't split in half. */

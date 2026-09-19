@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Plus, Sparkles, Globe } from 'lucide-react';
 import Link from 'next/link';
@@ -53,15 +53,6 @@ const GenerateCharacterDialog = dynamic(
 type CharacterPortraitUpdate = {
   portrait: GeneratedImage;
 };
-
-interface CharacterContext {
-  recentEvent?: string;
-  relationships: Array<{
-    characterId: string;
-    characterName: string;
-    portraitUrl?: string | null;
-  }>;
-}
 
 function transformGeneratedAttributes(
   generatedData: GeneratedCharacterData,
@@ -142,7 +133,7 @@ export default function CharactersPage() {
     createCharacter,
     updateCharacter,
   } = useCharacterStore();
-  const { worlds, currentWorldId, worldStates } = useWorldStore();
+  const { worlds, currentWorldId } = useWorldStore();
   const currentSessionId = useSessionStore((state) => state.id);
   const { getSessionSegments } = useNarrativeStore();
   const toast = useToast();
@@ -191,58 +182,6 @@ export default function CharactersPage() {
   const worldCharacters = (Object.values(characters) as StoreCharacter[]).filter(
     (char) => char.worldId === effectiveWorldId
   );
-  const worldState = effectiveWorldId
-    ? worldStates?.[effectiveWorldId]
-    : undefined;
-
-  const characterContextById = useMemo(() => {
-    if (!worldState) {
-      return {} as Record<string, CharacterContext>;
-    }
-
-    const relationshipByCharacter = worldState.characterRelationships ?? {};
-
-    return worldCharacters.reduce(
-      (acc, character) => {
-        const relationshipEntries = relationshipByCharacter[character.id] ?? {};
-
-        const relationships = Object.entries(relationshipEntries)
-          .filter(
-            ([otherId]) =>
-              otherId !== character.id && Boolean(characters[otherId])
-          )
-          .sort(([, a], [, b]) =>
-            b.lastInteraction.localeCompare(a.lastInteraction)
-          )
-          .slice(0, 2)
-          .map(([otherId]) => {
-            const relatedCharacter = characters[otherId];
-            return {
-              characterId: otherId,
-              characterName: relatedCharacter?.name ?? 'Unknown',
-              portraitUrl: relatedCharacter?.portrait?.url ?? null,
-            };
-          });
-
-        const characterEvents = (worldState.majorEvents ?? [])
-          .filter((event) => event.characterId === character.id)
-          .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-
-        const recentEvent =
-          characterEvents.length > 0
-            ? characterEvents[0].description
-            : undefined;
-
-        acc[character.id] = {
-          recentEvent,
-          relationships,
-        };
-
-        return acc;
-      },
-      {} as Record<string, CharacterContext>
-    );
-  }, [worldState, worldCharacters, characters]);
 
   const currentProgress = currentSessionId
     ? getSessionSegments(currentSessionId).length
@@ -580,7 +519,6 @@ export default function CharactersPage() {
                 onPlay={() => handleCharacterPlay(character.id)}
                 onEdit={() => handleEditCharacter(character.id)}
                 onDelete={() => handleDeleteCharacter(character.id)}
-                context={characterContextById[character.id]}
               />
             ))}
           </div>
