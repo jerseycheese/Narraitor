@@ -224,14 +224,9 @@ export class NarrativeGenerator {
         const previousSegments =
           request.narrativeContext?.previousSegments || [];
         const previousSegment = previousSegments[previousSegments.length - 1];
-        const templateType =
-          request.generationParameters?.segmentType === 'transition'
-            ? 'transition'
-            : 'scene';
-
         const debugInfoContext: DebugInfoContext = {
           fullPrompt: finalPrompt,
-          templateName: this.getTemplateName(templateType),
+          templateName: this.getTemplateName('scene'),
           world,
           toneSettings,
           loreContext,

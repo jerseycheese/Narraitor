@@ -622,10 +622,12 @@ async function commitAndSettleGeneratedTurn({
 
   syncNpcMetadata(worldId, result.metadata.characters);
 
-  try {
-    checkAndRecordLoreMentions(worldId, sessionId, result.content ?? '', 'narrative');
-  } catch (error) {
-    logger.warn('Failed to record lore mentions:', error);
+  if (!isFirstSegment) {
+    try {
+      checkAndRecordLoreMentions(worldId, sessionId, result.content ?? '', 'narrative');
+    } catch (error) {
+      logger.warn('Failed to record lore mentions:', error);
+    }
   }
 
   if (isFeatureEnabled('SETTLED_COMMITMENT_CHOICES')) {

@@ -306,7 +306,7 @@ describe('NarrativeGenerator', () => {
       expect(result.metadata.debugInfo?.rawResponse).toBe(mockAIResponse.content);
     });
 
-    it('attaches transition template name to debug info when segmentType is transition', async () => {
+    it('labels debug info with Scene Template even when segmentType is transition because scene template is invoked', async () => {
       (isDebugInfoEnabled as jest.Mock).mockReturnValue(true);
 
       mockGeminiClient.generateContent.mockResolvedValue({
@@ -323,7 +323,7 @@ describe('NarrativeGenerator', () => {
 
       const result = await narrativeGenerator.generateSegment(request);
 
-      expect(result.metadata.debugInfo?.templateName).toBe('Transition Template');
+      expect(result.metadata.debugInfo?.templateName).toBe('Scene Template');
     });
   });
 

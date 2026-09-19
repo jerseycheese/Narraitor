@@ -783,6 +783,23 @@ describe('TurnResolver', () => {
       );
     });
 
+    it('does not record lore mentions on initial turn to prevent duplicate recording', async () => {
+      const generator = makeMockGenerator(
+        makeGenerationResult({ content: 'Opening scene content.' })
+      );
+      await resolveInitialTurn(
+        {
+          sessionId: 'session-1',
+          worldId: 'world-1',
+          characterId: 'char-1',
+          generateChoices: true,
+        },
+        generator
+      );
+
+      expect(checkAndRecordLoreMentions).not.toHaveBeenCalled();
+    });
+
     it('fails open if checkAndRecordLoreMentions throws without marking turn partial', async () => {
       (checkAndRecordLoreMentions as jest.Mock).mockImplementationOnce(() => {
         throw new Error('Lore mention tracking failed');
