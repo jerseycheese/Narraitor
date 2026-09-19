@@ -130,7 +130,7 @@ const WorldListScreen: React.FC = () => {
   }
 
   return (
-    <main className="worlds-screen">
+    <div className="worlds-screen">
       {worlds.length > 0 && (
         <div className="worlds-toolbar">
           <WorldViewToggle mode={viewMode} onModeChange={handleViewModeChange} />
@@ -156,7 +156,7 @@ const WorldListScreen: React.FC = () => {
         description={deleteMessage}
         itemName={worldToDelete?.name || 'this world'}
       />
-    </main>
+    </div>
   );
 };
 
