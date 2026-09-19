@@ -196,7 +196,7 @@ describe('DashboardHome', () => {
       const { container } = render(<DashboardHome />);
 
       expect(
-        screen.getByRole('button', { name: /continue last game/i })
+        screen.getByRole('button', { name: /continue last session/i })
       ).toHaveClass('button-default');
       expect(container.querySelectorAll('.button-default')).toHaveLength(1);
     });
