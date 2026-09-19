@@ -175,13 +175,15 @@ describe('WorldListScreen integration (#347)', () => {
   });
 
   // AC: Tests verify accessibility in the integrated context
-  it('exposes a main landmark and an accessible name for every world card action, across the real subtree', () => {
+  it('exposes an accessible name for every world card action across the real subtree without declaring its own main landmark', () => {
     useWorldStore.getState().createWorld(worldData());
     useWorldStore.getState().createWorld(worldData({ name: 'Neon City' }));
 
-    render(<WorldListScreen />);
+    const { container } = render(<WorldListScreen />);
 
-    expect(screen.getByRole('main')).toBeInTheDocument();
+    expect(container.firstElementChild?.tagName.toLowerCase()).toBe('div');
+    expect(container.firstElementChild).toHaveClass('worlds-screen');
+    expect(screen.queryByRole('main')).not.toBeInTheDocument();
 
     const buttons = screen.getAllByRole('button');
     expect(buttons.length).toBeGreaterThan(0);
@@ -194,5 +196,19 @@ describe('WorldListScreen integration (#347)', () => {
     links.forEach((link) => {
       expect(link).toHaveAccessibleName();
     });
+  });
+
+  it('preserves a single main landmark when rendered inside an app shell (#2128)', () => {
+    useWorldStore.getState().createWorld(worldData());
+
+    render(
+      <main id="main-content" className="app-surface-main">
+        <WorldListScreen />
+      </main>
+    );
+
+    const mains = screen.getAllByRole('main');
+    expect(mains).toHaveLength(1);
+    expect(mains[0]).toHaveAttribute('id', 'main-content');
   });
 });

@@ -4,6 +4,13 @@ import userEvent from '@testing-library/user-event';
 import type { World } from '../../../types/world.types';
 import { UserFriendlyError } from '@/lib/utils/errorUtils';
 
+const testSettings = {
+  maxAttributes: 10,
+  maxSkills: 10,
+  attributePointPool: 100,
+  skillPointPool: 100,
+};
+
 // Create mock functions at the module level
 const mockFetchWorlds = jest.fn();
 const mockSetCurrentWorld = jest.fn();
@@ -130,10 +137,6 @@ jest.mock('../../../state/worldStore', () => {
   };
 });
 
-// Define type for worldStore function
-
-
-// Import after mocks are set up
 import WorldListScreen from '../WorldListScreen';
 
 describe('WorldListScreen', () => {
@@ -177,7 +180,13 @@ describe('WorldListScreen', () => {
     expect(screen.getByText('No worlds created yet.')).toBeInTheDocument();
   });
   
-  // Removed the problematic loading and error tests since the implementation doesn't match expectations
+  test('renders root element as a div with worlds-screen class, not a main landmark', () => {
+    const { container } = render(<WorldListScreen />);
+    const root = container.firstElementChild;
+    expect(root?.tagName.toLowerCase()).toBe('div');
+    expect(root).toHaveClass('worlds-screen');
+    expect(screen.queryByRole('main')).not.toBeInTheDocument();
+  });
 
   test('renders WorldList when worlds are available', () => {
     const mockWorlds: Record<string, World> = {
@@ -188,12 +197,7 @@ describe('WorldListScreen', () => {
         genre: 'fantasy',
         attributes: [],
         skills: [],
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 100,
-          skillPointPool: 100,
-        },
+        settings: testSettings,
         createdAt: '2023-01-01T10:00:00Z',
         updatedAt: '2023-01-01T10:00:00Z',
       },
@@ -204,12 +208,7 @@ describe('WorldListScreen', () => {
         genre: 'fantasy',
         attributes: [],
         skills: [],
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 100,
-          skillPointPool: 100,
-        },
+        settings: testSettings,
         createdAt: '2023-01-01T10:00:00Z',
         updatedAt: '2023-01-01T10:00:00Z',
       },
@@ -252,12 +251,7 @@ describe('WorldListScreen', () => {
         genre: 'fantasy',
         attributes: [],
         skills: [],
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 100,
-          skillPointPool: 100,
-        },
+        settings: testSettings,
         createdAt: '2023-01-01T10:00:00Z',
         updatedAt: '2023-01-01T10:00:00Z',
       },
