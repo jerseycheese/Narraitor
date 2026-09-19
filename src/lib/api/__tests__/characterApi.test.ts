@@ -4,6 +4,7 @@ jest.mock('@/lib/ai/aiFetch', () => ({
 
 import { characterApi } from '../characterApi';
 import { aiFetch } from '@/lib/ai/aiFetch';
+import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 
 const mockAiFetch = aiFetch as jest.MockedFunction<typeof aiFetch>;
 
@@ -55,5 +56,27 @@ describe('characterApi.generateCharacter', () => {
     await expect(
       characterApi.generateCharacter({ characterType: 'known', existingNames: [] })
     ).rejects.toThrow('Failed to generate character');
+  });
+
+  it('omits world.image from the request payload to avoid exceeding body limits', async () => {
+    mockAiFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ name: 'Hero' }),
+    } as unknown as Response);
+
+    await characterApi.generateCharacter({
+      characterType: 'original',
+      existingNames: [],
+      world: createMockWorld({
+        name: 'Fantasy World',
+        image: { url: 'data:image/png;base64,hugeImageData...', type: 'ai-generated' },
+      }),
+    });
+
+    const [, init] = mockAiFetch.mock.calls[0];
+    const body = JSON.parse(init?.body as string);
+    expect(body.world).toBeDefined();
+    expect(body.world.image).toBeUndefined();
+    expect(body.world.name).toBe('Fantasy World');
   });
 });

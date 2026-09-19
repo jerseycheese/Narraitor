@@ -245,6 +245,7 @@ Rules that hold across both surfaces:
 - **Prose caps at `70ch`.** Tables, grids, and cards use the full column; paragraphs don't stretch with them.
 - **One contextual CTA, suppressed where the page owns the action.** A screen that already has a Play button doesn't get a second one in the header.
 - **Breadcrumbs are for nested product routes.** The whole brand register is breadcrumb-free, and `/dashboard`, `/worlds`, `/characters` and `/settings` are top-level destinations that suppress them too.
+- **`/characters` carries its world's art as an inked vignette behind the page header**, not as a boxed hero card in the content column. The header's world switcher already names the world, so the masthead holds only the page title and count. The detail pages keep their hero cards for now.
 - Canon is the `04-Templates/layouts/AppShell` story, which shows the four header states side by side.
 
 This collapsed a three-surface split (#1655). The retired third surface — a 288px "workshop" rail on `/worlds*`, `/characters*`, and `/settings*` — existed so three design systems could feel like three products; ADR-013 deleted two of them. It reverses [#1432](https://github.com/jerseycheese/Narraitor/issues/1432) F7, which kept the rail on differentiation grounds that no longer apply, and supersedes the archived Workshop layout pattern in `public_docs/design-system/archive/redesign-planning/design-system.html`.
@@ -288,7 +289,7 @@ The family is one mark, a perforated dotted rule in `--color-text-muted` drawn o
 | Perforated dotted rule | `radial-gradient` dots at `12px 4px` | Drawn once under each approved section heading across the content column |
 | Corner bracket | L-shaped mark(s) in muted ink | Permitted only on cards or cells with no border of their own |
 
-Corner brackets are the narrow exception. On bordered cards with a radius, a square corner bracket sits on the curve and reads as a rendering glitch. On borderless surfaces - the dashboard cards (`.component-dashboard-*-card`), the About step cards (`.component-about-step`), and borderless detail cells (`.world-detail-npc`, `.character-detail-derived-stat`, etc.) - corner brackets read as deliberate trim marks framing the content.
+Corner brackets are the narrow exception. On bordered cards with a radius, a square corner bracket sits on the curve and reads as a rendering glitch. On borderless surfaces - the dashboard cards (`.component-dashboard-*-card`), the About step cards (`.component-about-step`), borderless detail cells (`.world-detail-npc`, `.character-detail-derived-stat`, etc.), a world card's empty art cell (an unprinted plate), and a character card's empty portrait cell - corner brackets read as deliberate trim marks framing the content.
 
 Data eyebrows are compact data labels (above or beside genuine data values, never headings) rather than decorative marks. Functional UI like the wizard's dotted step connectors (`.wizard-progress-connector`) indicates progress and sits outside the decorative drafting-mark family.
 

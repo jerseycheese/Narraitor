@@ -12,7 +12,7 @@
  */
 import { deriveWorldInk, type WorldInk } from './ink';
 import { halftone } from './screen';
-import { normaliseTone, toLuminance } from './tone';
+import { isFlat, normaliseTone, toLuminance } from './tone';
 
 /**
  * Screen pitch, in CSS pixels of the final display size.
@@ -114,6 +114,10 @@ function loadImage(source: string): Promise<HTMLImageElement | null> {
  * browser cannot decode the source, so callers fall back to the art itself
  * rather than showing a gap — the same shape `downscalePortraitDataUrl` uses.
  *
+ * Returns `'blank'` when the art decodes but carries no tonal range. That is a
+ * different answer from null: there is no art worth showing, so callers skip
+ * it and show their empty state instead of a solid slab.
+ *
  * The ink is read from the same decode, but from the whole art rather than the
  * cropped plate, so every surface showing a world agrees on its ink.
  *
@@ -123,7 +127,7 @@ function loadImage(source: string): Promise<HTMLImageElement | null> {
 export async function toPlate(
   source: string,
   { width, height, dpr = 2 }: PlateBox
-): Promise<Plate | null> {
+): Promise<Plate | 'blank' | null> {
   if (!source || width <= 0 || height <= 0) return null;
 
   const canvas = document.createElement('canvas');
@@ -171,10 +175,13 @@ export async function toPlate(
     return null;
   }
 
+  const luminance = toLuminance(pixels.data);
+  if (isFlat(luminance)) return 'blank';
+
   const ink = sampleInk(image);
 
   const screened = shouldScreen(width, height);
-  const tone = normaliseTone(toLuminance(pixels.data), {
+  const tone = normaliseTone(luminance, {
     gain: screened ? SCREENED_GAIN : CONTINUOUS_GAIN,
   });
 

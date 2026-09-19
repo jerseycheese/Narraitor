@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 // Use the store's Character type since it's more complete
 import { useCharacterStore } from '@/state/characterStore';
 
@@ -6,35 +6,19 @@ type StoreCharacter = ReturnType<
   typeof useCharacterStore.getState
 >['characters'][string];
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
-import { Badge } from '@/components/ui/badge';
 import {
-  Plus,
-  Star,
-  CheckCircle,
-  Play,
-  Eye,
-  Pencil,
-  Trash,
-} from 'lucide-react';
-import { truncate, safeTrim } from '@/lib/utils';
-
-interface CharacterContextSummary {
-  recentEvent?: string;
-  relationships?: Array<{
-    characterId: string;
-    characterName: string;
-    portraitUrl?: string | null;
-  }>;
-}
+  ActiveStateCard,
+  ActiveStateLabel,
+  CardActionGroup,
+} from '@/components/shared/cards';
+import { Play, Pencil, Trash } from 'lucide-react';
+import { truncate, safeTrim, formatDate } from '@/lib/utils';
 
 interface CharacterCardProps {
   /** The character data to display */
   character: StoreCharacter;
   /** Whether this character is currently active */
   isActive: boolean;
-  /** Callback when user wants to make this character active */
-  onMakeActive: () => void;
   /** Callback when user wants to view character details */
   onView: () => void;
   /** Callback when user wants to play with this character */
@@ -43,196 +27,168 @@ interface CharacterCardProps {
   onEdit: () => void;
   /** Callback when user wants to delete this character */
   onDelete: () => void;
-  /** Optional context describing the character's ongoing storyline */
-  context?: CharacterContextSummary;
+}
+
+/** First character as the reader sees it, so an emoji isn't split in half. */
+function initialOf(name: string): string {
+  return (Array.from(name)[0] ?? '').toUpperCase();
+}
+
+function getCharacterDescription(character: StoreCharacter): string {
+  const text = (character?.background?.history ||
+    character?.background?.personality ||
+    character?.description ||
+    '') as string;
+  const trimmedText = safeTrim(text);
+  if (!trimmedText) return '';
+  const sentences = trimmedText.split(/[.!?]+/);
+  let result = '';
+  for (const sentence of sentences) {
+    const trimmed = safeTrim(sentence);
+    if (!trimmed) continue;
+    if ((result + trimmed + '.').length > 280) break;
+    result += (result ? ' ' : '') + trimmed + '.';
+  }
+  return result || truncate(trimmedText, 280);
 }
 
 /**
  * CharacterCard - Display card for a character with actions
  *
  * Shows character information including portrait, name, level, type badges,
- * and description. Provides action buttons for viewing, playing, editing,
- * and deleting the character. Active characters get special styling.
- *
- * @param props - Character card configuration and event handlers
- * @returns A formatted character card with portrait and action buttons
- *
- * @example Basic usage
- * <CharacterCard
- *   character={character}
- *   isActive={character.id === currentCharacterId}
- *   onMakeActive={() => setActiveCharacter(character.id)}
- *   onView={() => router.push(`/characters/${character.id}`)}
- *   onPlay={() => startGame(character)}
- *   onEdit={() => router.push(`/characters/${character.id}/edit`)}
- *   onDelete={() => deleteCharacter(character.id)}
- * />
+ * and description. The name opens the character; Play, Edit and Delete sit in
+ * the footer. The active character is marked, not selected here: Play sets it.
  */
 export function CharacterCard({
   character,
   isActive,
-  onMakeActive,
   onView,
   onPlay,
   onEdit,
   onDelete,
-  context,
 }: CharacterCardProps) {
+  const titleId = useId();
+  const description = getCharacterDescription(character);
+  const timestamp = character.updatedAt || character.createdAt;
+
   return (
     <ActiveStateCard
       isActive={isActive}
-      activeText="Currently Active Character"
+      testId="character-card"
       className="component-character-card"
+      labelledBy={titleId}
     >
+      <div
+        className="character-card-portrait"
+        data-testid="character-portrait"
+        onClick={onView}
+        tabIndex={-1}
+        aria-hidden="true"
+      >
+        {character.portrait?.url ? (
+          <CharacterPortrait
+            portrait={character.portrait}
+            characterName={character.name}
+            size="large"
+          />
+        ) : (
+          <span className="character-card-plate-initial">
+            {initialOf(character.name)}
+          </span>
+        )}
+      </div>
+
       <div className="character-card-body">
-        <div className="character-card-inner">
-          <div
-            className="character-card-portrait"
-            onClick={(e) => {
-              e.stopPropagation();
-              onView();
-            }}
-          >
-            <CharacterPortrait
-              portrait={
-                character.portrait || { type: 'placeholder', url: null }
-              }
-              characterName={character.name}
-              size="large"
-            />
-          </div>
-          <h3
-            className="character-card-name"
-            onClick={(e) => {
-              e.stopPropagation();
-              onView();
-            }}
-          >
-            {character.name}
-          </h3>
-          <div className="character-card-meta">
-            <span className="character-card-level">Level {character.level || 1}</span>
-            {character?.background?.isKnownFigure !== undefined && (
-              <Badge
-                icon={
-                  character?.background?.isKnownFigure ? (
-                    <Star aria-hidden="true" />
-                  ) : (
-                    <Plus aria-hidden="true" />
-                  )
-                }
-                variant={
-                  character?.background?.isKnownFigure
-                    ? 'warning-static'
-                    : 'default-static'
-                }
+        <div className="character-card-content">
+          <div className="character-card-heading">
+            <h2
+              id={titleId}
+              className="character-card-title character-card-name"
+              data-testid="character-card-name"
+            >
+              <button
+                type="button"
+                className="character-card-name-button"
+                onClick={onView}
               >
-                {character?.background?.isKnownFigure
+                {character.name}
+              </button>
+            </h2>
+          </div>
+
+          <div className="character-card-meta">
+            <span className="character-card-level">
+              Level {character.level || 1}
+            </span>
+            {character?.background?.isKnownFigure !== undefined && (
+              <span className="character-card-type">
+                {character.background.isKnownFigure
                   ? 'Known Figure'
                   : 'Original'}
-              </Badge>
+              </span>
             )}
+            <ActiveStateLabel
+              isActive={isActive}
+              testId="character-card-active-label"
+            />
           </div>
-          <p className="character-card-description">
-            {(() => {
-              const text = (character?.background?.history ||
-                character?.background?.personality ||
-                'No description provided') as string;
-              const sentences = text.split(/[.!?]+/);
-              let result = '';
-              for (const sentence of sentences) {
-                const trimmed = safeTrim(sentence);
-                if (!trimmed) continue;
-                if ((result + trimmed + '.').length > 280) break;
-                result += (result ? ' ' : '') + trimmed + '.';
-              }
-              return result || truncate(text, 280);
-            })()}
-          </p>
-          {context?.relationships && context.relationships.length > 0 && (
-            <div className="character-card-connections">
-              <h4>Connections</h4>
-              <div className="character-card-connections-list">
-                {context.relationships.map((relation) => (
-                  <div key={relation.characterId} className="character-card-connection">
-                    {relation.portraitUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={relation.portraitUrl}
-                        alt={`${relation.characterName} portrait`}
-                      />
-                    ) : (
-                      <div className="character-card-connection-initial">
-                        <span>
-                          {relation.characterName.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                    <span>{relation.characterName}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {context?.recentEvent && (
-            <div className="character-card-recent">
-              <h4>Recent Event</h4>
-              <p>{context.recentEvent}</p>
-            </div>
-          )}
-          <div />
+
+          {description ? (
+            <p
+              className="character-card-description"
+              data-testid="character-card-description"
+            >
+              {description}
+            </p>
+          ) : null}
         </div>
 
-        {/* Footer with buttons - always at bottom */}
-        <footer className="character-card-footer">
-          <CardActionGroup
-            primaryActions={[
-              // Add Make Active button as first primary action for inactive characters
-              ...(isActive
-                ? []
-                : [
-                    {
-                      key: 'make-active',
-                      text: 'Make Active',
-                      onClick: onMakeActive,
-                      variant: 'secondary' as const,
-                      flex: true,
-                      icon: <CheckCircle aria-hidden="true" />,
-                    },
-                  ]),
-              {
-                key: 'play',
-                text: 'Play',
-                onClick: onPlay,
-                variant: 'secondary',
-                flex: true,
-                icon: <Play aria-hidden="true" />,
-              },
-            ]}
-            secondaryActions={[
-              {
-                key: 'view',
-                text: 'View',
-                onClick: onView,
-                variant: 'secondary',
-                icon: <Eye aria-hidden="true" />,
-              },
-              {
-                key: 'edit',
-                text: 'Edit',
-                onClick: onEdit,
-                variant: 'secondary',
-                icon: <Pencil aria-hidden="true" />,
-              },
-              {
-                key: 'delete',
-                text: 'Delete',
-                onClick: onDelete,
-                variant: 'danger',
-                icon: <Trash aria-hidden="true" />,
-              },
-            ]}
-          />
+        <footer>
+          {timestamp ? (
+            <div className="character-card-footer-meta">
+              <time dateTime={timestamp}>
+                {character.updatedAt
+                  ? `Updated: ${formatDate(character.updatedAt)}`
+                  : `Created: ${formatDate(character.createdAt)}`}
+              </time>
+            </div>
+          ) : null}
+
+          <div className="character-card-footer-actions">
+            <CardActionGroup
+              primaryActions={[
+                {
+                  key: 'play',
+                  text: 'Play',
+                  ariaLabel: `Play as ${character.name}`,
+                  onClick: onPlay,
+                  variant: 'accent',
+                  testId: 'character-card-actions-play-button',
+                  icon: <Play aria-hidden="true" />,
+                },
+              ]}
+              secondaryActions={[
+                {
+                  key: 'edit',
+                  text: 'Edit',
+                  ariaLabel: `Edit ${character.name}`,
+                  onClick: onEdit,
+                  variant: 'quiet',
+                  testId: 'character-card-actions-edit-button',
+                  icon: <Pencil aria-hidden="true" />,
+                },
+                {
+                  key: 'delete',
+                  text: 'Delete',
+                  ariaLabel: `Delete ${character.name}`,
+                  onClick: onDelete,
+                  variant: 'quiet-danger',
+                  testId: 'character-card-actions-delete-button',
+                  icon: <Trash aria-hidden="true" />,
+                },
+              ]}
+            />
+          </div>
         </footer>
       </div>
     </ActiveStateCard>

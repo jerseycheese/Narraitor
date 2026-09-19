@@ -14,7 +14,7 @@ const mockGetState: jest.Mock<MockWorldStore> = jest.fn();
 jest.mock('../../WorldList/WorldList', () => {
   return {
     __esModule: true,
-    default: ({ worlds, onSelectWorld, onDeleteWorld }: { worlds: World[], onSelectWorld: (id: string) => void, onDeleteWorld: (id: string) => void }) => {
+    default: ({ worlds, onDeleteWorld }: { worlds: World[], onDeleteWorld: (id: string) => void }) => {
       return (
         <div data-testid="world-list-container">
           {worlds.length === 0 ? (
@@ -23,7 +23,6 @@ jest.mock('../../WorldList/WorldList', () => {
             worlds.map(world => (
               <div key={world.id} data-testid={`world-item-${world.id}`}>
                 {world.name}
-                <button onClick={() => onSelectWorld(world.id)}>Select</button>
                 <button onClick={() => onDeleteWorld(world.id)}>Delete</button>
               </div>
             ))
@@ -278,12 +277,6 @@ describe('WorldListScreen', () => {
     }));
 
     render(<WorldListScreen />);
-
-    // Simulate selecting a world
-    const selectButton = screen.getByRole('button', { name: /Select/i });
-    await user.click(selectButton);
-
-    expect(mockSetCurrentWorld).toHaveBeenCalledWith('1');
 
     // Simulate deleting a world
     const deleteButton = screen.getByRole('button', { name: /Delete/i });

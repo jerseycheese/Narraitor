@@ -7,12 +7,24 @@ export interface CardAction {
   text: string;
   /** Click handler */
   onClick: (e: React.MouseEvent) => void;
-  /** Button variant */
-  variant?: 'primary' | 'secondary' | 'success' | 'danger';
+  /**
+   * Button variant. `accent` is the card's main action without a fill;
+   * `quiet` and `quiet-danger` are borderless text actions beside it.
+   */
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'danger'
+    | 'accent'
+    | 'quiet'
+    | 'quiet-danger';
   /** Optional icon */
   icon?: React.ReactNode;
   /** Optional tooltip */
   title?: string;
+  /** Accessible name when the visible text alone doesn't say which item it acts on */
+  ariaLabel?: string;
   /** Whether this action should take full width in its group */
   flex?: boolean;
   /** Custom CSS classes */
@@ -38,18 +50,21 @@ export interface CardActionGroupProps {
  * CardActionGroup - Handles button layouts for card actions
  *
  * Each rendered state must have exactly one filled ink-blue primary CTA. On list
- * pages the page-level Create action is that primary; per-card Play is secondary.
+ * pages the page-level Create action is that primary; per-card Play is unfilled.
  * On detail pages Play is primary and Edit is secondary.
+ *
+ * On list cards Play is the one bordered action, in accent, and the rest are
+ * quiet text actions. Each carries the item's name in its accessible label,
+ * because a list repeats the same visible text on every card.
  *
  * @example List page (worlds list, characters list)
  * <CardActionGroup
  *   primaryActions={[
- *     { key: 'make-active', text: 'Make Active', onClick: handleMakeActive, variant: 'secondary', flex: true },
- *     { key: 'play', text: 'Play', onClick: handlePlay, variant: 'secondary', flex: true }
+ *     { key: 'play', text: 'Play', ariaLabel: `Play as ${name}`, onClick: handlePlay, variant: 'accent', flex: true }
  *   ]}
  *   secondaryActions={[
- *     { key: 'edit', text: 'Edit', onClick: handleEdit },
- *     { key: 'delete', text: 'Delete', onClick: handleDelete, variant: 'danger' }
+ *     { key: 'edit', text: 'Edit', ariaLabel: `Edit ${name}`, onClick: handleEdit, variant: 'quiet' },
+ *     { key: 'delete', text: 'Delete', ariaLabel: `Delete ${name}`, onClick: handleDelete, variant: 'quiet-danger' }
  *   ]}
  * />
  */
@@ -71,6 +86,7 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
         onClick={action.onClick}
         className={getButtonClasses(action)}
         title={action.title}
+        aria-label={action.ariaLabel}
         data-testid={action.testId}
         data-flex={action.flex ? 'true' : undefined}
         type="button"

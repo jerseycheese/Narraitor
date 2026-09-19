@@ -130,6 +130,17 @@ test.describe('Main Pages Visual Tests', () => {
     await expect(page).toHaveScreenshot('worlds-list.png', { fullPage: true });
   });
 
+  test('Worlds list page should render consistently (dark mode)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await seedTestData(page);
+    await page.goto('/worlds');
+    await waitForContentStable(page);
+    await hideDynamicContent(page);
+    await expect(page).toHaveScreenshot('worlds-list-dark.png', { fullPage: true });
+  });
+
   test('Characters list page should render consistently', async ({ page }) => {
     await seedTestData(page);
     await page.goto('/characters');
@@ -138,6 +149,17 @@ test.describe('Main Pages Visual Tests', () => {
     
     // Take screenshot of characters page - should show populated characters
     await expect(page).toHaveScreenshot('characters-list.png', { fullPage: true });
+  });
+
+  test('Characters list page should render consistently (dark mode)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await seedTestData(page);
+    await page.goto('/characters');
+    await waitForContentStable(page);
+    await hideDynamicContent(page);
+    await expect(page).toHaveScreenshot('characters-list-dark.png', { fullPage: true });
   });
 
   test('World detail page should render consistently', async ({ page }) => {

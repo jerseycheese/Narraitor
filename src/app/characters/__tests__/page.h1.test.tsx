@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useRouter } from 'next/navigation';
 import CharactersPage from '../page';
@@ -19,7 +19,8 @@ jest.mock('@/components/character/CharacterTable', () => ({
 }));
 
 jest.mock('@/components/GenerateCharacterDialog', () => ({
-  GenerateCharacterDialog: () => null,
+  GenerateCharacterDialog: ({ isOpen }: { isOpen: boolean }) =>
+    isOpen ? <div role="dialog" aria-label="Generate Character" /> : null,
 }));
 
 jest.mock('@/services/characterDeletionService', () => ({
@@ -191,6 +192,18 @@ describe('CharactersPage action hierarchy (#2083)', () => {
     expect(
       screen.getAllByRole('button', { name: /generate character/i })
     ).toHaveLength(1);
+  });
+
+  it('opens the generate dialog from the empty roster instead of generating blind', async () => {
+    renderEmptyRoster();
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /generate character/i })
+    );
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Generate Character' })
+    ).toBeInTheDocument();
   });
 
   it('leaves the no-world state with Go to Worlds as its only primary', async () => {

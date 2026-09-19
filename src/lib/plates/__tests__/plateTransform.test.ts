@@ -13,7 +13,7 @@
 import fixture from './fixtures/normandy-128.json';
 
 import { halftone } from '../screen';
-import { autolevels, midtone, normaliseTone } from '../tone';
+import { autolevels, isFlat, midtone, normaliseTone } from '../tone';
 
 function decode(base64: string): Float32Array {
   const binary = Buffer.from(base64, 'base64');
@@ -101,5 +101,12 @@ describe('the tone pass', () => {
     const flat = new Float32Array(16).fill(0.5);
 
     expect(Array.from(autolevels(flat))).toEqual(Array.from(flat));
+  });
+
+  it('flags a blank source as flat, and real art as not', () => {
+    // A white placeholder is what a missing image decodes to; left unflagged
+    // the ink treatment prints it as a solid slab of paper.
+    expect(isFlat(new Float32Array(16).fill(1))).toBe(true);
+    expect(isFlat(source)).toBe(false);
   });
 });

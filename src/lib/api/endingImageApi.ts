@@ -1,6 +1,7 @@
 import type { World } from '@/types/world.types';
 import type { StoryEnding } from '@/types/narrative.types';
 import { aiFetch } from '@/lib/ai/aiFetch';
+import { withoutWorldImage } from '@/lib/api/worldPayload';
 
 export interface EndingImageParams {
   ending: StoryEnding;
@@ -33,7 +34,7 @@ async function postEndingImage(body: Record<string, unknown>) {
   const response = await aiFetch('/api/generate-ending-image', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ...body, world: withoutWorldImage(body.world) }),
   });
 
   if (!response.ok) {

@@ -8,6 +8,7 @@ import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { GameSessionState, PlayerChoice } from '@/types/game.types';
 import Logger from '@/lib/utils/logger';
+import { resolveSessionCharacterId } from '@/lib/session/sessionCharacter';
 
 /**
  * Efficiently compare two arrays of player choices without JSON.stringify
@@ -129,22 +130,7 @@ export const useGameSessionState = ({
   // Memoize the character for this session to prevent re-calculation
   const sessionCharacterId = useMemo(() => {
     if (!isClient) return null;
-    
-    // If current character belongs to this world, use it
-    if (currentCharacterId && actualCharacterState.characters?.[currentCharacterId]?.worldId === worldId) {
-      return currentCharacterId;
-    }
-    
-    // Otherwise, use the first available character for this world
-    const firstWorldChar = (Object.values(actualCharacterState.characters || {}) as StoreCharacter[]).find(
-      char => char.worldId === worldId
-    );
-    
-    if (firstWorldChar) {
-      return firstWorldChar.id;
-    }
-    
-    return null;
+    return resolveSessionCharacterId(actualCharacterState.characters || {}, currentCharacterId, worldId);
   }, [worldId, currentCharacterId, actualCharacterState.characters, isClient]);
   
   // Effect to update current character if needed - only when worldId or currentCharacterId changes

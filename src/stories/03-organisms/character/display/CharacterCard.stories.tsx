@@ -28,7 +28,6 @@ const meta = {
       control: 'boolean',
       description: 'Whether this character is currently active',
     },
-    onMakeActive: { action: 'makeActive' },
     onView: { action: 'view' },
     onPlay: { action: 'play' },
     onEdit: { action: 'edit' },
@@ -83,7 +82,6 @@ export const Default: Story = {
   args: {
     character: mockCharacter,
     isActive: false,
-    onMakeActive: () => console.log('Make active clicked'),
     onView: () => console.log('View clicked'),
     onPlay: () => console.log('Play clicked'),
     onEdit: () => console.log('Edit clicked'),
@@ -95,7 +93,6 @@ export const ActiveCharacter: Story = {
   args: {
     character: mockCharacter,
     isActive: true,
-    onMakeActive: () => console.log('Make active clicked'),
     onView: () => console.log('View clicked'),
     onPlay: () => console.log('Play clicked'),
     onEdit: () => console.log('Edit clicked'),
@@ -127,7 +124,6 @@ export const KnownFigure: Story = {
       },
     },
     isActive: false,
-    onMakeActive: () => console.log('Make active clicked'),
     onView: () => console.log('View clicked'),
     onPlay: () => console.log('Play clicked'),
     onEdit: () => console.log('Edit clicked'),
@@ -160,7 +156,6 @@ export const OriginalCharacter: Story = {
       },
     },
     isActive: false,
-    onMakeActive: () => console.log('Make active clicked'),
     onView: () => console.log('View clicked'),
     onPlay: () => console.log('Play clicked'),
     onEdit: () => console.log('Edit clicked'),
@@ -184,7 +179,6 @@ export const WithoutPortrait: Story = {
       },
     },
     isActive: false,
-    onMakeActive: () => console.log('Make active clicked'),
     onView: () => console.log('View clicked'),
     onPlay: () => console.log('Play clicked'),
     onEdit: () => console.log('Edit clicked'),
@@ -196,7 +190,6 @@ export const Grid: Story = {
   args: {
     character: mockCharacter,
     isActive: false,
-    onMakeActive: () => console.log('Make active clicked'),
     onView: () => console.log('View clicked'),
     onPlay: () => console.log('Play clicked'),
     onEdit: () => console.log('Edit clicked'),
@@ -218,7 +211,6 @@ export const Grid: Story = {
           },
         }}
         isActive={true}
-        onMakeActive={() => console.log('Make Aragorn active')}
         onView={() => console.log('View Aragorn')}
         onPlay={() => console.log('Play Aragorn')}
         onEdit={() => console.log('Edit Aragorn')}
@@ -245,7 +237,6 @@ export const Grid: Story = {
           },
         }}
         isActive={false}
-        onMakeActive={() => console.log('Make Frodo active')}
         onView={() => console.log('View Frodo')}
         onPlay={() => console.log('Play Frodo')}
         onEdit={() => console.log('Edit Frodo')}
@@ -272,7 +263,6 @@ export const Grid: Story = {
           },
         }}
         isActive={false}
-        onMakeActive={() => console.log('Make Lyra active')}
         onView={() => console.log('View Lyra')}
         onPlay={() => console.log('Play Lyra')}
         onEdit={() => console.log('Edit Lyra')}

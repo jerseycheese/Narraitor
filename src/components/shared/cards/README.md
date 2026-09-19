@@ -1,169 +1,46 @@
 # Shared Card Components
 
-Cards were all over the place with different styling, button layouts, and interaction patterns. This is our unified card component system that brings consistency to how entities are displayed across the app.
+The pieces the worlds and characters list cards are built from. `WorldCard` and `CharacterCard` are the working examples; read those before building a new card.
 
-## What's Available
+## ActiveStateCard
 
-### ActiveStateCard
-The main wrapper that handles the active/inactive styling. Basically gives you that green "currently active" header and proper click handling:
+The card wrapper. It only styles the state: an accent border and a faint wash when active. It isn't clickable, so nothing inside it needs to stop propagation.
 
 ```tsx
-<ActiveStateCard
-  isActive={isActive}
-  onClick={() => handleSelect(id)}
-  activeText="Currently Active World"
->
+<ActiveStateCard isActive={isActive} className="component-example-card" labelledBy={titleId}>
+  <CardImage />
   <CardContent />
 </ActiveStateCard>
 ```
 
-### ActiveStateIndicator
-Just the green header banner part if you want to use it independently:
+Children render in order; the card's own CSS places them. Pass `labelledBy` the title's id so the card is named after its item.
+
+## ActiveStateLabel
+
+Marks the active item with an "Active" pill. It's state, not a control: Play and the header world switcher are what change the active world or character, so list cards don't offer a separate way to do it. It renders nothing for inactive items.
 
 ```tsx
-<ActiveStateIndicator text="Currently Active World" />
+<ActiveStateLabel isActive={isActive} testId="world-card-active-label" />
 ```
 
-### MakeActiveButton
-Standardized "make this thing active" button. Saves you from having to style the same button over and over:
+Put it beside the item's type label.
 
-```tsx
-<MakeActiveButton
-  onClick={handleMakeActive}
-  text="Set as Active Character"
-/>
-```
+## CardActionGroup
 
-### CardActionGroup
-This one's pretty clever - handles the complexity of primary vs secondary action button layouts:
+Primary and secondary card actions. Each rendered state gets exactly one filled primary CTA. On list pages that's the page-level Create button, so per-card Play is `accent`: bordered in accent, never filled. The rest are `quiet` text actions, and `quiet-danger` only turns red when pointed at.
+
+A list repeats the same visible text on every card, so give each action the item's name through `ariaLabel`.
 
 ```tsx
 <CardActionGroup
   primaryActions={[
-    { key: 'create', text: 'Create Character', onClick: handleCreate, variant: 'primary', flex: true },
-    { key: 'play', text: 'Play', onClick: handlePlay, variant: 'success', flex: true }
+    { key: 'play', text: 'Play', ariaLabel: `Play as ${name}`, onClick: handlePlay, variant: 'accent', flex: true, icon: <Play aria-hidden="true" /> },
   ]}
   secondaryActions={[
-    { key: 'view', text: 'View', onClick: handleView },
-    { key: 'edit', text: 'Edit', onClick: handleEdit },
-    { key: 'delete', text: 'Delete', onClick: handleDelete, variant: 'danger' }
+    { key: 'edit', text: 'Edit', ariaLabel: `Edit ${name}`, onClick: handleEdit, variant: 'quiet', icon: <Pencil aria-hidden="true" /> },
+    { key: 'delete', text: 'Delete', ariaLabel: `Delete ${name}`, onClick: handleDelete, variant: 'quiet-danger', icon: <Trash aria-hidden="true" /> },
   ]}
 />
 ```
 
-### EntityBadge
-For those little colored badges that show entity types and statuses:
-
-```tsx
-<EntityBadge
-  type="world"
-  text="Set in Middle Earth"
-  icon={<Globe />}
-  variant="info"
-/>
-```
-
-## Real-World Example
-
-Here's how you'd refactor an existing card component to use these shared pieces instead of rolling your own:
-
-```tsx
-import {
-  ActiveStateCard,
-  MakeActiveButton,
-  CardActionGroup,
-  EntityBadge
-} from '@/components/shared/cards';
-
-const WorldCard = ({ world, isActive, onSelect, onDelete }) => {
-  const primaryActions = [
-    {
-      key: 'create-character',
-      text: 'Create Character',
-      onClick: handleCreateCharacter,
-      variant: 'primary' as const,
-      flex: true,
-      className: 'bg-green-600 text-white hover:bg-green-700',
-      icon: <PlusIcon className="w-5 h-5" />
-    },
-    {
-      key: 'play',
-      text: 'Play',
-      onClick: handlePlay,
-      variant: 'success' as const,
-      flex: true,
-      icon: <PlayIcon className="w-5 h-5" />
-    }
-  ];
-
-  const secondaryActions = [
-    { key: 'view', text: 'View', onClick: handleView },
-    { key: 'edit', text: 'Edit', onClick: handleEdit },
-    { key: 'delete', text: 'Delete', onClick: handleDelete, variant: 'danger' as const }
-  ];
-
-  return (
-    <ActiveStateCard
-      isActive={isActive}
-      onClick={() => onSelect(world.id)}
-      activeText="Currently Active World"
-      hasImage={!!world.image?.url}
-    >
-      {/* Image section */}
-      {world.image?.url && <WorldImage url={world.image.url} />}
-
-      {/* Card content */}
-      <div className="p-4">
-        <h2>{world.name}</h2>
-
-        {/* Entity badges */}
-        <div className="flex gap-2">
-          <EntityBadge
-            text={world.theme}
-            variant="primary"
-          />
-          <EntityBadge
-            type="world"
-            text={`Set in ${world.reference}`}
-            variant="info"
-          />
-        </div>
-
-        {/* Make active button for inactive worlds */}
-        {!isActive && (
-          <MakeActiveButton onClick={handleMakeActive} />
-        )}
-
-        {/* Action buttons */}
-        <CardActionGroup
-          primaryActions={primaryActions}
-          secondaryActions={secondaryActions}
-        />
-      </div>
-    </ActiveStateCard>
-  );
-};
-```
-
-## Why These Exist
-
-The design principles behind these components:
-
-1. **Consistency**: All cards use the same interaction patterns and styling
-2. **Flexibility**: You can still customize them without breaking the design system
-3. **Accessibility**: Built-in ARIA attributes and keyboard support (because we should all care about this)
-4. **Type Safety**: Full TypeScript support so you can't accidentally pass the wrong data
-5. **Testing**: Components include proper data-testid attributes
-
-## Layout Integration
-
-- **Navigation**: Cards integrate with the Navigation component for consistent world switching and actions
-- **Button layout**: Primary and secondary actions are grouped separately so the main action stands out
-- **PageLayout**: Cards compose with the shared PageLayout component for consistent page structure
-
-## Related Components
-
-These work well with:
-- **PageLayout**: New shared layout component for consistent page structure
-- **Navigation**: Enhanced navigation with better world switching and actions
-- **ActionButtonGroup**: Improved action button layouts for cards
+Buttons meet the 44px touch target through `--control-height-touch`.

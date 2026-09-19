@@ -61,6 +61,21 @@ test.describe('Mobile layouts', () => {
     await expect(page).toHaveScreenshot('mobile-worlds-list.png', { fullPage: true });
   });
 
+  test('characters list stacks at phone width', async ({ page }) => {
+    await page.setViewportSize(MOBILE_VIEWPORT);
+    await seedTestData(page);
+    await page.goto('/characters');
+    await page.waitForFunction(
+      () => (window as unknown as { __TEST_STORES_SEEDED__?: boolean }).__TEST_STORES_SEEDED__ === true,
+      { timeout: 15000 }
+    );
+    await page.reload();
+    await waitForContentStable(page);
+    await page.waitForSelector('.characters-grid', { timeout: 8000 });
+    await settle(page);
+    await expect(page).toHaveScreenshot('mobile-characters-list.png', { fullPage: true });
+  });
+
   test('character sheet folds at phone width', async ({ page }) => {
     await page.setViewportSize(MOBILE_VIEWPORT);
     await seedTestData(page);

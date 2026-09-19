@@ -488,7 +488,6 @@
   gap: var(--space-3);
   background: var(--color-surface);
   border: none;
-  backdrop-filter: blur(6px);
 }
 
 /* Corner brackets - top-left + bottom-right L-marks, drawn in muted ink.
@@ -648,74 +647,24 @@
 
 /* ─── DS3 ─── */
 
-:root .world-list-grid {
-  gap: var(--space-4);
-}
-
-:root .component-world-card {
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  backdrop-filter: blur(6px);
-}
-
-:root .world-card-content {
-  padding: var(--space-5);
-  gap: var(--space-3);
-}
-
-:root .component-world-card footer {
-  padding: var(--space-3) var(--space-5);
-  border-top: 1px dotted var(--color-border);
-}
-
-:root .world-card-description-block p {
-  font-family: var(--font-system);
-  font-size: var(--font-size-sm_5);
-}
-
-:root .world-card-footer-meta time {
-  font-family: var(--font-system);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: var(--font-size-2xs_5);
-}
-
 :root .world-list-empty {
   border-radius: var(--radius-md);
-  padding: var(--space-6) var(--space-5);
-  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
   background: var(--color-surface);
-  backdrop-filter: blur(6px);
 }
 
-:root .world-list-empty-icon {
-  border-radius: var(--radius-md);
-  width: 4rem;
-  height: 4rem;
-  background: var(--color-canvas);
-  border: 1px dotted var(--color-border);
-}
-
+/* The lead paragraph is the one piece of prose on a page with no worlds yet,
+   so it speaks in the narrative face rather than the interface one. */
 :root .world-list-empty-lede {
   font-family: var(--font-narrative);
   font-size: var(--font-size-lg);
   color: var(--color-text-primary);
 }
 
-:root .world-list-empty-guide {
-  border-radius: var(--radius-sm);
-  border: 1px dotted var(--color-border);
-  padding: var(--space-4) var(--space-5);
+:root .world-list-empty-steps li {
+  border-top-style: dotted;
 }
 
-:root .world-list-empty-guide-steps {
-  font-family: var(--font-system);
-  font-size: var(--font-size-sm);
-}
-
-:root .world-list-empty-tip {
-  border-radius: var(--radius-sm);
-  border-left: none;
-  border: 1px dotted var(--color-border);
-  background: var(--color-canvas);
+:root .world-list-empty-steps li:last-child {
+  border-bottom-style: dotted;
 }

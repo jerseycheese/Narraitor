@@ -143,7 +143,6 @@ const meta: Meta<typeof WorldCard> = {
   },
   tags: ['autodocs'],
   argTypes: {
-    onSelect: { action: 'selected' },
     onDelete: { action: 'delete clicked' },
   },
 };
@@ -153,8 +152,12 @@ type Story = StoryObj<typeof WorldCard>;
 export const Default: Story = {
   args: {
     world: mockWorld,
-    characters: mockCharacters,
-    onSelect: (id: string) => console.log(`Selected world: ${id}`),
+    // Five characters, so the pill list collapses past three into "+2 more"
+    characters: [
+      ...mockCharacters,
+      { ...mockCharacters[2], id: 'char4', name: 'Tobin Ashvale' },
+      { ...mockCharacters[2], id: 'char5', name: 'Mira Quell' },
+    ],
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
 };
@@ -164,14 +167,13 @@ export const ActiveWorld: Story = {
     world: mockWorld,
     isActive: true,
     characters: mockCharacters,
-    onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
     docs: {
       description: {
         story:
-          'A WorldCard in its active state with green header and character list',
+          'A WorldCard in its active state, with the Active label and character list',
       },
     },
   },
@@ -184,7 +186,6 @@ export const NoImage: Story = {
       image: undefined,
     },
     characters: mockCharacters,
-    onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
@@ -208,7 +209,6 @@ export const SetInWorld: Story = {
       relationship: 'set_within',
     },
     characters: mockCharacters.slice(0, 2),
-    onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
@@ -232,7 +232,6 @@ export const InspiredByWorld: Story = {
       relationship: 'inspired_by',
     },
     characters: mockCharacters.slice(0, 2),
-    onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
@@ -249,7 +248,6 @@ export const NoCharacters: Story = {
   args: {
     world: mockWorld,
     characters: [],
-    onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {

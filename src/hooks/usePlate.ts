@@ -4,6 +4,8 @@ import { useEffect, useState, type CSSProperties } from 'react';
 
 import { toPlate, type Plate, type PlateBox } from '@/lib/plates/plate';
 
+type PlateResult = Plate | 'blank' | null;
+
 /**
  * Plates are derived, not stored.
  *
@@ -15,7 +17,7 @@ import { toPlate, type Plate, type PlateBox } from '@/lib/plates/plate';
  * The cache is per session and keyed by art and display size, so each plate is
  * rendered once however many surfaces ask for it.
  */
-const cache = new Map<string, Plate | null>();
+const cache = new Map<string, PlateResult>();
 
 function cacheKey(source: string, { width, height, dpr = 2 }: PlateBox): string {
   return `${width}x${height}@${dpr}|${source}`;
@@ -24,7 +26,7 @@ function cacheKey(source: string, { width, height, dpr = 2 }: PlateBox): string 
 interface Settled {
   key: string;
   source: string;
-  plate: Plate | null;
+  result: PlateResult;
 }
 
 export interface PlateState {
@@ -32,6 +34,8 @@ export interface PlateState {
   plate: Plate | null;
   /** True while a plate for the current art and size is still being made. */
   pending: boolean;
+  /** True when the art carries no tonal range, so there is nothing to show. */
+  blank: boolean;
 }
 
 /**
@@ -39,7 +43,8 @@ export interface PlateState {
  *
  * Callers fall back to the art itself when `plate` is null, so a server render,
  * a failed decode, or a browser with no canvas degrades to the untreated image
- * rather than to a gap. On a resize the previous plate for the same art keeps
+ * rather than to a gap. Flat art reports `blank` instead, so callers can show
+ * their empty state rather than a solid slab. On a resize the previous plate for the same art keeps
  * showing until the new one lands, so the surface never flashes back to colour.
  *
  * @param source - The art, as a URL or data URL.
@@ -53,7 +58,7 @@ export function usePlate(source: string | undefined, box: PlateBox): PlateState 
 
   const [settled, setSettled] = useState<Settled | null>(() =>
     key && source && cache.has(key)
-      ? { key, source, plate: cache.get(key) ?? null }
+      ? { key, source, result: cache.get(key) ?? null }
       : null
   );
 
@@ -61,7 +66,7 @@ export function usePlate(source: string | undefined, box: PlateBox): PlateState 
     if (!key || !source) return;
 
     if (cache.has(key)) {
-      setSettled({ key, source, plate: cache.get(key) ?? null });
+      setSettled({ key, source, result: cache.get(key) ?? null });
       return;
     }
 
@@ -71,14 +76,14 @@ export function usePlate(source: string | undefined, box: PlateBox): PlateState 
       .then((result) => {
         cache.set(key, result);
         if (!active) return;
-        setSettled({ key, source, plate: result });
+        setSettled({ key, source, result });
       })
       .catch(() => {
         // A plate is an enhancement; failing to make one must not break the
         // surface that asked for it.
         cache.set(key, null);
         if (!active) return;
-        setSettled({ key, source, plate: null });
+        setSettled({ key, source, result: null });
       });
 
     return () => {
@@ -86,9 +91,12 @@ export function usePlate(source: string | undefined, box: PlateBox): PlateState 
     };
   }, [key, source, width, height, dpr]);
 
+  const result = source && settled?.source === source ? settled.result : null;
+
   return {
-    plate: source && settled?.source === source ? settled.plate : null,
+    plate: result === 'blank' ? null : result,
     pending: Boolean(source) && settled?.key !== key,
+    blank: result === 'blank',
   };
 }
 

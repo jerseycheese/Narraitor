@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Plus, Sparkles, Globe } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -51,15 +51,6 @@ const GenerateCharacterDialog = dynamic(
 type CharacterPortraitUpdate = {
   portrait: GeneratedImage;
 };
-
-interface CharacterContext {
-  recentEvent?: string;
-  relationships: Array<{
-    characterId: string;
-    characterName: string;
-    portraitUrl?: string | null;
-  }>;
-}
 
 function transformGeneratedAttributes(
   generatedData: GeneratedCharacterData,
@@ -140,7 +131,7 @@ export default function CharactersPage() {
     createCharacter,
     updateCharacter,
   } = useCharacterStore();
-  const { worlds, currentWorldId, worldStates } = useWorldStore();
+  const { worlds, currentWorldId } = useWorldStore();
   const currentSessionId = useSessionStore((state) => state.id);
   const { getSessionSegments } = useNarrativeStore();
   const toast = useToast();
@@ -189,58 +180,6 @@ export default function CharactersPage() {
   const worldCharacters = (Object.values(characters) as StoreCharacter[]).filter(
     (char) => char.worldId === effectiveWorldId
   );
-  const worldState = effectiveWorldId
-    ? worldStates?.[effectiveWorldId]
-    : undefined;
-
-  const characterContextById = useMemo(() => {
-    if (!worldState) {
-      return {} as Record<string, CharacterContext>;
-    }
-
-    const relationshipByCharacter = worldState.characterRelationships ?? {};
-
-    return worldCharacters.reduce(
-      (acc, character) => {
-        const relationshipEntries = relationshipByCharacter[character.id] ?? {};
-
-        const relationships = Object.entries(relationshipEntries)
-          .filter(
-            ([otherId]) =>
-              otherId !== character.id && Boolean(characters[otherId])
-          )
-          .sort(([, a], [, b]) =>
-            b.lastInteraction.localeCompare(a.lastInteraction)
-          )
-          .slice(0, 2)
-          .map(([otherId]) => {
-            const relatedCharacter = characters[otherId];
-            return {
-              characterId: otherId,
-              characterName: relatedCharacter?.name ?? 'Unknown',
-              portraitUrl: relatedCharacter?.portrait?.url ?? null,
-            };
-          });
-
-        const characterEvents = (worldState.majorEvents ?? [])
-          .filter((event) => event.characterId === character.id)
-          .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-
-        const recentEvent =
-          characterEvents.length > 0
-            ? characterEvents[0].description
-            : undefined;
-
-        acc[character.id] = {
-          recentEvent,
-          relationships,
-        };
-
-        return acc;
-      },
-      {} as Record<string, CharacterContext>
-    );
-  }, [worldState, worldCharacters, characters]);
 
   const currentProgress = currentSessionId
     ? getSessionSegments(currentSessionId).length
@@ -338,10 +277,6 @@ export default function CharactersPage() {
       setIsGenerating(false);
       setGeneratingStatus('');
     }
-  };
-
-  const handleSelectCharacter = (characterId: string) => {
-    setCurrentCharacter(characterId);
   };
 
   const handleViewCharacter = (characterId: string) => {
@@ -473,22 +408,33 @@ export default function CharactersPage() {
     },
   ];
 
-  return (
-    <PageLayout
-      title="My Characters"
-      description="Create unique characters for your interactive narrative adventures."
-    >
-      {/* Decorative world-art banner, the same one the detail pages carry. The
-          world switcher above already names the world, so the band repeats
-          neither its name nor its genre. */}
-      {mounted && currentWorld?.image?.url && (
+  const characterCount = worldCharacters.length;
+  const pageDescription = currentWorld
+    ? `${characterCount} ${characterCount === 1 ? 'character' : 'characters'} in this realm`
+    : 'Create unique characters for your interactive narrative adventures.';
+
+  // Decorative world art behind the masthead. The header's world switcher
+  // already names the world, so the masthead repeats neither its name nor genre.
+  const headerBackground =
+    mounted && currentWorld?.image?.url ? (
+      <div className="characters-header-vignette" aria-hidden="true">
         <Hero
           image={{
             url: currentWorld.image.url,
-            alt: `${currentWorld.name} world`,
+            alt: '',
           }}
+          treatment="ink"
         />
-      )}
+      </div>
+    ) : null;
+
+  return (
+    <PageLayout
+      title="My Characters"
+      description={pageDescription}
+      headerBackground={headerBackground}
+      headerClassName="characters-world-masthead"
+    >
 
       {/* An empty roster has nothing to switch views on, and the empty state
           below already offers both Create and Generate, so the toolbar would
@@ -512,10 +458,10 @@ export default function CharactersPage() {
               gap="sm"
               actions={[
                 {
-                  label: isGenerating
-                    ? generatingStatus || 'Generating...'
-                    : 'Generate Character',
-                  onClick: handleGenerateCharacter,
+                  // Opens the same dialog as the toolbar, so a failed
+                  // generation has somewhere visible to report its error.
+                  label: 'Generate Character',
+                  onClick: () => setShowGenerateDialog(true),
                   variant: 'secondary',
                   disabled: isGenerating,
                   size: 'lg',
@@ -535,7 +481,6 @@ export default function CharactersPage() {
           <CharacterTable
             characters={worldCharacters as StoreCharacter[]}
             currentCharacterId={currentCharacterId}
-            onMakeActive={handleSelectCharacter}
             onView={handleViewCharacter}
             onPlay={handleCharacterPlay}
             onEdit={handleEditCharacter}
@@ -548,12 +493,10 @@ export default function CharactersPage() {
                 key={character.id}
                 character={character}
                 isActive={currentCharacterId === character.id}
-                onMakeActive={() => handleSelectCharacter(character.id)}
                 onView={() => handleViewCharacter(character.id)}
                 onPlay={() => handleCharacterPlay(character.id)}
                 onEdit={() => handleEditCharacter(character.id)}
                 onDelete={() => handleDeleteCharacter(character.id)}
-                context={characterContextById[character.id]}
               />
             ))}
           </div>

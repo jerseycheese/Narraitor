@@ -288,12 +288,16 @@ export async function hideNextDevOverlay(page: Page): Promise<void> {
  * captureWizardStep.
  *
  * The mobile drawer needs no handling: it unmounts when closed (#1655).
+ *
+ * PageLayout headers are excluded: they are not sticky, and masthead vignettes
+ * are absolutely positioned against them, so forcing them static lets the art
+ * escape to the whole page.
  */
 export async function pinAppShell(page: Page): Promise<void> {
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.addStyleTag({
     content: `
-      header {
+      header:not(.page-layout-header) {
         position: static !important;
       }
     `,

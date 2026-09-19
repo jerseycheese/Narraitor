@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -7,22 +7,33 @@ import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { getGenreLabel } from '@/lib/constants/genres';
-import { ActiveStateCard, CardActionGroup } from '@/components/shared/cards';
-import { Badge } from '@/components/ui/badge';
+import {
+  ActiveStateCard,
+  ActiveStateLabel,
+  CardActionGroup,
+} from '@/components/shared/cards';
 import { formatDate } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
-import { CheckCircle, Play, Pencil, Trash } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { resolveSessionCharacterId } from '@/lib/session/sessionCharacter';
+import { Play, Pencil, Trash, UserPlus, Users } from 'lucide-react';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('WorldCard');
+
+/** Pills shown before the rest collapse into a "+N more" count. */
+const MAX_CHARACTER_PILLS = 3;
+
+/** First character as the reader sees it, so an emoji isn't split in half. */
+function initialOf(name: string): string {
+  return (Array.from(name)[0] ?? '').toUpperCase();
+}
 
 interface WorldCardProps {
   /** The world data to display */
   world: World;
   /** Whether this world is currently active */
   isActive?: boolean;
-  /** Callback when user selects this world */
-  onSelect: (worldId: string) => void;
   /** Callback when user wants to delete this world */
   onDelete: (worldId: string) => void;
   /** Characters in this world */
@@ -41,8 +52,8 @@ interface WorldCardProps {
  * - World image display if available
  * - Genre and world type badges
  * - Character count with navigation to characters list
- * - Smart play button that handles session resume
- * - Make active button for non-active worlds
+ * - Smart play button that handles session resume, and sets the active world
+ * - Active label on the current world
  * - Action buttons
  *
  * @param props - World card configuration and event handlers
@@ -52,23 +63,26 @@ interface WorldCardProps {
  * <WorldCard
  *   world={world}
  *   isActive={world.id === currentWorldId}
- *   onSelect={(id) => setCurrentWorld(id)}
  *   onDelete={(id) => deleteWorld(id)}
  * />
  */
 const WorldCard: React.FC<WorldCardProps> = ({
   world,
   isActive = false,
-  onSelect,
   onDelete,
   characters = [],
 }) => {
   const router = useRouter();
+  const titleId = useId();
 
-  const handleMakeActive = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSelect(world.id);
-  };
+  // Resolved the same way the play screen resolves it, so "Continue" only
+  // shows when Play will actually resume that session.
+  const sessionCharacterId = useCharacterStore((state) =>
+    resolveSessionCharacterId(state.characters, state.currentCharacterId, world.id)
+  );
+  const savedSession = useSessionStore((state) =>
+    sessionCharacterId ? state.getSavedSession(world.id, sessionCharacterId) : undefined
+  );
 
   const handleDeleteClick = () => {
     onDelete(world.id);
@@ -78,28 +92,16 @@ const WorldCard: React.FC<WorldCardProps> = ({
     try {
       useWorldStore.getState().setCurrentWorld(world.id);
 
-      // Check for characters in this world
-      const characterState = useCharacterStore.getState();
-      const worldCharacters = (
-        Object.values(characterState.characters) as StoreCharacter[]
-      ).filter((char) => char.worldId === world.id);
-
-      if (worldCharacters.length === 0) {
-        // No characters exist - redirect to characters page
-        router.push(`/characters?worldId=${world.id}`);
+      if (!sessionCharacterId) {
+        router.push(`/characters/create?worldId=${world.id}`);
         return;
       }
 
-      // Check for saved session
-      const savedSession = useSessionStore
-        .getState()
-        .getSavedSession(world.id, worldCharacters[0]?.id);
-
-      // Add query parameter to auto-resume if there's a saved session
-      const url = savedSession
-        ? `/worlds/${world.id}/play?autoResume=true`
-        : `/worlds/${world.id}/play`;
-      router.push(url);
+      router.push(
+        savedSession
+          ? `/worlds/${world.id}/play?autoResume=true`
+          : `/worlds/${world.id}/play`
+      );
     } catch (error) {
       logger.error('handlePlayClick', 'Failed to navigate to play world', error);
     }
@@ -113,169 +115,169 @@ const WorldCard: React.FC<WorldCardProps> = ({
     }
   };
 
+  // When a world has no image, render no <img> at all and let Hero fall back to
+  // its themed empty state. The alt is empty because the art link is hidden
+  // from assistive tech; the title link carries the name.
+  const heroImage = world.image?.url ? { url: world.image.url, alt: '' } : undefined;
+  const detailHref = `/worlds/${world.id}`;
+
+  // Play says what it will do: resume, start, or send you to make someone first.
+  const playLabel = !sessionCharacterId
+    ? 'Create a character'
+    : savedSession
+      ? 'Continue'
+      : 'Play';
+
   return (
     <ActiveStateCard
       isActive={isActive}
-      activeText="Currently Active World"
-      showActiveIndicator={isActive}
       testId="world-card"
-      hasImage={true}
       className="component-world-card"
+      labelledBy={titleId}
     >
-      {/* Always show Hero component - with image or themed background */}
-      <div>
-        <Link href={`/worlds/${world.id}`}>
-          {(() => {
-            // When a world has no image, render no <img> at all and let Hero
-            // fall back to its tokenized themed background (see .component-hero
-            // in app-shell.css). A previous white 1x1 placeholder rendered as a
-            // bright rectangle in dark mode (#1113). The themed empty-state is
-            // deterministic CSS, so it stays stable under visual tests too.
-            const heroImage = world.image?.url
-              ? { url: world.image.url, alt: `${world.name} world` }
-              : undefined;
-
-            return (
-              <Hero
-                title={world.name}
-                image={heroImage}
-                badge={
-                  world.genre && (
-                    <span data-testid="world-card-genre">
-                      {getGenreLabel(world.genre)}
-                    </span>
-                  )
-                }
-                titleTestId="world-card-name"
-                titleElement="h2"
-              />
-            );
-          })()}
-        </Link>
-      </div>
+      {/* The art is a second, pointer-only way into the world. Keyboard and
+          screen-reader users reach it once, through the title. */}
+      <Link
+        href={detailHref}
+        className="world-card-hero-link"
+        tabIndex={-1}
+        aria-hidden="true"
+      >
+        <Hero image={heroImage} />
+        <span className="world-card-plate-initial">
+          {initialOf(world.name)}
+        </span>
+      </Link>
 
       <div className="world-card-body">
-        {/* Content area that grows to fill space */}
         <div className="world-card-content">
-          {/* Character badges and manage link */}
+          <div className="world-card-heading">
+            <h2 id={titleId} className="world-card-title" data-testid="world-card-name">
+              <Link href={detailHref}>{world.name}</Link>
+            </h2>
+            {world.genre && (
+              <Badge variant="secondary" data-testid="world-card-genre">
+                {getGenreLabel(world.genre)}
+              </Badge>
+            )}
+          </div>
+
+          {world.description && (
+            <p className="world-card-description" data-testid="world-card-description">
+              {world.description}
+            </p>
+          )}
+
           <div className="world-card-meta">
             {characters.length > 0 && (
               <div className="world-card-character-pills">
-                {characters.map((char) => (
+                {characters.slice(0, MAX_CHARACTER_PILLS).map((char) => (
                   <button
                     key={char.id}
                     className="world-card-character-pill"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/characters/${char.id}`);
-                    }}
-                    title={`Play as ${char.name} - Level ${char.level}`}
+                    onClick={() => router.push(`/characters/${char.id}`)}
+                    title={`View ${char.name} - Level ${char.level}`}
+                    // The visible name hides on phones, so the button carries
+                    // it in a label rather than relying on its contents.
+                    aria-label={`${char.name}, level ${char.level}`}
                   >
                     {/* Character portrait or placeholder */}
                     {char.portrait?.url ? (
                       <Image
                         src={char.portrait.url}
-                        alt={`${char.name} portrait`}
+                        alt=""
                         width={40}
                         height={40}
                       />
                     ) : (
                       <div className="world-card-character-pill-initial">
-                        <span>{char.name.charAt(0).toUpperCase()}</span>
+                        <span>{initialOf(char.name)}</span>
                       </div>
                     )}
-                    <span>{char.name}</span>
+                    <span className="world-card-character-pill-name">
+                      {char.name}
+                    </span>
                   </button>
                 ))}
+                {characters.length > MAX_CHARACTER_PILLS && (
+                  <span
+                    className="world-card-character-pills-more"
+                    data-testid="world-card-character-pills-more"
+                  >
+                    +{characters.length - MAX_CHARACTER_PILLS} more
+                    <span className="sr-only"> characters in {world.name}</span>
+                  </span>
+                )}
               </div>
             )}
           </div>
 
-          <div className="world-card-description-block">
-            <p data-testid="world-card-description">{world.description}</p>
-
-            {/* World type badge */}
-            <div className="world-card-type-badge">
-              {world.reference ? (
-                <Badge
-                  variant={
-                    world.relationship === 'set_within'
-                      ? 'info-static'
-                      : 'success-static'
-                  }
-                  data-testid="world-card-type"
-                >
-                  {world.relationship === 'set_within'
-                    ? 'Set in'
-                    : 'Inspired by'}{' '}
-                  {world.reference}
-                </Badge>
-              ) : (
-                <Badge variant="default-static" data-testid="world-card-type">
-                  Original World
-                </Badge>
-              )}
-            </div>
+          <div className="world-card-type-badge">
+            <span className="world-card-type" data-testid="world-card-type">
+              {world.reference
+                ? `${world.relationship === 'set_within' ? 'Set in' : 'Inspired by'} ${world.reference}`
+                : 'Original World'}
+            </span>
+            <ActiveStateLabel
+              isActive={isActive}
+              testId="world-card-active-label"
+            />
           </div>
         </div>
 
-        {/* Footer with buttons - always at bottom */}
         <footer>
           <div className="world-card-footer-meta">
-            <time data-testid="world-card-createdAt">
-              Created: {formatDate(world.createdAt)}
-            </time>
+            {savedSession ? (
+              <time data-testid="world-card-lastPlayed" dateTime={savedSession.lastPlayed}>
+                Last played: {formatDate(savedSession.lastPlayed)}
+              </time>
+            ) : (
+              <time data-testid="world-card-createdAt" dateTime={world.createdAt}>
+                Created: {formatDate(world.createdAt)}
+              </time>
+            )}
           </div>
           <div className="world-card-footer-actions">
             <CardActionGroup
               primaryActions={[
-                // Add Make Active button as first primary action for inactive worlds
-                ...(isActive
-                  ? []
-                  : [
-                      {
-                        key: 'make-active',
-                        text: 'Make Active',
-                        onClick: handleMakeActive,
-                        variant: 'secondary' as const,
-                        flex: true,
-                        icon: <CheckCircle aria-hidden="true" />,
-                      },
-                    ]),
-                {
-                  key: 'manage-characters',
-                  text: 'Manage Characters',
-                  onClick: (e) => {
-                    e.stopPropagation();
-                    router.push(`/characters?worldId=${world.id}`);
-                  },
-                  variant: 'secondary',
-                  flex: true,
-                },
                 {
                   key: 'play',
-                  text: 'Play',
+                  text: playLabel,
+                  ariaLabel: sessionCharacterId
+                    ? `${playLabel} ${world.name}`
+                    : `Create a character for ${world.name}`,
                   onClick: handlePlayClick,
-                  variant: 'secondary',
-                  flex: true,
+                  variant: 'accent',
                   testId: 'world-card-actions-play-button',
-                  icon: <Play aria-hidden="true" />,
+                  icon: sessionCharacterId ? <Play aria-hidden="true" /> : <UserPlus aria-hidden="true" />,
                 },
               ]}
               secondaryActions={[
                 {
+                  key: 'characters',
+                  text: 'Characters',
+                  ariaLabel: `Characters in ${world.name}`,
+                  onClick: () => router.push(`/characters?worldId=${world.id}`),
+                  variant: 'quiet',
+                  testId: 'world-card-actions-characters-button',
+                  icon: <Users aria-hidden="true" />,
+                },
+                {
                   key: 'edit',
                   text: 'Edit',
+                  ariaLabel: `Edit ${world.name}`,
                   onClick: handleEditClick,
-                  variant: 'secondary',
+                  variant: 'quiet',
                   testId: 'world-card-actions-edit-button',
                   icon: <Pencil aria-hidden="true" />,
                 },
                 {
                   key: 'delete',
                   text: 'Delete',
+                  ariaLabel: `Delete ${world.name}`,
                   onClick: handleDeleteClick,
-                  variant: 'danger',
+                  variant: 'quiet-danger',
+                  testId: 'world-card-actions-delete-button',
                   icon: <Trash aria-hidden="true" />,
                 },
               ]}

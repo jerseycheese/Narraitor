@@ -29,14 +29,7 @@ const WorldTable = dynamic(
   { ssr: false }
 );
 
-interface WorldListScreenProps {
-  /** Callback to pass the view toggle component to parent for header placement */
-  onViewToggleRender?: (toggle: React.ReactNode) => void;
-}
-
-const WorldListScreen: React.FC<WorldListScreenProps> = ({
-  onViewToggleRender,
-}) => {
+const WorldListScreen: React.FC = () => {
   const [worlds, setWorlds] = useState<World[]>([]);
   const [currentWorldId, setCurrentWorldId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -53,15 +46,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
     setViewMode(mode);
     writeString('local', 'world-view-mode', mode);
   };
-
-  // Pass the view toggle component to parent for header placement
-  useEffect(() => {
-    if (onViewToggleRender) {
-      onViewToggleRender(
-        <WorldViewToggle mode={viewMode} onModeChange={handleViewModeChange} />
-      );
-    }
-  }, [viewMode, onViewToggleRender]);
 
   useEffect(() => {
     try {
@@ -94,10 +78,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
       setLoading(false);
     }
   }, []);
-
-  const handleSelectWorld = (worldId: string) => {
-    useWorldStore.getState().setCurrentWorld(worldId);
-  };
 
   const handleDeleteClick = (worldId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -151,6 +131,11 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
 
   return (
     <main className="worlds-screen">
+      {worlds.length > 0 && (
+        <div className="worlds-toolbar">
+          <WorldViewToggle mode={viewMode} onModeChange={handleViewModeChange} />
+        </div>
+      )}
       {viewMode === 'table' ? (
         <WorldTable
           worlds={worlds}
@@ -160,7 +145,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({
         <WorldList
           worlds={worlds}
           currentWorldId={currentWorldId}
-          onSelectWorld={handleSelectWorld}
           onDeleteWorld={(id) => handleDeleteClick(id)}
         />
       )}

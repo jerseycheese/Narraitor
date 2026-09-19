@@ -62,13 +62,9 @@ const meta: Meta<typeof WorldList> = {
   },
   tags: ['autodocs'],
   argTypes: {
-    onSelectWorld: { action: 'selected' },
     onDeleteWorld: { action: 'deleted' },
   },
   args: {
-    onSelectWorld: (worldId: string) => {
-      console.log(`[Storybook] World selected: ${worldId}`);
-    },
     onDeleteWorld: (worldId: string) => {
       console.log(`[Storybook] World deleted: ${worldId}`);
     },
