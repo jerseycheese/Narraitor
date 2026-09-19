@@ -216,7 +216,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
             <span className="world-card-type" data-testid="world-card-type">
               {world.reference
                 ? `${world.relationship === 'set_within' ? 'Set in' : 'Inspired by'} ${world.reference}`
-                : 'Original World'}
+                : 'Original'}
             </span>
             <ActiveStateLabel
               isActive={isActive}

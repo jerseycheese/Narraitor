@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useRouter } from 'next/navigation';
 import CharactersPage from '../page';
@@ -161,7 +161,45 @@ describe('CharactersPage action hierarchy (#2083)', () => {
     );
   }
 
-  it('gives the empty roster one Create Character, and it is the primary', async () => {
+  it('places action buttons in PageLayout actions slot and only view toggle in toolbar (#2122)', async () => {
+    mockStores({ populated: true });
+
+    const { container } = render(
+      <ToastProvider>
+        <CharactersPage />
+      </ToastProvider>
+    );
+
+    await screen.findByRole('heading', { level: 1, name: 'My Characters' });
+
+    // PageLayout actions slot contains Create Character and Generate Character
+    const headerActions = container.querySelector<HTMLElement>('.page-layout-actions');
+    expect(headerActions).not.toBeNull();
+    expect(
+      within(headerActions!).getByRole('button', { name: 'Create Character' })
+    ).toBeInTheDocument();
+    expect(
+      within(headerActions!).getByRole('button', { name: 'Generate Character' })
+    ).toBeInTheDocument();
+
+    // The body toolbar contains only the view toggle, not action buttons
+    const toolbar = container.querySelector<HTMLElement>('.characters-toolbar');
+    expect(toolbar).not.toBeNull();
+    expect(
+      within(toolbar!).getByRole('button', { name: /grid view/i })
+    ).toBeInTheDocument();
+    expect(
+      within(toolbar!).getByRole('button', { name: /table view/i })
+    ).toBeInTheDocument();
+    expect(
+      within(toolbar!).queryByRole('button', { name: 'Create Character' })
+    ).toBeNull();
+    expect(
+      within(toolbar!).queryByRole('button', { name: 'Generate Character' })
+    ).toBeNull();
+  });
+
+  it('provides Create Character in header actions and empty state when roster is empty (#2122)', async () => {
     const { container } = renderEmptyRoster();
 
     await screen.findByRole('heading', {
@@ -169,12 +207,19 @@ describe('CharactersPage action hierarchy (#2083)', () => {
       name: 'No characters in Fantasy Realm yet',
     });
 
-    const createButtons = screen.getAllByRole('button', {
-      name: 'Create Character',
-    });
-    expect(createButtons).toHaveLength(1);
-    expect(createButtons[0]).toHaveClass('button-default');
-    expect(primaryCtas(container)).toHaveLength(1);
+    // Header actions slot has Create Character
+    const headerActions = container.querySelector<HTMLElement>('.page-layout-actions');
+    expect(headerActions).not.toBeNull();
+    expect(
+      within(headerActions!).getByRole('button', { name: 'Create Character' })
+    ).toHaveClass('button-default');
+
+    // Empty state has Create Character
+    const emptyState = container.querySelector<HTMLElement>('.characters-empty');
+    expect(emptyState).not.toBeNull();
+    expect(
+      within(emptyState!).getByRole('button', { name: 'Create Character' })
+    ).toHaveClass('button-default');
   });
 
   it('drops the toolbar and its view toggle from the empty roster (#2099)', async () => {
@@ -189,16 +234,16 @@ describe('CharactersPage action hierarchy (#2083)', () => {
     expect(
       screen.queryByRole('button', { name: /table view/i })
     ).not.toBeInTheDocument();
-    expect(
-      screen.getAllByRole('button', { name: /generate character/i })
-    ).toHaveLength(1);
   });
 
   it('opens the generate dialog from the empty roster instead of generating blind', async () => {
-    renderEmptyRoster();
+    const { container } = renderEmptyRoster();
+
+    const emptyState = container.querySelector<HTMLElement>('.characters-empty');
+    expect(emptyState).not.toBeNull();
 
     fireEvent.click(
-      await screen.findByRole('button', { name: /generate character/i })
+      within(emptyState!).getByRole('button', { name: /generate character/i })
     );
 
     expect(

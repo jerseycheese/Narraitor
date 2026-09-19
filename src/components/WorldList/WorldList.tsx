@@ -1,19 +1,26 @@
+'use client';
+
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { World } from '@/types/world.types';
 import WorldCard from '@/components/WorldCard/WorldCard';
 import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 
 interface WorldListProps {
   worlds: World[];
   currentWorldId?: string | null;
   onDeleteWorld: (worldId: string) => void;
+  onCreateWorld?: () => void;
 }
 
 const WorldList: React.FC<WorldListProps> = ({
   worlds,
   currentWorldId,
   onDeleteWorld,
+  onCreateWorld,
 }) => {
+  const router = useRouter();
   // Get character counts and character data for each world using proper hook
   const characters = useCharacterStore((state) => state.characters);
   const allCharacters = Object.values(characters) as StoreCharacter[];
@@ -24,6 +31,14 @@ const WorldList: React.FC<WorldListProps> = ({
     },
     {} as Record<string, StoreCharacter[]>
   );
+
+  const handleCreateWorld = () => {
+    if (onCreateWorld) {
+      onCreateWorld();
+    } else {
+      router.push('/worlds/create');
+    }
+  };
 
   if (worlds.length === 0) {
     return (
@@ -44,6 +59,18 @@ const WorldList: React.FC<WorldListProps> = ({
             You can keep as many worlds as you like and switch between them
             whenever you want.
           </p>
+          <ActionButtonGroup
+            layout="horizontal"
+            gap="sm"
+            actions={[
+              {
+                label: 'Create World',
+                onClick: handleCreateWorld,
+                variant: 'primary',
+                size: 'lg',
+              },
+            ]}
+          />
         </div>
 
         <ol className="world-list-empty-steps">

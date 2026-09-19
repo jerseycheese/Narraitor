@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Sparkles } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { PageLayout } from '@/components/shared/PageLayout';
@@ -150,7 +150,6 @@ export default function WorldsPage() {
       onClick: () => setShowPrompt(true),
       variant: 'secondary' as const,
       disabled: isGenerating,
-      icon: <Sparkles aria-hidden="true" />,
     },
   ];
 
@@ -193,7 +192,6 @@ export default function WorldsPage() {
                   isGenerating ||
                   (worldTypeData.worldType !== 'original' &&
                     !worldTypeData.worldReference?.trim()),
-                icon: <Sparkles aria-hidden="true" />,
                 dataTutorial: 'generate-world-button',
                 flex: true,
               },

@@ -282,7 +282,11 @@ describe('WorldListScreen', () => {
     });
 
     // Check for the correct message
-    expect(screen.getByText('Are you sure you want to delete the world "World 1"?')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Are you sure you want to delete the world "World 1"? This will permanently delete all characters and saved sessions in this world.'
+      )
+    ).toBeInTheDocument();
 
     // Simulate confirming deletion
     const confirmButton = screen.getByRole('button', { name: /Confirm/i });
