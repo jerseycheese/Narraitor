@@ -109,6 +109,7 @@ const { inferItemsLostFromNarrative: inferItemsLostFromNarrativeActual } =
   jest.requireActual('../itemLossInference');
 const { syncNpcMetadata } = jest.requireMock('@/lib/ai/narrativeGenerator.npc');
 const { extractStructuredLore } = jest.requireMock('@/lib/ai/structuredLoreExtractor');
+const { checkAndRecordLoreMentions } = jest.requireMock('@/lib/ai/loreContextHelper');
 const { buildWorldClockPromptContext, needsSceneTransition } = jest.requireMock('../worldClock');
 
 function makeGenerationResult(overrides: Partial<NarrativeGenerationResult> = {}): NarrativeGenerationResult {
@@ -766,6 +767,70 @@ describe('TurnResolver', () => {
         expect.any(String),
         expect.objectContaining({ playerCharacterName: 'Test Character' })
       );
+    });
+
+    it('records lore mentions for resolved narrative segment', async () => {
+      const generator = makeMockGenerator(
+        makeGenerationResult({ content: 'The ancient crystal pulses with magic.' })
+      );
+      await resolveTurn(makeCommand(), generator);
+
+      expect(checkAndRecordLoreMentions).toHaveBeenCalledWith(
+        'world-1',
+        'session-1',
+        'The ancient crystal pulses with magic.',
+        'narrative'
+      );
+    });
+
+    it('does not record lore mentions on initial turn to prevent duplicate recording', async () => {
+      const generator = makeMockGenerator(
+        makeGenerationResult({ content: 'Opening scene content.' })
+      );
+      await resolveInitialTurn(
+        {
+          sessionId: 'session-1',
+          worldId: 'world-1',
+          characterId: 'char-1',
+          generateChoices: true,
+        },
+        generator
+      );
+
+      expect(checkAndRecordLoreMentions).not.toHaveBeenCalled();
+    });
+
+    it('fails open if checkAndRecordLoreMentions throws without marking turn partial', async () => {
+      (checkAndRecordLoreMentions as jest.Mock).mockImplementationOnce(() => {
+        throw new Error('Lore mention tracking failed');
+      });
+
+      const generator = makeMockGenerator();
+      const result = await resolveTurn(makeCommand(), generator);
+
+      expect(result.status).toBe('settled');
+      expect(result.reconciliationErrors).toEqual([]);
+    });
+
+    it('preserves debugInfo on resolved segment metadata', async () => {
+      const debugInfo = {
+        fullPrompt: 'test prompt',
+        templateName: 'Scene Template',
+        modelUsed: 'gemini-2.5-flash',
+        generatedAt: new Date(),
+      };
+      const generator = makeMockGenerator(
+        makeGenerationResult({
+          metadata: {
+            characterIds: [],
+            tags: [],
+            debugInfo,
+          },
+        })
+      );
+      const result = await resolveTurn(makeCommand(), generator);
+
+      expect(result.segment.metadata?.debugInfo).toEqual(debugInfo);
     });
 
     it('passes authoritative characterId to reconciliation, not the session singleton', async () => {

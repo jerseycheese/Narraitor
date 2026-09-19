@@ -7,8 +7,14 @@ import { getTimestamp } from '@/lib/utils/timestamp';
 import { createMockWorldStore } from '@/lib/test-utils';
 import type { World } from '@/types/world.types';
 
+import { isDebugInfoEnabled } from '../debugInfoBuilder';
+
 jest.mock('../geminiClient');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
+jest.mock('../debugInfoBuilder', () => ({
+  ...jest.requireActual('../debugInfoBuilder'),
+  isDebugInfoEnabled: jest.fn(() => false),
+}));
 jest.mock('@/state/worldStore', () => ({
   useWorldStore: {
     getState: jest.fn(),
@@ -57,6 +63,7 @@ describe('NarrativeGenerator', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (isDebugInfoEnabled as jest.Mock).mockReturnValue(false);
 
     // Create mocked client
     mockGeminiClient = {
@@ -273,6 +280,51 @@ describe('NarrativeGenerator', () => {
       // Segment type comes from AI's JSON response
       expect(result.segmentType).toBe('action');
     });
+
+    it('attaches prompt debug info to segment metadata when isDebugInfoEnabled is true', async () => {
+      (isDebugInfoEnabled as jest.Mock).mockReturnValue(true);
+
+      const mockAIResponse = {
+        content: 'The ancient trees stand tall in the moonlight.',
+        finishReason: 'stop',
+        promptTokens: 50,
+        completionTokens: 30,
+      };
+      mockGeminiClient.generateContent.mockResolvedValue(mockAIResponse);
+
+      const request = {
+        worldId: 'world-123',
+        sessionId: 'session-123',
+        characterIds: ['char-1'],
+      };
+
+      const result = await narrativeGenerator.generateSegment(request);
+
+      expect(result.metadata.debugInfo).toBeDefined();
+      expect(result.metadata.debugInfo?.templateName).toBe('Scene Template');
+      expect(result.metadata.debugInfo?.fullPrompt).toBeDefined();
+      expect(result.metadata.debugInfo?.rawResponse).toBe(mockAIResponse.content);
+    });
+
+    it('labels debug info with Scene Template even when segmentType is transition because scene template is invoked', async () => {
+      (isDebugInfoEnabled as jest.Mock).mockReturnValue(true);
+
+      mockGeminiClient.generateContent.mockResolvedValue({
+        content: 'Hours pass as you travel deeper into the forest.',
+        finishReason: 'stop',
+      });
+
+      const request = {
+        worldId: 'world-123',
+        sessionId: 'session-123',
+        characterIds: ['char-1'],
+        generationParameters: { segmentType: 'transition' as const },
+      };
+
+      const result = await narrativeGenerator.generateSegment(request);
+
+      expect(result.metadata.debugInfo?.templateName).toBe('Scene Template');
+    });
   });
 
   describe('generateInitialScene', () => {
@@ -296,6 +348,29 @@ describe('NarrativeGenerator', () => {
       expect(getNarrativeTemplate).toHaveBeenCalledWith(
         'narrative/initialScene'
       );
+    });
+
+    it('attaches prompt debug info when isDebugInfoEnabled is true', async () => {
+      (isDebugInfoEnabled as jest.Mock).mockReturnValue(true);
+
+      const mockAIResponse = {
+        content: 'You awaken in the heart of the Mystical Forest...',
+        finishReason: 'stop',
+        promptTokens: 40,
+        completionTokens: 35,
+      };
+      mockGeminiClient.generateContent.mockResolvedValue(mockAIResponse);
+
+      const result = await narrativeGenerator.generateInitialScene(
+        'world-123',
+        ['char-1'],
+        'session-123'
+      );
+
+      expect(result.metadata.debugInfo).toBeDefined();
+      expect(result.metadata.debugInfo?.templateName).toBe('Initial Scene Template');
+      expect(result.metadata.debugInfo?.fullPrompt).toBeDefined();
+      expect(result.metadata.debugInfo?.rawResponse).toBe(mockAIResponse.content);
     });
   });
 });
