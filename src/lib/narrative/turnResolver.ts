@@ -38,7 +38,10 @@ import { computeTurnsSinceComplication } from '@/lib/narrative/turnsSinceComplic
 import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { assembleSessionSnapshot } from '@/lib/narrative/sessionSnapshotAssembler';
 import { extractStructuredLore } from '@/lib/ai/structuredLoreExtractor';
-import { getLoreContextForPrompt } from '@/lib/ai/loreContextHelper';
+import {
+  getLoreContextForPrompt,
+  checkAndRecordLoreMentions,
+} from '@/lib/ai/loreContextHelper';
 import { collectContinuityTopicsFromStores } from '@/lib/ai/narrativeGenerator.continuity';
 import { logger } from '@/lib/utils/logger';
 import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
@@ -618,6 +621,12 @@ async function commitAndSettleGeneratedTurn({
   });
 
   syncNpcMetadata(worldId, result.metadata.characters);
+
+  try {
+    checkAndRecordLoreMentions(worldId, sessionId, result.content ?? '', 'narrative');
+  } catch (error) {
+    logger.warn('Failed to record lore mentions:', error);
+  }
 
   if (isFeatureEnabled('SETTLED_COMMITMENT_CHOICES')) {
     await extractAndStoreLore(

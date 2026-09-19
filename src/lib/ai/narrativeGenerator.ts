@@ -13,7 +13,17 @@ import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import type { SessionSnapshot } from '@/types/turnResolver.types';
 import { generateChoices } from './choiceGenerator';
-import { checkAndRecordLoreMentions } from './loreContextHelper';
+import {
+  getLoreContextForPrompt,
+  checkAndRecordLoreMentions,
+} from './loreContextHelper';
+import {
+  buildPromptDebugInfo,
+  isDebugInfoEnabled,
+  type DebugInfoContext,
+} from './debugInfoBuilder';
+import { getActiveProviderModel } from '@/state/providerStore';
+import { DEFAULT_TEXT_MODEL } from './config';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
@@ -205,6 +215,37 @@ export class NarrativeGenerator {
       // mid-pipeline should not get a result back.
       throwIfAborted(options?.signal);
 
+      if (isDebugInfoEnabled()) {
+        const loreContext = getLoreContextForPrompt(
+          request.worldId,
+          request.sessionId,
+          { recordUsage: false }
+        );
+        const previousSegments =
+          request.narrativeContext?.previousSegments || [];
+        const previousSegment = previousSegments[previousSegments.length - 1];
+        const templateType =
+          request.generationParameters?.segmentType === 'transition'
+            ? 'transition'
+            : 'scene';
+
+        const debugInfoContext: DebugInfoContext = {
+          fullPrompt: finalPrompt,
+          templateName: this.getTemplateName(templateType),
+          world,
+          toneSettings,
+          loreContext,
+          characterIds: request.characterIds,
+          previousSegmentContent: previousSegment?.content,
+          previousSegmentType: previousSegment?.type,
+          tokenUsage: result.tokenUsage,
+          modelUsed: getActiveProviderModel() ?? DEFAULT_TEXT_MODEL,
+          rawResponse: response.content,
+        };
+
+        result.metadata.debugInfo = buildPromptDebugInfo(debugInfoContext);
+      }
+
       return result;
     } catch (error) {
       logger.error('Failed to generate narrative segment', { error });
@@ -345,6 +386,26 @@ export class NarrativeGenerator {
         logger.warn('Failed to record lore mentions:', error);
       }
 
+      if (isDebugInfoEnabled()) {
+        const loreContext = getLoreContextForPrompt(worldId, sessionId, {
+          recordUsage: false,
+        });
+
+        const debugInfoContext: DebugInfoContext = {
+          fullPrompt: fullyEnhancedPrompt,
+          templateName: this.getTemplateName('initial'),
+          world,
+          toneSettings,
+          loreContext,
+          characterIds,
+          tokenUsage: result.tokenUsage,
+          modelUsed: getActiveProviderModel() ?? DEFAULT_TEXT_MODEL,
+          rawResponse: response.content,
+        };
+
+        result.metadata.debugInfo = buildPromptDebugInfo(debugInfoContext);
+      }
+
       return result;
     } catch (error) {
       logger.error('Failed to generate initial scene', { error });
@@ -366,6 +427,18 @@ export class NarrativeGenerator {
   private getTemplate(segmentType: string) {
     const templateKey = `narrative/${segmentType}`;
     return getNarrativeTemplate(templateKey);
+  }
+
+  private getTemplateName(segmentType: string): string {
+    const names: Record<string, string> = {
+      scene: 'Scene Template',
+      dialogue: 'Dialogue Template',
+      action: 'Action Template',
+      transition: 'Transition Template',
+      initial: 'Initial Scene Template',
+      initialScene: 'Initial Scene Template',
+    };
+    return names[segmentType] || 'Unknown Template';
   }
 
   async generatePlayerChoices(
