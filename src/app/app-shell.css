@@ -2339,9 +2339,24 @@
     opacity: 0.2;
   }
 
+  /* On a phone the actions stack inside the header, so a plate sized to the
+     header would stretch behind the buttons. These two pages cap it to the
+     title block instead. */
+  .world-detail-vignette,
+  .character-detail-vignette {
+    bottom: auto;
+    height: 6.5rem;
+  }
+
+  /* Fade every edge: a bottom-only mask left the top, left and right edges
+     hard, so the art read as a grey slab rather than a vignette. */
   .characters-header-vignette .component-hero {
-    mask-image: linear-gradient(to bottom, var(--color-canvas) 15%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, var(--color-canvas) 15%, transparent 100%);
+    mask-image:
+      linear-gradient(to bottom, transparent 0%, var(--color-canvas) 35%, var(--color-canvas) 55%, transparent 100%),
+      linear-gradient(to right, transparent 0%, var(--color-canvas) 14%, var(--color-canvas) 86%, transparent 100%);
+    -webkit-mask-image:
+      linear-gradient(to bottom, transparent 0%, var(--color-canvas) 35%, var(--color-canvas) 55%, transparent 100%),
+      linear-gradient(to right, transparent 0%, var(--color-canvas) 14%, var(--color-canvas) 86%, transparent 100%);
   }
 }
 
