@@ -2317,7 +2317,7 @@
 
 @media print {
   .characters-header-vignette {
-    display: none !important;
+    display: none;
   }
 
   :root .characters-world-masthead {
