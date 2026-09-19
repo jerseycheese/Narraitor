@@ -1266,8 +1266,17 @@
 }
 
 .characters-world-kicker-link {
+  position: relative;
   color: inherit;
   text-decoration: none;
+}
+
+/* The link is small type in a tight masthead, so its touch target grows
+   without growing the layout. */
+.characters-world-kicker-link::after {
+  content: "";
+  position: absolute;
+  inset: calc((var(--control-height-touch) - 1lh) / -2) calc(var(--space-2) * -1);
 }
 
 .characters-world-kicker-link:hover {

@@ -1,4 +1,5 @@
 import React from 'react';
+import clsx from 'clsx';
 
 export interface ActiveStateCardProps {
   /** Whether the card is in active state */
@@ -58,7 +59,7 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
   return (
     <article
       data-testid={testId}
-      className={`active-state-card ${stateClasses} ${className}`}
+      className={clsx('active-state-card', stateClasses, className)}
       aria-labelledby={labelledBy}
     >
       {hasImage && <div>{imageChild}</div>}
