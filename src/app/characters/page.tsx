@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Plus, Sparkles, Globe } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getGenreLabel } from '@/lib/constants/genres';
 import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -415,27 +413,8 @@ export default function CharactersPage() {
     ? `${characterCount} ${characterCount === 1 ? 'character' : 'characters'} in this realm`
     : 'Create unique characters for your interactive narrative adventures.';
 
-  const worldKicker = currentWorld ? (
-    <div className="characters-world-kicker" data-testid="characters-world-kicker">
-      <Link
-        href={`/worlds/${currentWorld.id}`}
-        className="characters-world-kicker-link"
-      >
-        <span>WORLD: {currentWorld.name}</span>
-      </Link>
-      {currentWorld.genre && (
-        <>
-          <span className="characters-kicker-dot" aria-hidden="true">
-            ·
-          </span>
-          <span className="characters-kicker-genre">
-            {getGenreLabel(currentWorld.genre)}
-          </span>
-        </>
-      )}
-    </div>
-  ) : null;
-
+  // Decorative world art behind the masthead. The header's world switcher
+  // already names the world, so the masthead repeats neither its name nor genre.
   const headerBackground =
     mounted && currentWorld?.image?.url ? (
       <div className="characters-header-vignette" aria-hidden="true">
@@ -452,7 +431,6 @@ export default function CharactersPage() {
   return (
     <PageLayout
       title="My Characters"
-      kicker={worldKicker}
       description={pageDescription}
       headerBackground={headerBackground}
       headerClassName="characters-world-masthead"

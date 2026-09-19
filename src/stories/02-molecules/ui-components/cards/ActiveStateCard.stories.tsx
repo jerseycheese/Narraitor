@@ -13,10 +13,6 @@ const meta = {
       control: 'boolean',
       description: 'Whether the card is in active state',
     },
-    hasImage: {
-      control: 'boolean',
-      description: 'Whether the card has an image at the top',
-    },
   },
 } satisfies Meta<typeof ActiveStateCard>;
 
@@ -48,45 +44,6 @@ export const Active: Story = {
   args: {
     isActive: true,
     children: <SampleContent />,
-  },
-};
-
-export const WithCustomStyling: Story = {
-  args: {
-    isActive: true,
-    activeClassName: '',
-    inactiveClassName: '',
-    children: <SampleContent />,
-  },
-};
-
-export const WithImage: Story = {
-  args: {
-    isActive: false,
-    hasImage: true,
-    children: (
-      <>
-        <div>
-          <span>Image Placeholder</span>
-        </div>
-        <SampleContent />
-      </>
-    ),
-  },
-};
-
-export const ActiveWithImage: Story = {
-  args: {
-    isActive: true,
-    hasImage: true,
-    children: (
-      <>
-        <div>
-          <span>Featured Image</span>
-        </div>
-        <SampleContent />
-      </>
-    ),
   },
 };
 

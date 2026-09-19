@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { Button } from '@/components/ui/button';
+import { Hero } from '@/components/shared/Hero';
 import { Plus, Sparkles, Play } from 'lucide-react';
 
 const meta: Meta<typeof PageLayout> = {
@@ -207,6 +208,28 @@ export const CharactersPageExample: Story = {
         )}
       </div>
     ),
+  },
+};
+
+/**
+ * The characters list masthead: the world's art, inked, sits behind the header
+ * as a vignette. The header's world switcher names the world, so the masthead
+ * carries only the title and count.
+ */
+export const WithWorldArt: Story = {
+  args: {
+    title: 'My Characters',
+    description: '3 characters in this realm',
+    headerClassName: 'characters-world-masthead',
+    headerBackground: (
+      <div className="characters-header-vignette" aria-hidden="true">
+        <Hero
+          image={{ url: '/visual-assets/worlds/normandy.webp', alt: '' }}
+          treatment="ink"
+        />
+      </div>
+    ),
+    children: <p>Character cards go here.</p>,
   },
 };
 

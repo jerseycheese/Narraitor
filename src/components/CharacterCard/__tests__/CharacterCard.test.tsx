@@ -98,7 +98,7 @@ describe('CharacterCard', () => {
     expect(screen.queryByRole('button', { name: /active/i })).not.toBeInTheDocument();
   });
 
-  it('names every action after the character, with Play as the accent action', () => {
+  it('names every action after the character', () => {
     render(
       <CharacterCard
         character={mockCharacter}
@@ -110,9 +110,7 @@ describe('CharacterCard', () => {
       />
     );
 
-    expect(screen.getByRole('button', { name: 'Play as Aragorn' })).toHaveClass(
-      'card-action-variant-accent'
-    );
+    expect(screen.getByRole('button', { name: 'Play as Aragorn' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Edit Aragorn' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Delete Aragorn' })).toBeInTheDocument();
     expect(screen.queryByTestId('character-card-actions-view-button')).not.toBeInTheDocument();

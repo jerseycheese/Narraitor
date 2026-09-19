@@ -7,11 +7,14 @@ import { useCharacterStore } from '@/state/characterStore';
 import { formatDate } from '@/lib/utils';
 
 type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
+import { World } from '@/types/world.types';
+
 interface CharacterHeaderProps {
   character: StoreCharacter;
+  world: World;
 }
 
-export function CharacterHeader({ character }: CharacterHeaderProps) {
+export function CharacterHeader({ character, world }: CharacterHeaderProps) {
   return (
     <div className="character-detail-header">
       <CharacterPortrait
@@ -20,8 +23,9 @@ export function CharacterHeader({ character }: CharacterHeaderProps) {
         size="xlarge"
       />
       <div className="character-detail-header-info">
-        {/* No name heading, level or world here: the page masthead already
-            carries all three, and repeating them stacked duplicates. */}
+        {/* No name heading here — the page-level h1 already announces the
+            character, and repeating it stacked duplicate headings (#1542) */}
+        <p>Level {character.level}</p>
         {character.background.personality && (
           <p>
             {character.background.personality}
@@ -30,6 +34,9 @@ export function CharacterHeader({ character }: CharacterHeaderProps) {
         <div className="character-detail-header-meta">
           <p>
             <strong>Created:</strong> {formatDate(character.createdAt)}
+          </p>
+          <p>
+            <strong>World:</strong> {world.name}
           </p>
         </div>
       </div>

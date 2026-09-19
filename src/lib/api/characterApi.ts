@@ -1,6 +1,7 @@
 import type { GeneratedCharacterData } from '@/lib/generators/characterGenerator';
 import type { World } from '@/types/world.types';
 import { aiFetch } from '@/lib/ai/aiFetch';
+import { withoutWorldImage } from '@/lib/api/worldPayload';
 
 export interface GenerateCharacterParams {
   worldId?: string;
@@ -17,17 +18,10 @@ export interface GenerateCharacterParams {
  */
 export const characterApi = {
   async generateCharacter(params: GenerateCharacterParams): Promise<GeneratedCharacterData> {
-    const { world, ...restParams } = params;
-    const worldPayload =
-      world && 'image' in world
-        ? (({ image: _image, ...rest }) => rest)(world)
-        : world;
-    const body = world !== undefined ? { ...restParams, world: worldPayload } : restParams;
-
     const response = await aiFetch('/api/generate-character', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ ...params, world: withoutWorldImage(params.world) }),
     });
 
     if (!response.ok) {

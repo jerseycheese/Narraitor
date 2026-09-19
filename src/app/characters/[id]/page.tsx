@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { Pencil, Play, Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
@@ -80,45 +79,10 @@ export default function CharacterViewPage() {
     },
   ];
 
-  const worldKicker = (
-    <div className="characters-world-kicker" data-testid="characters-world-kicker">
-      <Link
-        href={`/worlds/${world.id}`}
-        className="characters-world-kicker-link"
-      >
-        <span className="characters-kicker-prefix">WORLD: </span>
-        <span className="characters-kicker-name">{world.name}</span>
-      </Link>
-      {world.genre && (
-        <>
-          <span className="characters-kicker-dot" aria-hidden="true">
-            ·
-          </span>
-          <span className="characters-kicker-genre">
-            {getGenreLabel(world.genre)}
-          </span>
-        </>
-      )}
-    </div>
-  );
-
-  const headerBackground = world.image?.url ? (
-    <div className="characters-header-vignette character-detail-vignette" aria-hidden="true">
-      <Hero
-        image={{
-          url: world.image.url,
-          alt: '',
-        }}
-        treatment="ink"
-      />
-    </div>
-  ) : null;
-
   return (
     <PageLayout
       title={character.name}
-      kicker={worldKicker}
-      description={character.level ? `Level ${character.level}` : undefined}
+      description={`${character.level ? `Level ${character.level} • ` : ''}${world.name}${world.genre ? ` • ${getGenreLabel(world.genre)}` : ''}`}
       actions={
         <ActionButtonGroup 
           actions={actionButtons.map(btn => ({
@@ -129,15 +93,29 @@ export default function CharacterViewPage() {
           gap="sm" 
         />
       }
-      headerBackground={headerBackground}
-      headerClassName="characters-world-masthead character-detail-masthead"
     >
-      <div className="character-detail-back">
-        <BackNavigation href="/characters" label="Back to Characters" />
-      </div>
+      {/* Decorative world-image banner; the page h1 above already carries the
+          character name, so the hero repeats neither it nor the level line (#1542) */}
+      {world.image?.url && (
+        <div className="character-detail-hero">
+          <Hero
+            image={{
+              url: world.image.url,
+              alt: `${world.name} world`,
+            }}
+          />
+        </div>
+      )}
+
+      {/* Back navigation for pages without world image */}
+      {!world.image?.url && (
+        <div className="character-detail-back">
+          <BackNavigation href="/characters" label="Back to Characters" />
+        </div>
+      )}
 
       <div className="character-detail-body">
-        <CharacterHeader character={character} />
+        <CharacterHeader character={character} world={world} />
         <CharacterDetailsDisplay character={character} world={world} />
       </div>
 

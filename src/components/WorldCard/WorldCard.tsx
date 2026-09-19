@@ -21,7 +21,7 @@ import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('WorldCard');
 
-/** Pills shown before the rest collapse into a "+N more" roster link. */
+/** Pills shown before the rest collapse into a "+N more" count. */
 const MAX_CHARACTER_PILLS = 3;
 
 /** First character as the reader sees it, so an emoji isn't split in half. */

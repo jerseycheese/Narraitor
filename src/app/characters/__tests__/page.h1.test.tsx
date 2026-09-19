@@ -111,10 +111,6 @@ describe('CharactersPage heading hierarchy (#1530)', () => {
     expect(
       screen.queryByRole('heading', { name: 'Fantasy Realm' })
     ).not.toBeInTheDocument();
-
-    // The world name is anchored via the folio kicker without competing as a heading
-    const kicker = screen.getByTestId('characters-world-kicker');
-    expect(kicker).toHaveTextContent('WORLD: Fantasy Realm');
   });
 
   it('renders exactly one page-level h1 in the empty no-world state', async () => {

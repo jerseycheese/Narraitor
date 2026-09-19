@@ -4,6 +4,7 @@ jest.mock('@/lib/ai/aiFetch', () => ({
 
 import { characterApi } from '../characterApi';
 import { aiFetch } from '@/lib/ai/aiFetch';
+import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 
 const mockAiFetch = aiFetch as jest.MockedFunction<typeof aiFetch>;
 
@@ -66,18 +67,10 @@ describe('characterApi.generateCharacter', () => {
     await characterApi.generateCharacter({
       characterType: 'original',
       existingNames: [],
-      world: {
-        id: 'w1',
+      world: createMockWorld({
         name: 'Fantasy World',
-        description: 'A magical place',
-        genre: 'fantasy',
         image: { url: 'data:image/png;base64,hugeImageData...', type: 'ai-generated' },
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01',
-        attributes: [],
-        skills: [],
-        settings: {} as any,
-      },
+      }),
     });
 
     const [, init] = mockAiFetch.mock.calls[0];

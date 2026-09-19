@@ -1,6 +1,7 @@
 import type { GeneratedImage } from '@/types/common.types';
 import type { PortraitSubject } from '@/types/character.types';
 import { aiFetch } from '@/lib/ai/aiFetch';
+import { withoutWorldImage } from '@/lib/api/worldPayload';
 
 export interface PortraitRequest {
   character?: PortraitSubject;
@@ -18,18 +19,10 @@ export interface PortraitResponse {
 export async function generatePortrait(
   payload: PortraitRequest
 ): Promise<PortraitResponse> {
-  const worldPayload =
-    payload.world && typeof payload.world === 'object' && 'image' in payload.world
-      ? (({ image: _image, ...rest }: Record<string, unknown>) => rest)(
-          payload.world as Record<string, unknown>
-        )
-      : payload.world;
-  const body = payload.world !== undefined ? { ...payload, world: worldPayload } : payload;
-
   const response = await aiFetch('/api/generate-portrait', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ...payload, world: withoutWorldImage(payload.world) }),
   });
 
   if (!response.ok) {

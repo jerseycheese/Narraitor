@@ -1,12 +1,11 @@
 import React from 'react';
+import clsx from 'clsx';
 
 export interface PageLayoutProps {
   /** The main page title */
   title?: string;
-  /** Optional kicker or eyebrow above title (e.g. folio context) */
-  kicker?: React.ReactNode;
   /** Optional description text below the title */
-  description?: React.ReactNode;
+  description?: string;
   /** Optional action buttons to display in the header */
   actions?: React.ReactNode;
   /** Optional background art or vignette inside the header */
@@ -56,30 +55,23 @@ export interface PageLayoutProps {
  */
 export function PageLayout({ 
   title, 
-  kicker,
   description, 
   actions, 
   headerBackground,
-  headerClassName = '',
+  headerClassName,
   children, 
   className = '' 
 }: PageLayoutProps) {
   // Only render header if there's content for it
-  const hasHeaderContent = title || actions || description || kicker || headerBackground;
-  const headerClasses = ['page-layout-header', headerClassName].filter(Boolean).join(' ');
+  const hasHeaderContent = title || actions || description || headerBackground;
 
   return (
     <div className="component-page-layout">
       <div className={`${className}`}>
         {hasHeaderContent && (
-          <header className={headerClasses}>
+          <header className={clsx('page-layout-header', headerClassName)}>
             {headerBackground}
             <div className="page-layout-header-content">
-              {kicker && (
-                <div className="page-layout-kicker">
-                  {kicker}
-                </div>
-              )}
               <div className="page-layout-header-top">
                 {title && (
                   <h1 className="page-layout-title">

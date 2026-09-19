@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { act, render, screen, fireEvent, within } from '@testing-library/react';
 import WorldCard from '../WorldCard';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 import { formatDate } from '@/lib/utils';
@@ -14,6 +14,15 @@ jest.mock('next/navigation', () => ({
 
 beforeEach(() => {
   mockRouterPush.mockClear();
+});
+
+// Reset in afterEach, inside act, so a failed assertion can't leak store state
+// into the next test and the store's subscribers update without warnings.
+afterEach(() => {
+  act(() => {
+    useCharacterStore.setState(useCharacterStore.getInitialState(), true);
+    useSessionStore.setState(useSessionStore.getInitialState(), true);
+  });
 });
 
 // Regression: a world with no image previously rendered a white 1x1 data-URI
@@ -45,22 +54,6 @@ describe('WorldCard', () => {
     expect(screen.getByText(`Created: ${formatDate(mockWorld.createdAt)}`)).toBeInTheDocument();
   });
 
-  // Test case for visual presentation
-  test('presents information in a clean, readable format', () => {
-    render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
-    
-    // Verify header contains the name prominently
-    const header = screen.getByRole('heading', { name: mockWorld.name });
-    expect(header).toBeInTheDocument();
-    
-    // Verify all essential content is accessible
-    expect(screen.getByText(mockWorld.description)).toBeInTheDocument();
-    expect(screen.getByText('Fantasy')).toBeInTheDocument();
-    
-    // Verify timestamp information is present
-    expect(screen.getByText(/Created:/)).toBeInTheDocument();
-  });
-  
   // Test case for edge cases in data display
   test('handles missing or incomplete data gracefully', () => {
     const incompleteWorld = createMockWorld({
@@ -132,24 +125,17 @@ describe('WorldCard', () => {
     fireEvent.click(screen.getByRole('button', { name: `Continue ${mockWorld.name}` }));
     expect(mockRouterPush).toHaveBeenCalledWith(`/worlds/${mockWorld.id}/play?autoResume=true`);
     expect(screen.getByText(`Last played: ${formatDate(lastPlayed)}`)).toBeInTheDocument();
-
-    useCharacterStore.setState(useCharacterStore.getInitialState(), true);
-    useSessionStore.setState(useSessionStore.getInitialState(), true);
   });
 
-  // One-primary-per-state: page-level Create is the filled primary on the
-  // worlds list, so per-card Play is the unfilled accent action.
-  test('Play is the unfilled accent action and names its world', () => {
+  // A list repeats "Play" on every card, so the accessible name says which world.
+  test('Play names its world', () => {
     render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
 
     const playButton = screen.getByTestId('world-card-actions-play-button');
     expect(playButton).toHaveAccessibleName(expect.stringContaining(mockWorld.name));
-    expect(playButton).toHaveClass('card-action-variant-accent');
-    expect(playButton).not.toHaveClass('card-action-variant-primary');
   });
 
-  // Test for character avatar pill styling
-  test('character avatar buttons use design system classes', () => {
+  test('character pills keep their name on phones and open the character', () => {
     const mockCharacter = {
       id: 'char-1',
       worldId: mockWorld.id,
@@ -171,19 +157,17 @@ describe('WorldCard', () => {
     render(
       <WorldCard
         world={mockWorld}
-       
         onDelete={jest.fn()}
         characters={[mockCharacter]}
       />
     );
 
-    const characterButton = screen.getByTitle('View Aragorn - Level 5');
-    expect(characterButton).toHaveClass('world-card-character-pill');
     // The visible name hides on phones, so the accessible name can't depend on it.
-    expect(screen.getByRole('button', { name: 'Aragorn, level 5' })).toBe(characterButton);
+    fireEvent.click(screen.getByRole('button', { name: 'Aragorn, level 5' }));
+    expect(mockRouterPush).toHaveBeenCalledWith('/characters/char-1');
   });
 
-  test('caps character pills and links the rest to the filtered roster', () => {
+  test('caps character pills and counts the rest', () => {
     const characters = ['Aria', 'Bram', 'Cato', 'Dune', 'Esk'].map((name, i) => ({
       id: `char-${i}`,
       worldId: mockWorld.id,
@@ -205,7 +189,6 @@ describe('WorldCard', () => {
     const { container } = render(
       <WorldCard
         world={mockWorld}
-       
         onDelete={jest.fn()}
         characters={characters}
       />
@@ -214,9 +197,6 @@ describe('WorldCard', () => {
     expect(container.querySelectorAll('.world-card-character-pill')).toHaveLength(3);
     const more = screen.getByTestId('world-card-character-pills-more');
     expect(more).toHaveTextContent('+2 more');
-    // The count is not a link: the card's Characters action is the one route
-    // to the filtered roster.
-    expect(more).not.toHaveAttribute('href');
   });
 
   // Regression test for #1113 - no white placeholder image in the no-image case

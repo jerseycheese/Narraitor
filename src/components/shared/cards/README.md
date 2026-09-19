@@ -7,13 +7,13 @@ The pieces the worlds and characters list cards are built from. `WorldCard` and 
 The card wrapper. It only styles the state: an accent border and a faint wash when active. It isn't clickable, so nothing inside it needs to stop propagation.
 
 ```tsx
-<ActiveStateCard isActive={isActive} hasImage className="component-example-card">
+<ActiveStateCard isActive={isActive} className="component-example-card" labelledBy={titleId}>
   <CardImage />
   <CardContent />
 </ActiveStateCard>
 ```
 
-With `hasImage`, the first child goes in the media slot and the rest follow.
+Children render in order; the card's own CSS places them. Pass `labelledBy` the title's id so the card is named after its item.
 
 ## ActiveStateLabel
 
