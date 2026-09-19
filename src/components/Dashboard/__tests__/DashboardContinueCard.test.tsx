@@ -87,7 +87,7 @@ describe('DashboardContinueCard', () => {
     expect(mockOnContinue).toHaveBeenCalledWith(mockSession.id);
   });
 
-  it('renders Continue Last Game with the ink-blue primary variant, not green success', () => {
+  it('renders Continue Last Session with the ink-blue primary variant, not green success', () => {
     render(
       <DashboardContinueCard
         session={mockSession}
@@ -98,11 +98,32 @@ describe('DashboardContinueCard', () => {
       />
     );
 
-    const continueButton = screen.getByRole('button', { name: /continue last game/i });
+    const continueButton = screen.getByRole('button', { name: /continue last session/i });
     // ActionButtonGroup maps 'default' → button-default: the card owns the one
     // filled CTA in the active-session dashboard.
     expect(continueButton).toHaveClass('button-default');
     expect(continueButton).not.toHaveClass('button-success');
+  });
+
+  it('uses consistent session terminology and avoids game terminology', () => {
+    const { container } = render(
+      <DashboardContinueCard
+        session={mockSession}
+        world={mockWorld}
+        character={mockCharacter}
+        onContinue={mockOnContinue}
+        onDelete={mockOnDelete}
+      />
+    );
+
+    const heading = screen.getByRole('heading', { level: 2, name: 'Continue Your Session' });
+    expect(heading).toHaveAttribute('id', 'continue-session-heading');
+
+    const section = container.querySelector('section');
+    expect(section).toHaveAttribute('aria-labelledby', 'continue-session-heading');
+
+    expect(screen.getByRole('button', { name: 'Continue Last Session' })).toBeInTheDocument();
+    expect(screen.queryByText(/game/i)).not.toBeInTheDocument();
   });
 
   it('shows delete confirmation dialog when delete clicked', async () => {

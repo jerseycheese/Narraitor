@@ -73,12 +73,12 @@ test.describe('Main Pages Visual Tests', () => {
     await page.evaluate(() => document.fonts.ready);
     await hideDynamicContent(page);
     // Ensure the Continue section appears (seeded session present)
-    await page.waitForSelector('[aria-labelledby="continue-game-heading"]', { timeout: 8000 });
+    await page.waitForSelector('[aria-labelledby="continue-session-heading"]', { timeout: 8000 });
 
     // Verify page loaded with expected content
     await expect(page).toHaveTitle(/Narraitor/i);
 
-    // Take full page screenshot - should show "Continue Last Game" with character and world info
+    // Take full page screenshot - should show "Continue Last Session" with character and world info
     //
     // The Recent Worlds thumbnail (.dashboard-recent-world-thumb, 48x48px) goes
     // through next/image on-demand optimization, and whether it decodes before

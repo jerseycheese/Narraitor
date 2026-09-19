@@ -46,7 +46,7 @@ export function DashboardContinueCard({
     <>
       <section
         className="component-dashboard-continue-card"
-        aria-labelledby="continue-game-heading"
+        aria-labelledby="continue-session-heading"
       >
         {/* World image as an atmospheric background layer. Hidden by
             default; per-theme CSS opts in and applies a legibility scrim. */}
@@ -56,7 +56,7 @@ export function DashboardContinueCard({
           </div>
         )}
 
-        <h2 id="continue-game-heading">Continue Your Game</h2>
+        <h2 id="continue-session-heading">Continue Your Session</h2>
 
         <div className="dashboard-continue-card-row">
           {/* Character Portrait */}
@@ -96,7 +96,7 @@ export function DashboardContinueCard({
           gap="sm"
           actions={[
             {
-              label: 'Continue Last Game',
+              label: 'Continue Last Session',
               onClick: () => onContinue(session.id),
               variant: 'default',
             },
