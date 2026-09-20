@@ -43,6 +43,7 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
       title="World Image"
       description="A generated environmental image for your world. It appears on world cards and as the hero image on the world details page."
       currentImageUrl={world.image?.url}
+      currentImageType={world.image?.type}
       isGenerating={isGenerating}
       onGenerate={handleGenerateImage}
       onRemove={handleRemoveImage}

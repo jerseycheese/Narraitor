@@ -31,6 +31,7 @@ export const PortraitSection: React.FC<PortraitSectionProps> = ({
       title="Character Portrait"
       description="A portrait generated from this character's details."
       currentImageUrl={portrait?.url}
+      currentImageType={portrait?.type}
       isGenerating={generatingPortrait}
       onGenerate={onGeneratePortrait}
       onRemove={onRemovePortrait}
