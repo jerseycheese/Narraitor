@@ -135,24 +135,26 @@ describe('WorldCard', () => {
     expect(playButton).toHaveAccessibleName(expect.stringContaining(mockWorld.name));
   });
 
+  const createMockCharacter = (id: string, name: string, level = 1) => ({
+    id,
+    worldId: mockWorld.id,
+    name,
+    description: '',
+    portrait: { type: 'placeholder' as const, url: null },
+    level,
+    isPlayer: true,
+    attributes: [],
+    skills: [],
+    derivedStats: [],
+    background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+    status: { conditions: [] },
+    inventory: { characterId: id, items: [], capacity: 10, categories: [], itemOrder: [] },
+    createdAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-01-01T00:00:00.000Z',
+  });
+
   test('character pills keep their name on phones and open the character', () => {
-    const mockCharacter = {
-      id: 'char-1',
-      worldId: mockWorld.id,
-      name: 'Aragorn',
-      description: 'A ranger',
-      portrait: { type: 'placeholder' as const, url: null },
-      level: 5,
-      isPlayer: true,
-      attributes: [],
-      skills: [],
-      derivedStats: [],
-      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
-      status: { conditions: [] },
-      inventory: { characterId: 'char-1', items: [], capacity: 10, categories: [], itemOrder: [] },
-      createdAt: '2024-01-01T00:00:00.000Z',
-      updatedAt: '2024-01-01T00:00:00.000Z',
-    };
+    const mockCharacter = createMockCharacter('char-1', 'Aragorn', 5);
 
     render(
       <WorldCard
@@ -168,23 +170,9 @@ describe('WorldCard', () => {
   });
 
   test('caps character pills and counts the rest', () => {
-    const characters = ['Aria', 'Bram', 'Cato', 'Dune', 'Esk'].map((name, i) => ({
-      id: `char-${i}`,
-      worldId: mockWorld.id,
-      name,
-      description: '',
-      portrait: { type: 'placeholder' as const, url: null },
-      level: 1,
-      isPlayer: true,
-      attributes: [],
-      skills: [],
-      derivedStats: [],
-      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
-      status: { conditions: [] },
-      inventory: { characterId: `char-${i}`, items: [], capacity: 10, categories: [], itemOrder: [] },
-      createdAt: '2024-01-01T00:00:00.000Z',
-      updatedAt: '2024-01-01T00:00:00.000Z',
-    }));
+    const characters = ['Aria', 'Bram', 'Cato', 'Dune', 'Esk'].map((name, i) =>
+      createMockCharacter(`char-${i}`, name, 1)
+    );
 
     const { container } = render(
       <WorldCard
@@ -243,12 +231,63 @@ describe('WorldCard', () => {
     expect(mockRouterPush).toHaveBeenCalledWith(`/worlds/${mockWorld.id}/edit`);
   });
 
-  test('renders "Original" for original worlds without a reference', () => {
+  test('omits default Original label for worlds without a reference', () => {
     const originalWorld = createMockWorld({
       reference: undefined,
     });
     render(<WorldCard world={originalWorld} onDelete={jest.fn()} />);
-    expect(screen.getByTestId('world-card-type')).toHaveTextContent('Original');
+    expect(screen.queryByTestId('world-card-type')).not.toBeInTheDocument();
+    expect(screen.queryByText('Original')).not.toBeInTheDocument();
+  });
+
+  test('renders quiet text metadata for set_within references', () => {
+    const setInWorld = createMockWorld({
+      reference: 'Middle-earth',
+      relationship: 'set_within',
+    });
+    render(<WorldCard world={setInWorld} onDelete={jest.fn()} />);
+    expect(screen.getByTestId('world-card-type')).toHaveTextContent('Set in Middle-earth');
+  });
+
+  test('renders quiet text metadata for inspired_by references', () => {
+    const inspiredWorld = createMockWorld({
+      reference: 'Solaris',
+      relationship: 'inspired_by',
+    });
+    render(<WorldCard world={inspiredWorld} onDelete={jest.fn()} />);
+    expect(screen.getByTestId('world-card-type')).toHaveTextContent('Inspired by Solaris');
+  });
+
+  test('configures deliberate action layout with unfilled primary action and flexible actions', () => {
+    render(<WorldCard world={mockWorld} onDelete={jest.fn()} />);
+
+    const playButton = screen.getByTestId('world-card-actions-play-button');
+    const charactersButton = screen.getByTestId('world-card-actions-characters-button');
+    const editButton = screen.getByTestId('world-card-actions-edit-button');
+    const deleteButton = screen.getByTestId('world-card-actions-delete-button');
+
+    // Unfilled primary action per single-primary-action rule
+    expect(playButton).toHaveClass('card-action-variant-accent');
+    expect(playButton).toHaveAttribute('data-flex', 'true');
+
+    // Secondary actions take equal flex share to balance the row
+    expect(charactersButton).toHaveAttribute('data-flex', 'true');
+    expect(editButton).toHaveAttribute('data-flex', 'true');
+    expect(deleteButton).toHaveAttribute('data-flex', 'true');
+  });
+
+  test('preserves routes and accessible names for utility actions', () => {
+    const onDeleteMock = jest.fn();
+    render(<WorldCard world={mockWorld} onDelete={onDeleteMock} />);
+
+    const charactersButton = screen.getByRole('button', { name: `Characters in ${mockWorld.name}` });
+    const deleteButton = screen.getByRole('button', { name: `Delete ${mockWorld.name}` });
+
+    fireEvent.click(charactersButton);
+    expect(mockRouterPush).toHaveBeenCalledWith(`/characters?worldId=${mockWorld.id}`);
+
+    fireEvent.click(deleteButton);
+    expect(onDeleteMock).toHaveBeenCalledWith(mockWorld.id);
   });
 
 });

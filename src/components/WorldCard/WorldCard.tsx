@@ -41,30 +41,11 @@ interface WorldCardProps {
 }
 
 /**
- * WorldCard - Display card for a world with actions and information
+ * WorldCard - Display card for a world with deliberate actions and quiet metadata.
  *
- * Shows world details including name, genre, description, character count,
- * and world type (original, set in, inspired by). Provides action buttons
- * for playing, creating characters, viewing, editing, and deleting.
- * Active worlds get special styling and indicate current selection.
- *
- * Features:
- * - World image display if available
- * - Genre and world type badges
- * - Character count with navigation to characters list
- * - Smart play button that handles session resume, and sets the active world
- * - Active label on the current world
- * - Action buttons
- *
- * @param props - World card configuration and event handlers
- * @returns A formatted world card with image, details, and action buttons
- *
- * @example Basic usage
- * <WorldCard
- *   world={world}
- *   isActive={world.id === currentWorldId}
- *   onDelete={(id) => deleteWorld(id)}
- * />
+ * Shows world details (name, genre, description, character pills), quiet reference
+ * metadata if non-default, and structured action buttons (Play/Continue, Characters,
+ * Edit, Delete). Keeps single-primary CTA discipline with unfilled per-card Play.
  */
 const WorldCard: React.FC<WorldCardProps> = ({
   world,
@@ -212,17 +193,19 @@ const WorldCard: React.FC<WorldCardProps> = ({
             )}
           </div>
 
-          <div className="world-card-type-badge">
-            <span className="world-card-type" data-testid="world-card-type">
-              {world.reference
-                ? `${world.relationship === 'set_within' ? 'Set in' : 'Inspired by'} ${world.reference}`
-                : 'Original'}
-            </span>
-            <ActiveStateLabel
-              isActive={isActive}
-              testId="world-card-active-label"
-            />
-          </div>
+          {(world.reference || isActive) && (
+            <div className="world-card-type-badge">
+              {world.reference && (
+                <span className="world-card-type" data-testid="world-card-type">
+                  {world.relationship === 'set_within' ? 'Set in' : 'Inspired by'} {world.reference}
+                </span>
+              )}
+              <ActiveStateLabel
+                isActive={isActive}
+                testId="world-card-active-label"
+              />
+            </div>
+          )}
         </div>
 
         <footer>
@@ -248,6 +231,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     : `Create a character for ${world.name}`,
                   onClick: handlePlayClick,
                   variant: 'accent',
+                  flex: true,
                   testId: 'world-card-actions-play-button',
                   icon: sessionCharacterId ? <Play aria-hidden="true" /> : <UserPlus aria-hidden="true" />,
                 },
@@ -259,6 +243,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   ariaLabel: `Characters in ${world.name}`,
                   onClick: () => router.push(`/characters?worldId=${world.id}`),
                   variant: 'quiet',
+                  flex: true,
                   testId: 'world-card-actions-characters-button',
                   icon: <Users aria-hidden="true" />,
                 },
@@ -268,6 +253,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   ariaLabel: `Edit ${world.name}`,
                   onClick: handleEditClick,
                   variant: 'quiet',
+                  flex: true,
                   testId: 'world-card-actions-edit-button',
                   icon: <Pencil aria-hidden="true" />,
                 },
@@ -277,6 +263,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   ariaLabel: `Delete ${world.name}`,
                   onClick: handleDeleteClick,
                   variant: 'quiet-danger',
+                  flex: true,
                   testId: 'world-card-actions-delete-button',
                   icon: <Trash aria-hidden="true" />,
                 },

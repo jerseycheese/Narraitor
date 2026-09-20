@@ -3134,9 +3134,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 .world-card-type {
   font-family: var(--font-system);
   font-size: var(--font-size-2xs_5);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: var(--color-text-muted);
 }
 
@@ -3164,6 +3162,29 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+}
+
+:root .world-card-footer-actions .card-action-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: var(--space-2);
+}
+
+:root .world-card-footer-actions .card-action-row {
+  display: flex;
+  width: 100%;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+}
+
+:root .world-card-footer-actions .card-action-row.primary button {
+  width: 100%;
+}
+
+:root .world-card-footer-actions .card-action-row.secondary button {
+  min-width: 0;
+  padding-inline: var(--space-2);
 }
 
 
@@ -3392,18 +3413,25 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   }
 
   /* Stacked action rows cost a phone about 50px per card, which is what pushes
-     the first Play under the fold. Play now hugs its label, so the primary and
-     secondary rows collapse into one line of buttons. */
-  .component-character-card .character-card-footer-actions .card-action-group,
-  :root .world-card-footer-actions .card-action-group {
+     the first Play under the fold. For CharacterCard with two secondary actions,
+     the primary and secondary rows collapse into one line of buttons. */
+  .component-character-card .character-card-footer-actions .card-action-group {
     flex-flow: row wrap;
     align-items: center;
     gap: var(--space-2);
   }
 
-  .component-character-card .character-card-footer-actions .card-action-row,
-  :root .world-card-footer-actions .card-action-row {
+  .component-character-card .character-card-footer-actions .card-action-row {
     display: contents;
+  }
+
+  /* WorldCard actions on small screens: compact secondary utility row (desktop base
+     handles column layout, row nowrap, and primary width). */
+  :root .world-card-footer-actions .card-action-row.secondary button {
+    flex: 1 1 0%;
+    min-width: 0;
+    padding-inline: var(--space-1_5);
+    font-size: var(--font-size-xs);
   }
 }
 
