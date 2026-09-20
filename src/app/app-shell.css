@@ -3133,7 +3133,7 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 .world-card-type {
   font-family: var(--font-system);
-  font-size: var(--font-size-xs_5);
+  font-size: var(--font-size-2xs_5);
   font-weight: 500;
   color: var(--color-text-muted);
 }
@@ -3425,27 +3425,8 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
     display: contents;
   }
 
-  /* WorldCard actions have a deliberate 2-row layout: Play/Continue leads full-width
-     on top, while Characters, Edit, and Delete sit evenly in the secondary row without
-     wrapping or stranding any utility action. */
-  :root .world-card-footer-actions .card-action-group {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: var(--space-2);
-  }
-
-  :root .world-card-footer-actions .card-action-row {
-    display: flex;
-    width: 100%;
-    flex-wrap: nowrap;
-    gap: var(--space-2);
-  }
-
-  :root .world-card-footer-actions .card-action-row.primary button {
-    width: 100%;
-  }
-
+  /* WorldCard actions on small screens: compact secondary utility row (desktop base
+     handles column layout, row nowrap, and primary width). */
   :root .world-card-footer-actions .card-action-row.secondary button {
     flex: 1 1 0%;
     min-width: 0;

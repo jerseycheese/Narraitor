@@ -57,6 +57,13 @@ export interface CardActionGroupProps {
  * quiet text actions. Each carries the item's name in its accessible label,
  * because a list repeats the same visible text on every card.
  *
+ * Consumer cards adapt this layout deliberately on mobile:
+ * - CharacterCard (3 actions: Play, Edit, Delete) uses display: contents to
+ *   collapse rows into a single wrapping row.
+ * - WorldCard (4 actions: Play, Characters, Edit, Delete) retains its 2-row
+ *   structure (full-width primary, balanced secondaries) so Delete is never
+ *   stranded alone.
+ *
  * @example List page (worlds list, characters list)
  * <CardActionGroup
  *   primaryActions={[

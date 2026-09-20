@@ -135,21 +135,26 @@ describe('WorldCard', () => {
     expect(playButton).toHaveAccessibleName(expect.stringContaining(mockWorld.name));
   });
 
+  const createMockCharacter = (id: string, name: string, level = 1) => ({
+    id,
+    worldId: mockWorld.id,
+    name,
+    description: '',
+    portrait: { type: 'placeholder' as const, url: null },
+    level,
+    isPlayer: true,
+    attributes: [],
+    skills: [],
+    derivedStats: [],
+    background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+    status: { conditions: [] },
+    inventory: { characterId: id, items: [], capacity: 10, categories: [], itemOrder: [] },
+    createdAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-01-01T00:00:00.000Z',
+  });
+
   test('character pills keep their name on phones and open the character', () => {
-    const mockCharacter = {
-      id: 'char-1',
-      worldId: mockWorld.id,
-      name: 'Aragorn',
-      description: 'A ranger',
-      portrait: { type: 'placeholder' as const, url: null },
-      level: 5,
-      isPlayer: true,
-      attributes: [], skills: [], derivedStats: [],
-      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
-      status: { conditions: [] }, inventory: { characterId: 'char-1', items: [], capacity: 10, categories: [], itemOrder: [] },
-      createdAt: '2024-01-01T00:00:00.000Z',
-      updatedAt: '2024-01-01T00:00:00.000Z',
-    };
+    const mockCharacter = createMockCharacter('char-1', 'Aragorn', 5);
 
     render(
       <WorldCard
@@ -165,20 +170,9 @@ describe('WorldCard', () => {
   });
 
   test('caps character pills and counts the rest', () => {
-    const characters = ['Aria', 'Bram', 'Cato', 'Dune', 'Esk'].map((name, i) => ({
-      id: `char-${i}`,
-      worldId: mockWorld.id,
-      name,
-      description: '',
-      portrait: { type: 'placeholder' as const, url: null },
-      level: 1,
-      isPlayer: true,
-      attributes: [], skills: [], derivedStats: [],
-      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
-      status: { conditions: [] }, inventory: { characterId: `char-${i}`, items: [], capacity: 10, categories: [], itemOrder: [] },
-      createdAt: '2024-01-01T00:00:00.000Z',
-      updatedAt: '2024-01-01T00:00:00.000Z',
-    }));
+    const characters = ['Aria', 'Bram', 'Cato', 'Dune', 'Esk'].map((name, i) =>
+      createMockCharacter(`char-${i}`, name, 1)
+    );
 
     const { container } = render(
       <WorldCard
@@ -246,15 +240,16 @@ describe('WorldCard', () => {
     expect(screen.queryByText('Original')).not.toBeInTheDocument();
   });
 
-  test('renders quiet text metadata for worlds with a reference', () => {
+  test('renders quiet text metadata for set_within references', () => {
     const setInWorld = createMockWorld({
       reference: 'Middle-earth',
       relationship: 'set_within',
     });
-    const { unmount } = render(<WorldCard world={setInWorld} onDelete={jest.fn()} />);
+    render(<WorldCard world={setInWorld} onDelete={jest.fn()} />);
     expect(screen.getByTestId('world-card-type')).toHaveTextContent('Set in Middle-earth');
-    unmount();
+  });
 
+  test('renders quiet text metadata for inspired_by references', () => {
     const inspiredWorld = createMockWorld({
       reference: 'Solaris',
       relationship: 'inspired_by',
