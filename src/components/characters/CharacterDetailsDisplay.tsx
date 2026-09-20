@@ -75,7 +75,10 @@ export function CharacterDetailsDisplay({
       {showBackground && (
         <section className="character-detail-section">
           <h2>Background</h2>
-          <CharacterBackgroundDisplay background={character.background} />
+          <CharacterBackgroundDisplay
+            background={character.background}
+            showPersonality={false}
+          />
         </section>
       )}
     </div>

@@ -17,7 +17,7 @@ interface CharacterBackgroundDisplayProps {
 
 export function CharacterBackgroundDisplay({
   background,
-  showPersonality = false,
+  showPersonality = true,
 }: CharacterBackgroundDisplayProps) {
   return (
     <div className="character-detail-background">
