@@ -43,12 +43,18 @@ export function CharacterPropertyGrid<T extends PropertyLike>({
       return acc;
     }, {} as Record<string, T[]>);
 
+    const isLoneGeneralGroup =
+      Object.keys(grouped).length === 1 &&
+      Object.keys(grouped)[0].toLowerCase() === 'general';
+
     return (
       <div className={wrapperClass}>
         <div className={categoriesClass}>
           {Object.entries(grouped).map(([category, group]) => (
             <div key={category} className={categoryClass}>
-              <h3 className={categoryHeadingClass}>{category}</h3>
+              {!isLoneGeneralGroup && (
+                <h3 className={categoryHeadingClass}>{category}</h3>
+              )}
               <div className={gridClass}>
                 {group.map((item, index) => (
                   <React.Fragment key={item.id || `${kind}-${category}-${index}`}>
