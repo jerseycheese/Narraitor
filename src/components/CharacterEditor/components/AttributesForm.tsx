@@ -53,7 +53,6 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
   return (
     <div className="component-attributes-form">
       <div className="attributes-form-header">
-        <h2>Attributes</h2>
         <PointPoolDisplay pool={pool} label="Attribute Points" />
       </div>
 

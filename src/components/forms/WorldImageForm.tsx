@@ -43,9 +43,6 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
       title="World Image"
       description="A generated environmental image for your world. It appears on world cards and as the hero image on the world details page."
       currentImageUrl={world.image?.url}
-      currentImageType={world.image?.type}
-      generatedAt={world.image?.generatedAt}
-      currentPrompt={world.image?.prompt}
       isGenerating={isGenerating}
       onGenerate={handleGenerateImage}
       onRemove={handleRemoveImage}
@@ -55,6 +52,7 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
       generateButtonText="Generate World Image"
       regenerateButtonText="Regenerate World Image"
       removeButtonText="Remove World Image"
+      generateButtonVariant="secondary"
       imageComponent={
         <WorldImageComponent
           image={world.image || { type: 'placeholder', url: null }}

@@ -138,7 +138,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
           <Button
             onClick={() => setShowCreateModal(true)}
             disabled={isLimitReached}
-            variant="default"
+            variant="secondary"
             size="sm"
             aria-label={
               isLimitReached 

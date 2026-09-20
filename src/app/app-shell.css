@@ -1597,12 +1597,52 @@
 .character-editor-actions,
 .world-editor-actions {
   display: flex;
+  flex-direction: column;
   gap: var(--space-3);
   margin-top: var(--space-8);
-  padding: var(--space-4) var(--space-5);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.character-editor-validation-warning {
+  margin: 0;
+  color: var(--color-danger);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.character-editor-danger-zone {
+  display: flex;
+  justify-content: flex-start;
+  padding: var(--space-2) 0;
+  margin-top: var(--space-4);
+}
+
+.character-editor-delete-trigger {
+  background: transparent;
+  border: none;
+  padding: var(--space-2) 0;
+  color: var(--color-danger);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 120ms ease;
+}
+
+.character-editor-delete-trigger:hover {
+  opacity: 0.8;
+}
+
+.character-editor-delete-trigger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: none;
 }
 
 @media (width <= 640px) {
@@ -1613,7 +1653,7 @@
   }
 }
 
-/* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow, italic h2 */
+/* DS3 — Character and World editor child form styling */
 
 :root .component-character-editor .attributes-form-list,
 :root .component-character-editor .skills-form-list {
@@ -1632,24 +1672,22 @@
   font-family: var(--font-system);
 }
 
-:root .component-character-editor
-  .component-background-form
-  > h2,
-:root .component-character-editor
-  .attributes-form-header
-  > h2,
-:root .component-character-editor
-  .skills-form-header
-  > h2 {
-  font-family: var(--font-interface);
+.component-point-pool-display.is-over-budget {
+  color: var(--color-danger);
+}
+
+.component-point-pool-display .point-pool-over-budget {
+  color: var(--color-danger);
   font-weight: 600;
 }
 
-:root .character-editor-actions,
-:root .world-editor-actions {
-  background: transparent;
-  border: none;
-  border-radius: 0;
+.component-point-pool-display .point-pool-error-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3606,7 +3644,8 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 :root .component-world-editor > .component-collapsible-section:first-child,
 :root .component-character-editor > .component-collapsible-section:first-child,
 :root .component-world-editor > .world-editor-actions,
-:root .component-character-editor > .character-editor-actions {
+:root .component-character-editor > .character-editor-actions,
+:root .component-character-editor > .character-editor-danger-zone {
   grid-column: 1 / -1;
 }
 
