@@ -12,9 +12,13 @@ interface CharacterBackground {
 
 interface CharacterBackgroundDisplayProps {
   background: CharacterBackground;
+  showPersonality?: boolean;
 }
 
-export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDisplayProps) {
+export function CharacterBackgroundDisplay({
+  background,
+  showPersonality = false,
+}: CharacterBackgroundDisplayProps) {
   return (
     <div className="character-detail-background">
       {/* History Section */}
@@ -23,13 +27,15 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
         <p className="character-detail-background-text">{background.history}</p>
       </div>
 
-      {/* Personality Section */}
-      <div className="character-detail-background-section">
-        <h3 className="character-detail-background-heading">Personality</h3>
-        <p className="character-detail-background-text">
-          {background.personality}
-        </p>
-      </div>
+      {/* Personality Section (shown when not already in summary header) */}
+      {showPersonality && background.personality && (
+        <div className="character-detail-background-section">
+          <h3 className="character-detail-background-heading">Personality</h3>
+          <p className="character-detail-background-text">
+            {background.personality}
+          </p>
+        </div>
+      )}
 
       {/* Goals Section */}
       {background.goals && background.goals.length > 0 && (

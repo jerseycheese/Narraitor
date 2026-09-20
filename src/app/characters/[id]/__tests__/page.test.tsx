@@ -98,6 +98,7 @@ describe('CharacterViewPage', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Test Character' })).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { name: 'Test Character' })).toHaveLength(1);
     expect(screen.getByText('Level 5')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'WORLD: Test World' })).toHaveAttribute('href', '/worlds/world-1');
     
     // Should display character attributes 
     expect(screen.getByText('Strength')).toBeInTheDocument();
@@ -109,7 +110,7 @@ describe('CharacterViewPage', () => {
     
     // Should display background information
     expect(screen.getByText('A brave warrior with a noble past')).toBeInTheDocument();
-    expect(screen.getAllByText('Bold and honorable')).toHaveLength(2); // Appears in summary and detailed background
+    expect(screen.getByText('Bold and honorable')).toBeInTheDocument();
   });
 
   test('shows character not found message for invalid character ID', () => {

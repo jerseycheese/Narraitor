@@ -23,15 +23,9 @@ export function WorldAttributesList({ attributes }: WorldAttributesListProps) {
           <div key={`${attr.id ?? attr.name ?? index}`} className="world-detail-stat">
             <div className="world-detail-stat-head">
               <h3 className="world-detail-stat-name">{attr.name}</h3>
-              <span className="world-detail-stat-range">
-                Range: {attr.minValue} – {attr.maxValue}
-              </span>
             </div>
             {attr.description && (
               <p className="world-detail-stat-description">{attr.description}</p>
-            )}
-            {attr.baseValue !== undefined && (
-              <p className="world-detail-stat-default">Default: {attr.baseValue}</p>
             )}
           </div>
         ))}

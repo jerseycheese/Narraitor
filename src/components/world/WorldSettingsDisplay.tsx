@@ -9,6 +9,16 @@ interface WorldSettingsDisplayProps {
 }
 
 export function WorldSettingsDisplay({ settings }: WorldSettingsDisplayProps) {
+  if (
+    !settings ||
+    (!settings.maxAttributes &&
+      !settings.maxSkills &&
+      !settings.attributePointPool &&
+      !settings.skillPointPool)
+  ) {
+    return null;
+  }
+
   return (
     <section
       className="world-detail-section"

@@ -81,4 +81,11 @@ describe('World detail section headings', () => {
     expect(emptyAttributes).toBeEmptyDOMElement();
     expect(emptySkills).toBeEmptyDOMElement();
   });
+
+  it('omits internal data (range, default) from attribute cards', () => {
+    render(<WorldAttributesList attributes={attributes} />);
+
+    expect(screen.queryByText(/Range:/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Default:/i)).not.toBeInTheDocument();
+  });
 });

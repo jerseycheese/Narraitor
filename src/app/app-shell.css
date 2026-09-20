@@ -1089,10 +1089,9 @@
 }
 
 .world-detail-section {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .world-detail-section h2 {
@@ -1101,12 +1100,6 @@
   font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text-primary);
-}
-
-@media (width <= 640px) {
-  .world-detail-section {
-    padding: var(--space-4);
-  }
 }
 
 /* DS3 — Mechanical Manuscript: dotted dividers */
@@ -1247,6 +1240,55 @@
 .page-layout-header {
   /* Exception: Requires layout spacing larger than the maximum --space-8 token */
   margin-bottom: 3.5rem;
+}
+
+.page-layout-kicker,
+.characters-world-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+  font-family: var(--font-system);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.characters-world-kicker-link {
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The link is small type in a tight masthead, so its touch target grows
+   without growing the layout. */
+.characters-world-kicker-link::after {
+  content: "";
+  position: absolute;
+  inset: calc((var(--control-height-touch) - 1lh) / -2) calc(var(--space-2) * -1);
+}
+
+.characters-world-kicker-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.characters-world-kicker-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.characters-kicker-dot {
+  color: var(--color-text-muted);
+}
+
+.characters-kicker-genre {
+  color: var(--color-text-muted);
+  font-weight: 500;
 }
 
 .page-layout-header-top {
@@ -1420,6 +1462,22 @@
   margin-bottom: var(--space-3);
 }
 
+.character-detail-back {
+  margin-bottom: var(--space-4);
+}
+
+/* The ghost button's own padding pushed the arrow off the page gutter. */
+:root .character-detail-back button {
+  padding-inline-start: 0;
+}
+
+/* Delete is a quiet text action here, as it is on the list cards, so it
+   stops competing with Play for weight and no longer fills the row. */
+:root .character-detail-masthead .button-destructive-outline {
+  flex: 0 0 auto;
+  border-color: transparent;
+}
+
 .character-detail-body {
   display: flex;
   flex-direction: column;
@@ -1469,10 +1527,9 @@
 }
 
 .character-detail-section {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .character-detail-section h2 {
@@ -2174,8 +2231,9 @@
   color: var(--color-text-secondary);
 }
 
-/* World-context masthead: on the characters list the world is context
-   rather than subject. The masthead integrates the world's artwork as an inked vignette plate behind
+/* World-context masthead: on child pages under a world context (Characters
+   list, Character detail), the world is context rather than subject. The
+   masthead integrates the world's artwork as an inked vignette plate behind
    the title and metadata, rather than dropping a separate boxed hero card. */
 :root .characters-world-masthead {
   position: relative;
@@ -2187,10 +2245,27 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+:root .world-detail-masthead {
+  min-height: 6.5rem;
+  margin-bottom: var(--space-4);
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
+:root .character-detail-masthead {
+  min-height: 5rem;
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+}
+
 :root .characters-world-masthead .page-layout-header-content {
   position: relative;
   z-index: 1;
   max-width: 44rem;
+}
+
+:root .world-detail-masthead .page-layout-header-content {
+  max-width: 48rem;
 }
 
 .characters-header-vignette {
@@ -2203,6 +2278,20 @@
   overflow: hidden;
   z-index: 0;
   opacity: 0.8;
+}
+
+/* World detail: the world is the primary subject, so the vignette blooms in
+   full colour with a wider aperture and rich opacity behind the actions. */
+.world-detail-vignette {
+  width: clamp(14rem, 42vw, 32rem);
+  opacity: 0.88;
+}
+
+/* Character detail: subordinate world art to a discreet background watermark
+   so the character's portrait, stats, and identity lead the page (#2089). */
+.character-detail-vignette {
+  width: clamp(10rem, 24vw, 18rem);
+  opacity: 0.28;
 }
 
 .characters-header-vignette .component-hero {
@@ -2252,9 +2341,32 @@
     padding-bottom: var(--space-2);
   }
 
+  :root .world-detail-masthead {
+    min-height: 5.5rem;
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-2);
+  }
+
   .characters-header-vignette {
     width: 100%;
     opacity: 0.4;
+  }
+
+  .world-detail-vignette {
+    opacity: 0.45;
+  }
+
+  .character-detail-vignette {
+    opacity: 0.2;
+  }
+
+  /* On a phone the actions stack inside the header, so a plate sized to the
+     header would stretch behind the buttons. These two pages cap it to the
+     title block instead. */
+  .world-detail-vignette,
+  .character-detail-vignette {
+    bottom: auto;
+    height: 6.5rem;
   }
 
   /* Fade every edge: a bottom-only mask left the top, left and right edges
@@ -3414,7 +3526,8 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-auto-flow: dense;
-  gap: var(--space-4);
+  align-items: start;
+  gap: var(--space-6) var(--space-4);
 }
 
 :root .world-detail-section:first-child,
@@ -3435,7 +3548,9 @@ section[aria-labelledby="image-details-heading"] .component-data-field-stacked >
 
 :root .world-detail-section,
 :root .character-detail-section {
-  padding: var(--space-4);
+  padding: 0;
+  border: none;
+  background: transparent;
   border-radius: 0;
 }
 

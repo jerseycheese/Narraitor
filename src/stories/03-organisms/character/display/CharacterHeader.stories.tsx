@@ -5,7 +5,6 @@ import { useCharacterStore } from '@/state/characterStore';
 type StoreCharacter = ReturnType<
   typeof useCharacterStore.getState
 >['characters'][string];
-import { World } from '@/types/world.types';
 const meta = {
   title: '03-Organisms/character/display/CharacterHeader',
   component: CharacterHeader,
@@ -17,24 +16,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 // Mock data
-const mockWorld: World = {
-  id: 'world-1',
-  name: 'Middle Earth',
-  description: 'A fantasy world of magic and adventure',
-  genre: 'fantasy',
-  relationship: 'set_within',
-  reference: 'Lord of the Rings',
-  attributes: [],
-  skills: [],
-  settings: {
-    maxAttributes: 6,
-    maxSkills: 10,
-    attributePointPool: 27,
-    skillPointPool: 15,
-  },
-  createdAt: '2024-12-03T10:00:00Z',
-  updatedAt: '2024-12-03T10:00:00Z',
-};
 const mockCharacter: StoreCharacter = {
   id: 'char-1',
   name: 'Aragorn',
@@ -76,7 +57,6 @@ const mockCharacter: StoreCharacter = {
 export const Default: Story = {
   args: {
     character: mockCharacter,
-    world: mockWorld,
   },
 };
 export const WithoutPortrait: Story = {
@@ -85,7 +65,6 @@ export const WithoutPortrait: Story = {
       ...mockCharacter,
       portrait: undefined,
     },
-    world: mockWorld,
   },
 };
 export const OriginalCharacter: Story = {
@@ -112,12 +91,6 @@ export const OriginalCharacter: Story = {
         prompt: 'An elven mage with flowing silver hair and mystical aura',
       },
     },
-    world: {
-      ...mockWorld,
-      name: 'Aethermoor',
-      description:
-        'A magical realm where the boundaries between worlds are thin',
-    },
   },
 };
 export const LongPersonality: Story = {
@@ -138,7 +111,6 @@ export const LongPersonality: Story = {
         isKnownFigure: true,
       },
     },
-    world: mockWorld,
   },
 };
 export const SciFiCharacter: Story = {
@@ -162,12 +134,6 @@ export const SciFiCharacter: Story = {
         url: 'https://i.pravatar.cc/200?img=4',
         prompt: 'A futuristic commander with tactical gear and determined look',
       },
-    },
-    world: {
-      ...mockWorld,
-      name: 'New Terra',
-      description: 'A futuristic colony on a distant planet',
-      genre: 'fantasy',
     },
   },
 };
