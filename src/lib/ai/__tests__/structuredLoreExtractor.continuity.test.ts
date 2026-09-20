@@ -162,4 +162,89 @@ describe('extractStructuredLore continuity annotations', () => {
     expect(prompt).toContain('Master Key');
     expect(prompt).toContain('"continuity"');
   });
+
+  describe('unattested speakers quarantine', () => {
+    it('strips continuity annotations from events attributed to an unattested speaker while preserving other fields', async () => {
+      respondWith({
+        characters: [],
+        locations: [],
+        rules: [],
+        events: [
+          {
+            description: 'Davies claims he paid off the town watch last Tuesday.',
+            importance: 'high',
+            continuity: { kind: 'assertion', topic: 'watch bribe', speaker: 'Davies' },
+          },
+          {
+            description: 'Aunt Carol explains the mill deed was signed in 1912.',
+            importance: 'medium',
+            continuity: { kind: 'assertion', topic: 'mill deed', speaker: 'Aunt Carol' },
+          },
+        ],
+      });
+
+      const result = await extractStructuredLore('prose', undefined, {
+        unattestedSpeakers: ['Davies'],
+      });
+
+      expect(result.events[0].description).toBe('Davies claims he paid off the town watch last Tuesday.');
+      expect(result.events[0].importance).toBe('high');
+      expect(result.events[0].continuity).toBeUndefined();
+
+      expect(result.events[1].description).toBe('Aunt Carol explains the mill deed was signed in 1912.');
+      expect(result.events[1].importance).toBe('medium');
+      expect(result.events[1].continuity).toEqual({
+        kind: 'assertion',
+        topic: 'mill deed',
+        speaker: 'Aunt Carol',
+        status: undefined,
+        fulfillment: undefined,
+      });
+    });
+
+    it('matches speaker names canonicalized across case and surrounding whitespace', async () => {
+      respondWith({
+        characters: [],
+        locations: [],
+        rules: [],
+        events: [
+          {
+            description: 'Davies insists there was a private pact.',
+            continuity: { kind: 'assertion', topic: 'private pact', speaker: '  Councilman DAVIES  ' },
+          },
+        ],
+      });
+
+      const result = await extractStructuredLore('prose', undefined, {
+        unattestedSpeakers: [' councilman davies '],
+      });
+
+      expect(result.events[0].continuity).toBeUndefined();
+    });
+
+    it('includes quarantine instruction rule in the extraction prompt when unattested speakers are provided', async () => {
+      const generateContent = respondWith({ characters: [], locations: [], rules: [], events: [] });
+
+      await extractStructuredLore('prose', undefined, {
+        unattestedSpeakers: ['Davies', 'Rowan'],
+      });
+
+      const prompt = generateContent.mock.calls[0][0] as string;
+      expect(prompt).toContain(
+        '- Davies, Rowan just recounted a conversation that never happened in this story.'
+      );
+      expect(prompt).toContain(
+        'Record what happened on the page, but do NOT add a "continuity" annotation to any event carrying what they claim was said earlier.'
+      );
+    });
+
+    it('omits quarantine instruction rule from the extraction prompt when no unattested speakers are provided', async () => {
+      const generateContent = respondWith({ characters: [], locations: [], rules: [], events: [] });
+
+      await extractStructuredLore('prose', undefined, {});
+
+      const prompt = generateContent.mock.calls[0][0] as string;
+      expect(prompt).not.toContain('just recounted a conversation that never happened in this story');
+    });
+  });
 });

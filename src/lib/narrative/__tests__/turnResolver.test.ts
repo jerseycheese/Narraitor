@@ -769,6 +769,56 @@ describe('TurnResolver', () => {
       );
     });
 
+    it('passes unattestedSpeakers to lore extraction when continuity reports invented-exchange issues', async () => {
+      const generator = makeMockGenerator(
+        makeGenerationResult({
+          metadata: {
+            characterIds: [],
+            tags: [],
+            continuity: {
+              status: 'flagged',
+              remainingIssues: [
+                { type: 'invented-exchange', entity: 'Davies' },
+                { type: 'reversed-fact', entity: 'Rowan' },
+                { type: 'invented-exchange', entity: 'Marcus' },
+              ],
+            },
+          },
+        })
+      );
+      await resolveTurn(makeCommand(), generator);
+
+      expect(extractStructuredLore).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+        expect.objectContaining({ unattestedSpeakers: ['Davies', 'Marcus'] })
+      );
+    });
+
+    it('omits unattestedSpeakers from lore extraction options when no invented-exchange issues are present', async () => {
+      const generator = makeMockGenerator(
+        makeGenerationResult({
+          metadata: {
+            characterIds: [],
+            tags: [],
+            continuity: {
+              status: 'flagged',
+              remainingIssues: [
+                { type: 'reversed-fact', entity: 'Old Man Rowan' },
+              ],
+            },
+          },
+        })
+      );
+      await resolveTurn(makeCommand(), generator);
+
+      expect(extractStructuredLore).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+        expect.not.objectContaining({ unattestedSpeakers: expect.anything() })
+      );
+    });
+
     it('records lore mentions for resolved narrative segment', async () => {
       const generator = makeMockGenerator(
         makeGenerationResult({ content: 'The ancient crystal pulses with magic.' })
