@@ -243,4 +243,12 @@ describe('WorldCard', () => {
     expect(mockRouterPush).toHaveBeenCalledWith(`/worlds/${mockWorld.id}/edit`);
   });
 
+  test('renders "Original" for original worlds without a reference', () => {
+    const originalWorld = createMockWorld({
+      reference: undefined,
+    });
+    render(<WorldCard world={originalWorld} onDelete={jest.fn()} />);
+    expect(screen.getByTestId('world-card-type')).toHaveTextContent('Original');
+  });
+
 });

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Plus, Sparkles, Globe } from 'lucide-react';
+import { Plus, Globe } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCharacterStore, type StoreCharacter } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -404,7 +404,6 @@ export default function CharactersPage() {
       onClick: () => setShowGenerateDialog(true),
       variant: 'secondary' as const,
       disabled: isGenerating,
-      icon: <Sparkles aria-hidden="true" />,
     },
   ];
 
@@ -434,6 +433,9 @@ export default function CharactersPage() {
       description={pageDescription}
       headerBackground={headerBackground}
       headerClassName="characters-world-masthead"
+      actions={
+        <ActionButtonGroup actions={actionButtons} layout="horizontal" gap="sm" />
+      }
     >
 
       {/* An empty roster has nothing to switch views on, and the empty state
@@ -445,7 +447,6 @@ export default function CharactersPage() {
             mode={viewMode}
             onModeChange={handleViewModeChange}
           />
-          <ActionButtonGroup actions={actionButtons} layout="horizontal" gap="sm" />
         </div>
       )}
 
