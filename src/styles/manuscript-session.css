@@ -4132,7 +4132,7 @@ body.manuscript-overlay-open {
   margin-top: var(--space-1);
 }
 
-/* Ending Screen: open sections and dotted dividers (one-border-deep rule) */
+/* Ending Screen: open sections and solid hairline dividers (one-border-deep rule) */
 .component-ending-screen-content .component-section-wrapper {
   padding: 0;
   border: none;
@@ -4141,39 +4141,88 @@ body.manuscript-overlay-open {
 }
 
 .component-ending-screen-content .component-section-wrapper-title {
-  margin-bottom: var(--space-4);
-  padding-top: var(--space-3);
-  padding-bottom: var(--space-3);
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) 0;
   font-family: var(--font-interface);
   font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text-primary);
-  border-bottom: 1px dotted var(--color-border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .component-ending-screen-content .component-collapsible-section {
   padding: 0;
   border: none;
+  border-radius: 0;
   background: transparent;
 }
 
 .component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-header"] {
-  margin-bottom: var(--space-4);
-  padding-top: var(--space-3);
-  padding-bottom: var(--space-3);
-  border-bottom: 1px dotted var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
 }
 
-.component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-title"] {
+:root .component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-header"] {
+  padding: var(--space-3) 0;
+}
+
+:root .component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-header"]::after,
+:root .component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-header"][aria-expanded="true"]::after {
+  display: none;
+  content: none;
+}
+
+.component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-title"],
+:root .component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-title"] {
+  margin: 0;
+  padding: 0;
   font-family: var(--font-interface);
   font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
-.component-ending-screen-hero-frame:not(:has(.component-ending-screen-hero-image)) {
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
+.component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-content"],
+:root .component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-content"] {
+  padding: 0;
 }
+
+.component-ending-screen-content .component-section-wrapper-body {
+  padding: 0;
+}
+
+/* Empty ending hero: unboxed container in manuscript layout */
+.component-ending-screen-hero-frame:not(:has(.component-ending-screen-hero-image)) {
+  min-height: auto;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  gap: var(--space-3);
+}
+
+:root .component-ending-screen-hero-frame:not(:has(.component-ending-screen-hero-image)) {
+  border: none;
+}
+
+.component-ending-screen-hero-frame:not(:has(.component-ending-screen-hero-image))
+  .component-ending-screen-hero-overlay {
+  padding: 0;
+  background: transparent;
+}
+
+.component-ending-screen-hero-frame:not(:has(.component-ending-screen-hero-image))
+  .component-ending-screen-hero-placeholder,
+.component-ending-screen-hero-frame:not(:has(.component-ending-screen-hero-image))
+  .component-ending-screen-hero-error {
+  flex: 0 0 auto;
+  padding: 0;
+  justify-content: flex-start;
+  text-align: start;
+}
+
 
 

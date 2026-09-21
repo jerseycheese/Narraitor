@@ -42,7 +42,8 @@ describe('JournalEntryImage', () => {
     render(<JournalEntryImage entry={entry} />);
 
     expect(screen.getByRole('button', { name: /generate image/i })).toBeInTheDocument();
-    expect(screen.getByText(/no image/i)).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /no image/i })).toBeInTheDocument();
+    expect(screen.queryByText(/^no image$/i)).not.toBeInTheDocument();
   });
 
   it('renders the section heading as h4 to fit the detail panel heading order', () => {

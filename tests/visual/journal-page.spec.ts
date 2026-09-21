@@ -43,6 +43,14 @@ test.describe('Journal Page', () => {
       page.getByTestId('journal-detail-pane').getByRole('heading', { name: 'World Event' })
     ).toBeVisible({ timeout: 10000 });
 
+    // Verify empty image preview geometry is collapsed and has no redundant text
+    const emptyPreview = page.locator('.journal-entry-image-preview[data-state="empty"]');
+    await expect(emptyPreview).toBeVisible({ timeout: 10000 });
+    const box = await emptyPreview.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.height).toBeLessThan(200);
+    await expect(emptyPreview).not.toHaveText(/no image/i);
+
     // Verify journal page content is visible
     await expect(page.getByRole('heading', { level: 1, name: /Journal in/i })).toBeVisible();
     await expect(

@@ -39,9 +39,13 @@ const EntryImagePreview: React.FC<{
 
   if (!image || image.type === 'placeholder' || !image.url) {
     return (
-      <div className="journal-entry-image-preview" data-state="empty">
+      <div
+        className="journal-entry-image-preview"
+        data-state="empty"
+        role="img"
+        aria-label="No image"
+      >
         <ImageOff aria-hidden="true" />
-        <p>No image</p>
       </div>
     );
   }

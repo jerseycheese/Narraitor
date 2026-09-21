@@ -315,45 +315,30 @@ export function EndingScreen() {
           <div
             className={`component-ending-screen-hero-frame ending-${currentEnding.tone}`}
           >
+            <div className="component-ending-screen-hero-overlay">
+              <header className="component-ending-screen-hero-header">
+                <h2 className="component-ending-screen-hero-title">The End</h2>
+                <p className="component-ending-screen-hero-meta">
+                  {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
+                </p>
+              </header>
+            </div>
             <div className="component-ending-screen-hero-error">
               <p>{imageError}</p>
               <Button
                 onClick={generateEndingImage}
-                variant="link"
+                variant="secondary"
                 size="sm"
                 aria-label="Retry loading ending image"
               >
                 Try Again
               </Button>
             </div>
-            <div className="component-ending-screen-hero-overlay">
-              <header className="component-ending-screen-hero-header">
-                <h2 className="component-ending-screen-hero-title">The End</h2>
-                <p className="component-ending-screen-hero-meta">
-                  {`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
-                </p>
-              </header>
-            </div>
           </div>
         ) : (
           <div
             className={`component-ending-screen-hero-frame ending-${currentEnding.tone}`}
           >
-            <div className="component-ending-screen-hero-placeholder">
-              {/* Without the reason, a button that can never succeed just looks
-                  broken every time it is pressed. */}
-              <p>{imageSupport.reason ?? 'Ending image'}</p>
-              {imageSupport.supported && (
-                <Button
-                  onClick={generateEndingImage}
-                  variant="link"
-                  size="sm"
-                  aria-label="Generate ending image"
-                >
-                  Generate Image
-                </Button>
-              )}
-            </div>
             <div className="component-ending-screen-hero-overlay">
               <header className="component-ending-screen-hero-header">
                 <h2 className="component-ending-screen-hero-title">The End</h2>
@@ -362,6 +347,21 @@ export function EndingScreen() {
                 </p>
               </header>
             </div>
+            {(imageSupport.reason || imageSupport.supported) && (
+              <div className="component-ending-screen-hero-placeholder">
+                {imageSupport.reason && <p>{imageSupport.reason}</p>}
+                {imageSupport.supported && (
+                  <Button
+                    onClick={generateEndingImage}
+                    variant="secondary"
+                    size="sm"
+                    aria-label="Generate ending image"
+                  >
+                    Generate Image
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -439,21 +439,17 @@ export function EndingScreen() {
         </section>
 
         {/* Your Story - Collapsible Section */}
-        <section>
-          <CollapsibleSection title="Your Story" initialCollapsed={true}>
-            <div>
-              {fullStory ? (
-                <div className="manuscript-ending-prose">
-                  {fullStory.split(/\n{2,}/).map((paragraph, index) => (
-                    <p key={`story-paragraph-${index}`}>{paragraph.trim()}</p>
-                  ))}
-                </div>
-              ) : (
-                <p>No story checkpoints available for this session.</p>
-              )}
-            </div>
-          </CollapsibleSection>
-        </section>
+        {Boolean(fullStory) && (
+          <section>
+            <CollapsibleSection title="Your Story" initialCollapsed={true}>
+              <div className="manuscript-ending-prose">
+                {fullStory.split(/\n{2,}/).map((paragraph, index) => (
+                  <p key={`story-paragraph-${index}`}>{paragraph.trim()}</p>
+                ))}
+              </div>
+            </CollapsibleSection>
+          </section>
+        )}
 
         {/* Next Steps */}
         <section>
