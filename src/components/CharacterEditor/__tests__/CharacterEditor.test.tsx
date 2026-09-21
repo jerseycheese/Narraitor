@@ -233,4 +233,41 @@ describe('CharacterEditor MVP Tests', () => {
       await screen.findByText('Character Not Found', {}, { timeout: 3000 })
     ).toBeInTheDocument();
   });
+
+  test('shows validation warning and disables save when point pool is exceeded', async () => {
+    const overBudgetCharacter = {
+      ...mockCharacter,
+      attributes: [
+        {
+          id: 'attr-1',
+          characterId: 'test-char-1',
+          name: 'Strength',
+          baseValue: 60, // Exceeds world.settings.attributePointPool (50)
+          modifiedValue: 60,
+        },
+      ],
+    };
+
+    mockZustandStore(
+      useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        characters: { 'test-char-1': overBudgetCharacter },
+        updateCharacter: jest.fn(),
+        deleteCharacter: jest.fn(),
+      })
+    );
+
+    render(<CharacterEditor characterId="test-char-1" />);
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('Test Character')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByText('Point pool budget exceeded. Adjust your attributes or skills before saving.')
+    ).toBeInTheDocument();
+
+    const saveButton = screen.getByText('Save Changes');
+    expect(saveButton).toBeDisabled();
+  });
 });

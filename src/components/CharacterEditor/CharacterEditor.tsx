@@ -233,16 +233,15 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       </CollapsibleSection>
       
       <div className="character-editor-actions">
+        {!isPoolValid && (
+          <p className="character-editor-validation-warning" role="alert">
+            Point pool budget exceeded. Adjust your attributes or skills before saving.
+          </p>
+        )}
         <ActionButtonGroup
           layout="horizontal"
           gap="md"
           actions={[
-            {
-              label: 'Delete Character',
-              onClick: () => setShowDeleteDialog(true),
-              variant: 'danger',
-              disabled: saving,
-            },
             {
               label: 'Cancel',
               onClick: handleCancel,
@@ -257,6 +256,17 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
             },
           ]}
         />
+      </div>
+
+      <div className="character-editor-danger-zone">
+        <button
+          type="button"
+          className="character-editor-delete-trigger"
+          onClick={() => setShowDeleteDialog(true)}
+          disabled={saving}
+        >
+          Delete Character
+        </button>
       </div>
 
       <DeleteConfirmationDialog

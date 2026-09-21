@@ -1,5 +1,6 @@
 import React from 'react';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle } from 'lucide-react';
+import clsx from 'clsx';
 
 interface PointPool {
   total: number;
@@ -16,14 +17,19 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
   pool,
   label = 'Point Pool',
 }) => {
-  const statusText =
-    pool.remaining === 0
+  const isOverBudget = pool.remaining < 0;
+  const statusText = isOverBudget
+    ? `Over budget by ${Math.abs(pool.remaining)} points!`
+    : pool.remaining === 0
       ? 'All points allocated!'
       : `${pool.remaining} points remaining`;
 
   return (
     <div
-      className="component-point-pool-display"
+      className={clsx(
+        'component-point-pool-display',
+        isOverBudget && 'is-over-budget'
+      )}
       role="status"
       aria-live="polite"
       aria-atomic="true"
@@ -35,8 +41,8 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
             <span>
               Total: <span>{pool.total}</span>
             </span>
-            <span>
-              Remaining: {pool.remaining}
+            <span className={clsx(isOverBudget && 'point-pool-over-budget')}>
+              {isOverBudget ? `Over budget: ${Math.abs(pool.remaining)}` : `Remaining: ${pool.remaining}`}
             </span>
           </div>
         </div>
@@ -45,6 +51,12 @@ export const PointPoolDisplay: React.FC<PointPoolDisplayProps> = ({
             <span>
               <CheckCircle aria-hidden="true" />
               All allocated!
+            </span>
+          )}
+          {isOverBudget && (
+            <span className="point-pool-error-tag">
+              <AlertCircle aria-hidden="true" />
+              Over budget!
             </span>
           )}
         </div>

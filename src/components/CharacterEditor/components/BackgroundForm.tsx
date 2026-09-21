@@ -28,7 +28,6 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
 
   return (
     <div className="component-background-form">
-      <h2>Background</h2>
       <div className="background-form-fields">
         <div className="form-group">
           <Label>

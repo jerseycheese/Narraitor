@@ -69,6 +69,7 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
         <h3>Skills</h3>
         <Button
           onClick={handleAddSkill}
+          variant="secondary"
           size="sm"
         >
           Add Skill

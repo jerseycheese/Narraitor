@@ -56,7 +56,6 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
   return (
     <div className="component-skills-form">
       <div className="skills-form-header">
-        <h2>Skills</h2>
         <PointPoolDisplay pool={pool} label="Skill Points" />
       </div>
 

@@ -269,4 +269,72 @@ test.describe('Main Pages Visual Tests', () => {
     // Take screenshot of character edit page - should show character editing interface with all sections expanded
     await expect(page).toHaveScreenshot('character-edit.png', { fullPage: true });
   });
+
+  test('World edit page should render consistently (dark mode)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await seedTestData(page);
+    await page.goto('/worlds/world-cyberpunk-2077/edit');
+    await expect(page).toHaveURL(/\/worlds\/world-cyberpunk-2077\/edit/);
+    await waitForContentStable(page);
+    const editor = page.locator('[data-testid="world-editor-root"]');
+    await editor.waitFor({ timeout: 8000 });
+    await page.waitForSelector('[data-testid="collapsible-section"]', { timeout: 8000 });
+    await hideDynamicContent(page);
+    await expandAllCollapsibleSections(page, editor);
+    await pinAppShell(page);
+    await expect(page).toHaveScreenshot('world-edit-dark.png', { fullPage: true });
+  });
+
+  test('World edit page should render consistently (mobile)', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await seedTestData(page);
+    await page.goto('/worlds/world-cyberpunk-2077/edit');
+    await expect(page).toHaveURL(/\/worlds\/world-cyberpunk-2077\/edit/);
+    await waitForContentStable(page);
+    const editor = page.locator('[data-testid="world-editor-root"]');
+    await editor.waitFor({ timeout: 8000 });
+    await page.waitForSelector('[data-testid="collapsible-section"]', { timeout: 8000 });
+    await hideDynamicContent(page);
+    await expandAllCollapsibleSections(page, editor);
+    await pinAppShell(page);
+    await expect(page).toHaveScreenshot('world-edit-mobile.png', { fullPage: true });
+  });
+
+  test('Character edit page should render consistently (dark mode)', async ({ page }) => {
+    test.setTimeout(45000);
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await seedTestData(page);
+    await page.goto('/characters/char-cyberpunk-hacker/edit');
+    await waitForContentStable(page);
+    await page.waitForFunction(() => {
+      return document.body.textContent && 
+             !document.body.textContent.includes('Character not found') &&
+             (document.body.textContent.includes('Edit Character') || document.body.textContent.includes('CharacterEditor'));
+    }, { timeout: 10000 });
+    await hideDynamicContent(page);
+    await expandAllCollapsibleSections(page);
+    await pinAppShell(page);
+    await expect(page).toHaveScreenshot('character-edit-dark.png', { fullPage: true });
+  });
+
+  test('Character edit page should render consistently (mobile)', async ({ page }) => {
+    test.setTimeout(45000);
+    await page.setViewportSize({ width: 375, height: 812 });
+    await seedTestData(page);
+    await page.goto('/characters/char-cyberpunk-hacker/edit');
+    await waitForContentStable(page);
+    await page.waitForFunction(() => {
+      return document.body.textContent && 
+             !document.body.textContent.includes('Character not found') &&
+             (document.body.textContent.includes('Edit Character') || document.body.textContent.includes('CharacterEditor'));
+    }, { timeout: 10000 });
+    await hideDynamicContent(page);
+    await expandAllCollapsibleSections(page);
+    await pinAppShell(page);
+    await expect(page).toHaveScreenshot('character-edit-mobile.png', { fullPage: true });
+  });
 });
