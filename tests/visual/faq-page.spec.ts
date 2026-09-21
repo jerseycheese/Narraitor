@@ -20,4 +20,19 @@ test.describe('FAQ page rendering', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds3');
     await expect(page.locator('.component-faq')).toHaveScreenshot('faq-ds3.png');
   });
+
+  test('faq renders consistently in dark mode', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await gotoFaq(page);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds3');
+    await expect(page.locator('.component-faq')).toHaveScreenshot('faq-ds3-dark.png');
+  });
+
+  test('faq renders consistently at 375px', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await gotoFaq(page);
+    await expect(page.locator('.component-faq')).toHaveScreenshot('faq-ds3-mobile.png');
+  });
 });

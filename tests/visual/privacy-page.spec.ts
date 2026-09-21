@@ -20,4 +20,19 @@ test.describe('Privacy page rendering', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds3');
     await expect(page.locator('.component-legal')).toHaveScreenshot('privacy-ds3.png');
   });
+
+  test('privacy renders consistently in dark mode', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await gotoPrivacy(page);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds3');
+    await expect(page.locator('.component-legal')).toHaveScreenshot('privacy-ds3-dark.png');
+  });
+
+  test('privacy renders consistently at 375px', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await gotoPrivacy(page);
+    await expect(page.locator('.component-legal')).toHaveScreenshot('privacy-ds3-mobile.png');
+  });
 });
