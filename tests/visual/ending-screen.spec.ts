@@ -343,4 +343,139 @@ test.describe('EndingScreen Visual Tests', () => {
       fullPage: true
     });
   });
+
+  test('EndingScreen - Triumphant ending should render consistently (dark mode)', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.route('**/api/generate-ending-image', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZDcwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5Ucml1bXBoYW50IEVuZGluZzwvdGV4dD48L3N2Zz4='
+        }
+      });
+    });
+
+    await page.route('**/api/narrative/ending', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          data: {
+            epilogue: 'With the city liberated and the syndicate dismantled, your legend spreads through Neo-Tokyo. The skyline gleams brighter than ever.',
+            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, inspiring a new generation of free minds.',
+            worldImpact: 'Corporate overreach is pushed back; citizens regain control over their data and lives.',
+            tone: 'triumphant',
+            achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
+            playTime: 1234,
+            imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZDcwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5Ucml1bXBoYW50IEVuZGluZzwvdGV4dD48L3N2Zz4='
+          }
+        }
+      });
+    });
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await waitForActiveSession(page);
+    await page.waitForTimeout(100);
+    const endButton = page.getByRole('button', { name: 'End Story' });
+    await endButton.scrollIntoViewIfNeeded();
+    await expect(endButton).toBeVisible();
+    await expect(endButton).toBeEnabled();
+    await endButton.click();
+    await page.waitForSelector('[role="dialog"]:has-text("End Story")', { timeout: 5000 });
+    await page.locator('[role="dialog"] button:has-text("End Story")').click();
+
+    await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
+
+    try {
+      await page.waitForSelector('[data-testid="ending-screen"] img[alt*="ending for"]', { timeout: 5000 });
+    } catch {
+      console.log('Image not loaded yet, proceeding with screenshot');
+    }
+    await page.waitForTimeout(1000);
+
+    await expandAllCollapsibleSections(page);
+    await hideDynamicContent(page);
+    await page.waitForTimeout(100);
+
+    await expect(page).toHaveScreenshot('ending-screen-dark.png', {
+      threshold: 0.05,
+      fullPage: true
+    });
+  });
+
+  test('EndingScreen - Triumphant ending should render consistently (mobile)', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.route('**/api/generate-ending-image', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZDcwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5Ucml1bXBoYW50IEVuZGluZzwvdGV4dD48L3N2Zz4='
+        }
+      });
+    });
+
+    await page.route('**/api/narrative/ending', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          data: {
+            epilogue: 'With the city liberated and the syndicate dismantled, your legend spreads through Neo-Tokyo. The skyline gleams brighter than ever.',
+            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, inspiring a new generation of free minds.',
+            worldImpact: 'Corporate overreach is pushed back; citizens regain control over their data and lives.',
+            tone: 'triumphant',
+            achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
+            playTime: 1234,
+            imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2ZmZDcwMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5Ucml1bXBoYW50IEVuZGluZzwvdGV4dD48L3N2Zz4='
+          }
+        }
+      });
+    });
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await waitForActiveSession(page);
+    await page.waitForTimeout(100);
+    const endButton = page.getByRole('button', { name: 'End Story' });
+    await endButton.scrollIntoViewIfNeeded();
+    await expect(endButton).toBeVisible();
+    await expect(endButton).toBeEnabled();
+    await endButton.click();
+    await page.waitForSelector('[role="dialog"]:has-text("End Story")', { timeout: 5000 });
+    await page.locator('[role="dialog"] button:has-text("End Story")').click();
+
+    await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
+
+    try {
+      await page.waitForSelector('[data-testid="ending-screen"] img[alt*="ending for"]', { timeout: 5000 });
+    } catch {
+      console.log('Image not loaded yet, proceeding with screenshot');
+    }
+    await page.waitForTimeout(1000);
+
+    await expandAllCollapsibleSections(page);
+    await hideDynamicContent(page);
+    await page.waitForTimeout(100);
+
+    await expect(page).toHaveScreenshot('ending-screen-mobile.png', {
+      threshold: 0.05,
+      fullPage: true
+    });
+  });
 });

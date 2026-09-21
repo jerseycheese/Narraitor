@@ -4095,3 +4095,119 @@ body.manuscript-overlay-open {
   outline-offset: 2px;
 }
 
+/* ─── Journal & Ending Screen Pass (#2093) ─── */
+
+.journal-entry-image-preview[data-state="empty"] {
+  aspect-ratio: auto;
+  min-height: auto;
+  height: auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.journal-entry-list-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1_5);
+  padding: var(--space-3);
+}
+
+.journal-entry-list-item h4 {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.journal-entry-list-item p {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.journal-entry-list-item .journal-entry-meta {
+  margin-top: var(--space-1);
+}
+
+/* Ending Screen: open sections and dotted dividers (one-border-deep rule) */
+.component-ending-screen-content .component-section-wrapper {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.component-ending-screen-content .component-section-wrapper-title {
+  position: relative;
+  margin-bottom: var(--space-4);
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-ending-screen-content .component-section-wrapper-title::after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-text-muted) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+}
+
+.component-ending-screen-content .component-collapsible-section {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-header"] {
+  position: relative;
+  margin-bottom: var(--space-4);
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
+.component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-title"] {
+  font-family: var(--font-interface);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.component-ending-screen-content .component-collapsible-section [data-testid="collapsible-section-header"]::after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-image: radial-gradient(
+    circle,
+    var(--color-text-muted) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 12px 4px;
+  background-repeat: repeat-x;
+}
+
+.component-ending-screen-hero-frame:not(:has(.component-ending-screen-hero-image)) {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+

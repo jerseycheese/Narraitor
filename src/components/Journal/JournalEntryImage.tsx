@@ -109,6 +109,7 @@ export const JournalEntryImage: React.FC<JournalEntryImageProps> = ({ entry }) =
       customPromptLabel="Customize description for this image"
       customPromptPlaceholder="Describe the specific visual details you want in the image..."
       customPromptHelpText="This will override the auto-generated prompt based on the entry content for this generation only"
+      generateButtonVariant="secondary"
       generateButtonText="Generate Image"
       regenerateButtonText="Regenerate Image"
       removeButtonText="Remove Image"
