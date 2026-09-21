@@ -43,6 +43,14 @@ test.describe('Journal Page', () => {
       page.getByTestId('journal-detail-pane').getByRole('heading', { name: 'World Event' })
     ).toBeVisible({ timeout: 10000 });
 
+    // Verify empty image preview geometry is collapsed and has no redundant text
+    const emptyPreview = page.locator('.journal-entry-image-preview[data-state="empty"]');
+    await expect(emptyPreview).toBeVisible({ timeout: 10000 });
+    const box = await emptyPreview.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.height).toBeLessThan(200);
+    await expect(emptyPreview).not.toHaveText(/no image/i);
+
     // Verify journal page content is visible
     await expect(page.getByRole('heading', { level: 1, name: /Journal in/i })).toBeVisible();
     await expect(
@@ -53,6 +61,66 @@ test.describe('Journal Page', () => {
     await waitForPlates(page);
     await page.waitForTimeout(500); // Let layout settle
     await expect(page).toHaveScreenshot('journal-page.png', {
+      fullPage: true,
+      threshold: 0.3,
+    });
+  });
+
+  test('Should display journal entries on the journal page (dark mode)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play/journal');
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+    await page.waitForFunction(() => {
+      const testWindow = window as typeof window & { __TEST_JOURNAL_SEEDED__?: boolean };
+      return Boolean(testWindow.__TEST_JOURNAL_SEEDED__);
+    });
+    await expect(page.getByTestId('journal-list-pane')).toBeVisible({ timeout: 10000 });
+
+    const worldEventEntry = page.getByRole('button', { name: 'Select entry: World Event' });
+    await expect(worldEventEntry).toBeVisible({ timeout: 10000 });
+    await worldEventEntry.click();
+    await expect(
+      page.getByTestId('journal-detail-pane').getByRole('heading', { name: 'World Event' })
+    ).toBeVisible({ timeout: 10000 });
+
+    await waitForPlates(page);
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('journal-page-dark.png', {
+      fullPage: true,
+      threshold: 0.3,
+    });
+  });
+
+  test('Should display journal entries on the journal page (mobile)', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.goto('/worlds/world-cyberpunk-2077/play/journal');
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+    await page.waitForFunction(() => {
+      const testWindow = window as typeof window & { __TEST_JOURNAL_SEEDED__?: boolean };
+      return Boolean(testWindow.__TEST_JOURNAL_SEEDED__);
+    });
+    await expect(page.getByTestId('journal-list-pane')).toBeVisible({ timeout: 10000 });
+
+    const worldEventEntry = page.getByRole('button', { name: 'Select entry: World Event' });
+    await expect(worldEventEntry).toBeVisible({ timeout: 10000 });
+    await worldEventEntry.click();
+    await expect(
+      page.getByTestId('journal-detail-pane').getByRole('heading', { name: 'World Event' })
+    ).toBeVisible({ timeout: 10000 });
+
+    await waitForPlates(page);
+    await page.waitForTimeout(500);
+    await expect(page).toHaveScreenshot('journal-page-mobile.png', {
       fullPage: true,
       threshold: 0.3,
     });

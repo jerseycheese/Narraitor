@@ -117,14 +117,12 @@ describe('EndingScreen - Your Story Section', () => {
     jest.clearAllMocks();
   });
 
-  it('displays empty message when no checkpoints exist', () => {
+  it('does not render when no checkpoints exist', () => {
     setupStores([]);
     render(<EndingScreen />);
 
-    const button = screen.getByTestId('collapsible-section-header');
-    fireEvent.click(button);
-
-    expect(screen.getByText(/no story checkpoints available for this session/i)).toBeInTheDocument();
+    expect(screen.queryByText('Your Story')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('collapsible-section-header')).not.toBeInTheDocument();
   });
 
   it('displays checkpoint narrative from a single checkpoint', () => {
@@ -265,7 +263,16 @@ describe('EndingScreen - Your Story Section', () => {
   });
 
   it('has proper accessibility attributes', () => {
-    setupStores([]);
+    const checkpoint: StoryCheckpoint = {
+      id: 'checkpoint-1',
+      segment: 'The story unfolds here in the ending.',
+      highlights: [],
+      eventIds: ['event-1'],
+      createdAt: '2025-11-24T09:00:00Z',
+      sessionId: 'session-1',
+      metadata: {},
+    };
+    setupStores([checkpoint]);
     render(<EndingScreen />);
 
     const button = screen.getByTestId('collapsible-section-header');

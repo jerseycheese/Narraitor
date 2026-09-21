@@ -39,9 +39,13 @@ const EntryImagePreview: React.FC<{
 
   if (!image || image.type === 'placeholder' || !image.url) {
     return (
-      <div className="journal-entry-image-preview" data-state="empty">
+      <div
+        className="journal-entry-image-preview"
+        data-state="empty"
+        role="img"
+        aria-label="No image"
+      >
         <ImageOff aria-hidden="true" />
-        <p>No image</p>
       </div>
     );
   }
@@ -109,6 +113,7 @@ export const JournalEntryImage: React.FC<JournalEntryImageProps> = ({ entry }) =
       customPromptLabel="Customize description for this image"
       customPromptPlaceholder="Describe the specific visual details you want in the image..."
       customPromptHelpText="This will override the auto-generated prompt based on the entry content for this generation only"
+      generateButtonVariant="secondary"
       generateButtonText="Generate Image"
       regenerateButtonText="Regenerate Image"
       removeButtonText="Remove Image"
