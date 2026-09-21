@@ -48,6 +48,18 @@ test.describe('Landing page rendering', () => {
     );
   });
 
+  test('landing renders consistently in dark mode', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await gotoLanding(page);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds3');
+    await expect(page.locator('.component-landing')).toBeVisible();
+    await expect(page.locator('#main-content')).toHaveScreenshot(
+      'landing-ds3-dark.png'
+    );
+  });
+
   test('landing renders consistently at 375px', async ({ page }) => {
     // Set before navigating so the layout is never built at the desktop width
     // and then reflowed into the narrow-width rules.

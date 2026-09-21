@@ -20,4 +20,19 @@ test.describe('Terms page rendering', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds3');
     await expect(page.locator('.component-legal')).toHaveScreenshot('terms-ds3.png');
   });
+
+  test('terms renders consistently in dark mode', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await gotoTerms(page);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'ds3');
+    await expect(page.locator('.component-legal')).toHaveScreenshot('terms-ds3-dark.png');
+  });
+
+  test('terms renders consistently at 375px', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await gotoTerms(page);
+    await expect(page.locator('.component-legal')).toHaveScreenshot('terms-ds3-mobile.png');
+  });
 });
