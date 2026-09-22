@@ -119,7 +119,7 @@ test.describe('Journal Page', () => {
     ).toBeVisible({ timeout: 10000 });
 
     // Verify entry count has right gutter spacing and does not clip viewport boundary
-    const summarySpan = page.locator('.journal-nav span');
+    const summarySpan = page.locator('.journal-nav > span');
     await expect(summarySpan).toBeVisible({ timeout: 10000 });
     const summaryBox = await summarySpan.boundingBox();
     expect(summaryBox).not.toBeNull();
