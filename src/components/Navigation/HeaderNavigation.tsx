@@ -32,6 +32,7 @@ const RecentPagesDropdown = dynamic(
 // better one — the roster's Play sets the character before routing, where the
 // header's only sets the world — and both land on the same play URL.
 const CTA_SUPPRESSED_ROUTES: readonly RegExp[] = [
+  /^\/dashboard$/,
   /^\/worlds$/,
   /^\/worlds\/create$/,
   /^\/worlds\/[^/]+$/,

@@ -191,7 +191,7 @@ describe('HeaderNavigation', () => {
     };
 
     it('renders Play in the outline variant — it is a shell shortcut, not the page primary', () => {
-      mockPathname = '/dashboard';
+      mockPathname = '/settings';
       seedActiveWorld();
 
       render(<HeaderNavigation />);
@@ -205,6 +205,7 @@ describe('HeaderNavigation', () => {
     // World"), /characters (per-card Play), /characters/[id] ("Play with
     // Character"). All three land on the same play URL as the header's Play.
     it.each([
+      '/dashboard',
       '/worlds',
       '/worlds/world-1',
       '/characters',

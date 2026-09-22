@@ -46,29 +46,15 @@ export function DashboardGettingStarted({
 
   // Hide when all steps completed
   if (allComplete) {
-    return (
-      <section className="component-dashboard-getting-started component-dashboard-getting-started-complete">
-        <div className="dashboard-getting-started-complete-row">
-          <CheckCircle aria-hidden="true" className="dashboard-getting-started-complete-icon" />
-          <div className="dashboard-getting-started-complete-body">
-            <h3>Ready to Continue</h3>
-            <p>Your world is set up. Continue your adventure!</p>
-            <Button
-              onClick={() => onNavigate('/worlds')}
-              variant="default"
-              size="lg"
-            >
-              Continue Playing
-            </Button>
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (
-    <section className="component-dashboard-getting-started">
-      <h2>Getting Started</h2>
+    <section
+      className="component-dashboard-getting-started dashboard-section"
+      aria-labelledby="getting-started-heading"
+    >
+      <h2 id="getting-started-heading">Getting Started</h2>
 
       <ol className="dashboard-getting-started-steps">
         {steps.map((step) => {
