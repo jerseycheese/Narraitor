@@ -2080,12 +2080,24 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4) var(--space-4);
+  padding: var(--space-3) 0 var(--space-4);
+  padding-inline-end: var(--space-4);
   font-family: var(--font-interface);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+}
+
+@media (width < 768px) {
+  .journal-nav {
+    padding-inline-end: var(--space-3);
+  }
+}
+
+@media (width >= 1024px) {
+  .journal-nav {
+    padding-inline-end: var(--space-6);
+  }
 }
 
 /* DS3 - Mechanical Manuscript: monospace voice on the entry summary. */

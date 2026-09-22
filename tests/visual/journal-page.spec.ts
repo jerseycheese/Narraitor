@@ -122,8 +122,9 @@ test.describe('Journal Page', () => {
     const summarySpan = page.locator('.journal-nav > span');
     await expect(summarySpan).toBeVisible({ timeout: 10000 });
     const summaryBox = await summarySpan.boundingBox();
-    expect(summaryBox).not.toBeNull();
-    expect(summaryBox!.x + summaryBox!.width).toBeLessThanOrEqual(375 - 12);
+    const viewport = page.viewportSize();
+    expect(viewport).not.toBeNull();
+    expect(summaryBox!.x + summaryBox!.width).toBeLessThanOrEqual(viewport!.width - 12);
 
     await waitForPlates(page);
     await page.waitForTimeout(500);
