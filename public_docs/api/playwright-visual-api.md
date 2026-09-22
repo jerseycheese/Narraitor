@@ -164,7 +164,7 @@ await expect(page).toHaveScreenshot('full-page.png', {
 Screenshots are automatically named with browser and OS information:
 
 ```
-main-pages.spec.ts-snapshots/
+dashboard-page.spec.ts-snapshots/
 ├── screenshot-name-chromium-darwin.png
 └── another-screenshot-chromium-linux.png
 ```
@@ -175,11 +175,10 @@ main-pages.spec.ts-snapshots/
 
 ```
 tests/visual/
-├── main-pages.spec.ts
-├── main-pages.spec.ts-snapshots/
-│   ├── landing-page-full-chromium-darwin.png
-│   ├── navigation-header-chromium-darwin.png
-│   └── worlds-page-full-chromium-darwin.png
+├── dashboard-page.spec.ts
+├── dashboard-page.spec.ts-snapshots/
+│   ├── home-empty-state-chromium-darwin.png
+│   └── home-page-chromium-darwin.png
 ├── game-session.spec.ts
 └── game-session.spec.ts-snapshots/
     ├── game-session-dev-harness-chromium-darwin.png
@@ -206,7 +205,7 @@ Run visual tests in Chromium (fast development mode).
 **Options:**
 ```bash
 # Run specific test file
-npm run test:visual -- tests/visual/main-pages.spec.ts
+npm run test:visual -- tests/visual/dashboard-page.spec.ts
 
 # Run with custom grep pattern
 npm run test:visual -- --grep "landing page"
@@ -218,7 +217,7 @@ Update baseline screenshots for all tests.
 **Options:**
 ```bash
 # Update specific test
-npm run test:visual:update -- tests/visual/main-pages.spec.ts
+npm run test:visual:update -- tests/visual/dashboard-page.spec.ts
 
 # Update with specific browser
 npx playwright test --update-snapshots --project=chromium

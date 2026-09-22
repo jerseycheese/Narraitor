@@ -281,7 +281,7 @@ test('complete checkout flow', async ({ page }) => {
 ### Organization Strategy
 ```
 tests/visual/
-├── main-pages.spec.ts-snapshots/
+├── dashboard-page.spec.ts-snapshots/
 │   ├── button-primary-chromium-darwin.png
 │   ├── button-secondary-chromium-darwin.png
 │   └── input-field-error-chromium-darwin.png
@@ -492,7 +492,7 @@ export default defineConfig({
 npm run test:visual:headed
 
 # Debug specific test interactively
-npx playwright test tests/visual/main-pages.spec.ts --debug
+npx playwright test tests/visual/dashboard-page.spec.ts --debug
 
 # Generate detailed HTML report
 npx playwright show-report
