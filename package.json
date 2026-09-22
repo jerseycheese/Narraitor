@@ -82,6 +82,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@chromatic-com/storybook": "^3.2.7",
     "@eslint/eslintrc": "^3",
     "@jest/globals": "^29.7.0",
@@ -97,6 +98,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/jest": "^29.5.14",
+    "@types/jest-axe": "^3.5.9",
     "@types/node": "^24",
     "@types/pngjs": "^6.0.5",
     "@types/react": "^19",
@@ -115,6 +117,7 @@
     "glob": "^11.0.2",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
+    "jest-axe": "^11.0.0",
     "jest-environment-jsdom": "^29.7.0",
     "knip": "^6.13.1",
     "msw": "^2.14.6",
