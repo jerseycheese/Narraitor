@@ -27,4 +27,32 @@ test.describe('Settings Page Visual Tests', () => {
     // Take screenshot of settings page
     await expect(page).toHaveScreenshot('settings.png', { fullPage: true });
   });
+
+  test('Settings page should render consistently (dark mode)', async ({ page }) => {
+    test.setTimeout(60000);
+
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await seedTestData(page);
+
+    await page.goto('/settings');
+    await waitForContentStable(page);
+    await hideDynamicContent(page);
+
+    await expect(page).toHaveScreenshot('settings-dark.png', { fullPage: true });
+  });
+
+  test('Settings page should render consistently (mobile)', async ({ page }) => {
+    test.setTimeout(60000);
+
+    await page.setViewportSize({ width: 375, height: 812 });
+    await seedTestData(page);
+
+    await page.goto('/settings');
+    await waitForContentStable(page);
+    await hideDynamicContent(page);
+
+    await expect(page).toHaveScreenshot('settings-mobile.png', { fullPage: true });
+  });
 });

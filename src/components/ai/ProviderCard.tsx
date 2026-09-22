@@ -1,6 +1,7 @@
 import React from 'react';
 import { clsx } from 'clsx';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { ProviderAdvancedSettings } from './ProviderAdvancedSettings';
 import type { AdvancedSettings, ProviderConfig, ProviderValidationRecord } from '@/types/provider.types';
 import './provider-config.css';
@@ -50,17 +51,17 @@ export function ProviderCard({
         </div>
         <div className="provider-card-badges">
           {isActive && (
-            <span className="provider-badge" data-tone="active">
+            <Badge variant="default-static" size="sm">
               In use
-            </span>
+            </Badge>
           )}
           {validation && (
-            <span
-              className="provider-badge"
-              data-tone={validation.valid ? 'valid' : 'invalid'}
+            <Badge
+              variant={validation.valid ? 'success-static' : 'destructive-static'}
+              size="sm"
             >
               {validation.valid ? 'Connected' : 'Needs attention'}
-            </span>
+            </Badge>
           )}
         </div>
       </div>

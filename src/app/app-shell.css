@@ -1691,15 +1691,15 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Settings Page — structural treatment for the data-management
-   section card and the export/import action surface. Mirrors the
-   world-detail-section / character-detail-section vocabulary.
+   Settings Page — open document sections per DS3 Mechanical
+   Manuscript and the one-border-deep rule.
    ═══════════════════════════════════════════════════════════════ */
 
 .settings-page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-6);
+  max-width: var(--page-width-form);
 }
 
 .settings-section {
@@ -1716,25 +1716,24 @@
   color: var(--color-text-primary);
 }
 
-.settings-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
+.settings-section-description {
+  margin: 0;
+  font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.settings-section-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .settings-appearance-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-4);
-}
-
-.settings-appearance-label {
-  font-family: var(--font-interface);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  color: var(--color-text-secondary);
 }
 
 .settings-export-import {
@@ -1768,8 +1767,10 @@
 }
 
 @media (width <= 640px) {
-  .settings-card {
-    padding: var(--space-4);
+  .settings-appearance-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
   }
 
   .settings-export-import-actions {
@@ -1794,10 +1795,6 @@
 }
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
-
-:root .settings-card {
-  border-radius: var(--radius-md);
-}
 
 :root .settings-section h2 {
   position: relative;
