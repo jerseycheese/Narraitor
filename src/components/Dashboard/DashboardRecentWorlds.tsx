@@ -20,7 +20,10 @@ const THUMBNAIL_PX = 96;
 const THUMBNAIL_BOX = { width: THUMBNAIL_PX, height: THUMBNAIL_PX };
 
 function WorldThumbnail({ url, name }: WorldThumbnailProps) {
-  const { plate, pending } = usePlate(url ?? undefined, THUMBNAIL_BOX);
+  const { plate, pending, blank } = usePlate(url ?? undefined, THUMBNAIL_BOX);
+  // Flat art has no tonal range to print, so it would render as a solid slab.
+  // Drop it and let the unprinted plate take over, the same call Hero makes.
+  const printable = Boolean(url) && !blank;
 
   return (
     <span
@@ -29,7 +32,7 @@ function WorldThumbnail({ url, name }: WorldThumbnailProps) {
       data-plate={pending ? 'pending' : undefined}
       aria-hidden="true"
     >
-      {url ? (
+      {printable && url ? (
         <Image
           src={plate?.source ?? url}
           alt=""

@@ -12,7 +12,7 @@ import {
   ActiveStateLabel,
   CardActionGroup,
 } from '@/components/shared/cards';
-import { formatDate } from '@/lib/utils';
+import { formatDate, initialOf } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
 import { Badge } from '@/components/ui/badge';
 import { resolveSessionCharacterId } from '@/lib/session/sessionCharacter';
@@ -25,10 +25,6 @@ const logger = new Logger('WorldCard');
 const MAX_CHARACTER_PILLS = 3;
 
 /** First character as the reader sees it, so an emoji isn't split in half. */
-function initialOf(name: string): string {
-  return (Array.from(name)[0] ?? '').toUpperCase();
-}
-
 interface WorldCardProps {
   /** The world data to display */
   world: World;

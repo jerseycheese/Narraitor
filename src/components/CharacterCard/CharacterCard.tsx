@@ -12,7 +12,7 @@ import {
   CardActionGroup,
 } from '@/components/shared/cards';
 import { Play, Pencil, Trash } from 'lucide-react';
-import { truncate, safeTrim, formatDate } from '@/lib/utils';
+import { truncate, safeTrim, formatDate, initialOf } from '@/lib/utils';
 
 interface CharacterCardProps {
   /** The character data to display */
@@ -30,10 +30,6 @@ interface CharacterCardProps {
 }
 
 /** First character as the reader sees it, so an emoji isn't split in half. */
-function initialOf(name: string): string {
-  return (Array.from(name)[0] ?? '').toUpperCase();
-}
-
 function getCharacterDescription(character: StoreCharacter): string {
   const text = (character?.background?.history ||
     character?.background?.personality ||
