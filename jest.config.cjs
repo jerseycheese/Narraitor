@@ -30,6 +30,11 @@ const config = {
     // CSS stub must come first: mappers match in order, and the @/ alias would
     // otherwise resolve @/-form stylesheet imports to real files.
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    // @/tests/* must come before the general @/* mapper below (same
+    // match-in-order rule): it mirrors tsconfig.json's second, more specific
+    // path alias to the repo-root tests/ dir, which Playwright's tsconfig-aware
+    // transform already honors but this mapper didn't.
+    '^@/tests/(.*)$': '<rootDir>/tests/$1',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testMatch: [
