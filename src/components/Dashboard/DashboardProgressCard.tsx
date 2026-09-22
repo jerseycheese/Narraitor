@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Globe, Users, Play, BookOpen } from 'lucide-react';
 import type { DashboardMetrics } from '@/types/dashboard.types';
 
 interface DashboardProgressCardProps {
@@ -10,26 +9,10 @@ interface DashboardProgressCardProps {
 
 export function DashboardProgressCard({ metrics }: DashboardProgressCardProps) {
   const stats = [
-    {
-      label: 'Worlds',
-      value: metrics.worldsCreated,
-      icon: Globe,
-    },
-    {
-      label: 'Characters',
-      value: metrics.charactersCreated,
-      icon: Users,
-    },
-    {
-      label: 'Sessions',
-      value: metrics.sessionsPlayed,
-      icon: Play,
-    },
-    {
-      label: 'Entries',
-      value: metrics.narrativeSegments,
-      icon: BookOpen,
-    },
+    { label: 'Worlds', value: metrics.worldsCreated },
+    { label: 'Characters', value: metrics.charactersCreated },
+    { label: 'Sessions', value: metrics.sessionsPlayed },
+    { label: 'Entries', value: metrics.narrativeSegments },
   ];
 
   return (
@@ -41,18 +24,12 @@ export function DashboardProgressCard({ metrics }: DashboardProgressCardProps) {
       <h2 id="progress-heading">Your Progress</h2>
 
       <div className="dashboard-progress-stats">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div key={stat.label} className="dashboard-progress-stat">
-              <div className="dashboard-progress-stat-value">
-                <Icon aria-hidden="true" />
-                <span>{stat.value}</span>
-              </div>
-              <p className="dashboard-progress-stat-label">{stat.label}</p>
-            </div>
-          );
-        })}
+        {stats.map((stat) => (
+          <div key={stat.label} className="dashboard-progress-stat">
+            <span className="dashboard-progress-stat-label">{stat.label}</span>
+            <span className="dashboard-progress-stat-value">{stat.value}</span>
+          </div>
+        ))}
       </div>
     </section>
   );

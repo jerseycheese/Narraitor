@@ -42,16 +42,10 @@ export function DashboardGettingStarted({
   ];
 
   const nextStep = steps.find((step) => !step.completed);
-  const allComplete = !nextStep;
-
-  // Hide when all steps completed
-  if (allComplete) {
-    return null;
-  }
 
   return (
     <section
-      className="component-dashboard-getting-started dashboard-section"
+      className="component-dashboard-getting-started"
       aria-labelledby="getting-started-heading"
     >
       <h2 id="getting-started-heading">Getting Started</h2>

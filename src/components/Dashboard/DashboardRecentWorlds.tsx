@@ -3,9 +3,51 @@
 import React, { useMemo } from 'react';
 import Image from 'next/image';
 import { Plus } from 'lucide-react';
+import clsx from 'clsx';
 import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { useWorldStore } from '@/state/worldStore';
+import { plateInkStyle, usePlate } from '@/hooks/usePlate';
+
+interface WorldThumbnailProps {
+  url?: string | null;
+  name: string;
+}
+
+/** Thumbnail edge for continuous-tone ink plate. */
+const THUMBNAIL_PX = 96;
+const THUMBNAIL_BOX = { width: THUMBNAIL_PX, height: THUMBNAIL_PX };
+
+function initialOf(name: string): string {
+  return (Array.from(name)[0] ?? '').toUpperCase();
+}
+
+function WorldThumbnail({ url, name }: WorldThumbnailProps) {
+  const { plate, pending } = usePlate(url ?? undefined, THUMBNAIL_BOX);
+
+  return (
+    <span
+      className={clsx('dashboard-recent-world-thumb', plate && 'plate-inked')}
+      style={plateInkStyle(plate)}
+      data-plate={pending ? 'pending' : undefined}
+      aria-hidden="true"
+    >
+      {url ? (
+        <Image
+          src={plate?.source ?? url}
+          alt=""
+          width={THUMBNAIL_PX}
+          height={THUMBNAIL_PX}
+          unoptimized
+        />
+      ) : (
+        <span className="world-card-plate-initial">
+          {initialOf(name)}
+        </span>
+      )}
+    </span>
+  );
+}
 
 interface DashboardRecentWorldsProps {
   worlds: ReturnType<typeof useWorldStore.getState>['worlds'];
@@ -31,8 +73,11 @@ export function DashboardRecentWorlds({
 
   if (recentWorlds.length === 0) {
     return (
-      <section className="component-dashboard-recent-worlds">
-        <h2>Recent Worlds</h2>
+      <section
+        className="component-dashboard-recent-worlds"
+        aria-labelledby="recent-worlds-heading"
+      >
+        <h2 id="recent-worlds-heading">Recent Worlds</h2>
         <div className="dashboard-recent-empty-state">
           <p>No worlds yet</p>
           <Button onClick={() => onNavigate('/worlds')} variant="secondary">
@@ -45,8 +90,11 @@ export function DashboardRecentWorlds({
   }
 
   return (
-    <section className="component-dashboard-recent-worlds">
-      <h2>Recent Worlds</h2>
+    <section
+      className="component-dashboard-recent-worlds"
+      aria-labelledby="recent-worlds-heading"
+    >
+      <h2 id="recent-worlds-heading">Recent Worlds</h2>
 
       <div className="dashboard-recent-list">
         {/* Recent Worlds */}
@@ -66,21 +114,10 @@ export function DashboardRecentWorlds({
             }}
           >
             <div className="dashboard-recent-world-content">
-              {world.image?.url && (
-                <span className="dashboard-recent-world-thumb">
-                  <Image
-                    src={world.image.url}
-                    alt=""
-                    fill
-                    sizes="64px"
-                  />
-                </span>
-              )}
-              <div>
+              <WorldThumbnail url={world.image?.url} name={world.name} />
+              <div className="dashboard-recent-item-meta">
                 <h3>{world.name}</h3>
-                <div>
-                  <span>{getGenreLabel(world.genre)}</span>
-                </div>
+                <p>{getGenreLabel(world.genre)}</p>
               </div>
             </div>
           </div>
