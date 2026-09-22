@@ -685,6 +685,13 @@
   margin: 0;
 }
 
+/* Form-section headings are h2s for the document outline, but retain the
+   compact wizard hierarchy rather than inheriting the app shell's page-title h2. */
+.component-wizard-container .wizard-subheading {
+  font-size: var(--font-size-md);
+  line-height: 1.35;
+}
+
 .wizard-error-container {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
