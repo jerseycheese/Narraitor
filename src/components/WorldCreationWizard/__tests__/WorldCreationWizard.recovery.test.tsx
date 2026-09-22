@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { axe } from 'jest-axe';
 import WorldCreationWizard from '../WorldCreationWizard';
 import { DRAFT_STORAGE_KEY } from '@/hooks/useWorldCreationAutoSave';
 
@@ -73,6 +74,12 @@ describe('WorldCreationWizard draft auto-save and recovery', () => {
   beforeEach(() => {
     localStorage.clear();
     jest.clearAllMocks();
+  });
+
+  it('has no accessibility violations on the initial world creation step', async () => {
+    const { container } = render(<WorldCreationWizard />);
+
+    expect((await axe(container)).violations).toEqual([]);
   });
 
   it('renders recovery dialog when draft exists in localStorage', async () => {

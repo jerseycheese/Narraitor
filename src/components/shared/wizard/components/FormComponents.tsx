@@ -213,7 +213,7 @@ export const WizardFormSection: React.FC<WizardFormSectionProps> = ({
     <div className="wizard-form-section component-wizard-form-section" {...sectionProps}>
       {(title || description) && (
         <div className="wizard-form-section-header" {...headerProps}>
-          {title && <h3 className={wizardStyles.subheading}>{title}</h3>}
+          {title && <h2 className={wizardStyles.subheading}>{title}</h2>}
           {description && (
             <p className={wizardStyles.step.description}>{description}</p>
           )}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, act, fireEvent } from '@testing-library/react';
+import { axe } from 'jest-axe';
 import { TutorialProvider, useTutorial } from '@/components/TutorialProvider';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
 import { useSessionStore } from '@/state/sessionStore';
@@ -159,6 +160,16 @@ describe('CharacterCreationWizard Joyride Next integration', () => {
     _lastJoyrideProps = null;
   });
 
+  it('has no accessibility violations on the initial character creation step', async () => {
+    const { container } = render(
+      <TutorialProvider>
+        <CharacterCreationWizard worldId="world-1" />
+      </TutorialProvider>
+    );
+
+    expect((await axe(container)).violations).toEqual([]);
+  });
+
   it('reaches all five tutorial steps by clicking Joyrides own Next button', async () => {
     render(
       <TutorialProvider>
@@ -309,4 +320,3 @@ describe('CharacterCreationWizard Joyride Next integration', () => {
     expect(document.querySelector('[data-tutorial="attribute-allocation"]')).toBeNull();
   });
 });
-

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 import { seedTestData } from './utils/seedTestData';
 import { mockApiEndpoints } from './utils/mockApi';
 import { waitForStableScrollHeight } from './utils/wait-helpers';
@@ -57,6 +58,12 @@ test.describe('Choice card contrast', () => {
       await page.waitForSelector('[data-testid="manuscript-session-shell"]', { timeout: 15_000 });
       await page.locator('.manuscript-suggested-action').first().waitFor({ timeout: 15_000 });
       await waitForStableScrollHeight(page, { timeout: 10_000, stableDuration: 1000 });
+
+      const accessibility = await new AxeBuilder({ page })
+        .include('[data-testid="manuscript-session-shell"]')
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+        .analyze();
+      expect(accessibility.violations).toEqual([]);
 
       const runs = await page.evaluate(() => {
         function parse(value: string): [number, number, number, number] {

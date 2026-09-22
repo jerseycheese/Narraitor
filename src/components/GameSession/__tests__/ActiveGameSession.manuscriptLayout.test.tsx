@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { axe } from 'jest-axe';
 import ActiveGameSession from '../ActiveGameSession';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -145,6 +146,20 @@ describe('ActiveGameSession Manuscript Layout', () => {
     });
 
     (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+  });
+
+  it('has no accessibility violations on the play surface', async () => {
+    const { container } = render(
+      <ActiveGameSession
+        worldId={mockWorldId}
+        sessionId={mockSessionId}
+        onChoiceSelected={jest.fn()}
+      />
+    );
+
+    await screen.findByTestId('manuscript-session-shell');
+
+    expect((await axe(container)).violations).toEqual([]);
   });
 
   it('renders a manuscript shell instead of legacy columns', async () => {
