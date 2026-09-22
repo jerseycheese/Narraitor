@@ -13,14 +13,16 @@ const schemes: { id: ColorScheme; label: string; Icon: typeof Sun }[] = [
 
 interface DarkModeToggleProps {
   compact?: boolean;
+  showLabels?: boolean;
+  className?: string;
 }
 
-export function DarkModeToggle({ compact }: DarkModeToggleProps) {
+export function DarkModeToggle({ compact, showLabels, className }: DarkModeToggleProps) {
   const { colorScheme, setColorScheme } = useTheme();
 
   return (
     <div
-      className="dark-mode-toggle"
+      className={`dark-mode-toggle${showLabels ? ' dark-mode-toggle-labeled' : ''}${className ? ` ${className}` : ''}`}
       role="radiogroup"
       aria-label="Color scheme"
     >
@@ -31,10 +33,11 @@ export function DarkModeToggle({ compact }: DarkModeToggleProps) {
           role="radio"
           aria-checked={colorScheme === id}
           aria-label={label}
-          className={`dark-mode-toggle-option${colorScheme === id ? ' dark-mode-toggle-option-active' : ''}${compact ? ' dark-mode-toggle-option-compact' : ''}`}
+          className={`dark-mode-toggle-option${colorScheme === id ? ' dark-mode-toggle-option-active' : ''}${compact ? ' dark-mode-toggle-option-compact' : ''}${showLabels ? ' dark-mode-toggle-option-labeled' : ''}`}
           onClick={() => setColorScheme(id)}
         >
           <Icon aria-hidden="true" />
+          {showLabels && <span className="dark-mode-toggle-label">{label}</span>}
         </button>
       ))}
     </div>

@@ -34,30 +34,9 @@ jest.mock('@/components/shared/PageLayout', () => {
 });
 
 // Mock the appearance control (it depends on ThemeProvider context)
-jest.mock('@/components/Navigation/ThemeMenu', () => ({
-  ThemeMenu: () => <div data-testid="theme-menu" />,
+jest.mock('@/components/Navigation/DarkModeToggle', () => ({
+  DarkModeToggle: () => <div data-testid="dark-mode-toggle">Dark Mode Toggle</div>,
 }));
-
-// Mock the Card components
-jest.mock('@/components/ui/card', () => {
-  return {
-    Card: function MockCard({ children }: { children: React.ReactNode }) {
-      return <div data-testid="card">{children}</div>;
-    },
-    CardHeader: function MockCardHeader({ children }: { children: React.ReactNode }) {
-      return <div data-testid="card-header">{children}</div>;
-    },
-    CardTitle: function MockCardTitle({ children }: { children: React.ReactNode }) {
-      return <h3>{children}</h3>;
-    },
-    CardDescription: function MockCardDescription({ children }: { children: React.ReactNode }) {
-      return <p>{children}</p>;
-    },
-    CardContent: function MockCardContent({ children }: { children: React.ReactNode }) {
-      return <div data-testid="card-content">{children}</div>;
-    }
-  };
-});
 
 describe('SettingsPage', () => {
   test('renders settings page with correct title and description', () => {
@@ -85,5 +64,15 @@ describe('SettingsPage', () => {
     
     // Test that there's a clear data management section
     expect(screen.getByText(/data management/i)).toBeInTheDocument();
+  });
+
+  test('renders providers and appearance controls', () => {
+    render(<SettingsPage />);
+
+    expect(screen.getByRole('link', { name: /manage providers/i })).toHaveAttribute(
+      'href',
+      '/settings/providers'
+    );
+    expect(screen.getByTestId('dark-mode-toggle')).toBeInTheDocument();
   });
 });
