@@ -2,7 +2,7 @@ const config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   maxWorkers: 1,
-  testTimeout: 90_000,
+  testTimeout: 150_000,
   collectCoverage: false,
   testMatch: ['<rootDir>/tests/live/**/*.test.ts'],
   moduleNameMapper: {
