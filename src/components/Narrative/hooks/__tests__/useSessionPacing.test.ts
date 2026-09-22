@@ -179,24 +179,4 @@ describe('useSessionPacing', () => {
     // not frozen at the last segment's timestamp (3 min)
     expect(result.current.metrics.elapsedMinutes).toBe(15);
   });
-
-  it('continueReading dismisses the break prompt', () => {
-    const breakIntervalMs = 15 * 60 * 1000;
-    const { result } = renderHook(() =>
-      useSessionPacing({
-        segmentCount: 5,
-        breakIntervalMs,
-      })
-    );
-
-    act(() => {
-      jest.advanceTimersByTime(breakIntervalMs);
-    });
-    expect(result.current.showBreakPrompt).toBe(true);
-
-    act(() => {
-      result.current.continueReading();
-    });
-    expect(result.current.showBreakPrompt).toBe(false);
-  });
 });

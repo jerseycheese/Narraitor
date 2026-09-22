@@ -217,7 +217,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const {
     showBreakPrompt,
     dismissBreakPrompt,
-    continueReading,
     metrics: pacingMetrics,
   } = useSessionPacing({
     segmentCount: segments.length,
@@ -895,7 +894,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       <SessionBreakPrompt
         isOpen={showBreakPrompt}
         onDismiss={dismissBreakPrompt}
-        onContinue={continueReading}
         sessionMetrics={pacingMetrics}
       />
       {!hideHistory && (

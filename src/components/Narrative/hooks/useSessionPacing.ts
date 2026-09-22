@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from '@/components/ui/toast';
 
 export interface SessionMetrics {
@@ -13,6 +13,9 @@ export interface UseSessionPacingOptions {
   segmentCount?: number;
   decisionCount?: number;
   milestoneInterval?: number;
+  // breakIntervalMs and startTime have no production caller — NarrativeController
+  // always uses the defaults. They exist as test seams so specs can control the
+  // break timer without waiting on real time.
   breakIntervalMs?: number;
   startTime?: Date;
   enabled?: boolean;
@@ -21,7 +24,6 @@ export interface UseSessionPacingOptions {
 export interface UseSessionPacingReturn {
   showBreakPrompt: boolean;
   dismissBreakPrompt: () => void;
-  continueReading: () => void;
   metrics: SessionMetrics;
 }
 
@@ -74,28 +76,24 @@ export function useSessionPacing(options: UseSessionPacingOptions = {}): UseSess
     return () => clearTimeout(timer);
   }, [enabled, hasStartedReading, showBreakPrompt, breakIntervalMs]);
 
-  const handleCloseBreakPrompt = useCallback(() => {
+  const dismissBreakPrompt = useCallback(() => {
     setShowBreakPrompt(false);
   }, []);
 
-  const metrics = useMemo<SessionMetrics>(() => {
-    // Recompute elapsed time when the break prompt fires so elapsedMinutes
-    // reflects the prompt trigger time rather than the last segment's timestamp.
-    void showBreakPrompt;
-    const elapsedMs = Math.max(0, Date.now() - startTimeRef.current.getTime());
-    return {
-      startTime: startTimeRef.current,
-      segmentCount: count,
-      decisionCount,
-      elapsedTimeMs: elapsedMs,
-      elapsedMinutes: Math.floor(elapsedMs / 60000),
-    };
-  }, [count, decisionCount, showBreakPrompt]);
+  // Computed fresh every render (not memoized) so elapsedMinutes always reflects
+  // the actual current time rather than the timestamp of the last dependency change.
+  const elapsedMs = Math.max(0, Date.now() - startTimeRef.current.getTime());
+  const metrics: SessionMetrics = {
+    startTime: startTimeRef.current,
+    segmentCount: count,
+    decisionCount,
+    elapsedTimeMs: elapsedMs,
+    elapsedMinutes: Math.floor(elapsedMs / 60000),
+  };
 
   return {
     showBreakPrompt,
-    dismissBreakPrompt: handleCloseBreakPrompt,
-    continueReading: handleCloseBreakPrompt,
+    dismissBreakPrompt,
     metrics,
   };
 }
