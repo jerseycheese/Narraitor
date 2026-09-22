@@ -5,12 +5,6 @@ import type { World } from '@/types/world.types';
  * Used in visual regression tests and integration tests
  */
 
-// Deterministic PNG data URIs to avoid network and randomness in visuals
-// 1x1 solid light-gray PNG that scales consistently in layout
-const STABLE_WORLD_IMAGE =
-  'data:image/png;base64,' +
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
-
 export const SAMPLE_WORLDS: World[] = [
   {
     id: 'world-cyberpunk-2077',
@@ -90,7 +84,7 @@ export const SAMPLE_WORLDS: World[] = [
       'A magical realm where ancient dragons soar above floating cities and arcane mysteries shape reality',
     genre: 'fantasy',
     image: {
-      url: STABLE_WORLD_IMAGE,
+      url: '/visual-assets/fixtures/world-aethermoor.png',
       type: 'ai-generated',
       prompt:
         'A magical fantasy realm with floating cities, ancient dragons soaring through mystical clouds, and arcane energy flowing through the sky',

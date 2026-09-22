@@ -409,7 +409,7 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
         stackable: false,
         image: {
           type: 'ai-generated',
-          url: 'https://api.dicebear.com/7.x/shapes/svg?seed=cyberdeck&backgroundColor=1e293b&scale=80',
+          url: '/visual-assets/fixtures/item-ghostlink-cyberdeck.png',
           generatedAt: '2024-01-01T01:58:30.000Z',
           prompt: 'Product photography of Ghostlink Cyberdeck (Signature deck tuned to slip past Arasaka intrusion countermeasures) cyberpunk style sleek futuristic device clear background detailed view high quality centered composition',
         },
@@ -439,7 +439,7 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
         maxStack: 5,
         image: {
           type: 'ai-generated',
-          url: 'https://api.dicebear.com/7.x/shapes/svg?seed=neurostim&backgroundColor=3b82f6&scale=80',
+          url: '/visual-assets/fixtures/item-neuroboost-stims.png',
           generatedAt: '2024-01-01T01:45:30.000Z',
           prompt: 'Product photography of NeuroBoost Stims (Fast-acting injectors that keep reflexes sharp during breach attempts) cyberpunk style medical injector clear background detailed view high quality centered composition',
         },
@@ -468,7 +468,7 @@ export async function seedInventoryItemsForVisual(page: Page): Promise<void> {
         stackable: false,
         image: {
           type: 'ai-generated',
-          url: 'https://api.dicebear.com/7.x/shapes/svg?seed=blackice&backgroundColor=7c3aed&scale=80',
+          url: '/visual-assets/fixtures/item-black-ice-shard.png',
           generatedAt: '2024-01-01T02:01:30.000Z',
           prompt: 'Product photography of Black ICE Shard (Prototype defensive program that can be slotted into the deck on demand) cyberpunk style crystalline data chip clear background detailed view high quality centered composition',
         },

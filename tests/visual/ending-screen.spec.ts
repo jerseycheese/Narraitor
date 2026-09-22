@@ -152,9 +152,9 @@ test.describe('EndingScreen Visual Tests', () => {
         json: {
           success: true,
           data: {
-            epilogue: 'With the city liberated and the syndicate dismantled, your legend spreads through Neo-Tokyo. The skyline gleams brighter than ever.',
-            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, inspiring a new generation of free minds.',
-            worldImpact: 'Corporate overreach is pushed back; citizens regain control over their data and lives.',
+            epilogue: 'With the city liberated and the syndicate dismantled, Nova watches community relays bloom across Neo-Tokyo. The skyline still bears the scars of the blackout, but each repaired district sends its own signal into the rain, proof that the city can speak for itself again.',
+            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, teaching new crews how to protect one another before they learn how to break a system.',
+            worldImpact: 'Corporate overreach is pushed back as neighborhood networks take control of essential data, mutual-aid channels, and the stories that once vanished behind paywalls.',
             tone: 'triumphant',
             achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
             playTime: 1234,
@@ -232,9 +232,9 @@ test.describe('EndingScreen Visual Tests', () => {
         json: {
           success: true,
           data: {
-            epilogue: 'The final breach comes at a terrible cost. Your last transmission fades into static as the city mourns a silent guardian.',
-            characterLegacy: 'Your name becomes a whispered memory among the resistance—sacrifice etched in the network forever.',
-            worldImpact: 'The power vacuum sparks turmoil before a fragile hope emerges from the chaos.',
+            epilogue: 'The final breach closes only after Nova burns every route home. Her last transmission dissolves into static while rain carries the glow of emergency beacons through the district, and the people she protected begin the harder work of surviving without her.',
+            characterLegacy: 'Her name becomes a whispered memory among the resistance, a reminder that sacrifice is not a strategy but sometimes the cost of leaving a door open for others.',
+            worldImpact: 'The power vacuum sparks turf wars and uncertainty, yet the encrypted tools Nova left behind give scattered communities a fragile way to coordinate before the corporations return.',
             tone: 'tragic',
             achievements: ['Last Stand: Protected the weak', 'Unseen Hero: Faded into legend'],
             playTime: 987,
@@ -302,9 +302,9 @@ test.describe('EndingScreen Visual Tests', () => {
         json: {
           success: true,
           data: {
-            epilogue: 'As the network quiets, a new signal whispers from the shadows. The story ends—or perhaps begins again.',
-            characterLegacy: 'Some say you vanished into the code itself; others claim you walk the alleys still.',
-            worldImpact: 'Rumors ripple across encrypted forums; a hidden hand guides the city\'s fate.',
+            epilogue: 'As the network quiets, one unlisted relay begins repeating a phrase only Nova’s first crew would recognize. The story closes on an empty alley and a reflected silhouette in a shop window, leaving no proof of whether she escaped or became part of the signal itself.',
+            characterLegacy: 'Some say Nova vanished into the code; others swear they still see her walking the alleys before a corporate raid, always gone before anyone can say thank you.',
+            worldImpact: 'Rumors ripple through encrypted forums and abandoned switchboards, suggesting a hidden hand is redirecting danger away from the city’s most vulnerable residents.',
             tone: 'mysterious',
             achievements: ['Ghost In The Wires', 'Whispers of the Grid'],
             playTime: 456,
@@ -376,9 +376,9 @@ test.describe('EndingScreen Visual Tests', () => {
         json: {
           success: true,
           data: {
-            epilogue: 'With new allies and a free network, the path forward glows brighter than neon.',
-            characterLegacy: 'Your actions kindle a movement—open, resilient, unbreakable.',
-            worldImpact: 'Community hubs and open protocols flourish; the city dreams again.',
+            epilogue: 'With new allies guarding a free network, Nova steps onto a rooftop as the first public broadcast rolls across Neo-Tokyo. It is not a promise that every danger has passed, only an invitation for people who have been isolated for too long to find one another in the open.',
+            characterLegacy: 'Her actions kindle a movement that is open, resilient, and patient enough to outlast the next executive who believes the city can be owned.',
+            worldImpact: 'Community hubs, repair collectives, and open protocols flourish across the districts, giving residents practical reasons to believe the city can dream again.',
             tone: 'hopeful',
             achievements: ['Beacon of Hope', 'Architect of Freedom'],
             playTime: 321,
@@ -450,9 +450,9 @@ test.describe('EndingScreen Visual Tests', () => {
         json: {
           success: true,
           data: {
-            epilogue: 'With the city liberated and the syndicate dismantled, your legend spreads through Neo-Tokyo. The skyline gleams brighter than ever.',
-            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, inspiring a new generation of free minds.',
-            worldImpact: 'Corporate overreach is pushed back; citizens regain control over their data and lives.',
+            epilogue: 'With the city liberated and the syndicate dismantled, Nova watches community relays bloom across Neo-Tokyo. The skyline still bears the scars of the blackout, but each repaired district sends its own signal into the rain, proof that the city can speak for itself again.',
+            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, teaching new crews how to protect one another before they learn how to break a system.',
+            worldImpact: 'Corporate overreach is pushed back as neighborhood networks take control of essential data, mutual-aid channels, and the stories that once vanished behind paywalls.',
             tone: 'triumphant',
             achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
             playTime: 1234,
@@ -514,9 +514,9 @@ test.describe('EndingScreen Visual Tests', () => {
         json: {
           success: true,
           data: {
-            epilogue: 'With the city liberated and the syndicate dismantled, your legend spreads through Neo-Tokyo. The skyline gleams brighter than ever.',
-            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, inspiring a new generation of free minds.',
-            worldImpact: 'Corporate overreach is pushed back; citizens regain control over their data and lives.',
+            epilogue: 'With the city liberated and the syndicate dismantled, Nova watches community relays bloom across Neo-Tokyo. The skyline still bears the scars of the blackout, but each repaired district sends its own signal into the rain, proof that the city can speak for itself again.',
+            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, teaching new crews how to protect one another before they learn how to break a system.',
+            worldImpact: 'Corporate overreach is pushed back as neighborhood networks take control of essential data, mutual-aid channels, and the stories that once vanished behind paywalls.',
             tone: 'triumphant',
             achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
             playTime: 1234,
@@ -577,9 +577,9 @@ test.describe('EndingScreen Visual Tests', () => {
         json: {
           success: true,
           data: {
-            epilogue: 'With the city liberated and the syndicate dismantled, your legend spreads through Neo-Tokyo. The skyline gleams brighter than ever.',
-            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, inspiring a new generation of free minds.',
-            worldImpact: 'Corporate overreach is pushed back; citizens regain control over their data and lives.',
+            epilogue: 'With the city liberated and the syndicate dismantled, Nova watches community relays bloom across Neo-Tokyo. The skyline still bears the scars of the blackout, but each repaired district sends its own signal into the rain, proof that the city can speak for itself again.',
+            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, teaching new crews how to protect one another before they learn how to break a system.',
+            worldImpact: 'Corporate overreach is pushed back as neighborhood networks take control of essential data, mutual-aid channels, and the stories that once vanished behind paywalls.',
             tone: 'triumphant',
             achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
             playTime: 1234,
@@ -647,9 +647,9 @@ test.describe('EndingScreen Visual Tests', () => {
         json: {
           success: true,
           data: {
-            epilogue: 'With the city liberated and the syndicate dismantled, your legend spreads through Neo-Tokyo. The skyline gleams brighter than ever.',
-            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, inspiring a new generation of free minds.',
-            worldImpact: 'Corporate overreach is pushed back; citizens regain control over their data and lives.',
+            epilogue: 'With the city liberated and the syndicate dismantled, Nova watches community relays bloom across Neo-Tokyo. The skyline still bears the scars of the blackout, but each repaired district sends its own signal into the rain, proof that the city can speak for itself again.',
+            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, teaching new crews how to protect one another before they learn how to break a system.',
+            worldImpact: 'Corporate overreach is pushed back as neighborhood networks take control of essential data, mutual-aid channels, and the stories that once vanished behind paywalls.',
             tone: 'triumphant',
             achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
             playTime: 1234,
@@ -719,11 +719,11 @@ test.describe('EndingScreen Visual Tests', () => {
           success: true,
           data: {
             epilogue:
-              'With the city liberated and the syndicate dismantled, your legend spreads through Neo-Tokyo. The skyline gleams brighter than ever.',
+              'With the city liberated and the syndicate dismantled, Nova watches community relays bloom across Neo-Tokyo. The skyline still bears the scars of the blackout, but each repaired district sends its own signal into the rain, proof that the city can speak for itself again.',
             characterLegacy:
-              'Nova Ghost Chen becomes a symbol of resistance, inspiring a new generation of free minds.',
+              'Nova Ghost Chen becomes a symbol of resistance, teaching new crews how to protect one another before they learn how to break a system.',
             worldImpact:
-              'Corporate overreach is pushed back; citizens regain control over their data and lives.',
+              'Corporate overreach is pushed back as neighborhood networks take control of essential data, mutual-aid channels, and the stories that once vanished behind paywalls.',
             tone: 'triumphant',
             achievements: [
               'Master Hacker: Outsmarted corporate AI',
