@@ -32,7 +32,6 @@ const RecentPagesDropdown = dynamic(
 // better one — the roster's Play sets the character before routing, where the
 // header's only sets the world — and both land on the same play URL.
 const CTA_SUPPRESSED_ROUTES: readonly RegExp[] = [
-  /^\/dashboard$/,
   /^\/worlds$/,
   /^\/worlds\/create$/,
   /^\/worlds\/[^/]+$/,
@@ -107,21 +106,24 @@ export function HeaderNavigation() {
   const suppressCta =
     !isProductRegister ||
     CTA_SUPPRESSED_ROUTES.some((route) => route.test(pathname));
+  const suppressPlay = suppressCta || pathname === '/dashboard';
 
   const cta = suppressCta ? null : currentWorld ? (
-    <Button
-      type="button"
-      onClick={() =>
-        navigateWithLoading(
-          `/worlds/${currentWorld.id}/play`,
-          `Starting ${currentWorld.name}...`
-        )
-      }
-      variant="outline"
-    >
-      <Play aria-hidden="true" />
-      Play
-    </Button>
+    suppressPlay ? null : (
+      <Button
+        type="button"
+        onClick={() =>
+          navigateWithLoading(
+            `/worlds/${currentWorld.id}/play`,
+            `Starting ${currentWorld.name}...`
+          )
+        }
+        variant="outline"
+      >
+        <Play aria-hidden="true" />
+        Play
+      </Button>
+    )
   ) : !hasWorldsStore ? (
     <Button
       type="button"

@@ -67,6 +67,10 @@ const APPROVED_BRACKET_SELECTORS = new Set([
   '.component-world-card .component-hero:not(:has(.component-hero-image))::after',
   '.component-character-card .character-card-portrait:not(:has(img))::before',
   '.component-character-card .character-card-portrait:not(:has(img))::after',
+  '.dashboard-recent-world-thumb:not(:has(img))::before',
+  '.dashboard-recent-world-thumb:not(:has(img))::after',
+  '.dashboard-recent-character-portrait:not(:has(img))::before',
+  '.dashboard-recent-character-portrait:not(:has(img))::after',
 ]);
 
 const APPROVED_HEADING_RADIAL_SELECTORS = new Set([
