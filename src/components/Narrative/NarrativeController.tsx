@@ -97,7 +97,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   hideHistory = false,
   retryToken = 0,
   onStreamingPreviewChange,
-  enableSessionPacing = process.env.NODE_ENV !== 'test',
+  enableSessionPacing = true,
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -217,7 +217,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const {
     showBreakPrompt,
     dismissBreakPrompt,
-    continueReading,
     metrics: pacingMetrics,
   } = useSessionPacing({
     segmentCount: segments.length,
@@ -531,6 +530,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     generateChoices,
     getSessionSegments,
     generatePlayerChoices,
+    worldId,
+    characterId,
   ]);
 
   const generateInitialNarrative = async () => {
@@ -893,7 +894,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       <SessionBreakPrompt
         isOpen={showBreakPrompt}
         onDismiss={dismissBreakPrompt}
-        onContinue={continueReading}
         sessionMetrics={pacingMetrics}
       />
       {!hideHistory && (

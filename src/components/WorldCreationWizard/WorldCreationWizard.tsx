@@ -211,7 +211,7 @@ export default function WorldCreationWizard({
         worldData: wizard.state.data,
       });
     }
-  }, [isAutoSaveLoaded, wizard.state.currentStep, hasRecoveryData, showRecoveryModal, setAutoSaveData]);
+  }, [isAutoSaveLoaded, wizard.state.currentStep, wizard.state.data, hasRecoveryData, showRecoveryModal, setAutoSaveData]);
 
   const handleRecoverProgress = useCallback(() => {
     if (autoSaveData) {
@@ -490,7 +490,7 @@ export default function WorldCreationWizard({
       wizard.updateData({ createdWorldId: worldId });
       finishWizard(worldId);
     }
-  }, [wizard, createWorld, finishWizard]);
+  }, [wizard, createWorld, finishWizard, clearAutoSave]);
 
   const updateWorldData = useCallback((updates: Partial<World>) => {
     wizard.updateData(updates);

@@ -32,22 +32,22 @@ jest.mock('@/hooks/useWorldCreationAutoSave', () => ({
 // Mock worldStore
 const mockCreateWorld = jest.fn().mockReturnValue('world-123');
 
+type MockWorldStoreState = {
+  createWorld: jest.Mock;
+  setCurrentWorld: jest.Mock;
+  updateWorld: jest.Mock;
+  worlds: Record<string, unknown>;
+};
+
 jest.mock('@/state/worldStore', () => ({
-  useWorldStore: (selector: any) => {
-    if (typeof selector === 'function') {
-      return selector({
-        createWorld: mockCreateWorld,
-        setCurrentWorld: jest.fn(),
-        updateWorld: jest.fn(),
-        worlds: {},
-      });
-    }
-    return {
+  useWorldStore: (selector?: (state: MockWorldStoreState) => unknown) => {
+    const state: MockWorldStoreState = {
       createWorld: mockCreateWorld,
       setCurrentWorld: jest.fn(),
       updateWorld: jest.fn(),
       worlds: {},
     };
+    return typeof selector === 'function' ? selector(state) : state;
   },
 }));
 

@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from '@/components/ui/toast';
-import { NarrativeSegment } from '@/types/narrative.types';
 
 export interface SessionMetrics {
   startTime: Date;
@@ -12,9 +11,11 @@ export interface SessionMetrics {
 
 export interface UseSessionPacingOptions {
   segmentCount?: number;
-  segments?: NarrativeSegment[];
   decisionCount?: number;
   milestoneInterval?: number;
+  // breakIntervalMs and startTime have no production caller — NarrativeController
+  // always uses the defaults. They exist as test seams so specs can control the
+  // break timer without waiting on real time.
   breakIntervalMs?: number;
   startTime?: Date;
   enabled?: boolean;
@@ -23,7 +24,6 @@ export interface UseSessionPacingOptions {
 export interface UseSessionPacingReturn {
   showBreakPrompt: boolean;
   dismissBreakPrompt: () => void;
-  continueReading: () => void;
   metrics: SessionMetrics;
 }
 
@@ -36,18 +36,17 @@ const DEFAULT_BREAK_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
  */
 export function useSessionPacing(options: UseSessionPacingOptions = {}): UseSessionPacingReturn {
   const {
-    segmentCount: propSegmentCount,
-    segments,
+    segmentCount = 0,
     decisionCount = 0,
     milestoneInterval = DEFAULT_MILESTONE_INTERVAL,
     breakIntervalMs = DEFAULT_BREAK_INTERVAL_MS,
-    startTime: propStartTime,
+    startTime,
     enabled = true,
   } = options;
 
   const toast = useToast();
-  const count = propSegmentCount ?? segments?.length ?? 0;
-  const startTimeRef = useRef<Date>(propStartTime ?? new Date());
+  const count = segmentCount;
+  const startTimeRef = useRef<Date>(startTime ?? new Date());
   const firedMilestonesRef = useRef<Set<number>>(new Set());
   const [showBreakPrompt, setShowBreakPrompt] = useState(false);
 
@@ -81,25 +80,20 @@ export function useSessionPacing(options: UseSessionPacingOptions = {}): UseSess
     setShowBreakPrompt(false);
   }, []);
 
-  const continueReading = useCallback(() => {
-    setShowBreakPrompt(false);
-  }, []);
-
-  const metrics = useMemo<SessionMetrics>(() => {
-    const elapsedMs = Math.max(0, Date.now() - startTimeRef.current.getTime());
-    return {
-      startTime: startTimeRef.current,
-      segmentCount: count,
-      decisionCount,
-      elapsedTimeMs: elapsedMs,
-      elapsedMinutes: Math.floor(elapsedMs / 60000),
-    };
-  }, [count, decisionCount]);
+  // Computed fresh every render (not memoized) so elapsedMinutes always reflects
+  // the actual current time rather than the timestamp of the last dependency change.
+  const elapsedMs = Math.max(0, Date.now() - startTimeRef.current.getTime());
+  const metrics: SessionMetrics = {
+    startTime: startTimeRef.current,
+    segmentCount: count,
+    decisionCount,
+    elapsedTimeMs: elapsedMs,
+    elapsedMinutes: Math.floor(elapsedMs / 60000),
+  };
 
   return {
     showBreakPrompt,
     dismissBreakPrompt,
-    continueReading,
     metrics,
   };
 }

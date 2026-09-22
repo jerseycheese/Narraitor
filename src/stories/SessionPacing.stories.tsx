@@ -111,7 +111,6 @@ function MilestonePacingDemo() {
       <SessionBreakPrompt
         isOpen={pacing.showBreakPrompt}
         onDismiss={pacing.dismissBreakPrompt}
-        onContinue={pacing.continueReading}
         sessionMetrics={pacing.metrics}
       />
     </div>
