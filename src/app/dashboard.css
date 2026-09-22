@@ -238,8 +238,8 @@
   margin: 0;
 }
 
-.dashboard-recent-item span,
-.dashboard-recent-item p {
+.dashboard-recent-item-meta span,
+.dashboard-recent-item-meta p {
   font-family: var(--font-system);
   font-size: var(--font-size-xs_5);
   color: var(--color-text-muted);
@@ -614,8 +614,8 @@
   font-family: var(--font-system);
 }
 
-:root .dashboard-recent-item span,
-:root .dashboard-recent-item p {
+:root .dashboard-recent-item-meta span,
+:root .dashboard-recent-item-meta p {
   font-family: var(--font-interface);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
