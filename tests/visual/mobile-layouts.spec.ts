@@ -20,8 +20,8 @@ import { waitForStoreReady } from './utils/tutorial-helpers';
  * A regression in the mobile breakpoints surfaces as a diff here.
  *
  * NOTE: like the other full-page specs, the committed baselines are the CI
- * runner's render, not a local one — refresh from a CI E2E run rather than
- * regenerating locally (see main-pages.spec.ts).
+ * runner's render, not a local one - refresh from a CI E2E run rather than
+ * regenerating locally (see dashboard-page.spec.ts).
  */
 
 const MOBILE_VIEWPORT = { width: 375, height: 812 };

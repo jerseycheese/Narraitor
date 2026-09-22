@@ -145,7 +145,7 @@ test('component visual test', async ({ page }) => {
 **Organize by interface area:**
 ```
 tests/visual/
-├── main-pages.spec.ts          # Navigation, homepage
+├── dashboard-page.spec.ts      # Navigation, dashboard
 ├── character-creation.spec.ts  # Character forms
 ├── game-session.spec.ts       # Game interfaces
 └── journal-page.spec.ts       # Journal page snapshots

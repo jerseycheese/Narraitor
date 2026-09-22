@@ -208,17 +208,17 @@ Flaky tests pass sometimes and fail other times without code changes. Signs:
 
 ```bash
 # Run the same test multiple times
-for i in {1..5}; do npm run test:visual -- tests/visual/main-pages.spec.ts; done
+for i in {1..5}; do npm run test:visual -- tests/visual/dashboard-page.spec.ts; done
 ```
 
 ### Step 2: Debug with Visible Browser
 
 ```bash
 # Run in headed mode to see what's happening
-npm run test:visual:headed -- tests/visual/main-pages.spec.ts
+npm run test:visual:headed -- tests/visual/dashboard-page.spec.ts
 
 # Or debug step by step
-npm run test:visual:debug -- tests/visual/main-pages.spec.ts
+npm run test:visual:debug -- tests/visual/dashboard-page.spec.ts
 ```
 
 ### Step 3: Common Fixes
