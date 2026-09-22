@@ -51,37 +51,6 @@
 
 /* ─── Progress Card ─── */
 
-.dashboard-progress-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: var(--space-3);
-}
-
-@media (width <= 640px) {
-  .dashboard-progress-stats {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.dashboard-progress-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-canvas);
-}
-
-.dashboard-progress-stat-value {
-  font-family: var(--font-system);
-  font-size: var(--font-size-xl);
-  line-height: 1;
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
-
 .dashboard-progress-stat-label {
   margin: 0;
   font-family: var(--font-system);
@@ -556,18 +525,14 @@
 :root .dashboard-progress-stats {
   display: flex;
   flex-wrap: wrap;
-  grid-template-columns: none;
   gap: var(--space-3) var(--space-6);
 }
 
 :root .dashboard-progress-stat {
+  display: flex;
   flex: 0 1 auto;
-  flex-direction: row;
   align-items: baseline;
   gap: var(--space-2);
-  padding: 0;
-  border: none;
-  background: transparent;
 }
 
 
@@ -610,10 +575,6 @@
   padding: var(--space-3) var(--space-4);
 }
 
-:root .dashboard-progress-stat-label {
-  font-family: var(--font-system);
-}
-
 :root .dashboard-recent-item-meta span,
 :root .dashboard-recent-item-meta p {
   font-family: var(--font-interface);
@@ -624,6 +585,7 @@
 :root .dashboard-progress-stat-value {
   font-family: var(--font-system);
   font-size: var(--font-size-md);
+  color: var(--color-text-primary);
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.01em;

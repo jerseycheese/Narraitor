@@ -6,10 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
-
-function initialOf(name: string): string {
-  return (Array.from(name)[0] ?? '').toUpperCase();
-}
+import { initialOf } from '@/lib/utils';
 
 interface DashboardRecentCharactersProps {
   characters: ReturnType<typeof useCharacterStore.getState>['characters'];
@@ -82,7 +79,6 @@ export function DashboardRecentCharacters({
               <div className="dashboard-recent-character-content">
                 <div
                   className="dashboard-recent-character-portrait"
-                  data-testid="character-portrait"
                   aria-hidden="true"
                 >
                   {character.portrait?.url ? (

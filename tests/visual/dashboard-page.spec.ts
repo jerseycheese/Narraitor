@@ -133,4 +133,3 @@ test.describe('Dashboard Visual Tests', () => {
     });
   });
 });
-

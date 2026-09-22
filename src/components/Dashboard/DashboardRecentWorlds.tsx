@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { useWorldStore } from '@/state/worldStore';
 import { plateInkStyle, usePlate } from '@/hooks/usePlate';
+import { initialOf } from '@/lib/utils';
 
 interface WorldThumbnailProps {
   url?: string | null;
@@ -17,10 +18,6 @@ interface WorldThumbnailProps {
 /** Thumbnail edge for continuous-tone ink plate. */
 const THUMBNAIL_PX = 96;
 const THUMBNAIL_BOX = { width: THUMBNAIL_PX, height: THUMBNAIL_PX };
-
-function initialOf(name: string): string {
-  return (Array.from(name)[0] ?? '').toUpperCase();
-}
 
 function WorldThumbnail({ url, name }: WorldThumbnailProps) {
   const { plate, pending } = usePlate(url ?? undefined, THUMBNAIL_BOX);
