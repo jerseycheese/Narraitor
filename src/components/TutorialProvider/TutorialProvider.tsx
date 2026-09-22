@@ -386,7 +386,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
         }
       }, 100);
     }
-  }, [activeTour, completeTutorialPhase, updateTutorialProgress, endTour, pauseTour, stopTour, stepMapping, currentWizardStep, steps, tutorialProgress.phases]);
+  }, [activeTour, updateTutorialProgress, endTour, pauseTour, stopTour, stepMapping, currentWizardStep, steps, tutorialProgress.phases]);
 
   const lastWizardStepRef = useRef<number | null>(null);
 

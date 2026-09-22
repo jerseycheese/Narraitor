@@ -132,6 +132,7 @@ describe('NarrativeController context summary persistence', () => {
         sessionId="test-session"
         triggerGeneration={false}
         generateChoices
+        enableSessionPacing={false}
       />
     );
 

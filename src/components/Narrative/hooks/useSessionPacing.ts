@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useToast } from '@/components/ui/toast';
-import { NarrativeSegment } from '@/types/narrative.types';
 
 export interface SessionMetrics {
   startTime: Date;
@@ -12,7 +11,6 @@ export interface SessionMetrics {
 
 export interface UseSessionPacingOptions {
   segmentCount?: number;
-  segments?: NarrativeSegment[];
   decisionCount?: number;
   milestoneInterval?: number;
   breakIntervalMs?: number;
@@ -36,18 +34,17 @@ const DEFAULT_BREAK_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
  */
 export function useSessionPacing(options: UseSessionPacingOptions = {}): UseSessionPacingReturn {
   const {
-    segmentCount: propSegmentCount,
-    segments,
+    segmentCount = 0,
     decisionCount = 0,
     milestoneInterval = DEFAULT_MILESTONE_INTERVAL,
     breakIntervalMs = DEFAULT_BREAK_INTERVAL_MS,
-    startTime: propStartTime,
+    startTime,
     enabled = true,
   } = options;
 
   const toast = useToast();
-  const count = propSegmentCount ?? segments?.length ?? 0;
-  const startTimeRef = useRef<Date>(propStartTime ?? new Date());
+  const count = segmentCount;
+  const startTimeRef = useRef<Date>(startTime ?? new Date());
   const firedMilestonesRef = useRef<Set<number>>(new Set());
   const [showBreakPrompt, setShowBreakPrompt] = useState(false);
 
@@ -77,15 +74,14 @@ export function useSessionPacing(options: UseSessionPacingOptions = {}): UseSess
     return () => clearTimeout(timer);
   }, [enabled, hasStartedReading, showBreakPrompt, breakIntervalMs]);
 
-  const dismissBreakPrompt = useCallback(() => {
-    setShowBreakPrompt(false);
-  }, []);
-
-  const continueReading = useCallback(() => {
+  const handleCloseBreakPrompt = useCallback(() => {
     setShowBreakPrompt(false);
   }, []);
 
   const metrics = useMemo<SessionMetrics>(() => {
+    // Recompute elapsed time when the break prompt fires so elapsedMinutes
+    // reflects the prompt trigger time rather than the last segment's timestamp.
+    void showBreakPrompt;
     const elapsedMs = Math.max(0, Date.now() - startTimeRef.current.getTime());
     return {
       startTime: startTimeRef.current,
@@ -94,12 +90,12 @@ export function useSessionPacing(options: UseSessionPacingOptions = {}): UseSess
       elapsedTimeMs: elapsedMs,
       elapsedMinutes: Math.floor(elapsedMs / 60000),
     };
-  }, [count, decisionCount]);
+  }, [count, decisionCount, showBreakPrompt]);
 
   return {
     showBreakPrompt,
-    dismissBreakPrompt,
-    continueReading,
+    dismissBreakPrompt: handleCloseBreakPrompt,
+    continueReading: handleCloseBreakPrompt,
     metrics,
   };
 }

@@ -151,4 +151,52 @@ describe('useSessionPacing', () => {
     expect(result.current.metrics.segmentCount).toBe(8);
     expect(result.current.metrics.decisionCount).toBe(3);
   });
+
+  it('updates elapsedMinutes when break prompt fires rather than freezing at last segment timestamp', () => {
+    const breakIntervalMs = 15 * 60 * 1000;
+    const { result, rerender } = renderHook(
+      ({ count }) => useSessionPacing({ segmentCount: count, breakIntervalMs }),
+      { initialProps: { count: 1 } }
+    );
+
+    // Initial segment arrived at minute 0
+    expect(result.current.metrics.elapsedMinutes).toBe(0);
+
+    // Advance 3 minutes and add a segment
+    act(() => {
+      jest.advanceTimersByTime(3 * 60 * 1000);
+      rerender({ count: 2 });
+    });
+    expect(result.current.metrics.elapsedMinutes).toBe(3);
+    expect(result.current.showBreakPrompt).toBe(false);
+
+    // Advance to 15 minutes (another 12 minutes) without any new segment
+    act(() => {
+      jest.advanceTimersByTime(12 * 60 * 1000);
+    });
+    expect(result.current.showBreakPrompt).toBe(true);
+    // elapsedMinutes must reflect the actual elapsed time at prompt time (15 min),
+    // not frozen at the last segment's timestamp (3 min)
+    expect(result.current.metrics.elapsedMinutes).toBe(15);
+  });
+
+  it('continueReading dismisses the break prompt', () => {
+    const breakIntervalMs = 15 * 60 * 1000;
+    const { result } = renderHook(() =>
+      useSessionPacing({
+        segmentCount: 5,
+        breakIntervalMs,
+      })
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(breakIntervalMs);
+    });
+    expect(result.current.showBreakPrompt).toBe(true);
+
+    act(() => {
+      result.current.continueReading();
+    });
+    expect(result.current.showBreakPrompt).toBe(false);
+  });
 });

@@ -172,6 +172,7 @@ describe('NarrativeController — per-choice segment timeout (#1429)', () => {
         triggerGeneration={true}
         generateChoices={false}
         choiceId="choice-1"
+        enableSessionPacing={false}
       />
     );
 
@@ -202,6 +203,7 @@ describe('NarrativeController — per-choice segment timeout (#1429)', () => {
         triggerGeneration={true}
         generateChoices={false}
         choiceId="choice-1"
+        enableSessionPacing={false}
       />
     );
 

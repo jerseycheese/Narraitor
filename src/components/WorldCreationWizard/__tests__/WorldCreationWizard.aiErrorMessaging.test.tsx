@@ -12,9 +12,16 @@ jest.mock('next/navigation', () => ({
   }),
 }));
 
+type MockWorldStoreState = {
+  createWorld: jest.Mock;
+  setCurrentWorld: jest.Mock;
+  updateWorld: jest.Mock;
+  worlds: Record<string, unknown>;
+};
+
 jest.mock('@/state/worldStore', () => ({
-  useWorldStore: (selector: any) => {
-    const state = {
+  useWorldStore: (selector?: (state: MockWorldStoreState) => unknown) => {
+    const state: MockWorldStoreState = {
       createWorld: jest.fn().mockReturnValue('world-123'),
       setCurrentWorld: jest.fn(),
       updateWorld: jest.fn(),
