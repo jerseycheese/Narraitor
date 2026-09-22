@@ -33,4 +33,22 @@ test.describe('Providers settings page', () => {
       'providers-empty-ds3.png'
     );
   });
+
+  test('empty state renders consistently (dark mode)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await gotoProviders(page);
+    await expect(page.locator('.component-providers-page')).toHaveScreenshot(
+      'providers-empty-dark.png'
+    );
+  });
+
+  test('empty state renders consistently (mobile)', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await gotoProviders(page);
+    await expect(page.locator('.component-providers-page')).toHaveScreenshot(
+      'providers-empty-mobile.png'
+    );
+  });
 });

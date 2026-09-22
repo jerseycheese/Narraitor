@@ -15,10 +15,7 @@
   flex-direction: column;
   gap: var(--space-3);
   align-items: flex-start;
-  padding: var(--space-6);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
+  padding: var(--space-2) 0 var(--space-4);
   color: var(--color-text-secondary);
   font-family: var(--font-interface);
 }
@@ -37,18 +34,42 @@
 
 /* Provider card */
 .component-provider-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-5);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   font-family: var(--font-interface);
 }
 
+:root .component-provider-card::before,
+:root .component-provider-card::after {
+  content: "";
+  position: absolute;
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border: 0 solid var(--color-text-muted);
+  pointer-events: none;
+}
+
+:root .component-provider-card::before {
+  top: 0;
+  left: 0;
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+
+:root .component-provider-card::after {
+  right: 0;
+  bottom: 0;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+
 .component-provider-card[data-active='true'] {
-  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
 }
 
 .provider-card-head {
@@ -72,29 +93,6 @@
   display: flex;
   gap: var(--space-2);
   flex-wrap: wrap;
-}
-
-.provider-badge {
-  font-size: var(--font-size-xs);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-}
-
-.provider-badge[data-tone='active'] {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
-
-.provider-badge[data-tone='valid'] {
-  border-color: var(--color-success);
-  color: var(--color-success);
-}
-
-.provider-badge[data-tone='invalid'] {
-  border-color: var(--color-danger);
-  color: var(--color-danger);
 }
 
 .provider-card-actions {
