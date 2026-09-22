@@ -14,8 +14,7 @@ import { mockApiEndpoints } from './utils/mockApi';
  * tests/visual/ending-screen-themes.spec.ts.
  */
 
-const MOCK_ENDING_IMAGE =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/awp2z0AAAAASUVORK5CYII=';
+const MOCK_ENDING_IMAGE = '/visual-assets/world-cyberpunk.png';
 
 test.describe('EndingScreen Visual Tests', () => {
   test.describe.configure({ timeout: 60000 });
@@ -159,7 +158,6 @@ test.describe('EndingScreen Visual Tests', () => {
             tone: 'triumphant',
             achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
             playTime: 1234,
-            imageUrl: MOCK_ENDING_IMAGE,
           },
         },
       });
@@ -183,10 +181,11 @@ test.describe('EndingScreen Visual Tests', () => {
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
 
-    // Ensure ending hero image is visible
-    await expect(page.locator('.component-ending-screen-hero-image')).toBeVisible();
+    // Assert fallback state: placeholder button is visible, hero image is not rendered
+    await expect(page.getByRole('button', { name: 'Generate ending image' })).toBeVisible();
+    await expect(page.locator('.component-ending-screen-hero-image')).not.toBeVisible();
 
-    // Give extra time for image rendering
+    // Give extra time for rendering settle
     await page.waitForTimeout(1000);
 
     // Expand all collapsible sections including "Your Story"
@@ -239,7 +238,6 @@ test.describe('EndingScreen Visual Tests', () => {
             tone: 'tragic',
             achievements: ['Last Stand: Protected the weak', 'Unseen Hero: Faded into legend'],
             playTime: 987,
-            imageUrl: MOCK_ENDING_IMAGE,
           },
         },
       });
@@ -260,8 +258,10 @@ test.describe('EndingScreen Visual Tests', () => {
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
 
-    // Ensure ending hero image is visible
-    await expect(page.locator('.component-ending-screen-hero-image')).toBeVisible();
+    // Assert fallback state: placeholder button is visible, hero image is not rendered
+    await expect(page.getByRole('button', { name: 'Generate ending image' })).toBeVisible();
+    await expect(page.locator('.component-ending-screen-hero-image')).not.toBeVisible();
+
     await page.waitForTimeout(1000);
 
     // Hide dynamic content that could cause flakiness
@@ -308,7 +308,6 @@ test.describe('EndingScreen Visual Tests', () => {
             tone: 'mysterious',
             achievements: ['Ghost In The Wires', 'Whispers of the Grid'],
             playTime: 456,
-            imageUrl: MOCK_ENDING_IMAGE,
           },
         },
       });
@@ -329,10 +328,10 @@ test.describe('EndingScreen Visual Tests', () => {
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
 
-    // Ensure ending hero image is visible
-    await expect(page.locator('.component-ending-screen-hero-image')).toBeVisible();
+    // Assert fallback state: placeholder button is visible, hero image is not rendered
+    await expect(page.getByRole('button', { name: 'Generate ending image' })).toBeVisible();
+    await expect(page.locator('.component-ending-screen-hero-image')).not.toBeVisible();
 
-    // Give extra time for image rendering
     await page.waitForTimeout(1000);
 
     // Expand all collapsible sections including "Your Story"
@@ -340,7 +339,6 @@ test.describe('EndingScreen Visual Tests', () => {
 
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
-    // Small settle for style application
     await page.waitForTimeout(150);
     
     // Take a full-page screenshot to include the entire UI chrome
@@ -384,7 +382,6 @@ test.describe('EndingScreen Visual Tests', () => {
             tone: 'hopeful',
             achievements: ['Beacon of Hope', 'Architect of Freedom'],
             playTime: 321,
-            imageUrl: MOCK_ENDING_IMAGE,
           },
         },
       });
@@ -405,8 +402,10 @@ test.describe('EndingScreen Visual Tests', () => {
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
 
-    // Ensure ending hero image is visible
-    await expect(page.locator('.component-ending-screen-hero-image')).toBeVisible();
+    // Assert fallback state: placeholder button is visible, hero image is not rendered
+    await expect(page.getByRole('button', { name: 'Generate ending image' })).toBeVisible();
+    await expect(page.locator('.component-ending-screen-hero-image')).not.toBeVisible();
+
     await page.waitForTimeout(1000);
 
     // Expand all collapsible sections including "Your Story"
@@ -415,7 +414,6 @@ test.describe('EndingScreen Visual Tests', () => {
     // Hide dynamic content that could cause flakiness
     await hideDynamicContent(page);
 
-    // Wait for content to stabilize
     await page.waitForTimeout(100);
 
     // Take a full-page screenshot to include the entire UI chrome
@@ -458,7 +456,6 @@ test.describe('EndingScreen Visual Tests', () => {
             tone: 'triumphant',
             achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
             playTime: 1234,
-            imageUrl: MOCK_ENDING_IMAGE,
           },
         },
       });
@@ -477,8 +474,10 @@ test.describe('EndingScreen Visual Tests', () => {
 
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
 
-    // Ensure ending hero image is visible
-    await expect(page.locator('.component-ending-screen-hero-image')).toBeVisible();
+    // Assert fallback state: placeholder button is visible, hero image is not rendered
+    await expect(page.getByRole('button', { name: 'Generate ending image' })).toBeVisible();
+    await expect(page.locator('.component-ending-screen-hero-image')).not.toBeVisible();
+
     await page.waitForTimeout(1000);
 
     await expandAllCollapsibleSections(page);
@@ -521,7 +520,6 @@ test.describe('EndingScreen Visual Tests', () => {
             tone: 'triumphant',
             achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
             playTime: 1234,
-            imageUrl: MOCK_ENDING_IMAGE,
           },
         },
       });
@@ -540,8 +538,10 @@ test.describe('EndingScreen Visual Tests', () => {
 
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
 
-    // Ensure ending hero image is visible
-    await expect(page.locator('.component-ending-screen-hero-image')).toBeVisible();
+    // Assert fallback state: placeholder button is visible, hero image is not rendered
+    await expect(page.getByRole('button', { name: 'Generate ending image' })).toBeVisible();
+    await expect(page.locator('.component-ending-screen-hero-image')).not.toBeVisible();
+
     await page.waitForTimeout(1000);
 
     await expandAllCollapsibleSections(page);
@@ -549,6 +549,142 @@ test.describe('EndingScreen Visual Tests', () => {
     await page.waitForTimeout(100);
 
     await expect(page).toHaveScreenshot('ending-screen-mobile.png', {
+      threshold: 0.05,
+      fullPage: true,
+    });
+  });
+
+  test('EndingScreen - with image should render consistently', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.route('**/api/generate-ending-image', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          imageUrl: MOCK_ENDING_IMAGE,
+        },
+      });
+    });
+
+    await page.route('**/api/narrative/ending', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          data: {
+            epilogue: 'With the city liberated and the syndicate dismantled, your legend spreads through Neo-Tokyo. The skyline gleams brighter than ever.',
+            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, inspiring a new generation of free minds.',
+            worldImpact: 'Corporate overreach is pushed back; citizens regain control over their data and lives.',
+            tone: 'triumphant',
+            achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
+            playTime: 1234,
+          },
+        },
+      });
+    });
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await waitForActiveSession(page);
+
+    await page.waitForTimeout(100);
+    const endButton = page.getByRole('button', { name: 'End Story' });
+    await endButton.scrollIntoViewIfNeeded();
+    await expect(endButton).toBeVisible();
+    await expect(endButton).toBeEnabled();
+    await endButton.click();
+    await page.waitForSelector('[role="dialog"]:has-text("End Story")', { timeout: 5000 });
+    await page.locator('[role="dialog"] button:has-text("End Story")').click();
+
+    await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
+
+    // Trigger image generation and verify hero image renders
+    const generateButton = page.getByRole('button', { name: 'Generate ending image' });
+    await expect(generateButton).toBeVisible();
+    await generateButton.click();
+
+    await expect(page.locator('.component-ending-screen-hero-image')).toBeVisible({ timeout: 10000 });
+
+    await page.waitForTimeout(1000);
+    await expandAllCollapsibleSections(page);
+    await hideDynamicContent(page);
+    await page.waitForTimeout(100);
+
+    await expect(page).toHaveScreenshot('ending-screen-with-image.png', {
+      threshold: 0.05,
+      fullPage: true,
+    });
+  });
+
+  test('EndingScreen - with image should render consistently (dark mode)', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+
+    await page.route('**/api/generate-ending-image', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          imageUrl: MOCK_ENDING_IMAGE,
+        },
+      });
+    });
+
+    await page.route('**/api/narrative/ending', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          success: true,
+          data: {
+            epilogue: 'With the city liberated and the syndicate dismantled, your legend spreads through Neo-Tokyo. The skyline gleams brighter than ever.',
+            characterLegacy: 'Nova Ghost Chen becomes a symbol of resistance, inspiring a new generation of free minds.',
+            worldImpact: 'Corporate overreach is pushed back; citizens regain control over their data and lives.',
+            tone: 'triumphant',
+            achievements: ['Master Hacker: Outsmarted corporate AI', 'City Savior: Freed Neo-Tokyo'],
+            playTime: 1234,
+          },
+        },
+      });
+    });
+
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await waitForActiveSession(page);
+
+    await page.waitForTimeout(100);
+    const endButton = page.getByRole('button', { name: 'End Story' });
+    await endButton.scrollIntoViewIfNeeded();
+    await expect(endButton).toBeVisible();
+    await expect(endButton).toBeEnabled();
+    await endButton.click();
+    await page.waitForSelector('[role="dialog"]:has-text("End Story")', { timeout: 5000 });
+    await page.locator('[role="dialog"] button:has-text("End Story")').click();
+
+    await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
+
+    // Trigger image generation and verify hero image renders
+    const generateButton = page.getByRole('button', { name: 'Generate ending image' });
+    await expect(generateButton).toBeVisible();
+    await generateButton.click();
+
+    await expect(page.locator('.component-ending-screen-hero-image')).toBeVisible({ timeout: 10000 });
+
+    await page.waitForTimeout(1000);
+    await expandAllCollapsibleSections(page);
+    await hideDynamicContent(page);
+    await page.waitForTimeout(100);
+
+    await expect(page).toHaveScreenshot('ending-screen-with-image-dark.png', {
       threshold: 0.05,
       fullPage: true,
     });
@@ -594,7 +730,6 @@ test.describe('EndingScreen Visual Tests', () => {
               'City Savior: Freed Neo-Tokyo',
             ],
             playTime: 1234,
-            imageUrl: MOCK_ENDING_IMAGE,
           },
         },
       });
@@ -621,11 +756,9 @@ test.describe('EndingScreen Visual Tests', () => {
     // Wait for the ending screen to render
     await page.waitForSelector('[data-testid="ending-screen"]', { timeout: 10000 });
 
-    // Assert ending hero image is visible
-    await expect(page.locator('.component-ending-screen-hero-image')).toBeVisible();
-
-    // Give extra time for image rendering
-    await page.waitForTimeout(1000);
+    // Assert fallback hero state
+    await expect(page.getByRole('button', { name: 'Generate ending image' })).toBeVisible();
+    await expect(page.locator('.component-ending-screen-hero-image')).not.toBeVisible();
 
     // Click to expand the "Your Story" section
     const yourStoryButton = page.getByRole('button', { name: /Your Story/i }).first();

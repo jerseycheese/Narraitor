@@ -167,7 +167,6 @@ export const createNarrativeEndingActions = (
         updatedAt: isoNow,
         achievements: result.achievements || [],
         playTime: result.playTime,
-        imageUrl: result.imageUrl,
       };
 
       set({
