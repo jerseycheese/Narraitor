@@ -337,6 +337,28 @@ export function capitalize(text: string): string {
 }
 
 /**
+ * Returns the first character of a name, upper-cased.
+ *
+ * The plate treatment shows a single drop-cap initial wherever art is missing,
+ * so it has to survive names that begin with an astral character. `Array.from`
+ * splits by code point rather than code unit, which `charAt` does not.
+ *
+ * @param name - Name to take the initial from
+ * @returns The upper-cased first character, or '' for an empty name
+ *
+ * @example
+ * ```typescript
+ * import { initialOf } from '@/lib/utils';
+ *
+ * initialOf('Aldara'); // "A"
+ * initialOf('');       // ""
+ * ```
+ */
+export function initialOf(name: string): string {
+  return (Array.from(name)[0] ?? '').toUpperCase();
+}
+
+/**
  * Converts text to title case (capitalizes first letter of each word)
  * 
  * Transforms text so that each word starts with a capital letter.

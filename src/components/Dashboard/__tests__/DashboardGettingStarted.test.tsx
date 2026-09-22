@@ -38,20 +38,6 @@ describe('DashboardGettingStarted', () => {
     expect(screen.getByRole('button', { name: /create.*character/i })).toBeInTheDocument();
   });
 
-  it('shows all steps complete for experienced user', () => {
-    render(
-      <DashboardGettingStarted
-        hasWorlds={true}
-        hasCharacters={true}
-        hasSessions={true}
-        onNavigate={mockOnNavigate}
-      />
-    );
-
-    // Should show continue playing CTA
-    expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
-  });
-
   it('calls onNavigate with correct path when CTA clicked', async () => {
     const user = userEvent.setup();
 

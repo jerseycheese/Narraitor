@@ -106,21 +106,24 @@ export function HeaderNavigation() {
   const suppressCta =
     !isProductRegister ||
     CTA_SUPPRESSED_ROUTES.some((route) => route.test(pathname));
+  const suppressPlay = suppressCta || pathname === '/dashboard';
 
   const cta = suppressCta ? null : currentWorld ? (
-    <Button
-      type="button"
-      onClick={() =>
-        navigateWithLoading(
-          `/worlds/${currentWorld.id}/play`,
-          `Starting ${currentWorld.name}...`
-        )
-      }
-      variant="outline"
-    >
-      <Play aria-hidden="true" />
-      Play
-    </Button>
+    suppressPlay ? null : (
+      <Button
+        type="button"
+        onClick={() =>
+          navigateWithLoading(
+            `/worlds/${currentWorld.id}/play`,
+            `Starting ${currentWorld.name}...`
+          )
+        }
+        variant="outline"
+      >
+        <Play aria-hidden="true" />
+        Play
+      </Button>
+    )
   ) : !hasWorldsStore ? (
     <Button
       type="button"

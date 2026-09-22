@@ -51,51 +51,6 @@
 
 /* ─── Progress Card ─── */
 
-.dashboard-progress-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: var(--space-3);
-}
-
-@media (width <= 640px) {
-  .dashboard-progress-stats {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.dashboard-progress-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-canvas);
-}
-
-.dashboard-progress-stat-value {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  color: var(--color-text-primary);
-}
-
-.dashboard-progress-stat-value svg {
-  width: 1rem;
-  height: 1rem;
-  color: var(--color-accent);
-  align-self: center;
-}
-
-.dashboard-progress-stat-value span {
-  font-family: var(--font-system);
-  font-size: 1.75rem;
-  line-height: 1;
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
-
 .dashboard-progress-stat-label {
   margin: 0;
   font-family: var(--font-system);
@@ -159,7 +114,7 @@
 .dashboard-continue-card-field dd {
   margin: 0;
   font-family: var(--font-interface);
-  font-size: 1.0625rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text-primary);
   white-space: nowrap;
@@ -252,58 +207,127 @@
   margin: 0;
 }
 
-.dashboard-recent-item span,
-.dashboard-recent-item p {
+.dashboard-recent-item-meta span,
+.dashboard-recent-item-meta p {
   font-family: var(--font-system);
   font-size: var(--font-size-xs_5);
   color: var(--color-text-muted);
   margin: 0;
 }
 
-.dashboard-recent-character-content {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-/* CharacterPortrait inherits its size from the parent — give it an explicit
-   small avatar box in this list context so the placeholder doesn't stretch. */
-.dashboard-recent-character-content > .component-character-portrait {
-  flex: 0 0 auto;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-full);
-}
-
-.dashboard-recent-character-content > div:not(.component-character-portrait) {
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
-/* Recent-world item: image thumbnail + text, mirroring the character row. */
+.dashboard-recent-character-content,
 .dashboard-recent-world-content {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
-.dashboard-recent-world-content > div {
+.dashboard-recent-item-meta {
   min-width: 0;
   flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
-.dashboard-recent-world-thumb {
+/* Character portrait plate: 5rem (80px) on mobile, 6rem (96px) on desktop */
+.dashboard-recent-character-portrait {
   position: relative;
   flex: 0 0 auto;
-  width: 3rem;
-  height: 3rem;
-  border-radius: var(--radius-md);
+  width: 5rem;
+  height: 5rem;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   background: var(--color-canvas);
 }
 
+@media (width >= 768px) {
+  .dashboard-recent-character-portrait {
+    width: 6rem;
+    height: 6rem;
+  }
+}
+
+.dashboard-recent-character-portrait .component-character-portrait {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+}
+
+.dashboard-recent-character-portrait:not(:has(img))::before,
+.dashboard-recent-character-portrait:not(:has(img))::after {
+  content: "";
+  position: absolute;
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border: 0 solid var(--color-text-muted);
+  pointer-events: none;
+}
+
+.dashboard-recent-character-portrait:not(:has(img))::before {
+  top: var(--space-1_5);
+  left: var(--space-1_5);
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+
+.dashboard-recent-character-portrait:not(:has(img))::after {
+  right: var(--space-1_5);
+  bottom: var(--space-1_5);
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+
+/* Recent-world thumbnail: ink plate via usePlate with continuous tone */
+.dashboard-recent-world-thumb {
+  position: relative;
+  flex: 0 0 auto;
+  width: 5rem;
+  height: 5rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--plate-shadow, var(--color-surface-hover));
+}
+
+@media (width >= 768px) {
+  .dashboard-recent-world-thumb {
+    width: 6rem;
+    height: 6rem;
+  }
+}
+
 .dashboard-recent-world-thumb img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+}
+
+.dashboard-recent-world-thumb:not(:has(img)) {
+  background: var(--color-canvas);
+}
+
+.dashboard-recent-world-thumb:not(:has(img))::before,
+.dashboard-recent-world-thumb:not(:has(img))::after {
+  content: "";
+  position: absolute;
+  width: var(--mark-arm-length);
+  height: var(--mark-arm-length);
+  border: 0 solid var(--color-text-muted);
+  pointer-events: none;
+}
+
+.dashboard-recent-world-thumb:not(:has(img))::before {
+  top: var(--space-1_5);
+  left: var(--space-1_5);
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+
+.dashboard-recent-world-thumb:not(:has(img))::after {
+  right: var(--space-1_5);
+  bottom: var(--space-1_5);
+  border-right-width: 1px;
+  border-bottom-width: 1px;
 }
 
 .dashboard-recent-empty-state {
@@ -405,60 +429,22 @@
   align-self: flex-start;
 }
 
-/* "Ready to Continue" variant — shown when all steps complete. */
-.component-dashboard-getting-started-complete {
-  background: var(--color-accent-soft);
-  border-color: var(--color-accent);
-}
-
-.dashboard-getting-started-complete-row {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-}
-
-.dashboard-getting-started-complete-icon {
-  flex-shrink: 0;
-  width: 1.5rem;
-  height: 1.5rem;
-  margin-top: var(--space-0_5);
-  color: hsl(var(--success));
-}
-
-.dashboard-getting-started-complete-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.dashboard-getting-started-complete-body h3 {
-  margin: 0;
-  font-family: var(--font-interface);
-  font-size: 1.0625rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.dashboard-getting-started-complete-body p {
-  margin: 0;
-  font-family: var(--font-interface);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-}
-
 /* ─── DS3 — "The Mechanical Manuscript" ───
    Aged paper + drafting ink, per ADR-011 and the DS3 showcase canon.
    Panels are featherweight cards on the canvas, framed by thin accent
    corner brackets as a drafting-ink mechanical mark. The compact stat
-   strip sits on top of the 3-col row of Recent + Getting Started.
+   strip sits on top of the row of Recent items and Getting Started.
    Dot-grid field comes from the app-surface root (app-shell.css), not
    defined per-page — see ds3.css --pattern-dot-grid-image. */
 
 :root .component-dashboard-home {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4);
+}
+
+:root .component-dashboard-home:has(.component-dashboard-getting-started) {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 @media (width < 768px) {
@@ -539,18 +525,14 @@
 :root .dashboard-progress-stats {
   display: flex;
   flex-wrap: wrap;
-  grid-template-columns: none;
   gap: var(--space-3) var(--space-6);
 }
 
 :root .dashboard-progress-stat {
+  display: flex;
   flex: 0 1 auto;
-  flex-direction: row;
   align-items: baseline;
   gap: var(--space-2);
-  padding: 0;
-  border: none;
-  background: transparent;
 }
 
 
@@ -564,7 +546,7 @@
   border: none;
   border-bottom: 1px dotted var(--color-border);
   background: transparent;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3);
 }
 
 :root .dashboard-recent-item:last-child {
@@ -572,13 +554,13 @@
 }
 
 :root .dashboard-recent-item:hover {
-  background: var(--color-surface);
+  background: var(--color-surface-hover);
   border-bottom-color: var(--color-accent);
 }
 
 :root .dashboard-recent-item h3 {
   font-family: var(--font-interface);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -588,18 +570,23 @@
   border-radius: 0;
 }
 
-:root .dashboard-progress-stat-label {
-  font-family: var(--font-system);
+:root .dashboard-recent-empty-slot {
+  border-style: dotted;
+  padding: var(--space-3) var(--space-4);
 }
 
-:root .dashboard-recent-item span,
-:root .dashboard-recent-item p {
+:root .dashboard-recent-item-meta span,
+:root .dashboard-recent-item-meta p {
   font-family: var(--font-interface);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 }
 
-:root .dashboard-progress-stat-value span {
+:root .dashboard-progress-stat-value {
   font-family: var(--font-system);
-  font-size: 2rem;
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+  font-weight: 600;
   line-height: 1;
   letter-spacing: -0.01em;
 }

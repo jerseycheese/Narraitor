@@ -49,7 +49,10 @@ test.describe('Dashboard Visual Tests', () => {
     await seedTestData(page);
     await page.goto('/dashboard');
     // Wait for seeding to complete before stabilizing
-    await page.waitForFunction(() => (window as any).__TEST_STORES_SEEDED__ === true, { timeout: 15000 });
+    await page.waitForFunction(() => {
+      const testWindow = window as typeof window & { __TEST_STORES_SEEDED__?: boolean };
+      return Boolean(testWindow.__TEST_STORES_SEEDED__);
+    }, { timeout: 15000 });
 
     // Reload to ensure localStorage is picked up cleanly
     await page.reload();
@@ -77,6 +80,54 @@ test.describe('Dashboard Visual Tests', () => {
     // out of the comparison is the fix the issue itself calls for, without a
     // per-spec pixel budget standing in for a real wait.
     await expect(page).toHaveScreenshot('home-page.png', {
+      fullPage: true,
+      mask: [page.locator('.dashboard-recent-world-thumb')],
+    });
+  });
+
+  test('Dashboard should render consistently (dark mode)', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('narraitor-color-scheme', 'dark');
+    });
+    await seedTestData(page);
+    await page.goto('/dashboard');
+    await page.waitForFunction(() => {
+      const testWindow = window as typeof window & { __TEST_STORES_SEEDED__?: boolean };
+      return Boolean(testWindow.__TEST_STORES_SEEDED__);
+    }, { timeout: 15000 });
+
+    await page.reload();
+    await waitForContentStable(page);
+    await page.evaluate(() => document.fonts.ready);
+    await hideDynamicContent(page);
+    await page.waitForSelector('[aria-labelledby="continue-session-heading"]', { timeout: 8000 });
+
+    await expect(page).toHaveTitle(/Narraitor/i);
+
+    await expect(page).toHaveScreenshot('home-page-dark.png', {
+      fullPage: true,
+      mask: [page.locator('.dashboard-recent-world-thumb')],
+    });
+  });
+
+  test('Dashboard should render consistently (mobile)', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await seedTestData(page);
+    await page.goto('/dashboard');
+    await page.waitForFunction(() => {
+      const testWindow = window as typeof window & { __TEST_STORES_SEEDED__?: boolean };
+      return Boolean(testWindow.__TEST_STORES_SEEDED__);
+    }, { timeout: 15000 });
+
+    await page.reload();
+    await waitForContentStable(page);
+    await page.evaluate(() => document.fonts.ready);
+    await hideDynamicContent(page);
+    await page.waitForSelector('[aria-labelledby="continue-session-heading"]', { timeout: 8000 });
+
+    await expect(page).toHaveTitle(/Narraitor/i);
+
+    await expect(page).toHaveScreenshot('home-page-mobile.png', {
       fullPage: true,
       mask: [page.locator('.dashboard-recent-world-thumb')],
     });

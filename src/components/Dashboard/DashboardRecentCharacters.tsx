@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { initialOf } from '@/lib/utils';
 
 interface DashboardRecentCharactersProps {
   characters: ReturnType<typeof useCharacterStore.getState>['characters'];
@@ -33,8 +34,11 @@ export function DashboardRecentCharacters({
 
   if (recentCharacters.length === 0) {
     return (
-      <section className="component-dashboard-recent-characters">
-        <h2>Recent Characters</h2>
+      <section
+        className="component-dashboard-recent-characters"
+        aria-labelledby="recent-characters-heading"
+      >
+        <h2 id="recent-characters-heading">Recent Characters</h2>
         <div className="dashboard-recent-empty-state">
           <p>No characters yet</p>
           <Button onClick={() => onNavigate('/characters')} variant="secondary">
@@ -47,8 +51,11 @@ export function DashboardRecentCharacters({
   }
 
   return (
-    <section className="component-dashboard-recent-characters">
-      <h2>Recent Characters</h2>
+    <section
+      className="component-dashboard-recent-characters"
+      aria-labelledby="recent-characters-heading"
+    >
+      <h2 id="recent-characters-heading">Recent Characters</h2>
 
       <div className="dashboard-recent-list">
         {/* Recent Characters */}
@@ -70,14 +77,23 @@ export function DashboardRecentCharacters({
               }}
             >
               <div className="dashboard-recent-character-content">
-                <CharacterPortrait
-                  portrait={
-                    character.portrait || { type: 'placeholder', url: null }
-                  }
-                  characterName={character.name}
-                  size="small"
-                />
-                <div>
+                <div
+                  className="dashboard-recent-character-portrait"
+                  aria-hidden="true"
+                >
+                  {character.portrait?.url ? (
+                    <CharacterPortrait
+                      portrait={character.portrait}
+                      characterName={character.name}
+                      size="medium"
+                    />
+                  ) : (
+                    <span className="character-card-plate-initial">
+                      {initialOf(character.name)}
+                    </span>
+                  )}
+                </div>
+                <div className="dashboard-recent-item-meta">
                   <h3>{character.name}</h3>
                   {world && <p>{world.name}</p>}
                 </div>

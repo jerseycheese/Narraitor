@@ -23,6 +23,7 @@ export {
   truncate,
   capitalize,
   titleCase,
+  initialOf,
   safeTrim,
   escapeRegExp,
 } from './formatters';
