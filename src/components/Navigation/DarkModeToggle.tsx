@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
+import clsx from 'clsx';
 import { useTheme } from '@/lib/theme';
 import type { ColorScheme } from '@/lib/theme';
 
@@ -13,19 +14,15 @@ const schemes: { id: ColorScheme; label: string; Icon: typeof Sun }[] = [
 
 interface DarkModeToggleProps {
   compact?: boolean;
+  /** Spell the modes out beside their icons, for surfaces with room to read. */
   showLabels?: boolean;
-  className?: string;
 }
 
-export function DarkModeToggle({ compact, showLabels, className }: DarkModeToggleProps) {
+export function DarkModeToggle({ compact, showLabels }: DarkModeToggleProps) {
   const { colorScheme, setColorScheme } = useTheme();
 
   return (
-    <div
-      className={`dark-mode-toggle${showLabels ? ' dark-mode-toggle-labeled' : ''}${className ? ` ${className}` : ''}`}
-      role="radiogroup"
-      aria-label="Color scheme"
-    >
+    <div className="dark-mode-toggle" role="radiogroup" aria-label="Color scheme">
       {schemes.map(({ id, label, Icon }) => (
         <button
           key={id}
@@ -33,11 +30,16 @@ export function DarkModeToggle({ compact, showLabels, className }: DarkModeToggl
           role="radio"
           aria-checked={colorScheme === id}
           aria-label={label}
-          className={`dark-mode-toggle-option${colorScheme === id ? ' dark-mode-toggle-option-active' : ''}${compact ? ' dark-mode-toggle-option-compact' : ''}${showLabels ? ' dark-mode-toggle-option-labeled' : ''}`}
+          className={clsx(
+            'dark-mode-toggle-option',
+            colorScheme === id && 'dark-mode-toggle-option-active',
+            compact && 'dark-mode-toggle-option-compact',
+            showLabels && 'dark-mode-toggle-option-labeled'
+          )}
           onClick={() => setColorScheme(id)}
         >
           <Icon aria-hidden="true" />
-          {showLabels && <span className="dark-mode-toggle-label">{label}</span>}
+          {showLabels && <span>{label}</span>}
         </button>
       ))}
     </div>

@@ -1699,16 +1699,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  max-width: var(--page-width-form, 40rem);
+  max-width: var(--page-width-form);
 }
 
 .settings-section {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  background: transparent;
-  border: none;
-  padding: 0;
 }
 
 .settings-section h2 {
@@ -1733,23 +1730,10 @@
   gap: var(--space-3);
 }
 
-.settings-card {
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
 .settings-appearance-row {
   display: flex;
   align-items: center;
   gap: var(--space-4);
-}
-
-.settings-appearance-label {
-  font-family: var(--font-interface);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  color: var(--color-text-secondary);
 }
 
 .settings-export-import {
@@ -1783,10 +1767,6 @@
 }
 
 @media (width <= 640px) {
-  .settings-card {
-    padding: 0;
-  }
-
   .settings-appearance-row {
     flex-direction: column;
     align-items: flex-start;
@@ -1815,13 +1795,6 @@
 }
 
 /* DS3 — Mechanical Manuscript: dotted dividers, monospace bullet eyebrow */
-
-:root .settings-card {
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  padding: 0;
-}
 
 :root .settings-section h2 {
   position: relative;
