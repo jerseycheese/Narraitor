@@ -118,6 +118,14 @@ test.describe('Journal Page', () => {
       page.getByTestId('journal-detail-pane').getByRole('heading', { name: 'World Event' })
     ).toBeVisible({ timeout: 10000 });
 
+    // Verify entry count has right gutter spacing and does not clip viewport boundary
+    const summarySpan = page.locator('.journal-nav > span');
+    await expect(summarySpan).toBeVisible({ timeout: 10000 });
+    const summaryBox = await summarySpan.boundingBox();
+    const viewport = page.viewportSize();
+    expect(viewport).not.toBeNull();
+    expect(summaryBox!.x + summaryBox!.width).toBeLessThanOrEqual(viewport!.width - 12);
+
     await waitForPlates(page);
     await page.waitForTimeout(500);
     await expect(page).toHaveScreenshot('journal-page-mobile.png', {
