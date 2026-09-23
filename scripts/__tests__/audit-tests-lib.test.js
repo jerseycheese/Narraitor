@@ -11,6 +11,7 @@ import {
   promisedCollaboratorMocks,
   resolveSpec,
   mockedModules,
+  extractFileModuleSpecs,
 } from '../audit-tests-lib.cjs';
 
 describe('isMockPlusFiller', () => {
@@ -101,5 +102,74 @@ describe('mockedModules', () => {
         realTests: ['src/lib/api/__tests__/characterApi.test.ts'],
       },
     ]);
+  });
+
+  it('ignores fixture strings when counting mocked modules', () => {
+    const files = [
+      { rel: 'src/app/a.test.tsx', text: "jest.mock('@/lib/api/characterApi');" },
+      { rel: 'src/app/b.test.tsx', text: "jest.mock('@/lib/api/characterApi');" },
+      {
+        rel: 'scripts/__tests__/audit-tests-lib.test.js',
+        text: 'const fixture = "jest.mock(\'@/lib/api/characterApi\')";\n// jest.mock(\'@/lib/api/characterApi\');',
+      },
+    ];
+    expect(mockedModules(files, 3)).toEqual([]);
+  });
+
+  it('excludes type-only imports from runtime real-test counts', () => {
+    const files = [
+      { rel: 'src/app/a.test.tsx', text: "jest.mock('@/state/characterStore');" },
+      { rel: 'src/app/b.test.tsx', text: "jest.mock('@/state/characterStore');" },
+      { rel: 'src/app/c.test.tsx', text: "jest.mock('@/state/characterStore');" },
+      {
+        rel: 'src/components/Dashboard/__tests__/DashboardContinueCard.test.tsx',
+        text: "import type { StoreCharacter } from '@/state/characterStore';",
+      },
+      {
+        rel: 'src/components/Dashboard/__tests__/DashboardOther.test.tsx',
+        text: "import { type StoreCharacter } from '@/state/characterStore';",
+      },
+      {
+        rel: 'src/state/__tests__/characterStore.test.ts',
+        text: "import { useCharacterStore } from '@/state/characterStore';",
+      },
+    ];
+    expect(mockedModules(files, 3)).toEqual([
+      {
+        module: 'src/state/characterStore',
+        mockedIn: 3,
+        realTests: ['src/state/__tests__/characterStore.test.ts'],
+      },
+    ]);
+  });
+});
+
+describe('extractFileModuleSpecs', () => {
+  it('extracts real mocks and runtime imports while ignoring comments and strings', () => {
+    const text = `
+      // jest.mock('@/commented')
+      /* import { x } from '@/blockCommented'; */
+      const fixture = "jest.mock('@/inString')";
+      jest.mock('@/realMock');
+      import { realImport } from '@/realImport';
+      const req = require('@/realRequire');
+    `;
+    expect(extractFileModuleSpecs(text)).toEqual({
+      mocks: ['@/realMock'],
+      runtimeImports: ['@/realImport', '@/realRequire'],
+    });
+  });
+
+  it('distinguishes type-only imports from runtime imports', () => {
+    const text = `
+      import type { OnlyType } from '@/typeOnly';
+      import { type A, type B } from '@/inlineTypeOnly';
+      import { A, type B } from '@/mixedImport';
+      import DefaultItem, { type C } from '@/defaultPlusType';
+    `;
+    expect(extractFileModuleSpecs(text)).toEqual({
+      mocks: [],
+      runtimeImports: ['@/mixedImport', '@/defaultPlusType'],
+    });
   });
 });
