@@ -19,8 +19,7 @@
       "src/components/ai/ProviderCard.tsx",
       "src/components/world/WorldDetailsDisplay.tsx",
       "src/components/world/WorldSettingsDisplay.tsx",
-      "src/components/world/ToneSettingsDisplay.tsx",
-      "src/components/world/WorldImageDisplay.tsx"
+      "src/components/world/ToneSettingsDisplay.tsx"
     ]
   },
   "coverageExceptions": {
