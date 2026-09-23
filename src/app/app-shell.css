@@ -1491,12 +1491,18 @@
   gap: var(--space-5);
 }
 
-.character-detail-header > .component-character-portrait {
+.character-detail-portrait-plate {
   flex: 0 0 auto;
+  width: fit-content;
+}
+
+.character-detail-header > .component-character-portrait,
+.character-detail-portrait-plate .component-character-portrait {
   width: clamp(160px, 20vw, 240px);
   height: clamp(160px, 20vw, 240px);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   background: var(--color-surface-hover);
+  overflow: hidden;
 }
 
 .character-detail-header-info {
@@ -1544,6 +1550,10 @@
   .character-detail-header {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .character-detail-portrait-plate {
+    align-self: flex-start;
   }
 }
 
@@ -2193,6 +2203,44 @@
   --plate-paper: var(--plate-ink-dark, var(--color-text-primary));
 }
 
+/* Tipped-in colour plate.
+
+   Letterpress exception: colour art is presented as a physical plate
+   mounted to the sheet rather than printed in ink directly. Creamy mount
+   border, tactile paper shadow, crisp rectangular edge with no vignette mask. */
+
+.plate-tipped {
+  --plate-mount: var(--color-surface-opaque);
+  --plate-border: var(--color-border-strong);
+  --plate-shadow: 0 2px 8px hsl(0deg 0% 0% / 12%), 0 1px 3px hsl(0deg 0% 0% / 8%);
+
+  position: relative;
+  background: var(--plate-mount);
+  border: 1px solid var(--plate-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--plate-shadow);
+  padding: var(--space-1_5);
+}
+
+:root.dark .plate-tipped {
+  --plate-mount: var(--color-surface-opaque);
+  --plate-border: var(--color-border-strong);
+  --plate-shadow: 0 3px 12px hsl(0deg 0% 0% / 40%), 0 1px 4px hsl(0deg 0% 0% / 30%);
+}
+
+.component-hero.plate-tipped .component-hero-image {
+  position: absolute;
+  inset: var(--space-1_5);
+  width: calc(100% - var(--space-3));
+  height: calc(100% - var(--space-3));
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.component-hero.plate-tipped:not(:has(.component-hero-overlay))::after {
+  display: none;
+}
+
 /* Top feather — pseudo-element softens the join between image and the solid
    overlay bar below. Sits above the image but below the overlay content. */
 
@@ -2298,6 +2346,7 @@
   margin-bottom: var(--space-4);
   padding-top: var(--space-3);
   padding-bottom: var(--space-3);
+  overflow: visible;
 }
 
 :root .character-detail-masthead {
@@ -2328,11 +2377,25 @@
   opacity: 0.8;
 }
 
-/* World detail: the world is the primary subject, so the vignette blooms in
-   full colour with a wider aperture and rich opacity behind the actions. */
-.world-detail-vignette {
-  width: clamp(14rem, 42vw, 32rem);
-  opacity: 0.88;
+/* World detail: tipped-in colour plate inset in the masthead header. */
+.world-detail-plate {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--page-gutter, var(--space-4));
+  bottom: var(--space-3);
+  width: clamp(14rem, 38vw, 30rem);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.world-detail-plate .component-hero {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 
 /* Character detail: subordinate world art to a discreet background watermark
@@ -2371,7 +2434,8 @@
 }
 
 @media print {
-  .characters-header-vignette {
+  .characters-header-vignette,
+  .world-detail-plate {
     display: none;
   }
 
@@ -2395,24 +2459,27 @@
     padding-bottom: var(--space-2);
   }
 
+  :root .world-detail-masthead .page-layout-title {
+    padding-right: calc(clamp(7rem, 28vw, 10rem) + var(--space-2));
+  }
+
+  .world-detail-plate {
+    top: var(--space-2);
+    right: var(--space-2);
+    bottom: auto;
+    width: clamp(7rem, 28vw, 10rem);
+    height: 4.5rem;
+  }
+
   .characters-header-vignette {
     width: 100%;
     opacity: 0.4;
   }
 
-  .world-detail-vignette {
-    opacity: 0.45;
-  }
-
+  /* On a phone the actions stack inside the header, so a watermark sized to the
+     header would stretch behind the buttons. Cap it to the title block instead. */
   .character-detail-vignette {
     opacity: 0.2;
-  }
-
-  /* On a phone the actions stack inside the header, so a plate sized to the
-     header would stretch behind the buttons. These two pages cap it to the
-     title block instead. */
-  .world-detail-vignette,
-  .character-detail-vignette {
     bottom: auto;
     height: 6.5rem;
   }

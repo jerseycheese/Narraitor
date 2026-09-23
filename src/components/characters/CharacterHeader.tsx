@@ -15,11 +15,13 @@ interface CharacterHeaderProps {
 export function CharacterHeader({ character }: CharacterHeaderProps) {
   return (
     <div className="character-detail-header">
-      <CharacterPortrait
-        portrait={character.portrait || { type: 'placeholder', url: null }}
-        characterName={character.name}
-        size="xlarge"
-      />
+      <div className="character-detail-portrait-plate plate-tipped">
+        <CharacterPortrait
+          portrait={character.portrait || { type: 'placeholder', url: null }}
+          characterName={character.name}
+          size="xlarge"
+        />
+      </div>
       <div className="character-detail-header-info">
         {/* No name heading, level or world here: the page masthead already
             carries all three, and repeating them stacked duplicates. */}
