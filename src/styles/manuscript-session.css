@@ -1160,6 +1160,8 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-drawer-backdrop {
+  position: fixed;
+  inset: 0;
   z-index: 220;
   pointer-events: auto;
   animation: manuscript-fade-in 200ms ease;
@@ -1179,7 +1181,7 @@ body.manuscript-overlay-open {
   height: 100%;
   z-index: 1;
   border-color: var(--color-border);
-  background: var(--color-surface);
+  background: var(--color-surface-opaque);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -3287,13 +3289,14 @@ body.manuscript-overlay-open {
   display: none;
 }
 
-/* Drawer: lighter overlay, tighter panel, header border (Pass 7, fixes 1-6) */
+/* Drawer: dim scrim backdrop, opaque solid surface, tighter panel, header border (#2154) */
 :root .manuscript-overlay-backdrop.manuscript-drawer-backdrop {
-  background: rgb(0 0 0 / 15%);
+  background: var(--color-scrim);
 }
 
 :root .manuscript-drawer-panel {
   width: min(100%, 23.75rem);
+  background: var(--color-surface-opaque);
 }
 
 :root .manuscript-drawer-header {
