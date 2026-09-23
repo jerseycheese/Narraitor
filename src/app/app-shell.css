@@ -1491,12 +1491,18 @@
   gap: var(--space-5);
 }
 
-.character-detail-header > .component-character-portrait {
+.character-detail-portrait-plate {
   flex: 0 0 auto;
+  width: fit-content;
+}
+
+.character-detail-header > .component-character-portrait,
+.character-detail-portrait-plate .component-character-portrait {
   width: clamp(160px, 20vw, 240px);
   height: clamp(160px, 20vw, 240px);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   background: var(--color-surface-hover);
+  overflow: hidden;
 }
 
 .character-detail-header-info {
@@ -1544,6 +1550,10 @@
   .character-detail-header {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .character-detail-portrait-plate {
+    align-self: flex-start;
   }
 }
 
@@ -2192,6 +2202,32 @@
   --plate-shadow: var(--color-canvas);
   --plate-paper: var(--plate-ink-dark, var(--color-text-primary));
 }
+
+/* Tipped-in colour plate.
+
+   Letterpress exception: colour art is presented as a physical plate
+   mounted to the sheet rather than printed in ink directly. Creamy mount
+   border, tactile paper shadow, crisp rectangular edge with no vignette mask. */
+
+.plate-tipped {
+  --plate-mount: var(--color-surface-opaque);
+  --plate-border: var(--color-border-strong);
+  --plate-shadow: 0 2px 8px hsl(0deg 0% 0% / 12%), 0 1px 3px hsl(0deg 0% 0% / 8%);
+
+  position: relative;
+  background: var(--plate-mount);
+  border: 1px solid var(--plate-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--plate-shadow);
+  padding: var(--space-1_5);
+}
+
+:root.dark .plate-tipped {
+  --plate-mount: var(--color-surface-opaque);
+  --plate-border: var(--color-border-strong);
+  --plate-shadow: 0 3px 12px hsl(0deg 0% 0% / 40%), 0 1px 4px hsl(0deg 0% 0% / 30%);
+}
+
 
 /* Top feather — pseudo-element softens the join between image and the solid
    overlay bar below. Sits above the image but below the overlay content. */
