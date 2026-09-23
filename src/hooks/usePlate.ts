@@ -17,18 +17,23 @@ type PlateResult = Plate | 'blank' | null;
  * The cache is per session and keyed by art and display size, so each plate is
  * rendered once however many surfaces ask for it.
  */
-const MAX_CACHE_ENTRIES = 30;
-const cache = new Map<string, PlateResult>();
-
-function getCached(key: string): PlateResult | undefined {
-  if (!cache.has(key)) return undefined;
-  const value = cache.get(key)!;
-  cache.delete(key);
-  cache.set(key, value);
-  return value;
+interface CacheEntry {
+  source: string;
+  result: PlateResult;
 }
 
-function setCached(key: string, value: PlateResult): void {
+const MAX_CACHE_ENTRIES = 30;
+const cache = new Map<string, CacheEntry>();
+
+function getCached(key: string, source: string): PlateResult | undefined {
+  const entry = cache.get(key);
+  if (!entry || entry.source !== source) return undefined;
+  cache.delete(key);
+  cache.set(key, entry);
+  return entry.result;
+}
+
+function setCached(key: string, source: string, value: PlateResult): void {
   if (cache.has(key)) {
     cache.delete(key);
   } else if (cache.size >= MAX_CACHE_ENTRIES) {
@@ -37,7 +42,7 @@ function setCached(key: string, value: PlateResult): void {
       cache.delete(oldest);
     }
   }
-  cache.set(key, value);
+  cache.set(key, { source, result: value });
 }
 
 function hashSource(source: string): string {
@@ -90,14 +95,14 @@ export function usePlate(source: string | undefined, box: PlateBox): PlateState 
 
   const [settled, setSettled] = useState<Settled | null>(() => {
     if (!key || !source) return null;
-    const cached = getCached(key);
+    const cached = getCached(key, source);
     return cached !== undefined ? { key, source, result: cached } : null;
   });
 
   useEffect(() => {
     if (!key || !source) return;
 
-    const cached = getCached(key);
+    const cached = getCached(key, source);
     if (cached !== undefined) {
       setSettled({ key, source, result: cached });
       return;
@@ -107,14 +112,14 @@ export function usePlate(source: string | undefined, box: PlateBox): PlateState 
 
     toPlate(source, { width, height, dpr })
       .then((result) => {
-        setCached(key, result);
+        setCached(key, source, result);
         if (!active) return;
         setSettled({ key, source, result });
       })
       .catch(() => {
         // A plate is an enhancement; failing to make one must not break the
         // surface that asked for it.
-        setCached(key, null);
+        setCached(key, source, null);
         if (!active) return;
         setSettled({ key, source, result: null });
       });

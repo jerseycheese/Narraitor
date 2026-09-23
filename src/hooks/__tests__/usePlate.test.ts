@@ -133,6 +133,40 @@ describe('usePlate', () => {
     expect(result.current.plate?.source).toBe('data:image/png;base64,rendered');
   });
 
+  it('does not return cached plate on key collision when source differs', async () => {
+    // Two distinct sources that produce the exact same 32-bit FNV-1a hash and length
+    const s1 =
+      'data:image/png;base64,AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1vvzjeqi';
+    const s2 =
+      'data:image/png;base64,AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAse27237a';
+
+    const plate1 = { source: 'plate-1', ink: null };
+    const plate2 = { source: 'plate-2', ink: null };
+
+    mockToPlate.mockResolvedValueOnce(plate1);
+
+    const { result: r1 } = renderHook(() =>
+      usePlate(s1, { width: 32, height: 32 })
+    );
+
+    await waitFor(() => {
+      expect(r1.current.pending).toBe(false);
+    });
+    expect(r1.current.plate).toEqual(plate1);
+
+    mockToPlate.mockResolvedValueOnce(plate2);
+
+    const { result: r2 } = renderHook(() =>
+      usePlate(s2, { width: 32, height: 32 })
+    );
+
+    await waitFor(() => {
+      expect(r2.current.pending).toBe(false);
+    });
+    expect(r2.current.plate).toEqual(plate2);
+    expect(mockToPlate).toHaveBeenCalledWith(s2, { width: 32, height: 32, dpr: 2 });
+  });
+
   it('produces plate ink style when ink is present', () => {
     const style = plateInkStyle({
       source: 'data:...',
