@@ -1,6 +1,6 @@
 # CharacterPortrait Component
 
-This component handles displaying character portraits throughout the app. The challenge was balancing AI-generated portrait features with reliable fallbacks, since AI image generation can be slow or fail entirely.
+Displays character portraits across the app, pairing generated artwork with SVG placeholders and initial-based fallbacks when generation is pending or unavailable.
 
 ## What It Does
 

@@ -1,6 +1,6 @@
 # Character Creation Wizard
 
-This wizard handles character creation with point allocation, skill selection, and background building. The challenge was balancing flexibility with guidance: giving users enough options without overwhelming them.
+A multi-step character creation workflow covering attribute point allocation, skill selection, and background details, constrained by the active world's rules.
 
 ## What It Does
 

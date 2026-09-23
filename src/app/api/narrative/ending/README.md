@@ -2,7 +2,7 @@
 
 ## Endpoint: `/api/narrative/ending`
 
-This API endpoint generates AI-powered story endings for completed game sessions.
+This API endpoint returns generated story endings for completed game sessions.
 
 ### Method: POST
 

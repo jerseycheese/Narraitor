@@ -31,7 +31,30 @@ interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
  * Supports auto-dismiss with configurable duration and manual dismissal.
  *
  * @example
- * ```tsx * // Basic usage with useToast hook * const toast = useToast() * * const handleSave = () => { * toast.success('Saved successfully', 'Your changes have been saved.') * } * * // Direct component usage * <Toast * title="Welcome!" * description="You have successfully logged in." * variant="success" * onDismiss={() => setShowWelcome(false)} * /> * * // Error notification with custom duration * <Toast * title="Connection failed" * description="Please check your internet connection and try again." * variant="error" * duration={10000} * /> *```
+ * ```tsx
+ * // Basic usage with useToast hook
+ * const toast = useToast();
+ *
+ * const handleSave = () => {
+ *   toast.success('Saved successfully', 'Your changes have been saved.');
+ * };
+ *
+ * // Direct component usage
+ * <Toast
+ *   title="Settings saved"
+ *   description="Your preferences have been updated."
+ *   variant="success"
+ *   onDismiss={() => setShowToast(false)}
+ * />
+ *
+ * // Error notification with custom duration
+ * <Toast
+ *   title="Export failed"
+ *   description="Could not write file. Please try again."
+ *   variant="error"
+ *   duration={10000}
+ * />
+ * ```
  *
  * @component
  * @accessibility

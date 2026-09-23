@@ -1,8 +1,8 @@
 # Form Components
 
-These components started life as part of the world editing feature, but we built them to be reusable from the beginning. The challenge was creating form components that could handle complex data structures (like worlds with attributes, skills, and settings) while still being flexible enough to work with other entities later.
+Reusable form building blocks designed to handle complex data structures like attributes, skills, and settings without locking them to a single entity type.
 
-We wanted to avoid the classic mistake of building super-specific forms that only work in one place, so these components are building blocks you can use for any similar data editing needs.
+These components avoid single-purpose form implementations, providing modular pieces you can assemble for any similar editing workflow.
 
 ## Available Components
 

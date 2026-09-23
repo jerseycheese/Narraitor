@@ -7,9 +7,7 @@ updated: 2026-07-21
 
 # Portrait Generation Guide
 
-This system generates character portraits from the character's own description and the setting of the world they live in.
-
-The challenge was making this work with character creation while handling AI image generation issues - rate limits, failed generations, inappropriate content.
+Generates character portraits from a character's description and world setting, handling rate limits, failed requests, and fallback placeholders alongside the creation workflow.
 
 ## Getting Started
 

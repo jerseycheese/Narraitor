@@ -1,6 +1,6 @@
 # GuidedFirstTimeExperience Component
 
-This gets new players from "I have no idea what this app does" to "I'm playing a story" in under 2 minutes. The challenge was making onboarding fast enough that people don't bounce, while still explaining what makes this different from other story apps.
+An onboarding flow that takes new players from zero to an active story session in under two minutes. The flow keeps world setup brief enough to prevent drop-off while introducing the core mechanics.
 
 ## How It Works
 

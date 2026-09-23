@@ -4,7 +4,7 @@ Skills are where world building gets really interesting. This component handles 
 
 ## What Makes This Complex
 
-The challenge was supporting multi-attribute skill linking without making the UI confusing. In the old system, each skill was tied to exactly one attribute. Simple, but limiting. Now a skill like "Stealth" might use both "Dexterity" and "Intelligence" (for knowing where guards patrol), so we needed checkboxes instead of a dropdown.
+Supporting multi-attribute skill linking without cluttering the UI is the main constraint here. In the old system, each skill was tied to exactly one attribute. Simple, but limiting. Now a skill like "Stealth" might use both "Dexterity" and "Intelligence" (for knowing where guards patrol), so checkboxes replaced the single dropdown.
 
 ## Key Features
 

@@ -1,6 +1,6 @@
 # Narrative Generator Usage Guide
 
-The `NarrativeGenerator` class handles generating AI-powered narrative content for the game. It's the main interface between your app and the AI service, handling all the prompt building and response formatting.
+The `NarrativeGenerator` class handles generated narrative content for the game. It's the main interface between your app and the AI service, handling all the prompt building and response formatting.
 
 ## Basic Usage
 

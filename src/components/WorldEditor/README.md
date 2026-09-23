@@ -1,6 +1,6 @@
 # WorldEditor Component
 
-This component handles editing existing worlds after they've been created. The challenge was making world editing feel as smooth as the creation wizard while dealing with much more complex state.
+Provides the interface for editing existing worlds after creation.
 
 ## The Problem We're Solving
 

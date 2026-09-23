@@ -12,7 +12,7 @@ import { withAIRoute } from '@/utils/apiHelpers';
 const logger = new Logger('API');
 
 /**
- * Single function to build portrait prompts with AI-powered actor detection
+ * Single function to build portrait prompts with actor detection
  */
 async function buildPortraitPrompt(
   characterName: string,
