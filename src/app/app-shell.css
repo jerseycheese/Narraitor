@@ -2228,18 +2228,6 @@
   --plate-shadow: 0 3px 12px hsl(0deg 0% 0% / 40%), 0 1px 4px hsl(0deg 0% 0% / 30%);
 }
 
-.component-hero.plate-tipped .component-hero-image {
-  position: absolute;
-  inset: var(--space-1_5);
-  width: calc(100% - var(--space-3));
-  height: calc(100% - var(--space-3));
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-}
-
-.component-hero.plate-tipped:not(:has(.component-hero-overlay))::after {
-  display: none;
-}
 
 /* Top feather — pseudo-element softens the join between image and the solid
    overlay bar below. Sits above the image but below the overlay content. */
@@ -2346,7 +2334,6 @@
   margin-bottom: var(--space-4);
   padding-top: var(--space-3);
   padding-bottom: var(--space-3);
-  overflow: visible;
 }
 
 :root .character-detail-masthead {
@@ -2377,25 +2364,11 @@
   opacity: 0.8;
 }
 
-/* World detail: tipped-in colour plate inset in the masthead header. */
-.world-detail-plate {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--page-gutter, var(--space-4));
-  bottom: var(--space-3);
-  width: clamp(14rem, 38vw, 30rem);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.world-detail-plate .component-hero {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  mask-image: none;
-  -webkit-mask-image: none;
+/* World detail: the world is the primary subject, so the vignette blooms in
+   full colour with a wider aperture and rich opacity behind the actions. */
+.world-detail-vignette {
+  width: clamp(14rem, 42vw, 32rem);
+  opacity: 0.88;
 }
 
 /* Character detail: subordinate world art to a discreet background watermark
@@ -2434,8 +2407,7 @@
 }
 
 @media print {
-  .characters-header-vignette,
-  .world-detail-plate {
+  .characters-header-vignette {
     display: none;
   }
 
@@ -2459,27 +2431,24 @@
     padding-bottom: var(--space-2);
   }
 
-  :root .world-detail-masthead .page-layout-title {
-    padding-right: calc(clamp(7rem, 28vw, 10rem) + var(--space-2));
-  }
-
-  .world-detail-plate {
-    top: var(--space-2);
-    right: var(--space-2);
-    bottom: auto;
-    width: clamp(7rem, 28vw, 10rem);
-    height: 4.5rem;
-  }
-
   .characters-header-vignette {
     width: 100%;
     opacity: 0.4;
   }
 
-  /* On a phone the actions stack inside the header, so a watermark sized to the
-     header would stretch behind the buttons. Cap it to the title block instead. */
+  .world-detail-vignette {
+    opacity: 0.45;
+  }
+
   .character-detail-vignette {
     opacity: 0.2;
+  }
+
+  /* On a phone the actions stack inside the header, so a plate sized to the
+     header would stretch behind the buttons. These two pages cap it to the
+     title block instead. */
+  .world-detail-vignette,
+  .character-detail-vignette {
     bottom: auto;
     height: 6.5rem;
   }

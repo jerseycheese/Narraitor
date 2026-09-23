@@ -95,7 +95,7 @@ export default function WorldViewPage() {
   ];
 
   const headerBackground = world.image?.url ? (
-    <div className="world-detail-plate" aria-hidden="true">
+    <div className="characters-header-vignette world-detail-vignette" aria-hidden="true">
       <Hero
         image={{
           url: world.image.url,

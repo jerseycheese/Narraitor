@@ -132,11 +132,7 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <div
       ref={frameRef}
-      className={clsx(
-        'component-hero',
-        showPlate && 'plate-inked',
-        Boolean(image) && treatment === 'colour' && 'plate-tipped'
-      )}
+      className={clsx('component-hero', showPlate && 'plate-inked')}
       style={showPlate ? plateInkStyle(plate) : undefined}
       data-plate={pending ? 'pending' : undefined}
     >
