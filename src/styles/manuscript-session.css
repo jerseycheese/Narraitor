@@ -3381,8 +3381,7 @@ body.manuscript-overlay-open {
     "image header actions"
     "image badge  actions"
     "image desc   actions";
-  column-gap: var(--space-3);
-  row-gap: var(--space-1);
+  gap: var(--space-1) var(--space-3);
   align-items: center;
   padding: var(--space-2_5) 0;
   background: transparent;
