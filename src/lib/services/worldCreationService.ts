@@ -122,7 +122,7 @@ Every NPC must fit this world snugly. IDs must be unique, lowercase, kebab-case 
 }
 
 /**
- * Generate AI-powered tone settings for world data
+ * Generate tone settings for world data
  */
 async function generateAIToneSettings(worldData: Partial<World>): Promise<ToneSettings> {
   try {
@@ -176,7 +176,7 @@ export const worldCreationService = {
       relationship: generatedData.relationship,
     };
 
-    // Generate AI-powered tone settings based on world data
+    // Generate tone settings based on world data
     const aiToneSettings = await generateAIToneSettings(initialWorldData);
 
     // Prepare complete world data

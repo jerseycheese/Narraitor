@@ -1,6 +1,6 @@
 # LoreViewer Component
 
-This handles displaying the lore that builds up as players explore their world. The challenge was creating something that feels like a living reference guide, not just a static data dump.
+Displays the lore facts and world knowledge that accumulate during gameplay, organized into a structured reference guide rather than a static list.
 
 ## What It Does
 

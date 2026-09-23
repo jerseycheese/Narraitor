@@ -425,54 +425,7 @@ export const UIComponentShowcase: Story = {
         },
       });
 
-      return (
-        <div>
-          <div>
-            <div>
-              <h2>
-                shadcn/ui Component Integration
-              </h2>
-              <ul>
-                <li>
-                  ✅ <strong>Input</strong> components with proper styling and
-                  focus states
-                </li>
-                <li>
-                  ✅ <strong>Select</strong> components replacing raw select
-                  elements
-                </li>
-                <li>
-                  ✅ <strong>Textarea</strong> components with consistent
-                  styling
-                </li>
-                <li>
-                  ✅ <strong>Button</strong> components with variants (default,
-                  outline, destructive, link)
-                </li>
-                <li>
-                  ✅ <strong>Checkbox</strong> components with integrated labels
-                </li>
-                <li>
-                  ✅ <strong>Label</strong> components with proper accessibility
-                </li>
-                <li>
-                  ✅ <strong>NEW:</strong> RadioGroup components for better form
-                  controls
-                </li>
-                <li>
-                  ✅ <strong>NEW:</strong> Consistent styling across world
-                  editor and creation wizard
-                </li>
-                <li>
-                  ✅ <strong>NEW:</strong> Improved component reusability and
-                  maintainability
-                </li>
-              </ul>
-            </div>
-            <Story args={{ characterId }} />
-          </div>
-        </div>
-      );
+      return <Story args={{ characterId }} />;
     },
   ],
 };

@@ -1,6 +1,6 @@
 # ChoiceSelector Component
 
-This handles player choice selection in all its forms - from simple "go left or right" decisions to complex scenarios with custom player input. The challenge was creating one component that works for both AI-generated choices and player creativity without feeling cluttered.
+Renders player decisions across the game, from binary narrative branches to freeform custom responses. It balances generated suggestions with player input while keeping inventory requirements and character limits clear.
 
 ## What It Handles
 
