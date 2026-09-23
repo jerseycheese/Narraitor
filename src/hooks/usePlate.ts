@@ -17,10 +17,42 @@ type PlateResult = Plate | 'blank' | null;
  * The cache is per session and keyed by art and display size, so each plate is
  * rendered once however many surfaces ask for it.
  */
+const MAX_CACHE_ENTRIES = 30;
 const cache = new Map<string, PlateResult>();
 
+function getCached(key: string): PlateResult | undefined {
+  if (!cache.has(key)) return undefined;
+  const value = cache.get(key)!;
+  cache.delete(key);
+  cache.set(key, value);
+  return value;
+}
+
+function setCached(key: string, value: PlateResult): void {
+  if (cache.has(key)) {
+    cache.delete(key);
+  } else if (cache.size >= MAX_CACHE_ENTRIES) {
+    const oldest = cache.keys().next().value;
+    if (oldest !== undefined) {
+      cache.delete(oldest);
+    }
+  }
+  cache.set(key, value);
+}
+
+function hashSource(source: string): string {
+  if (source.length <= 128) return source;
+
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < source.length; i++) {
+    hash ^= source.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return `h${(hash >>> 0).toString(36)}_${source.length}`;
+}
+
 function cacheKey(source: string, { width, height, dpr = 2 }: PlateBox): string {
-  return `${width}x${height}@${dpr}|${source}`;
+  return `${width}x${height}@${dpr}|${hashSource(source)}`;
 }
 
 interface Settled {
@@ -56,17 +88,18 @@ export function usePlate(source: string | undefined, box: PlateBox): PlateState 
   const measured = width > 0 && height > 0;
   const key = source && measured ? cacheKey(source, { width, height, dpr }) : null;
 
-  const [settled, setSettled] = useState<Settled | null>(() =>
-    key && source && cache.has(key)
-      ? { key, source, result: cache.get(key) ?? null }
-      : null
-  );
+  const [settled, setSettled] = useState<Settled | null>(() => {
+    if (!key || !source) return null;
+    const cached = getCached(key);
+    return cached !== undefined ? { key, source, result: cached } : null;
+  });
 
   useEffect(() => {
     if (!key || !source) return;
 
-    if (cache.has(key)) {
-      setSettled({ key, source, result: cache.get(key) ?? null });
+    const cached = getCached(key);
+    if (cached !== undefined) {
+      setSettled({ key, source, result: cached });
       return;
     }
 
@@ -74,14 +107,14 @@ export function usePlate(source: string | undefined, box: PlateBox): PlateState 
 
     toPlate(source, { width, height, dpr })
       .then((result) => {
-        cache.set(key, result);
+        setCached(key, result);
         if (!active) return;
         setSettled({ key, source, result });
       })
       .catch(() => {
         // A plate is an enhancement; failing to make one must not break the
         // surface that asked for it.
-        cache.set(key, null);
+        setCached(key, null);
         if (!active) return;
         setSettled({ key, source, result: null });
       });

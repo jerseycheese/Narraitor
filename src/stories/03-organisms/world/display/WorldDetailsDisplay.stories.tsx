@@ -22,10 +22,6 @@ const meta = {
       control: 'boolean',
       description: 'Whether to show the tone settings section',
     },
-    showImageDetails: {
-      control: 'boolean',
-      description: 'Whether to show the image details section',
-    },
     showInfo: {
       control: 'boolean',
       description: 'Whether to show the info section',

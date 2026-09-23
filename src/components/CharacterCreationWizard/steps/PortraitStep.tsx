@@ -117,11 +117,9 @@ export function PortraitStep({
     };
 
     try {
-      // Exclude the world image to keep the payload well under the AI route limit
-      const { image: _image, ...worldWithoutImage } = worldConfig ?? {};
       const generatedPortrait = await generate({
         character: characterForGeneration,
-        world: worldWithoutImage,
+        world: worldConfig,
         customDescription: localPhysicalDescription,
       });
       if (sourceEpochRef.current !== epoch) return;

@@ -1072,10 +1072,6 @@
 
 /* ─── World detail page ─── */
 
-.world-detail-hero {
-  margin-bottom: var(--space-3);
-}
-
 .world-detail-body {
   display: flex;
   flex-direction: column;
@@ -1457,10 +1453,6 @@
 }
 
 /* ─── Character Detail Page ─── */
-
-.character-detail-hero {
-  margin-bottom: var(--space-3);
-}
 
 .character-detail-back {
   margin-bottom: var(--space-4);
@@ -2854,13 +2846,6 @@
   line-height: 1.5;
 }
 
-.world-detail-stat-default {
-  margin: 0;
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-}
-
 .world-detail-stat-tags {
   display: flex;
   flex-wrap: wrap;
@@ -2923,22 +2908,6 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-muted);
-}
-
-/* F25 — World image details: densify. The generation prompt is long, so let it
-   span the full grid width as a compact block (fewer wrapped lines) and tighten
-   the surrounding rhythm so the section stops dominating the page. */
-section[aria-labelledby="image-details-heading"] .world-detail-meta-grid {
-  gap: var(--space-2);
-}
-
-section[aria-labelledby="image-details-heading"] .component-data-field-stacked {
-  grid-column: 1 / -1;
-}
-
-section[aria-labelledby="image-details-heading"] .component-data-field-stacked > div:last-child {
-  font-size: var(--font-size-xs_5);
-  line-height: 1.45;
 }
 
 /* DS3 console — corner brackets on stat/npc/data cards */

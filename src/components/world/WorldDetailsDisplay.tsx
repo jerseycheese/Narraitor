@@ -6,7 +6,6 @@ import { WorldAttributesList } from './WorldAttributesList';
 import { WorldSkillsList } from './WorldSkillsList';
 import { WorldSettingsDisplay } from './WorldSettingsDisplay';
 import { ToneSettingsDisplay } from './ToneSettingsDisplay';
-import { WorldImageDisplay } from './WorldImageDisplay';
 import { WorldInfoSection } from './WorldInfoSection';
 import { useNPCStore } from '@/state/npcStore';
 
@@ -17,7 +16,6 @@ interface WorldDetailsDisplayProps {
   showDescription?: boolean;
   showSettings?: boolean;
   showToneSettings?: boolean;
-  showImageDetails?: boolean;
   showInfo?: boolean;
 }
 
@@ -26,7 +24,6 @@ export function WorldDetailsDisplay({
   showDescription = true,
   showSettings = true,
   showToneSettings = true,
-  showImageDetails = true,
   showInfo = true,
 }: WorldDetailsDisplayProps) {
   const npcIds = useNPCStore(
@@ -111,7 +108,6 @@ export function WorldDetailsDisplay({
       {showToneSettings && (
         <ToneSettingsDisplay toneSettings={world.toneSettings} />
       )}
-      {showImageDetails && <WorldImageDisplay image={world.image} />}
       {showInfo && <WorldInfoSection world={world} />}
     </div>
   );

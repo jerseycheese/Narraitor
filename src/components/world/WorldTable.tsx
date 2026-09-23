@@ -4,20 +4,18 @@
  */
 
 import * as React from 'react';
-import Image from 'next/image';
 import { type ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Pencil, Trash2, Globe } from 'lucide-react';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import clsx from 'clsx';
 import { useCharacterStore } from '@/state/characterStore';
 import type { World } from '@/types/world.types';
 import type { EntityID } from '@/types/common.types';
 import { formatDate } from '@/lib/utils';
 import { getGenreLabel } from '@/lib/constants/genres';
-import { plateInkStyle, usePlate } from '@/hooks/usePlate';
+import { WorldThumbnail } from './WorldThumbnail';
 
 interface WorldTableProps {
   worlds: World[];
@@ -33,40 +31,6 @@ const WorldTableRow = React.memo(
 );
 
 WorldTableRow.displayName = 'WorldTableRow';
-
-interface WorldThumbnailProps {
-  url?: string | null;
-}
-
-/** Thumbnail edge in CSS pixels; matches `--space-8` in the thumb's CSS. */
-const THUMBNAIL_PX = 32;
-
-const THUMBNAIL_BOX = { width: THUMBNAIL_PX, height: THUMBNAIL_PX };
-
-const WorldThumbnail: React.FC<WorldThumbnailProps> = ({ url }) => {
-  const { plate, pending } = usePlate(url ?? undefined, THUMBNAIL_BOX);
-
-  return (
-    <span
-      className={clsx('component-world-table-thumb', plate && 'plate-inked')}
-      style={plateInkStyle(plate)}
-      data-plate={pending ? 'pending' : undefined}
-      aria-hidden="true"
-    >
-      {url ? (
-        <Image
-          src={plate?.source ?? url}
-          alt=""
-          width={THUMBNAIL_PX}
-          height={THUMBNAIL_PX}
-          unoptimized
-        />
-      ) : (
-        <Globe />
-      )}
-    </span>
-  );
-};
 
 /**
  * WorldTable - A data table component for managing multiple worlds
@@ -113,7 +77,11 @@ export function WorldTable({
             className="component-world-table-name"
             onClick={() => handleViewWorld(row.original.id)}
           >
-            <WorldThumbnail url={row.original.image?.url} />
+            <WorldThumbnail
+              url={row.original.image?.url}
+              name={row.getValue('name') as string}
+              size="sm"
+            />
             <span>{row.getValue('name') as string}</span>
           </div>
         ),
