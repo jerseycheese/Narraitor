@@ -1175,6 +1175,7 @@ body.manuscript-overlay-open {
 }
 
 .manuscript-drawer-panel {
+  box-sizing: border-box;
   position: absolute;
   top: 0;
   width: min(100%, 28rem);
