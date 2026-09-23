@@ -3375,9 +3375,15 @@ body.manuscript-overlay-open {
 }
 
 :root .manuscript-inventory-item {
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+  grid-template-areas:
+    "image header actions"
+    "image badge  actions"
+    "image desc   actions";
+  column-gap: var(--space-3);
+  row-gap: var(--space-1);
   align-items: center;
-  gap: var(--space-3);
   padding: var(--space-2_5) 0;
   background: transparent;
   border: none;
@@ -3389,8 +3395,22 @@ body.manuscript-overlay-open {
   border-bottom: none;
 }
 
-:root .manuscript-inventory-item-header {
+:root .manuscript-inventory-item-image-wrapper {
+  grid-area: image;
   margin-bottom: 0;
+  align-self: center;
+}
+
+:root .manuscript-inventory-item-image,
+:root .manuscript-inventory-item-image-placeholder {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+:root .manuscript-inventory-item-header {
+  grid-area: header;
+  margin-bottom: 0;
+  min-width: 0;
 }
 
 :root .manuscript-inventory-item-name {
@@ -3398,21 +3418,32 @@ body.manuscript-overlay-open {
   font-weight: 500;
 }
 
-:root .manuscript-inventory-item-description {
-  font-family: var(--font-interface);
-  font-size: var(--font-size-xs_5);
+:root .manuscript-inventory-item-equipped-badge {
+  grid-area: badge;
   margin-bottom: 0;
 }
 
-/* Row axis (not column) here, so trailing-edge alignment is margin-left, not
-   margin-top; the column layout's top divider has no row equivalent. Left
-   shrinkable (no flex-shrink:0) so narrow drawers fall through to
-   .manuscript-inventory-actions' flex-wrap instead of overflowing. */
+:root .manuscript-inventory-item-description {
+  grid-area: desc;
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs_5);
+  margin-bottom: 0;
+  min-width: 0;
+}
+
 :root .manuscript-inventory-item-footer {
-  margin-top: 0;
-  margin-left: auto;
+  grid-area: actions;
+  margin: 0;
   padding-top: 0;
   border-top: none;
+  align-self: center;
+}
+
+:root .manuscript-inventory-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-end;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
