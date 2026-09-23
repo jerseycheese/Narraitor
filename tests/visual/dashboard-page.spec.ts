@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, waitForImagesLoadedIn } from './utils/wait-helpers';
 import { seedTestData, seedBaseData } from './utils/seedTestData';
 
 /**
@@ -71,17 +71,9 @@ test.describe('Dashboard Visual Tests', () => {
     await expect(page).toHaveTitle(/Narraitor/i);
 
     // Take full page screenshot - should show "Continue Last Session" with character and world info
-    //
-    // The Recent Worlds thumbnail (.dashboard-recent-world-thumb, 48x48px) goes
-    // through next/image on-demand optimization, and whether it decodes before
-    // capture is a coin flip on CI -- sometimes it never resolves at all, so a
-    // scoped image-load wait isn't reliable here (#1742). Mask it instead of
-    // waiting for it: the flake is isolated to that one region, so masking it
-    // out of the comparison is the fix the issue itself calls for, without a
-    // per-spec pixel budget standing in for a real wait.
+    await waitForImagesLoadedIn(page, 'main');
     await expect(page).toHaveScreenshot('home-page.png', {
       fullPage: true,
-      mask: [page.locator('.dashboard-recent-world-thumb')],
     });
   });
 
@@ -104,9 +96,9 @@ test.describe('Dashboard Visual Tests', () => {
 
     await expect(page).toHaveTitle(/Narraitor/i);
 
+    await waitForImagesLoadedIn(page, 'main');
     await expect(page).toHaveScreenshot('home-page-dark.png', {
       fullPage: true,
-      mask: [page.locator('.dashboard-recent-world-thumb')],
     });
   });
 
@@ -127,9 +119,9 @@ test.describe('Dashboard Visual Tests', () => {
 
     await expect(page).toHaveTitle(/Narraitor/i);
 
+    await waitForImagesLoadedIn(page, 'main');
     await expect(page).toHaveScreenshot('home-page-mobile.png', {
       fullPage: true,
-      mask: [page.locator('.dashboard-recent-world-thumb')],
     });
   });
 });
