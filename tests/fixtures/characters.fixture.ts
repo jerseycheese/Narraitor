@@ -9,7 +9,8 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'char-cyberpunk-hacker',
     name: 'Nova "Ghost" Chen',
-    description: 'Elite corporate hacker turned underground resistance fighter',
+    description:
+      'A former corporate intrusion specialist who now dismantles surveillance grids for neighborhood crews, carrying every breach map in a battered encrypted deck.',
     worldId: 'world-cyberpunk-2077',
     level: 3,
     isPlayer: true,
@@ -72,18 +73,18 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
     },
     portrait: {
       type: 'ai-generated',
-      url: 'https://api.dicebear.com/7.x/personas/png?seed=nova-ghost&backgroundColor=18181b',
+      url: '/visual-assets/fixtures/portrait-nova-chen.png',
       generatedAt: '2024-01-01T01:00:00.000Z',
       prompt: 'Cyberpunk hacker with tech augments',
     },
     createdAt: '2024-01-01T01:00:00.000Z',
     updatedAt: '2024-01-01T01:00:00.000Z',
   },
-  // Cyberpunk character without portrait (to validate empty portrait state)
+  // Intentional empty portrait state for visual coverage.
   {
     id: 'char-cyberpunk-operative',
     name: 'Kade "Null" Armitage',
-    description: 'Field operative who prefers to stay off-grid',
+    description: 'An off-grid courier who changes safehouses before sunrise.',
     worldId: 'world-cyberpunk-2077',
     level: 2,
     isPlayer: false,
@@ -149,7 +150,8 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'char-fantasy-mage',
     name: 'Lyralei Moonwhisper',
-    description: 'Young elven archmage seeking to restore balance to the realm',
+    description:
+      'A young archmage tracing the fractures between Aethermoor’s floating cities and the old forests below.',
     worldId: 'world-fantasy-realm',
     level: 4,
     isPlayer: true,
@@ -213,11 +215,12 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
     createdAt: '2024-01-02T01:00:00.000Z',
     updatedAt: '2024-01-02T01:00:00.000Z',
   },
-  // Fantasy character with portrait (to validate has-image state)
+  // Fantasy character with a local portrait (to validate image state).
   {
     id: 'char-fantasy-ranger',
     name: 'Thalen Oakstride',
-    description: 'Ranger of Aethermoor sworn to protect ancient paths',
+    description:
+      'A patient ranger who guides displaced villagers through hidden greenways while cataloguing the blight creeping along the ancient roads.',
     worldId: 'world-fantasy-realm',
     level: 2,
     isPlayer: false,
@@ -267,7 +270,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
     },
     portrait: {
       type: 'ai-generated',
-      url: 'https://api.dicebear.com/7.x/personas/png?seed=ranger&backgroundColor=1a2e1a',
+      url: '/visual-assets/fixtures/portrait-thalen-oakstride.png',
       generatedAt: '2024-01-02T01:15:00.000Z',
       prompt: 'Ranger portrait',
     },
@@ -289,7 +292,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'npc-raven',
     name: 'Raven',
-    description: 'Shadow operative with unknown allegiances',
+    description: 'A quiet operative who trades in favors, exits, and half-finished truths.',
     worldId: 'world-cyberpunk-2077',
     level: 7,
     isPlayer: false,
@@ -301,7 +304,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
     inventory: { characterId: 'npc-raven', items: [], capacity: 10, categories: [], itemOrder: [] },
     portrait: {
       type: 'ai-generated' as const,
-      url: 'https://api.dicebear.com/7.x/personas/png?seed=raven&backgroundColor=1e293b',
+      url: '/visual-assets/fixtures/portrait-raven.png',
       generatedAt: '2024-01-01T01:00:00.000Z',
       prompt: 'Cyberpunk operative',
     },
@@ -311,7 +314,8 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'npc-kira',
     name: 'Kira Tanaka',
-    description: 'Tech specialist with corporate ties',
+    description:
+      'A precise systems engineer balancing an old corporate pension against the people her work can still protect.',
     worldId: 'world-cyberpunk-2077',
     level: 6,
     isPlayer: false,
@@ -323,7 +327,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
     inventory: { characterId: 'npc-kira', items: [], capacity: 10, categories: [], itemOrder: [] },
     portrait: {
       type: 'ai-generated' as const,
-      url: 'https://api.dicebear.com/7.x/personas/png?seed=kira&backgroundColor=312e81',
+      url: '/visual-assets/fixtures/portrait-kira-tanaka.png',
       generatedAt: '2024-01-01T01:00:00.000Z',
       prompt: 'Cyberpunk tech specialist',
     },
@@ -333,7 +337,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'npc-fixer',
     name: 'Dexter DeShawn',
-    description: 'Legendary fixer',
+    description: 'The city’s best-connected fixer, never seen arriving or leaving.',
     worldId: 'world-cyberpunk-2077',
     level: 10,
     isPlayer: false,
@@ -349,7 +353,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'npc-guard-1',
     name: 'Arasaka Guard Alpha',
-    description: 'Security personnel',
+    description: 'A tower guard assigned to the dawn security rotation.',
     worldId: 'world-cyberpunk-2077',
     level: 5,
     isPlayer: false,
@@ -365,7 +369,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'npc-guard-2',
     name: 'Arasaka Guard Beta',
-    description: 'Security personnel',
+    description: 'A checkpoint officer trained to spot counterfeit access badges.',
     worldId: 'world-cyberpunk-2077',
     level: 5,
     isPlayer: false,
@@ -381,7 +385,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'npc-guard-3',
     name: 'Arasaka Guard Gamma',
-    description: 'Security personnel',
+    description: 'A perimeter guard who keeps a handwritten incident ledger.',
     worldId: 'world-cyberpunk-2077',
     level: 5,
     isPlayer: false,
@@ -397,7 +401,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'npc-drone-1',
     name: 'Security Drone X-1',
-    description: 'Autonomous drone',
+    description: 'A patrol drone with a cracked sensor array and persistent route memory.',
     worldId: 'world-cyberpunk-2077',
     level: 1,
     isPlayer: false,
@@ -413,7 +417,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'npc-drone-2',
     name: 'Security Drone X-2',
-    description: 'Autonomous drone',
+    description: 'A compact surveillance drone repurposed for building maintenance.',
     worldId: 'world-cyberpunk-2077',
     level: 1,
     isPlayer: false,
@@ -429,7 +433,7 @@ export const SAMPLE_CHARACTERS: StoreCharacter[] = [
   {
     id: 'npc-civilian-1',
     name: 'Street Vendor',
-    description: 'Local merchant',
+    description: 'A night-market vendor who hears every district rumor before breakfast.',
     worldId: 'world-cyberpunk-2077',
     level: 1,
     isPlayer: false,
