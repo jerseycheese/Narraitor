@@ -146,6 +146,25 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
       'OpenAI states that API inputs and outputs are not used to train their models by default, and are retained for up to 30 days for abuse monitoring.',
   },
   {
+    id: 'claude',
+    name: 'Anthropic Claude',
+    type: 'claude',
+    endpoint: 'https://api.anthropic.com/v1/messages',
+    models: ['claude-sonnet-5', 'claude-haiku-4-5'],
+    defaultModel: 'claude-sonnet-5',
+    // No image generation on this API at all. ClaudeClient simply omits
+    // generateImage (an optional AIClient method), the same way
+    // OpenAICompatibleClient does — image generation stays on Gemini.
+    capabilities: { text: true, images: false, streaming: true },
+    helpUrl: 'https://console.anthropic.com/settings/keys',
+    // Adapter and client exist (see providers/claude/), but this hasn't had
+    // the live streamed-turn check the other `available: true` presets have —
+    // see the module-level TODO above for what flipping this needs.
+    available: false,
+    privacyNote:
+      'Anthropic states that API inputs and outputs are not used to train their models by default, and are retained for up to 30 days for abuse monitoring.',
+  },
+  {
     id: 'deepseek',
     name: 'Deepseek',
     type: 'openai-compatible',

@@ -1,6 +1,7 @@
 import { consumeProviderStreamEvents } from '../core/streamConsumer';
 import { geminiAdapter } from '../gemini/adapter';
 import { openAICompatibleAdapter } from '../openai-compatible/adapter';
+import { claudeAdapter } from '../claude/adapter';
 import type { NarrativeStreamEvent } from '../../types';
 
 const encoder = new TextEncoder();
@@ -88,6 +89,26 @@ describe('consumeProviderStreamEvents', () => {
       // Lowercase "stop" upstream, one vocabulary downstream.
       finishReason: 'STOP',
       promptTokens: 30,
+      completionTokens: 63,
+    });
+  });
+
+  it('reveals content from Claude native frames', async () => {
+    const events = await collect(
+      fakeReader([
+        { type: 'content_block_delta', delta: { type: 'text_delta', text: CHUNKS[0] } },
+        { type: 'content_block_delta', delta: { type: 'text_delta', text: CHUNKS[1] } },
+        { type: 'message_delta', delta: { stop_reason: 'end_turn' }, usage: { output_tokens: 63 } },
+      ]),
+      claudeAdapter
+    );
+
+    expect(revealedText(events)).toBe('Once upon a time, a hero arose.');
+    expect(events[events.length - 1]).toEqual({
+      done: true,
+      content: WHOLE,
+      finishReason: 'STOP',
+      promptTokens: undefined,
       completionTokens: 63,
     });
   });

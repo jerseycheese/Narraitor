@@ -15,11 +15,19 @@ jest.mock('../../geminiClient', () => ({
 }));
 
 import { createProviderClient } from '../factory';
+import { ClaudeClient } from '../claude/client';
 
 const GEMINI_DESCRIPTOR: ProviderDescriptor = {
   type: 'gemini',
   endpoint: '',
   model: 'gemini-2.5-pro',
+  apiKey: 'player-key',
+};
+
+const CLAUDE_DESCRIPTOR: ProviderDescriptor = {
+  type: 'claude',
+  endpoint: '',
+  model: 'claude-sonnet-5',
   apiKey: 'player-key',
 };
 
@@ -65,5 +73,11 @@ describe('createProviderClient', () => {
       'Additional system instructions:\nUse spare prose.'
     );
     expect(mockGenerateContent.mock.calls[0][0]).toContain('Continue the story.');
+  });
+
+  it('builds a ClaudeClient for a claude descriptor', () => {
+    const client = createProviderClient(CLAUDE_DESCRIPTOR);
+
+    expect(client).toBeInstanceOf(ClaudeClient);
   });
 });

@@ -143,15 +143,90 @@ describe('POST /api/ai/validate-provider', () => {
     expect(data.error).toBe('RATE_LIMITED');
   });
 
-  test('rejects a provider type with no adapter without calling upstream', async () => {
-    // Anthropic's own API is not OpenAI-shaped and has no adapter; reaching
-    // Claude through OpenRouter is an `openai-compatible` provider instead.
-    const response = await POST(buildRequest({ key: KEY, body: { type: 'claude' } }));
+  test('rejects a provider type outside the known set without calling upstream', async () => {
+    const response = await POST(buildRequest({ key: KEY, body: { type: 'not-a-real-provider' } }));
     const data = await response.json();
 
     expect(data.valid).toBe(false);
     expect(data.error).toBe('UNSUPPORTED_PROVIDER');
     expect(mockMakeGeminiRequest).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST /api/ai/validate-provider — Claude', () => {
+  function claudeRequest(body: Record<string, unknown> = {}) {
+    return buildRequest({ key: KEY, body: { type: 'claude', ...body } });
+  }
+
+  beforeEach(() => {
+    global.fetch = jest.fn();
+    // resetAllMocks in afterEach strips the module mock's implementation too.
+    (globalRateLimiter.checkLimit as jest.Mock).mockReturnValue({
+      allowed: true,
+      remaining: 50,
+      resetTime: Date.now() + 3600000,
+    });
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  test('validates through the provider abstraction, same as Gemini', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    const response = await POST(claudeRequest({ model: 'claude-sonnet-5' }));
+    const data = await response.json();
+
+    expect(data.valid).toBe(true);
+    expect(data.model).toBe('claude-sonnet-5');
+    // No image generation on this API at all, unlike Gemini.
+    expect(data.capabilities).toEqual({ text: true, images: false, streaming: true });
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://api.anthropic.com/v1/messages',
+      expect.objectContaining({ method: 'POST' })
+    );
+    expect(JSON.stringify(data)).not.toContain(KEY);
+  });
+
+  test('sends the key as x-api-key with the anthropic-version header, never a bearer token', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    await POST(claudeRequest({ model: 'claude-sonnet-5' }));
+
+    const [url, init] = (global.fetch as jest.Mock).mock.calls[0];
+    const headers = init.headers as Record<string, string>;
+    expect(url).not.toContain(KEY);
+    expect(headers['x-api-key']).toBe(KEY);
+    expect(headers['anthropic-version']).toBe('2023-06-01');
+    expect(headers.Authorization).toBeUndefined();
+  });
+
+  test('falls back to the preset default model when none is requested', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    const response = await POST(claudeRequest());
+    const data = await response.json();
+
+    expect(data.model).toBe('claude-sonnet-5');
+  });
+
+  test('maps a 401 to INVALID_KEY', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(
+      fakeResponse(401, { error: { type: 'authentication_error', message: 'invalid x-api-key' } })
+    );
+
+    const response = await POST(claudeRequest({ model: 'claude-sonnet-5' }));
+
+    expect((await response.json()).error).toBe('INVALID_KEY');
+  });
+
+  test('maps a 429 to RATE_LIMITED', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(429));
+
+    const response = await POST(claudeRequest({ model: 'claude-sonnet-5' }));
+
+    expect((await response.json()).error).toBe('RATE_LIMITED');
   });
 });
 

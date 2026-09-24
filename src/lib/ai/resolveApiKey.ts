@@ -189,12 +189,13 @@ function readModel(request: NextRequest | undefined, type: ProviderType): string
 }
 
 /**
- * The upstream URL. Gemini's is pinned in its adapter and never comes from a
- * header, so this returns an empty string for it. Everything else must supply
- * one that survives the endpoint guard; null signals a failed resolution.
+ * The upstream URL. Gemini's and Claude's are both pinned in their adapters
+ * (`playerSuppliedEndpoint: false`) and never come from a header, so this
+ * returns an empty string for either. Everything else must supply one that
+ * survives the endpoint guard; null signals a failed resolution.
  */
 function readEndpoint(request: NextRequest | undefined, type: ProviderType): string | null {
-  if (type === 'gemini') return '';
+  if (type === 'gemini' || type === 'claude') return '';
 
   const raw = request?.headers.get(PROVIDER_ENDPOINT_HEADER)?.trim();
   if (!raw || !isSafeProviderEndpoint(raw)) return null;
