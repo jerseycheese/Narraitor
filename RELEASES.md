@@ -4,6 +4,57 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.9.0 - 2026-09-24
+
+v1.9 runs the page-by-page pass v1.8's foundations were built for: wizards, lists, detail pages, edit pages, dashboard, journal and ending, settings and providers, and the public pages, each carrying its own dark and mobile baselines. The milestone closes 8 issues across 33 commits since [v1.8.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.8.0).
+
+**What's in this release**
+
+The page-by-page pass:
+
+- World and character creation are one wizard shape instead of two, and the wizard shell handles both ([#2088](https://github.com/jerseycheese/Narraitor/issues/2088)).
+- The worlds and characters lists were redesigned, with clearer empty states and card actions ([#2089](https://github.com/jerseycheese/Narraitor/issues/2089)).
+- World and character detail pages became open sections instead of tabs ([#2090](https://github.com/jerseycheese/Narraitor/issues/2090)).
+- World and character edit pages picked up the same rules ([#2091](https://github.com/jerseycheese/Narraitor/issues/2091)).
+- The dashboard is aligned with the Mechanical Manuscript system ([#2092](https://github.com/jerseycheese/Narraitor/issues/2092)).
+- The journal and ending screen match the same rules ([#2093](https://github.com/jerseycheese/Narraitor/issues/2093)).
+- Settings and the providers page got their first real pass ([#2094](https://github.com/jerseycheese/Narraitor/issues/2094)).
+- The landing, about, FAQ, and legal pages picked up dark and mobile baselines ([#2095](https://github.com/jerseycheese/Narraitor/issues/2095)).
+
+Polish that followed each page:
+
+- World art now prints in ink, except on the world detail page ([#2125](https://github.com/jerseycheese/Narraitor/issues/2125)). Detail surfaces also picked up tipped-in colour plates ([#2124](https://github.com/jerseycheese/Narraitor/issues/2124)).
+- List pages got a contrast and empty-state pass ([#2122](https://github.com/jerseycheese/Narraitor/issues/2122)), world card actions became more deliberate with less redundant metadata ([#2126](https://github.com/jerseycheese/Narraitor/issues/2126)), and a nested `<main>` landmark on the worlds list was fixed for screen readers ([#2128](https://github.com/jerseycheese/Narraitor/issues/2128)).
+- The journal nav's end padding follows the gutter ladder now ([#2141](https://github.com/jerseycheese/Narraitor/issues/2141)), and the dashboard's continue card uses "session" consistently instead of mixing terms ([#2118](https://github.com/jerseycheese/Narraitor/issues/2118)).
+- Mobile manuscript drawers got an opaque surface and backdrop, so content behind them no longer shows through ([#2154](https://github.com/jerseycheese/Narraitor/issues/2154)).
+
+Narrative and state fixes:
+
+- World costs and lore mentions are recorded correctly on the resolver path, and segment debug info that had gone missing is back ([#2116](https://github.com/jerseycheese/Narraitor/issues/2116)).
+- Stale pacing metrics and a dead session-pacing API were root-fixed rather than patched ([#2147](https://github.com/jerseycheese/Narraitor/pull/2147)).
+- The persist migrate contract now says what it actually does, and unreachable side-effect tails were dropped from the narrative generator ([#2114](https://github.com/jerseycheese/Narraitor/issues/2114)).
+
+Plain language:
+
+- A pass over player-facing copy and the remaining plain-language sweep findings both landed ([#2109](https://github.com/jerseycheese/Narraitor/issues/2109)).
+
+Code health and test infrastructure:
+
+- Two weekly code-health sweeps resolved their findings ([#2108](https://github.com/jerseycheese/Narraitor/issues/2108), [#2159](https://github.com/jerseycheese/Narraitor/issues/2159)).
+- New coverage: automated accessibility checks, Storybook regression guards for badges, swatches, and the toast decorator, an opt-in live game-loop contract tier, and quarantine assertions for unattested speakers in the narrative resolver ([#2023](https://github.com/jerseycheese/Narraitor/issues/2023), [#1389](https://github.com/jerseycheese/Narraitor/issues/1389)).
+- The visual suite's main-pages spec was split by page group for faster, more isolated runs, and ending-screen fallback and image-generation baselines were added.
+- Visual fixture media is now local art instead of a third-party dependency.
+
+**Known incomplete**
+
+There's still no static guard for the border-nesting rule from v1.8 — it depends on too much context to lint, so review and screenshots remain the only enforcement. The play screen and flow changes stayed out of scope, as planned.
+
+**What's next**
+
+No v1.10 milestone is set yet. A native-SDK Claude provider ([#894](https://github.com/jerseycheese/Narraitor/issues/894)) and merging the wizard auto-save hooks ([#2158](https://github.com/jerseycheese/Narraitor/issues/2158)) are queued next. The Jest 30 upgrade ([#797](https://github.com/jerseycheese/Narraitor/issues/797)) goes ahead of the `@google/genai` 1.x bump ([#794](https://github.com/jerseycheese/Narraitor/issues/794)) so the two lockfile-touching changes don't land in flight together. Verifying the remaining OpenAI-compatible provider presets ([#1800](https://github.com/jerseycheese/Narraitor/issues/1800)) waits on buying provider keys, and the weekly comment-sweep issue ([#2112](https://github.com/jerseycheese/Narraitor/issues/2112)) stays open until its two carved-out findings land.
+
+---
+
 ## v1.8.0 - 2026-09-14
 
 v1.8 is a design release with no gameplay changes. It sets the shared visual rules that keep the app from looking generated: one filled button per screen, one set of font roles, labels only on data, no border inside a border, and a single decorative mark. The milestone closes 7 issues, plus [#2099](https://github.com/jerseycheese/Narraitor/issues/2099) fixed along the way, across 8 commits since [v1.7.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.7.0), two of which are docs.

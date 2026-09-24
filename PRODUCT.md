@@ -2,7 +2,7 @@
 
 <!-- impeccable:product-schema 1 -->
 
-*Verified against the tree on 2026-09-14, at v1.8.0. Every claim below is checkable from a
+*Verified against the tree on 2026-09-24, at v1.9.0. Every claim below is checkable from a
 path in this file. When one stops matching the code, fix it here rather than working around
 it, and re-date this line.*
 
@@ -25,7 +25,7 @@ attributes, and tone; create characters that fit it; and play a generated, choic
 with tracked consequences, inventory, and a journal. The story adapts to your world's voice
 rather than defaulting to generic fantasy. Success is an immersive, coherent, replayable story
 loop that stays out of its own way. v1.8 shipped on 2026-09-14 and set shared design rules for
-buttons, type, and borders. v1.9 applies them page by page.
+buttons, type, and borders. v1.9 shipped on 2026-09-24 and applied them page by page.
 
 ## Positioning
 
@@ -124,13 +124,14 @@ Real, usable:
 - The product itself. Every route runs locally, and the story loop works end to end with a key.
   Captures of actual play are the strongest proof material on hand.
 - Three current screenshots at `public_docs/images/readme-{landing,play,world-creation}.png`,
-  embedded in README. Landing and play show the shipped DS3 surface. World creation predates
-  v1.8 and still shows italic headings and nested borders, so don't use it as design reference.
+  embedded in README, all showing the shipped DS3 surface after the v1.9 page-by-page pass.
 - Architecture decisions of record at `public_docs/architecture/` (ADR-001 through ADR-014).
-- Seven images under `public/visual-assets/`. Four world illustrations sit in `worlds/` as
-  `.webp` (`debt-court`, `normandy`, `port-city`, `survey-ship`), which the landing page
-  renders per world. The three older PNGs (`world-cyberpunk`, `portrait-cyberpunk`,
-  `portrait-fantasy`) serve `/about`, Storybook, and test fixtures.
+- Seven product images under `public/visual-assets/`. Four world illustrations sit in
+  `worlds/` as `.webp` (`debt-court`, `normandy`, `port-city`, `survey-ship`), which the
+  landing page renders per world. The three older PNGs (`world-cyberpunk`,
+  `portrait-cyberpunk`, `portrait-fantasy`) serve `/about` and Storybook. A separate
+  `visual-assets/fixtures/` holds nine test-only PNGs (portraits, items, a world) that
+  replaced third-party visual-regression fixture media.
 - The project is open source at https://github.com/jerseycheese/Narraitor, and `/about` links
   to it.
 - Site copy already written in `src/app/layout.tsx`: the title is "Narraitor: play a story that
