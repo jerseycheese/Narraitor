@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
 import WorldCreationWizard from '../WorldCreationWizard';
-import { DRAFT_STORAGE_KEY } from '@/hooks/useWorldCreationAutoSave';
+import { WORLD_DRAFT_STORAGE_KEY as DRAFT_STORAGE_KEY } from '../WizardState';
 
 const mockPush = jest.fn();
 const mockCreateWorld = jest.fn().mockReturnValue('world-123');

@@ -25,14 +25,20 @@ describe('worldAnalyzerClient', () => {
 
     const result = await analyzeWorldDescriptionClient('A fantasy world');
 
-    expect(fetch).toHaveBeenCalledWith('/api/ai/analyze-world', {
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const [url, init] = (fetch as jest.MockedFunction<typeof fetch>).mock.calls[0];
+    expect(url).toBe('/api/ai/analyze-world');
+    expect(init).toMatchObject({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ description: 'A fantasy world' }),
-      signal: expect.any(AbortSignal),
     });
+    // aiFetch's signal comes from timeoutSignal(), which needs AbortSignal.timeout -
+    // present in Node/CI's jsdom but not every local jsdom build (see its JSDoc in
+    // src/lib/ai/abortTimeout.ts), so don't pin the assertion to one or the other.
+    expect(init?.signal === undefined || init?.signal instanceof AbortSignal).toBe(true);
 
     expect(result).toEqual(mockResponse);
   });

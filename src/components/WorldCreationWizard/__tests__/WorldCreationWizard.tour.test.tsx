@@ -14,8 +14,8 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock auto save to avoid recovery dialog
-jest.mock('@/hooks/useWorldCreationAutoSave', () => ({
-  useWorldCreationAutoSave: () => ({
+jest.mock('@/hooks/useDraftAutoSave', () => ({
+  useDraftAutoSave: () => ({
     data: undefined,
     setData: jest.fn(),
     clearAutoSave: jest.fn(),

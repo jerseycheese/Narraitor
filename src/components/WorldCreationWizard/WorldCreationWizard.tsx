@@ -21,14 +21,24 @@ import {
   WizardStep 
 } from '@/components/shared/wizard';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
-import { useWorldCreationAutoSave } from '@/hooks/useWorldCreationAutoSave';
+import { useDraftAutoSave } from '@/hooks/useDraftAutoSave';
 import { RecoveryNotification } from '@/components/shared/RecoveryNotification';
 import BasicInfoStep from './steps/BasicInfoStep';
 import DescriptionStep from './steps/DescriptionStep';
 import AttributeReviewStep from './steps/AttributeReviewStep';
 import SkillReviewStep from './steps/SkillReviewStep';
 import FinalizeStep from './steps/FinalizeStep';
-import { AttributeSuggestion, SkillSuggestion, WIZARD_STEPS } from './WizardState';
+import {
+  AttributeSuggestion,
+  SkillSuggestion,
+  WIZARD_STEPS,
+  WorldCreationData,
+  WorldCreationDraft,
+  WORLD_DRAFT_STORAGE_KEY,
+  isValidWorldDraft,
+  analyzeWorldDraftRecovery,
+  hasWorldDraftData,
+} from './WizardState';
 import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 import { generateWorldImage } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
@@ -62,22 +72,7 @@ const areArraysEqual = <T extends object>(a: T[] = [], b: T[] = []): boolean => 
   return true;
 };
 
-export type { AttributeSuggestion, SkillSuggestion };
-
-interface WorldCreationData extends Partial<World> {
-  aiSuggestions?: {
-    attributes: AttributeSuggestion[];
-    skills: SkillSuggestion[];
-  };
-  aiSuggestionsGenerated?: boolean;
-  worldType?: 'original' | 'inspired_by' | 'set_within';
-  createdWorldId?: string;
-  aiSuggestionMeta?: {
-    source: AIGuidanceSource;
-    generatedAt?: string;
-    descriptionSnapshot?: string;
-  };
-}
+export type { AttributeSuggestion, SkillSuggestion, WorldCreationData };
 
 export interface WorldCreationWizardProps {
   onComplete?: (worldId: string) => void;
@@ -153,7 +148,12 @@ export default function WorldCreationWizard({
     recoveryPreview,
     hasCurrentData: autoSaveHasCurrentData,
     isLoaded: isAutoSaveLoaded,
-  } = useWorldCreationAutoSave();
+  } = useDraftAutoSave<WorldCreationDraft, ReturnType<typeof analyzeWorldDraftRecovery>>({
+    storageKey: WORLD_DRAFT_STORAGE_KEY,
+    analyzeRecovery: analyzeWorldDraftRecovery,
+    hasCurrentData: hasWorldDraftData,
+    isValidDraft: isValidWorldDraft,
+  });
 
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
 

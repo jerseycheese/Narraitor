@@ -21,9 +21,11 @@ Here's what it does:
 
 There are basically two pieces that work together:
 
-### useCharacterCreationAutoSave Hook
+### useDraftAutoSave Hook
 
-The hook provides the core auto-save functionality with localStorage persistence:
+Character creation shares its auto-save mechanics with world creation through one generic
+hook, `useDraftAutoSave` (`src/hooks/useDraftAutoSave.ts`), configured for character creation
+by `src/components/CharacterCreationWizard/utils/characterDraft.ts`:
 
 ```typescript
 const {
@@ -34,7 +36,12 @@ const {
   recoveryPreview,
   hasCurrentData,
   saveStatus
-} = useCharacterCreationAutoSave(worldId);
+} = useDraftAutoSave({
+  storageKey: getCharacterDraftStorageKey(worldId),
+  analyzeRecovery: analyzeCharacterDraftRecovery,
+  hasCurrentData: hasCharacterDraftData,
+  isValidDraft: isValidCharacterDraft,
+});
 ```
 
 **State Management:**
@@ -86,7 +93,7 @@ The component handles user choice when recovery data is available:
 The system persists the complete character creation state:
 
 ```typescript
-interface CharacterCreationState {
+interface CharacterCreationDraft {
   currentStep: number;
   worldId: EntityID;
   characterData: unknown; // Complete character data structure
@@ -139,7 +146,7 @@ saveTimeoutRef.current = setTimeout(() => {
 The system analyzes saved data to generate meaningful previews:
 
 ```typescript
-function analyzeRecoveryData(data: CharacterCreationState): RecoveryDataPreview {
+function analyzeRecoveryData(data: CharacterCreationDraft): RecoveryDataPreview {
   const preview: RecoveryDataPreview = {
     currentStep: data.currentStep,
     lastSaved: data.lastSaved,
@@ -189,7 +196,12 @@ export const CharacterCreationWizard: React.FC<Props> = ({ worldId }) => {
     recoveryPreview, 
     hasCurrentData, 
     saveStatus 
-  } = useCharacterCreationAutoSave(worldId);
+  } = useDraftAutoSave({
+    storageKey: getCharacterDraftStorageKey(worldId),
+    analyzeRecovery: analyzeCharacterDraftRecovery,
+    hasCurrentData: hasCharacterDraftData,
+    isValidDraft: isValidCharacterDraft,
+  });
   
   // Recovery dialog state
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
@@ -249,9 +261,16 @@ The SaveIndicator component shows:
 The hook includes test coverage:
 
 ```typescript
-describe('useCharacterCreationAutoSave', () => {
+const characterDraftOptions = {
+  storageKey: getCharacterDraftStorageKey('world-1'),
+  analyzeRecovery: analyzeCharacterDraftRecovery,
+  hasCurrentData: hasCharacterDraftData,
+  isValidDraft: isValidCharacterDraft,
+};
+
+describe('useDraftAutoSave (character creation)', () => {
   test('automatically saves data after 300ms delay', async () => {
-    const { result } = renderHook(() => useCharacterCreationAutoSave('world-1'));
+    const { result } = renderHook(() => useDraftAutoSave(characterDraftOptions));
     
     act(() => {
       result.current.setData(mockCharacterData);
@@ -269,10 +288,19 @@ describe('useCharacterCreationAutoSave', () => {
   test('detects recovery data on mount', () => {
     localStorage.setItem('character-creation-world-1', JSON.stringify(mockSavedData));
     
-    const { result } = renderHook(() => useCharacterCreationAutoSave('world-1'));
+    const { result } = renderHook(() => useDraftAutoSave(characterDraftOptions));
     
     expect(result.current.hasRecoveryData).toBe(true);
     expect(result.current.recoveryPreview).toBeDefined();
+  });
+
+  test('discards a corrupt saved draft instead of offering it for recovery', () => {
+    localStorage.setItem('character-creation-world-1', 'not valid json');
+    
+    const { result } = renderHook(() => useDraftAutoSave(characterDraftOptions));
+    
+    expect(result.current.hasRecoveryData).toBe(false);
+    expect(localStorage.getItem('character-creation-world-1')).toBeNull();
   });
 });
 ```
@@ -312,13 +340,18 @@ try {
 ### Data Corruption
 ```typescript
 try {
-  const parsed = JSON.parse(saved);
+  const parsed: unknown = JSON.parse(saved);
+  if (!isValidDraft(parsed)) {
+    throw new Error('Saved draft does not match the expected shape');
+  }
   setDataInternal(parsed);
-} catch (e) {
-  console.error('[AutoSave] Failed to restore character creation data', e);
-  // Keep recovery data true since data exists, even if corrupted
-  setHasRecoveryData(true);
-  setRecoveryPreview(undefined); // Can't preview corrupted data
+} catch (error) {
+  logger.error('Discarding corrupt draft', storageKey, error);
+  // Corrupt data is discarded outright, never offered for recovery.
+  localStorage.removeItem(storageKey);
+  setHasRecoveryData(false);
+  setRecoveryPreview(undefined);
+  setDataInternal(undefined);
 }
 ```
 

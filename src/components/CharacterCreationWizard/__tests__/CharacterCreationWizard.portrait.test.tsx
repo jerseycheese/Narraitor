@@ -28,8 +28,8 @@ const readPortraitFileMock = jest.requireMock('@/lib/portraits/portraitUpload')
   .readPortraitFile as jest.Mock;
 // Mock fetch for API routes
 const mockFetch = jest.fn();
-jest.mock('../../../hooks/useCharacterCreationAutoSave', () => ({
-  useCharacterCreationAutoSave: () => ({
+jest.mock('../../../hooks/useDraftAutoSave', () => ({
+  useDraftAutoSave: () => ({
     data: null,
     setData: jest.fn(),
     clearAutoSave: jest.fn(),

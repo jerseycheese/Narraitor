@@ -9,7 +9,7 @@
  * ```tsx
  * function CharacterCreationWizard() {
  *   const { hasRecoveryData, recoveryPreview, hasCurrentData, clearAutoSave } =
- *     useCharacterCreationAutoSave(worldId);
+ *     useDraftAutoSave({ storageKey, analyzeRecovery, hasCurrentData, isValidDraft });
  *   const [showDialog, setShowDialog] = useState(false);
  *
  *   useEffect(() => {

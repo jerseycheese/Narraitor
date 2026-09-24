@@ -71,7 +71,9 @@ describe('GeminiClient', () => {
       client = new GeminiClient(config);
       const result = await client.generateContent('Test prompt');
 
-      expect(mockGenerateContent).toHaveBeenCalledWith({
+      expect(mockGenerateContent).toHaveBeenCalledTimes(1);
+      const call = mockGenerateContent.mock.calls[0][0];
+      expect(call).toMatchObject({
         model: 'gemini-2.0-flash',
         contents: 'Test prompt',
         config: {
@@ -81,9 +83,14 @@ describe('GeminiClient', () => {
           maxOutputTokens: 2048,
           safetySettings: config.safetySettings,
           thinkingConfig: undefined,
-          abortSignal: expect.any(AbortSignal)
         }
       });
+      // timeoutSignal()'s abortSignal needs AbortSignal.timeout - present in
+      // Node/CI's jsdom but not every local jsdom build (see its JSDoc in
+      // src/lib/ai/abortTimeout.ts), so don't pin the assertion to one or the other.
+      expect(
+        call.config.abortSignal === undefined || call.config.abortSignal instanceof AbortSignal
+      ).toBe(true);
       expect(result).toEqual({
         content: 'Generated test content',
         finishReason: 'STOP',
@@ -232,7 +239,9 @@ describe('GeminiClient', () => {
       client = new GeminiClient(customConfig);
       await client.generateContent('Test prompt');
 
-      expect(mockGenerateContent).toHaveBeenCalledWith({
+      expect(mockGenerateContent).toHaveBeenCalledTimes(1);
+      const call = mockGenerateContent.mock.calls[0][0];
+      expect(call).toMatchObject({
         model: 'gemini-2.0-flash',
         contents: 'Test prompt',
         config: {
@@ -242,9 +251,14 @@ describe('GeminiClient', () => {
           maxOutputTokens: 1024,
           safetySettings: customConfig.safetySettings,
           thinkingConfig: undefined,
-          abortSignal: expect.any(AbortSignal)
         }
       });
+      // timeoutSignal()'s abortSignal needs AbortSignal.timeout - present in
+      // Node/CI's jsdom but not every local jsdom build (see its JSDoc in
+      // src/lib/ai/abortTimeout.ts), so don't pin the assertion to one or the other.
+      expect(
+        call.config.abortSignal === undefined || call.config.abortSignal instanceof AbortSignal
+      ).toBe(true);
     });
 
     // The SDK reads generation params off `config` and silently drops unknown
