@@ -1,53 +1,11 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import Image from 'next/image';
 import { Plus } from 'lucide-react';
-import clsx from 'clsx';
 import { Button } from '@/components/ui/button';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { useWorldStore } from '@/state/worldStore';
-import { plateInkStyle, usePlate } from '@/hooks/usePlate';
-import { initialOf } from '@/lib/utils';
-
-interface WorldThumbnailProps {
-  url?: string | null;
-  name: string;
-}
-
-/** Thumbnail edge for continuous-tone ink plate. */
-const THUMBNAIL_PX = 96;
-const THUMBNAIL_BOX = { width: THUMBNAIL_PX, height: THUMBNAIL_PX };
-
-function WorldThumbnail({ url, name }: WorldThumbnailProps) {
-  const { plate, pending, blank } = usePlate(url ?? undefined, THUMBNAIL_BOX);
-  // Flat art has no tonal range to print, so it would render as a solid slab.
-  // Drop it and let the unprinted plate take over, the same call Hero makes.
-  const printable = Boolean(url) && !blank;
-
-  return (
-    <span
-      className={clsx('dashboard-recent-world-thumb', plate && 'plate-inked')}
-      style={plateInkStyle(plate)}
-      data-plate={pending ? 'pending' : undefined}
-      aria-hidden="true"
-    >
-      {printable && url ? (
-        <Image
-          src={plate?.source ?? url}
-          alt=""
-          width={THUMBNAIL_PX}
-          height={THUMBNAIL_PX}
-          unoptimized
-        />
-      ) : (
-        <span className="world-card-plate-initial">
-          {initialOf(name)}
-        </span>
-      )}
-    </span>
-  );
-}
+import { WorldThumbnail } from '@/components/world/WorldThumbnail';
 
 interface DashboardRecentWorldsProps {
   worlds: ReturnType<typeof useWorldStore.getState>['worlds'];
@@ -114,7 +72,7 @@ export function DashboardRecentWorlds({
             }}
           >
             <div className="dashboard-recent-world-content">
-              <WorldThumbnail url={world.image?.url} name={world.name} />
+              <WorldThumbnail url={world.image?.url} name={world.name} size="lg" />
               <div className="dashboard-recent-item-meta">
                 <h3>{world.name}</h3>
                 <p>{getGenreLabel(world.genre)}</p>
