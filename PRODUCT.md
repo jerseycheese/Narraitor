@@ -126,10 +126,12 @@ Real, usable:
 - Three current screenshots at `public_docs/images/readme-{landing,play,world-creation}.png`,
   embedded in README, all showing the shipped DS3 surface after the v1.9 page-by-page pass.
 - Architecture decisions of record at `public_docs/architecture/` (ADR-001 through ADR-014).
-- Seven images under `public/visual-assets/`. Four world illustrations sit in `worlds/` as
-  `.webp` (`debt-court`, `normandy`, `port-city`, `survey-ship`), which the landing page
-  renders per world. The three older PNGs (`world-cyberpunk`, `portrait-cyberpunk`,
-  `portrait-fantasy`) serve `/about`, Storybook, and test fixtures.
+- Seven product images under `public/visual-assets/`. Four world illustrations sit in
+  `worlds/` as `.webp` (`debt-court`, `normandy`, `port-city`, `survey-ship`), which the
+  landing page renders per world. The three older PNGs (`world-cyberpunk`,
+  `portrait-cyberpunk`, `portrait-fantasy`) serve `/about` and Storybook. A separate
+  `visual-assets/fixtures/` holds nine test-only PNGs (portraits, items, a world) that
+  replaced third-party visual-regression fixture media.
 - The project is open source at https://github.com/jerseycheese/Narraitor, and `/about` links
   to it.
 - Site copy already written in `src/app/layout.tsx`: the title is "Narraitor: play a story that
