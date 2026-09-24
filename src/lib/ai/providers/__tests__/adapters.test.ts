@@ -317,13 +317,31 @@ describe('claudeAdapter', () => {
 
   it("uses the player's advanced-settings overrides in place of the spec defaults", () => {
     const body = claudeAdapter.buildBody(
-      { ...CLAUDE, temperatureOverride: 1.5, topPOverride: 0.8, maxTokensOverride: 512 },
+      { ...CLAUDE, temperatureOverride: 0.9, topPOverride: 0.8, maxTokensOverride: 512 },
       SPEC
     ) as Record<string, unknown>;
 
-    expect(body.temperature).toBe(1.5);
+    expect(body.temperature).toBe(0.9);
     expect(body.top_p).toBe(0.8);
     expect(body.max_tokens).toBe(512);
+  });
+
+  it("clamps a temperature override above Claude's 0.0-1.0 range instead of forwarding it", () => {
+    const body = claudeAdapter.buildBody(
+      { ...CLAUDE, temperatureOverride: 1.5 },
+      SPEC
+    ) as Record<string, unknown>;
+
+    expect(body.temperature).toBe(1.0);
+  });
+
+  it('clamps a negative temperature override up to 0.0', () => {
+    const body = claudeAdapter.buildBody(
+      { ...CLAUDE, temperatureOverride: -0.2 },
+      SPEC
+    ) as Record<string, unknown>;
+
+    expect(body.temperature).toBe(0.0);
   });
 
   it('omits the sampling controls entirely for a service that fixes them', () => {
@@ -389,5 +407,14 @@ describe('claudeAdapter', () => {
 
   it('ignores frame types that carry nothing the narrative stream needs', () => {
     expect(claudeAdapter.parseStreamFrame({ type: 'content_block_stop' })).toBeNull();
+  });
+
+  it('surfaces a mid-stream error event as the shared ERROR finish reason', () => {
+    expect(
+      claudeAdapter.parseStreamFrame({
+        type: 'error',
+        error: { type: 'overloaded_error', message: 'Overloaded' },
+      })
+    ).toEqual({ finishReason: 'ERROR' });
   });
 });

@@ -54,6 +54,11 @@ function normalizeFinishReason(raw: string | undefined | null): FinishReason {
   return FINISH_REASONS[raw] ?? 'OTHER';
 }
 
+/** Claude's Messages API only accepts 0.0 through 1.0. */
+function clampClaudeTemperature(value: number): number {
+  return Math.min(Math.max(value, 0), 1);
+}
+
 interface ClaudeContentBlock {
   type?: string;
   text?: string;
@@ -113,7 +118,12 @@ export const claudeAdapter: ProviderAdapter = {
       ...(descriptor.hasFixedSamplingControls
         ? {}
         : {
-            temperature: descriptor.temperatureOverride ?? spec.temperature,
+            // Unlike Gemini and the OpenAI-compatible services, which take
+            // temperature up to 2.0, Claude's Messages API rejects anything
+            // above 1.0 with a 400 — the shared advanced-settings panel
+            // doesn't know that, so a player-configured override needs
+            // clamping here rather than trusted as-is.
+            temperature: clampClaudeTemperature(descriptor.temperatureOverride ?? spec.temperature),
             top_p: descriptor.topPOverride ?? 1.0,
           }),
       ...(spec.stream ? { stream: true } : {}),
@@ -167,6 +177,14 @@ export const claudeAdapter: ProviderAdapter = {
             : undefined,
           completionTokens: parsed.usage?.output_tokens,
         };
+
+      // Anthropic sends this after the SSE response has already opened
+      // (e.g. a transient overload) instead of an HTTP error status. Mapped
+      // onto the shared ERROR finish reason so the generic stream consumer
+      // surfaces it as a stream error instead of a silent `done` with
+      // whatever partial content happened to arrive.
+      case 'error':
+        return { finishReason: 'ERROR' };
 
       // message_stop, content_block_start/stop, ping: nothing these carry
       // reaches the narrative stream.
