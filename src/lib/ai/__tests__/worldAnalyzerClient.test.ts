@@ -31,6 +31,7 @@ describe('worldAnalyzerClient', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ description: 'A fantasy world' }),
+      signal: expect.any(AbortSignal),
     });
 
     expect(result).toEqual(mockResponse);
