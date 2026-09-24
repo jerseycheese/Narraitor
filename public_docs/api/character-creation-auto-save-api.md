@@ -2,25 +2,43 @@
 
 If you're working with the auto-save system, this covers the main hook and component APIs. The implementation is pretty straightforward - here's how to use it.
 
-## Hook: `useCharacterCreationAutoSave`
+## Hook: `useDraftAutoSave`
+
+Character creation shares its auto-save mechanics with world creation through one generic
+hook, `useDraftAutoSave` (`src/hooks/useDraftAutoSave.ts`). Character creation configures it
+with the functions in `src/components/CharacterCreationWizard/utils/characterDraft.ts`:
 
 ```typescript
-function useCharacterCreationAutoSave(worldId: EntityID): UseCharacterCreationAutoSaveReturn
+function useDraftAutoSave<TDraft, TPreview>(options: UseDraftAutoSaveOptions<TDraft, TPreview>): UseDraftAutoSaveResult<TDraft, TPreview>
 ```
 
-Just pass it the `worldId` for the world where the character is being created. The hook uses this to namespace the localStorage key so characters for different worlds don't interfere with each other.
+```typescript
+const { data, setData, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } =
+  useDraftAutoSave<CharacterCreationDraft, CharacterDraftRecoveryPreview>({
+    storageKey: getCharacterDraftStorageKey(worldId),
+    analyzeRecovery: analyzeCharacterDraftRecovery,
+    hasCurrentData: hasCharacterDraftData,
+    isValidDraft: isValidCharacterDraft,
+  });
+```
+
+`getCharacterDraftStorageKey(worldId)` namespaces the localStorage key so characters for
+different worlds don't interfere with each other. `isValidCharacterDraft` is what makes a
+corrupt saved draft safe to discard instead of crashing the load — see Data Corruption below.
 
 What you get back:
 
 ```typescript
-interface UseCharacterCreationAutoSaveReturn {
-  data: CharacterCreationState | undefined;
-  setData: (newData: CharacterCreationState | undefined) => void;
+interface UseDraftAutoSaveResult<TDraft, TPreview> {
+  data: TDraft | undefined;
+  setData: (newData: TDraft | undefined) => void;
   clearAutoSave: () => void;
+  dismissRecovery: () => void;
   hasRecoveryData: boolean;
-  recoveryPreview: RecoveryDataPreview | undefined;
+  recoveryPreview: TPreview | undefined;
   hasCurrentData: boolean;
   saveStatus: 'idle' | 'saving' | 'saved';
+  isLoaded: boolean;
 }
 ```
 
@@ -28,20 +46,22 @@ interface UseCharacterCreationAutoSaveReturn {
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `data` | `CharacterCreationState \| undefined` | Current character creation data with save metadata |
-| `setData` | `(newData: CharacterCreationState \| undefined) => void` | Function to update character data (triggers auto-save) |
+| `data` | `TDraft \| undefined` | Current character creation data with save metadata |
+| `setData` | `(newData: TDraft \| undefined) => void` | Function to update character data (triggers auto-save) |
 | `clearAutoSave` | `() => void` | Function to clear all auto-save data and reset state |
+| `dismissRecovery` | `() => void` | Function to hide the recovery prompt without clearing the saved draft |
 | `hasRecoveryData` | `boolean` | Whether recovery data was detected on mount |
-| `recoveryPreview` | `RecoveryDataPreview \| undefined` | Analyzed preview data for recovery dialog |
+| `recoveryPreview` | `TPreview \| undefined` | Analyzed preview data for recovery dialog |
 | `hasCurrentData` | `boolean` | Whether current form has meaningful data that would be overwritten |
 | `saveStatus` | `'idle' \| 'saving' \| 'saved'` | Current save operation status for UI feedback |
+| `isLoaded` | `boolean` | Whether the initial restore-from-localStorage pass has finished |
 
 ### Type Definitions
 
-#### `CharacterCreationState`
+#### `CharacterCreationDraft`
 
 ```typescript
-interface CharacterCreationState {
+interface CharacterCreationDraft {
   /** Current wizard step index */
   currentStep: number;
   /** World ID for the character being created */
@@ -57,10 +77,10 @@ interface CharacterCreationState {
 }
 ```
 
-#### `RecoveryDataPreview`
+#### `CharacterDraftRecoveryPreview`
 
 ```typescript
-interface RecoveryDataPreview {
+interface CharacterDraftRecoveryPreview {
   name?: string;
   currentStep?: number;
   lastSaved?: string;
@@ -77,7 +97,13 @@ interface RecoveryDataPreview {
 #### Basic Usage
 
 ```typescript
-import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
+import { useDraftAutoSave } from '@/hooks/useDraftAutoSave';
+import {
+  getCharacterDraftStorageKey,
+  isValidCharacterDraft,
+  analyzeCharacterDraftRecovery,
+  hasCharacterDraftData,
+} from './utils/characterDraft';
 
 function CharacterCreationWizard({ worldId }) {
   const { 
@@ -86,7 +112,12 @@ function CharacterCreationWizard({ worldId }) {
     clearAutoSave, 
     hasRecoveryData, 
     saveStatus 
-  } = useCharacterCreationAutoSave(worldId);
+  } = useDraftAutoSave({
+    storageKey: getCharacterDraftStorageKey(worldId),
+    analyzeRecovery: analyzeCharacterDraftRecovery,
+    hasCurrentData: hasCharacterDraftData,
+    isValidDraft: isValidCharacterDraft,
+  });
 
   // Update character data (automatically saves after 300ms)
   const handleDataChange = (newCharacterData) => {
@@ -117,7 +148,12 @@ function CharacterCreationWizard({ worldId }) {
     recoveryPreview, 
     hasCurrentData,
     clearAutoSave 
-  } = useCharacterCreationAutoSave(worldId);
+  } = useDraftAutoSave({
+    storageKey: getCharacterDraftStorageKey(worldId),
+    analyzeRecovery: analyzeCharacterDraftRecovery,
+    hasCurrentData: hasCharacterDraftData,
+    isValidDraft: isValidCharacterDraft,
+  });
   
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
 
@@ -289,17 +325,22 @@ try {
 
 ### Data Corruption
 
-Corrupted save data keeps the recovery flag set but clears the preview, instead of crashing the load:
+A saved draft that fails to parse, or that parses but fails `isValidCharacterDraft`'s shape
+check, is discarded outright rather than offered for recovery or surfaced as an error:
 
 ```typescript
 try {
-  const parsed = JSON.parse(saved);
+  const parsed: unknown = JSON.parse(saved);
+  if (!isValidDraft(parsed)) {
+    throw new Error('Saved draft does not match the expected shape');
+  }
   // Use parsed data
-} catch (e) {
-  console.error('[AutoSave] Failed to restore', e);
-  // Keep recovery flag true but clear preview data
-  setHasRecoveryData(true);
+} catch (error) {
+  logger.error('Discarding corrupt draft', storageKey, error);
+  localStorage.removeItem(storageKey);
+  setHasRecoveryData(false);
   setRecoveryPreview(undefined);
+  setDataInternal(undefined);
 }
 ```
 
@@ -318,8 +359,8 @@ try {
 
 ## Storage
 
-localStorage only. `useCharacterCreationAutoSave` reads and writes a single per-world key and
-never touches sessionStorage.
+localStorage only. `useDraftAutoSave`, configured with `getCharacterDraftStorageKey`, reads
+and writes a single per-world key and never touches sessionStorage.
 
 ## Testing Considerations
 
@@ -328,15 +369,17 @@ never touches sessionStorage.
 For testing, mock the hook return values:
 
 ```typescript
-jest.mock('@/hooks/useCharacterCreationAutoSave', () => ({
-  useCharacterCreationAutoSave: jest.fn(() => ({
+jest.mock('@/hooks/useDraftAutoSave', () => ({
+  useDraftAutoSave: jest.fn(() => ({
     data: mockCharacterData,
     setData: jest.fn(),
     clearAutoSave: jest.fn(),
+    dismissRecovery: jest.fn(),
     hasRecoveryData: false,
     recoveryPreview: undefined,
     hasCurrentData: false,
-    saveStatus: 'idle'
+    saveStatus: 'idle',
+    isLoaded: true
   }))
 }));
 ```

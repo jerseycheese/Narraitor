@@ -54,7 +54,12 @@ interface RecoveryData {
 import { RecoveryNotification } from '@/components/shared/RecoveryNotification';
 
 function CharacterCreationWizard() {
-  const { hasRecoveryData, recoveryPreview, hasCurrentData } = useCharacterCreationAutoSave(worldId);
+  const { hasRecoveryData, recoveryPreview, hasCurrentData } = useDraftAutoSave({
+    storageKey: getCharacterDraftStorageKey(worldId),
+    analyzeRecovery: analyzeCharacterDraftRecovery,
+    hasCurrentData: hasCharacterDraftData,
+    isValidDraft: isValidCharacterDraft,
+  });
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
 
   useEffect(() => {
@@ -275,7 +280,8 @@ return (
 
 ### With Auto-Save Hook
 
-The component is built to pair with `useCharacterCreationAutoSave`:
+The component is built to pair with `useDraftAutoSave`, configured for character creation
+by `src/components/CharacterCreationWizard/utils/characterDraft.ts`:
 
 ```typescript
 const {
@@ -283,7 +289,12 @@ const {
   recoveryPreview,
   hasCurrentData,
   clearAutoSave
-} = useCharacterCreationAutoSave(worldId);
+} = useDraftAutoSave({
+  storageKey: getCharacterDraftStorageKey(worldId),
+  analyzeRecovery: analyzeCharacterDraftRecovery,
+  hasCurrentData: hasCharacterDraftData,
+  isValidDraft: isValidCharacterDraft,
+});
 
 // Component automatically detects when to show dialog
 useEffect(() => {
