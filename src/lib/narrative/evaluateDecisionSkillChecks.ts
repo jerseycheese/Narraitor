@@ -1,8 +1,7 @@
 // Evaluates a chosen decision option's skill requirements: rolls each skill
 // check, builds the narrative tags that get merged into the next segment,
-// derives an overall decision outcome. Extracted from
-// NarrativeController.generateNextSegment as a pure (no React state) unit;
-// the only side effect is the injected onSkillCheckPerformed callback.
+// and derives an overall decision outcome. The only side effect is the
+// injected onSkillCheckPerformed callback.
 
 import {
   evaluateSkillCheck,
