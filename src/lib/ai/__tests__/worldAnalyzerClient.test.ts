@@ -31,7 +31,10 @@ describe('worldAnalyzerClient', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ description: 'A fantasy world' }),
-      signal: expect.any(AbortSignal),
+      // jsdom (the Jest test environment) has no AbortSignal.timeout, so
+      // aiFetch's timeoutSignal() deliberately falls back to undefined here -
+      // see its JSDoc in src/lib/ai/abortTimeout.ts.
+      signal: undefined,
     });
 
     expect(result).toEqual(mockResponse);

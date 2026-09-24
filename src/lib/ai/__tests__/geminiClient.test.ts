@@ -81,7 +81,10 @@ describe('GeminiClient', () => {
           maxOutputTokens: 2048,
           safetySettings: config.safetySettings,
           thinkingConfig: undefined,
-          abortSignal: expect.any(AbortSignal)
+          // jsdom (the Jest test environment) has no AbortSignal.timeout, so
+          // timeoutSignal() deliberately falls back to undefined here - see
+          // its JSDoc in src/lib/ai/abortTimeout.ts.
+          abortSignal: undefined
         }
       });
       expect(result).toEqual({
@@ -242,7 +245,10 @@ describe('GeminiClient', () => {
           maxOutputTokens: 1024,
           safetySettings: customConfig.safetySettings,
           thinkingConfig: undefined,
-          abortSignal: expect.any(AbortSignal)
+          // jsdom (the Jest test environment) has no AbortSignal.timeout, so
+          // timeoutSignal() deliberately falls back to undefined here - see
+          // its JSDoc in src/lib/ai/abortTimeout.ts.
+          abortSignal: undefined
         }
       });
     });
