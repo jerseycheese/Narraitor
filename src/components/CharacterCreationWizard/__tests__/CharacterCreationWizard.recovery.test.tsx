@@ -3,9 +3,13 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
 
-import type { useCharacterCreationAutoSave as useAutoSaveHook } from '@/hooks/useCharacterCreationAutoSave';
+import type { UseDraftAutoSaveResult } from '@/hooks/useDraftAutoSave';
+import type {
+  CharacterCreationDraft,
+  CharacterDraftRecoveryPreview,
+} from '../utils/characterDraft';
 
-type AutoSaveReturn = ReturnType<typeof useAutoSaveHook>;
+type AutoSaveReturn = UseDraftAutoSaveResult<CharacterCreationDraft, CharacterDraftRecoveryPreview>;
 
 const pauseTour = jest.fn();
 const resumeTour = jest.fn();
@@ -15,6 +19,7 @@ let mockAutoSaveState: AutoSaveReturn = {
   data: undefined,
   setData: jest.fn(),
   clearAutoSave: mockClearAutoSave,
+  dismissRecovery: jest.fn(),
   hasRecoveryData: true,
   recoveryPreview: {
     name: 'Peren Ashford',
@@ -24,6 +29,7 @@ let mockAutoSaveState: AutoSaveReturn = {
   },
   hasCurrentData: false,
   saveStatus: 'idle' as const,
+  isLoaded: true,
 };
 
 jest.mock('next/navigation', () => ({
@@ -46,8 +52,8 @@ jest.mock('@/components/TutorialProvider', () => ({
   }),
 }));
 
-jest.mock('@/hooks/useCharacterCreationAutoSave', () => ({
-  useCharacterCreationAutoSave: () => mockAutoSaveState,
+jest.mock('@/hooks/useDraftAutoSave', () => ({
+  useDraftAutoSave: () => mockAutoSaveState,
 }));
 
 jest.mock('@/hooks/useCharacterPointPools', () => ({
@@ -178,6 +184,7 @@ describe('CharacterCreationWizard recovery modal', () => {
       },
       setData: jest.fn(),
       clearAutoSave: mockClearAutoSave,
+      dismissRecovery: jest.fn(),
       hasRecoveryData: true,
       recoveryPreview: {
         name: 'Peren Ashford',
@@ -187,6 +194,7 @@ describe('CharacterCreationWizard recovery modal', () => {
       },
       hasCurrentData: false,
       saveStatus: 'idle' as const,
+      isLoaded: true,
     };
   });
 

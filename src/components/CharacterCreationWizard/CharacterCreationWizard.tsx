@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { EntityID } from '@/types/common.types';
-import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
+import { useDraftAutoSave } from '@/hooks/useDraftAutoSave';
 import { useCharacterCreationWizard, CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
 import { useCharacterPointPools } from '@/hooks/useCharacterPointPools';
 import { finalizeCharacterCreation } from '@/lib/utils/characterFinalization';
@@ -20,6 +20,13 @@ import { SkillsStep } from './steps/SkillsStep';
 import { BackgroundStep } from './steps/BackgroundStep';
 import { PortraitStep } from './steps/PortraitStep';
 import { normalizeSkillBounds } from './utils/skillAllocation';
+import {
+  getCharacterDraftStorageKey,
+  isValidCharacterDraft,
+  analyzeCharacterDraftRecovery,
+  hasCharacterDraftData,
+  CharacterCreationDraft,
+} from './utils/characterDraft';
 import { useTutorial } from '@/components/TutorialProvider';
 import { tourStepToWizardStep } from '@/lib/tutorial/characterCreationWizardTour';
 import type { WizardValidation } from '@/hooks/useWizardState';
@@ -51,7 +58,13 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const pausedForRecoveryRef = useRef(false);
 
   // Auto-save integration
-  const { data, setData, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
+  const { data, setData, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } =
+    useDraftAutoSave<CharacterCreationDraft, ReturnType<typeof analyzeCharacterDraftRecovery>>({
+      storageKey: getCharacterDraftStorageKey(worldId),
+      analyzeRecovery: analyzeCharacterDraftRecovery,
+      hasCurrentData: hasCharacterDraftData,
+      isValidDraft: isValidCharacterDraft,
+    });
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
 
   React.useEffect(() => {
