@@ -2,8 +2,11 @@
  * Test audit.
  *
  * Lists tests that pass no matter what the code does: duplicates, cases whose
- * every assertion is a mock call-check, single-assertion render checks, and
- * suites whose name promises behavior the body never observes. It is an AUDIT,
+ * every assertion is a mock call-check (or a call-check padded with existence
+ * checks, or the stubbed value asserted straight back), single-assertion render
+ * checks, and suites whose name promises behavior the body never observes. It
+ * also rolls up the local modules mocked across many files, with the tests that
+ * import them unmocked, so a reviewer can find seams no test crosses. It is an AUDIT,
  * not a fix: it writes nothing, deletes nothing, and never fails CI (exit 0).
  *
  * Why this approach (chosen over alternatives):
@@ -32,6 +35,16 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import auditLib from './audit-tests-lib.cjs';
+
+const {
+  MOCK_MATCHER,
+  isMockPlusFiller,
+  isMockEcho,
+  isCallbackContract,
+  promisedCollaboratorMocks,
+  mockedModules,
+} = auditLib;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -84,7 +97,6 @@ const ONLY = /^\s*(?:it|test|describe)\s*\.\s*only\s*\(/;
 
 // Assertion shapes.
 const EXPECT = /\bexpect\s*\(/;
-const MOCK_MATCHER = /\.(toHaveBeenCalled|toHaveBeenCalledWith|toHaveBeenCalledTimes|toHaveBeenLastCalledWith|toHaveBeenNthCalledWith)\b/;
 // A case counts as mock-only on the MATCHER alone. An earlier version also
 // required the subject to look mock-named, which made detection depend on what
 // a variable was called: `expect(notFound).toHaveBeenCalled()` slipped through
@@ -117,6 +129,10 @@ const findings = {
   definedOnly: [],
   mockOnly: [],
   mockOnlyNameMismatch: [],
+  mockOnlyCallbackContract: [],
+  mockPlusFiller: [],
+  mockEcho: [],
+  promisedCollaboratorMocked: [],
   singleRenderAssertion: [],
   noAssertion: [],
 };
@@ -124,6 +140,7 @@ const findings = {
 let totalCases = 0;
 let totalFiles = 0;
 const fileStats = [];
+const fileTexts = [];
 
 // Walk forward from a case's opening line, tracking brace depth, and return
 // every line in its body. Brace counting ignores braces inside strings, which
@@ -164,7 +181,11 @@ function globalMocks() {
 
 function scanFile(file) {
   const rel = path.relative(rootDir, file);
-  const lines = fs.readFileSync(file, 'utf8').split('\n');
+  const source = fs.readFileSync(file, 'utf8');
+  const lines = source.split('\n');
+  fileTexts.push({ rel, text: source });
+  const promised = promisedCollaboratorMocks(rel, source);
+  if (promised.length) findings.promisedCollaboratorMocked.push({ file: rel, mocks: promised });
   const seenNames = new Map();
   let cases = 0;
   // Duplicate names only matter within one describe block: jest's reported name
@@ -263,9 +284,22 @@ function scanFile(file) {
     if (expects.every((l) => MOCK_MATCHER.test(l))) {
       const entry = { at, name, assertions: expects.length };
       findings.mockOnly.push(entry);
-      if (PROMISE_WORDS.test(name)) {
+      if (isCallbackContract(expects)) {
+        findings.mockOnlyCallbackContract.push(entry);
+      } else if (PROMISE_WORDS.test(name)) {
         findings.mockOnlyNameMismatch.push(entry);
       }
+      return;
+    }
+
+    // Mock-only with existence-only padding, and cases that assert the stub
+    // they set up. Both can pass whatever the code under test does.
+    if (isMockPlusFiller(expects)) {
+      findings.mockPlusFiller.push({ at, name });
+      return;
+    }
+    if (isMockEcho(text, expects)) {
+      findings.mockEcho.push({ at, name });
       return;
     }
 
@@ -312,10 +346,24 @@ function main() {
     .filter((f) => f.count >= 3 && f.count / f.cases >= 0.5)
     .sort((a, b) => b.count - a.count);
 
+  // Seam triage context, not findings: local modules mocked across several
+  // files, with the tests that import them unmocked. Zero means no test drives
+  // the module directly (it may still run transitively). Any real importers
+  // still need their fixtures checked against production-sized data.
+  const mocked = mockedModules(fileTexts, 3);
+
   if (asJson) {
     console.log(
       JSON.stringify(
-        { scope: scopeLabel, totalFiles, totalCases, globalMocks: mocks, findings, renderHeavy },
+        {
+          scope: scopeLabel,
+          totalFiles,
+          totalCases,
+          globalMocks: mocks,
+          findings,
+          renderHeavy,
+          mockedModules: mocked,
+        },
         null,
         2,
       ),
@@ -350,9 +398,17 @@ function main() {
 
   console.log('\n==== TIER 2: needs a human call - rewrite or delete ====');
   console.log('Name promises behavior the body never observes. Strongest signal here:');
+  section('Integration/persistence files that mock local modules', findings.promisedCollaboratorMocked, (f) => `${f.file}  mocks ${f.mocks.join(', ')}`);
   section('Mock-only, and the name claims real behavior', findings.mockOnlyNameMismatch, (f) => `${f.at}  "${f.name}"  (${f.assertions} assertions, all call-checks)`);
   section('Mock-only cases (all assertions are call-checks)', findings.mockOnly, (f) => `${f.at}  "${f.name}"  (${f.assertions})`);
+  section('  of which callback-prop or router contracts (usually fine)', findings.mockOnlyCallbackContract, (f) => `${f.at}  "${f.name}"`);
+  section('Mock plus filler (call-checks padded with existence checks)', findings.mockPlusFiller, (f) => `${f.at}  "${f.name}"`);
+  section('Mock echo (asserts the stubbed value straight back)', findings.mockEcho, (f) => `${f.at}  "${f.name}"`);
   section('Files that are mostly single-assertion render checks', renderHeavy, (f) => `${f.file}  ${f.count}/${f.cases} cases`);
+
+  console.log('\n==== SEAM TRIAGE: local modules mocked in 3+ files ====');
+  console.log('Zero = no test imports it unmocked; it may still run transitively. Check the fixtures either way.');
+  section('Mocked modules, fewest real importers first', mocked, (m) => `${m.module}  mocked in ${m.mockedIn}, imported unmocked in ${m.realTests.length}`);
 
   const tier1 =
     findings.duplicateNames.length +
@@ -362,7 +418,8 @@ function main() {
     findings.definedOnly.length +
     findings.noAssertion.length;
 
-  console.log(`\n==== TOTAL: ${tier1} tier-1, ${findings.mockOnly.length} mock-only (${findings.mockOnlyNameMismatch.length} with a mismatched name), ${findings.singleRenderAssertion.length} single-assertion render checks ====`);
+  const unexercised = mocked.filter((m) => m.realTests.length === 0).length;
+  console.log(`\n==== TOTAL: ${tier1} tier-1, ${findings.mockOnly.length} mock-only (${findings.mockOnlyNameMismatch.length} with a mismatched name, ${findings.mockOnlyCallbackContract.length} callback contracts), ${findings.mockPlusFiller.length} mock plus filler, ${findings.mockEcho.length} mock echo, ${findings.promisedCollaboratorMocked.length} integration files mocking locals, ${unexercised}/${mocked.length} heavily mocked modules no test imports unmocked, ${findings.singleRenderAssertion.length} single-assertion render checks ====`);
   console.log(
     'NOTE: every case above is a CANDIDATE. Mock-only cases usually mark a ' +
       'coverage gap that wants a REWRITE, not a deletion. DO NOT auto-delete.',
