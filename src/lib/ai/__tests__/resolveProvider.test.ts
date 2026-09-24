@@ -157,9 +157,24 @@ describe('resolveProvider', () => {
     expect(resolveProvider(requestWith({}))).toEqual({ ok: false, reason: 'NO_KEY' });
   });
 
-  it('rejects a provider type we have no adapter for', () => {
+  it('resolves the whole descriptor for a configured Claude provider, endpoint pinned like Gemini', () => {
     const resolution = resolveProvider(
-      requestWith({ [PROVIDER_API_KEY_HEADER]: 'byo-key', [PROVIDER_TYPE_HEADER]: 'claude' })
+      requestWith({
+        [PROVIDER_API_KEY_HEADER]: 'byo-key',
+        [PROVIDER_TYPE_HEADER]: 'claude',
+        [PROVIDER_MODEL_HEADER]: 'claude-sonnet-5',
+      })
+    );
+
+    expect(resolution).toEqual({
+      ok: true,
+      descriptor: { type: 'claude', endpoint: '', model: 'claude-sonnet-5', apiKey: 'byo-key' },
+    });
+  });
+
+  it('rejects a provider type outside the known set', () => {
+    const resolution = resolveProvider(
+      requestWith({ [PROVIDER_API_KEY_HEADER]: 'byo-key', [PROVIDER_TYPE_HEADER]: 'not-a-real-provider' })
     );
 
     expect(resolution).toEqual({ ok: false, reason: 'UNSUPPORTED_PROVIDER' });

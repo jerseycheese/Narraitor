@@ -81,6 +81,7 @@ describe('PROVIDER_PRESETS', () => {
 
   it('covers every service the multi-provider work set out to list', () => {
     expect(PROVIDER_PRESETS.map((preset) => preset.id).sort()).toEqual([
+      'claude',
       'deepseek',
       'gemini',
       'groq',

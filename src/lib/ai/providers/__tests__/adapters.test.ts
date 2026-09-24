@@ -1,5 +1,6 @@
 import { geminiAdapter } from '../gemini/adapter';
 import { openAICompatibleAdapter } from '../openai-compatible/adapter';
+import { claudeAdapter } from '../claude/adapter';
 import type { ProviderDescriptor, TextGenerationSpec } from '../types';
 
 const GEMINI: ProviderDescriptor = {
@@ -13,6 +14,13 @@ const OPENAI: ProviderDescriptor = {
   type: 'openai-compatible',
   endpoint: 'https://openrouter.ai/api/v1/chat/completions',
   model: 'openai/gpt-4o',
+  apiKey: 'player-key',
+};
+
+const CLAUDE: ProviderDescriptor = {
+  type: 'claude',
+  endpoint: '',
+  model: 'claude-sonnet-5',
   apiKey: 'player-key',
 };
 
@@ -261,5 +269,125 @@ describe('openAICompatibleAdapter', () => {
       promptTokens: 30,
       completionTokens: 12,
     });
+  });
+});
+
+describe('claudeAdapter', () => {
+  it('always posts to the pinned Anthropic endpoint, ignoring a descriptor endpoint', () => {
+    const spoofed = { ...CLAUDE, endpoint: 'https://attacker.test/collect' };
+
+    expect(claudeAdapter.buildUrl(spoofed, SPEC)).toBe('https://api.anthropic.com/v1/messages');
+  });
+
+  it('sends the key as a header, never in the URL', () => {
+    expect(claudeAdapter.buildHeaders(CLAUDE)['x-api-key']).toBe('player-key');
+    expect(claudeAdapter.buildHeaders(CLAUDE)['anthropic-version']).toBe('2023-06-01');
+    expect(claudeAdapter.buildUrl(CLAUDE, SPEC)).not.toContain('player-key');
+  });
+
+  it('carries the content rating as system guidance, since there is no safety setting to send', () => {
+    const body = claudeAdapter.buildBody(CLAUDE, SPEC) as {
+      model: string;
+      max_tokens: number;
+      system: string;
+      messages: Array<{ role: string; content: string }>;
+      stream?: boolean;
+    };
+
+    expect(body.model).toBe('claude-sonnet-5');
+    expect(body.max_tokens).toBe(2048);
+    expect(body.system).toContain('adult audience');
+    expect(body.messages).toEqual([{ role: 'user', content: 'Continue the story.' }]);
+    expect(body.stream).toBeUndefined();
+  });
+
+  it('uses custom safety and system prompts in the system field', () => {
+    const body = claudeAdapter.buildBody(
+      {
+        ...CLAUDE,
+        customSafetyPromptOverride: 'Keep violence implied.',
+        customSystemPromptOverride: 'Write in clipped sentences.',
+      },
+      SPEC
+    ) as { system: string };
+
+    expect(body.system).toBe('Keep violence implied.\n\nWrite in clipped sentences.');
+    expect(body.system).not.toContain('adult audience');
+  });
+
+  it("uses the player's advanced-settings overrides in place of the spec defaults", () => {
+    const body = claudeAdapter.buildBody(
+      { ...CLAUDE, temperatureOverride: 1.5, topPOverride: 0.8, maxTokensOverride: 512 },
+      SPEC
+    ) as Record<string, unknown>;
+
+    expect(body.temperature).toBe(1.5);
+    expect(body.top_p).toBe(0.8);
+    expect(body.max_tokens).toBe(512);
+  });
+
+  it('omits the sampling controls entirely for a service that fixes them', () => {
+    const body = claudeAdapter.buildBody({ ...CLAUDE, hasFixedSamplingControls: true }, SPEC) as Record<
+      string,
+      unknown
+    >;
+
+    expect(body).not.toHaveProperty('temperature');
+    expect(body).not.toHaveProperty('top_p');
+  });
+
+  it('reads content and usage out of a native response', () => {
+    const parsed = claudeAdapter.parseTextResponse({
+      content: [{ type: 'text', text: 'A door opens.' }],
+      stop_reason: 'end_turn',
+      usage: { input_tokens: 10, output_tokens: 5 },
+    });
+
+    expect(parsed).toEqual({
+      ok: true,
+      result: { content: 'A door opens.', finishReason: 'STOP', promptTokens: 10, completionTokens: 5 },
+    });
+  });
+
+  it('normalizes max_tokens onto the shared finish-reason vocabulary', () => {
+    const parsed = claudeAdapter.parseTextResponse({
+      content: [{ type: 'text', text: 'A door opens.' }],
+      stop_reason: 'max_tokens',
+    });
+
+    expect(parsed).toMatchObject({ ok: true, result: { finishReason: 'MAX_TOKENS' } });
+  });
+
+  it('reports a response with no content as malformed', () => {
+    expect(claudeAdapter.parseTextResponse({})).toEqual({ ok: false, failure: 'malformed' });
+  });
+
+  it('names an empty refusal as a content block, not a blank turn', () => {
+    const parsed = claudeAdapter.parseTextResponse({
+      content: [],
+      stop_reason: 'refusal',
+    });
+
+    expect(parsed).toEqual({ ok: false, failure: 'moderation' });
+  });
+
+  it('reads a streaming delta out of the Claude frame shape', () => {
+    expect(claudeAdapter.parseStreamFrame({ type: 'content_block_delta', delta: { type: 'text_delta', text: 'Once upon' } })).toEqual({
+      text: 'Once upon',
+    });
+  });
+
+  it('reads finish reason and completion tokens off the message_delta frame', () => {
+    expect(
+      claudeAdapter.parseStreamFrame({
+        type: 'message_delta',
+        delta: { stop_reason: 'end_turn' },
+        usage: { output_tokens: 12 },
+      })
+    ).toEqual({ finishReason: 'STOP', completionTokens: 12 });
+  });
+
+  it('ignores frame types that carry nothing the narrative stream needs', () => {
+    expect(claudeAdapter.parseStreamFrame({ type: 'content_block_stop' })).toBeNull();
   });
 });

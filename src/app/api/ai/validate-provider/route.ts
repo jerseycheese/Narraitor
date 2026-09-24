@@ -5,13 +5,16 @@ import { withAIRoute, makeGeminiRequest } from '@/utils/apiHelpers';
 import { DEFAULT_TEXT_MODEL, getSafetySettings } from '@/lib/ai/config';
 import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
 import { getProviderAdapter } from '@/lib/ai/providers/adapterRegistry';
+import { claudeAdapter } from '@/lib/ai/providers/claude/adapter';
 import { isSafeProviderEndpoint } from '@/lib/ai/providers/endpointGuard';
 import {
+  getPresetById,
   presetHeadersForEndpoint,
   presetMaxOutputTokensParamForEndpoint,
 } from '@/lib/ai/presets';
 import { sendProviderRequest } from '@/lib/ai/providers/core/request';
 import { supportsImages } from '@/lib/ai/providers/capabilities';
+import type { ProviderDescriptor, TextGenerationSpec } from '@/lib/ai/providers/types';
 import type { ProviderType } from '@/types/provider.types';
 
 /**
@@ -41,6 +44,20 @@ const PING_TIMEOUT_MS = 10000;
  * not the text, and a handful of tokens costs nothing.
  */
 const PING_MAX_OUTPUT_TOKENS = 16;
+
+/**
+ * A spec good enough to hand to claudeAdapter.buildUrl, which ignores it —
+ * Claude's endpoint doesn't vary with streaming or content rating the way its
+ * body does. Not reused for the body itself: the ping's body is its own
+ * minimal shape below, same as every other provider's ping.
+ */
+const PING_SPEC: TextGenerationSpec = {
+  prompt: 'ping',
+  temperature: 0,
+  maxTokens: PING_MAX_OUTPUT_TOKENS,
+  contentRating: null,
+  stream: false,
+};
 
 type ValidationError =
   | 'NO_KEY'
@@ -77,9 +94,9 @@ export const POST = withAIRoute(async (request: NextRequest) => {
     return fail('UNSUPPORTED_PROVIDER');
   }
 
-  return type === 'gemini'
-    ? validateGemini(key, body.model)
-    : validateOpenAICompatible(key, type, body.endpoint, body.model);
+  if (type === 'gemini') return validateGemini(key, body.model);
+  if (type === 'claude') return validateClaude(key, body.model);
+  return validateOpenAICompatible(key, type, body.endpoint, body.model);
 });
 
 /**
@@ -112,6 +129,37 @@ async function validateGemini(key: string, requestedModel?: string) {
     }
 
     return fail(classifyGeminiError(response.status, await readGeminiError(response)));
+  } catch {
+    return fail('NETWORK');
+  }
+}
+
+/**
+ * Claude's ping. Like Gemini, its endpoint is pinned rather than
+ * player-supplied (see claudeAdapter.playerSuppliedEndpoint), so this needs
+ * no endpoint guard — the adapter itself builds the URL and auth headers,
+ * which keeps this ping's wire shape from drifting out of sync with the
+ * generation path the way a hand-rolled OpenAI-shaped ping would.
+ */
+async function validateClaude(key: string, requestedModel?: string) {
+  const model = requestedModel || getPresetById('claude')?.defaultModel;
+  if (!model) return fail('INVALID_MODEL');
+
+  const descriptor: ProviderDescriptor = { type: 'claude', endpoint: '', model, apiKey: key };
+
+  try {
+    const response = await sendProviderRequest(
+      claudeAdapter.buildUrl(descriptor, PING_SPEC),
+      claudeAdapter.buildHeaders(descriptor),
+      { model, max_tokens: PING_MAX_OUTPUT_TOKENS, messages: [{ role: 'user', content: 'ping' }] },
+      { timeoutMs: PING_TIMEOUT_MS, playerSuppliedEndpoint: false }
+    );
+
+    if (response.ok) {
+      return NextResponse.json({ valid: true, capabilities: toWireCapabilities('claude'), model });
+    }
+
+    return fail(classifyClaudeError(response.status, await readErrorMessage(response)));
   } catch {
     return fail('NETWORK');
   }
@@ -240,6 +288,20 @@ function classifyGeminiError(httpStatus: number, upstream: UpstreamError): Valid
 function classifyOpenAICompatibleError(httpStatus: number, message: string): ValidationError {
   if (httpStatus === 429) return 'RATE_LIMITED';
   if (httpStatus === 401 || httpStatus === 403 || message.includes('api key')) return 'INVALID_KEY';
+  if (httpStatus === 404 || message.includes('model')) return 'INVALID_MODEL';
+  return 'VALIDATION_FAILED';
+}
+
+/**
+ * Anthropic's error shape is `{ error: { type, message } }`, read the same way
+ * readErrorMessage already reads the OpenAI-compatible one. A bad key is a
+ * 401 `authentication_error`; an unknown model is a 404 `not_found_error`.
+ */
+function classifyClaudeError(httpStatus: number, message: string): ValidationError {
+  if (httpStatus === 429) return 'RATE_LIMITED';
+  if (httpStatus === 401 || message.includes('api key') || message.includes('authentication')) {
+    return 'INVALID_KEY';
+  }
   if (httpStatus === 404 || message.includes('model')) return 'INVALID_MODEL';
   return 'VALIDATION_FAILED';
 }

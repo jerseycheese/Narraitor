@@ -3,6 +3,7 @@
 import type { AIClient } from '../types';
 import type { ProviderDescriptor } from './types';
 import { OpenAICompatibleClient } from './openai-compatible/client';
+import { ClaudeClient } from './claude/client';
 import { GeminiClient } from '../geminiClient';
 import { getAIConfig, getDefaultConfig } from '../config';
 import { applyGeminiPromptOverrides } from './promptOverrides';
@@ -43,5 +44,10 @@ export function createProviderClient(descriptor: ProviderDescriptor): AIClient {
   }
 
   const { maxRetries, timeout } = getAIConfig();
+
+  if (descriptor.type === 'claude') {
+    return new ClaudeClient(descriptor, { maxRetries, timeout });
+  }
+
   return new OpenAICompatibleClient(descriptor, { maxRetries, timeout });
 }
