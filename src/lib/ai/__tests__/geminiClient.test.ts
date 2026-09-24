@@ -79,7 +79,9 @@ describe('GeminiClient', () => {
           topP: 1.0,
           topK: 40,
           maxOutputTokens: 2048,
-          safetySettings: config.safetySettings
+          safetySettings: config.safetySettings,
+          thinkingConfig: undefined,
+          abortSignal: expect.any(AbortSignal)
         }
       });
       expect(result).toEqual({
@@ -238,7 +240,9 @@ describe('GeminiClient', () => {
           topP: 0.8,
           topK: 30,
           maxOutputTokens: 1024,
-          safetySettings: customConfig.safetySettings
+          safetySettings: customConfig.safetySettings,
+          thinkingConfig: undefined,
+          abortSignal: expect.any(AbortSignal)
         }
       });
     });
