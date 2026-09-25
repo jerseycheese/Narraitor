@@ -529,6 +529,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           generationError={generationError}
           onRetryGeneration={handleRetryGeneration}
           shortcutsSuspended={isModalOpen}
+          hideChoices={Boolean(showEndingSuggestion && endingSuggestionReason)}
         />
       </ManuscriptDecisionBlock>
 
