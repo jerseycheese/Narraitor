@@ -109,4 +109,36 @@ describe('parseNarrativeResponse debris guard', () => {
       'Panic claws at your throat as the shadow lunges forward.'
     );
   });
+
+  it('stops cutting at the closing quote of content instead of sweeping trailing metadata into prose', () => {
+    const raw =
+      'content: "Panic claws at your throat as the shadow lunges forward. You have to move.", "type": "action", "metadata": {"characterIds": [], "itemsLost": [{"name": "pocketknife", "lossReason": "stolen"}], "mood": "tense, desperate", "location": "Camp Crystal Lake woods", "tags": ["combat", "escape", "darkness"], "majorEvent": "Player jabbed the creature in its eye and broke free of its grip"}';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'Panic claws at your throat as the shadow lunges forward. You have to move.'
+    );
+    expect(parsed.segmentType).toBe('action');
+    expect(parsed.actualContent).not.toContain('metadata');
+    expect(parsed.actualContent).not.toContain('majorEvent');
+  });
+
+  it('handles escaped quotes inside prose without cutting early', () => {
+    const raw =
+      'content: "She whispered, \\"Run!\\", then paused. You have to move.", "type": "action", "metadata": {"mood": "tense"}';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'She whispered, \\"Run!\\", then paused. You have to move.'
+    );
+    expect(parsed.segmentType).toBe('action');
+  });
+
+  it('cuts before trailing metadata even when type is not present', () => {
+    const raw =
+      'content: "You made it to the clearing.", "metadata": {"location": "Clearing"}';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe('You made it to the clearing.');
+  });
 });

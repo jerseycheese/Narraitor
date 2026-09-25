@@ -44,6 +44,27 @@ const isJsonDebris = (text: string): boolean => {
 const FLATTENED_FIELD_PATTERN =
   /(?:^|\s)(?:metadata\.\w+\s*[:=]|content\s*[:=]\s*")/;
 
+const SCHEMA_KEY_BOUNDARY_PATTERN =
+  /^\s*,\s*["']?(?:type|metadata)(?:["']|\.\w+)?\s*[:=]/i;
+
+const findContentClosingQuoteIndex = (text: string): number => {
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === '"') {
+      let backslashes = 0;
+      for (let j = i - 1; j >= 0 && text[j] === '\\'; j--) {
+        backslashes++;
+      }
+      if (
+        backslashes % 2 === 0 &&
+        SCHEMA_KEY_BOUNDARY_PATTERN.test(text.slice(i + 1))
+      ) {
+        return i;
+      }
+    }
+  }
+  return text.lastIndexOf('"');
+};
+
 const extractFlattenedFields = (
   raw: string
 ): { content: string; type?: string } | null => {
@@ -53,14 +74,16 @@ const extractFlattenedFields = (
   if (!contentMatch) return null;
 
   const afterMarker = raw.slice(contentMatch.index! + contentMatch[0].length);
-  const lastQuoteIndex = afterMarker.lastIndexOf('"');
-  if (lastQuoteIndex === -1) return null;
+  const closingQuoteIndex = findContentClosingQuoteIndex(afterMarker);
+  if (closingQuoteIndex === -1) return null;
 
-  const content = afterMarker.slice(0, lastQuoteIndex);
+  const content = afterMarker.slice(0, closingQuoteIndex);
   if (isJsonDebris(content)) return null;
 
-  const trailing = afterMarker.slice(lastQuoteIndex + 1);
-  const typeMatch = trailing.match(/(?:^|\s)type\s*[:=]\s*["']?(\w+)["']?/i);
+  const trailing = afterMarker.slice(closingQuoteIndex + 1);
+  const typeMatch = trailing.match(
+    /(?:^|[\s,])["']?type["']?\s*[:=]\s*["']?(\w+)["']?/i
+  );
   const rawType = typeMatch ? typeMatch[1].toLowerCase() : undefined;
   const type =
     rawType && VALID_SEGMENT_TYPES.includes(rawType) ? rawType : undefined;
