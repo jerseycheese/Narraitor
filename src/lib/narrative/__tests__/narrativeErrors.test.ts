@@ -2,7 +2,7 @@
  * Tests for narrative-styled error copy (Issue #201)
  */
 
-import { getNarrativeError } from '../narrativeErrors';
+import { getNarrativeError, PARTIAL_RECONCILIATION_ERROR } from '../narrativeErrors';
 
 // Jargon that must never reach the player in narrative copy.
 const JARGON = [/\bAI\b/, /network/i, /\b429\b/, /timeout/i, /\bAPI\b/, /unauthorized/i, /HTTP/i];
@@ -50,19 +50,46 @@ describe('getNarrativeError', () => {
     assertNoJargon(result.suggestion ?? '');
   });
 
-  it('frames validation errors as something that did not fit the story', () => {
+  it('frames validation errors as something that did not fit the story and marks them retryable', () => {
     const result = getNarrativeError(new Error('invalid input data'));
     expect(result.title).toBe('That didn\'t fit the story');
-    expect(result.retryable).toBe(false);
+    expect(result.retryable).toBe(true);
     assertNoJargon(result.message);
+    assertNoJargon(result.suggestion ?? '');
   });
 
-  it('gives unknown errors a gentle narrative fallback', () => {
+  it('gives unknown errors a gentle narrative fallback with retry', () => {
     const result = getNarrativeError(new Error('something exploded internally'));
     expect(result.title).toBe('The story stumbled');
     expect(result.retryLabel).toBe('Continue the story');
+    expect(result.retryable).toBe(true);
     assertNoJargon(result.message);
     assertNoJargon(result.suggestion ?? '');
+  });
+
+  it('marks malformed API response errors as retryable (#2169)', () => {
+    const result = getNarrativeError(new Error('Service error: malformed API response'));
+    expect(result.retryable).toBe(true);
+    expect(result.retryLabel).toBe('Continue the story');
+    assertNoJargon(result.title);
+    assertNoJargon(result.message);
+    assertNoJargon(result.suggestion ?? '');
+  });
+
+  it('marks plain 500 and 503 errors as retryable (#2169)', () => {
+    const error500 = getNarrativeError(new Error('500 Internal Server Error'));
+    expect(error500.retryable).toBe(true);
+    expect(error500.retryLabel).toBe('Continue the story');
+    assertNoJargon(error500.message);
+
+    const error503 = getNarrativeError('503 Service Unavailable');
+    expect(error503.retryable).toBe(true);
+    expect(error503.retryLabel).toBe('Continue the story');
+    assertNoJargon(error503.message);
+  });
+
+  it('leaves PARTIAL_RECONCILIATION_ERROR non-retryable (#2169)', () => {
+    expect(PARTIAL_RECONCILIATION_ERROR.retryable).toBe(false);
   });
 
   it('accepts a raw string and still returns clean narrative copy', () => {
