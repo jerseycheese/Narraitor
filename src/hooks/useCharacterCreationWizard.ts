@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
 import {
   Validator,
@@ -115,16 +115,21 @@ export function useCharacterCreationWizard({
     };
   }, [worldId, world]);
 
+  const handleStepValidation = useCallback(
+    (stepIndex: number, data: CharacterCreationData) => {
+      const validator = stepValidators[stepIndex];
+      return validator ? validator(data) : { valid: true, errors: [], touched: true };
+    },
+    [stepValidators]
+  );
+
   // Wizard state management
   const wizard = useWizardState<CharacterCreationData>({
     initialData,
     initialStep,
     steps,
     validateOnUpdate: false,
-    onStepValidation: (stepIndex, data) => {
-      const validator = stepValidators[stepIndex];
-      return validator ? validator(data) : { valid: true, errors: [], touched: true };
-    },
+    onStepValidation: handleStepValidation,
   });
 
   return {

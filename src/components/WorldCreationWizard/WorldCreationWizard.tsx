@@ -177,16 +177,12 @@ export default function WorldCreationWizard({
     }
   }, [showRecoveryModal, isTourActive, pauseTour, resumeTour]);
 
-  const handleDataChange = useCallback(
-    (newData: WorldCreationData) => {
-      if (isAutoSaveLoaded && !hasRecoveryData && !showRecoveryModal) {
-        setAutoSaveData({
-          currentStep: wizardRef.current?.state.currentStep ?? 0,
-          worldData: newData,
-        });
-      }
+  const handleStepValidation = useCallback(
+    (stepIndex: number, data: WorldCreationData) => {
+      const validator = stepValidators[stepIndex];
+      return validator ? validator(data) : { valid: true, errors: [], touched: true };
     },
-    [setAutoSaveData, isAutoSaveLoaded, hasRecoveryData, showRecoveryModal]
+    [stepValidators]
   );
 
   // Wizard state management
@@ -194,23 +190,32 @@ export default function WorldCreationWizard({
     initialData: initialWorldData,
     initialStep,
     steps: WIZARD_STEPS,
-    onStepValidation: (stepIndex, data) => {
-      const validator = stepValidators[stepIndex];
-      return validator ? validator(data) : { valid: true, errors: [], touched: true };
-    },
-    onDataChange: handleDataChange,
+    onStepValidation: handleStepValidation,
   });
 
-  const wizardRef = React.useRef(wizard);
-  wizardRef.current = wizard;
+  const prevAutoSaveRef = React.useRef<{ step: number; data: WorldCreationData } | null>(null);
 
   React.useEffect(() => {
-    if (isAutoSaveLoaded && wizard.state.data && !hasRecoveryData && !showRecoveryModal) {
-      setAutoSaveData({
-        currentStep: wizard.state.currentStep,
-        worldData: wizard.state.data,
-      });
+    if (!isAutoSaveLoaded || !wizard.state.data || hasRecoveryData || showRecoveryModal) {
+      return;
     }
+
+    if (
+      prevAutoSaveRef.current?.step === wizard.state.currentStep &&
+      prevAutoSaveRef.current?.data === wizard.state.data
+    ) {
+      return;
+    }
+
+    prevAutoSaveRef.current = {
+      step: wizard.state.currentStep,
+      data: wizard.state.data,
+    };
+
+    setAutoSaveData({
+      currentStep: wizard.state.currentStep,
+      worldData: wizard.state.data,
+    });
   }, [isAutoSaveLoaded, wizard.state.currentStep, wizard.state.data, hasRecoveryData, showRecoveryModal, setAutoSaveData]);
 
   const handleRecoverProgress = useCallback(() => {
@@ -222,7 +227,7 @@ export default function WorldCreationWizard({
       dismissRecovery();
     }
     setShowRecoveryModal(false);
-  }, [autoSaveData, wizard, dismissRecovery]);
+  }, [autoSaveData, wizard.reset, dismissRecovery]);
 
   const handleDismissRecovery = useCallback(() => {
     clearAutoSave();
@@ -259,7 +264,7 @@ export default function WorldCreationWizard({
     if (targetWizardStep !== undefined && targetWizardStep !== wizard.state.currentStep) {
       wizard.goToStep(targetWizardStep);
     }
-  }, [stepIndex, isTourActive, isPaused, showRecoveryModal, currentTour, wizard]);
+  }, [stepIndex, isTourActive, isPaused, showRecoveryModal, currentTour, wizard.state.currentStep, wizard.goToStep]);
 
   const shouldAutoStartTour = useMemo(() => {
     if (worldCreationProgress.skipped) return false;
@@ -353,7 +358,14 @@ export default function WorldCreationWizard({
     } finally {
       wizard.setProcessing(false);
     }
-  }, [wizard, hasConfiguredKey]);
+  }, [
+    wizard.state.data.description,
+    wizard.setError,
+    wizard.setProcessing,
+    wizard.clearError,
+    wizard.updateData,
+    hasConfiguredKey,
+  ]);
 
   const clearAISuggestions = useCallback(() => {
     wizard.updateData({
@@ -363,7 +375,7 @@ export default function WorldCreationWizard({
       // Note: Don't clear attributes/skills here - let the step components
       // preserve custom attributes/skills that the user manually created
     });
-  }, [wizard]);
+  }, [wizard.updateData]);
 
   const handleNext = useCallback(async () => {
     // Auto-generate attribute/skill suggestions when leaving the Description step (step 1)
@@ -372,7 +384,12 @@ export default function WorldCreationWizard({
     }
 
     wizard.goNext();
-  }, [wizard, generateAISuggestions]);
+  }, [
+    wizard.state.currentStep,
+    wizard.state.data.aiSuggestionsGenerated,
+    wizard.goNext,
+    generateAISuggestions,
+  ]);
 
   const getDefaultSuggestions = () => ({
     attributes: [
@@ -389,7 +406,7 @@ export default function WorldCreationWizard({
 
   const handleBack = useCallback(() => {
     wizard.goBack();
-  }, [wizard]);
+  }, [wizard.goBack]);
 
   const handleCancel = useCallback(() => {
     // Check if user has made meaningful changes
@@ -490,11 +507,17 @@ export default function WorldCreationWizard({
       wizard.updateData({ createdWorldId: worldId });
       finishWizard(worldId);
     }
-  }, [wizard, createWorld, finishWizard, clearAutoSave]);
+  }, [
+    wizard.state.data,
+    wizard.updateData,
+    createWorld,
+    finishWizard,
+    clearAutoSave,
+  ]);
 
   const updateWorldData = useCallback((updates: Partial<World>) => {
     wizard.updateData(updates);
-  }, [wizard]);
+  }, [wizard.updateData]);
 
   const stepProps = {
     worldData: wizard.state.data,

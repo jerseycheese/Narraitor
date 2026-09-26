@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 
 // In-memory step/data/validation state only. If you also want localStorage
 // persistence, a submit lifecycle, and cancel-routing, use `useWizardFlow`
@@ -74,6 +74,15 @@ export function useWizardState<TData = unknown>({
     errors: {},
   });
 
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
+  const onStepValidationRef = useRef(onStepValidation);
+  onStepValidationRef.current = onStepValidation;
+
+  const onDataChangeRef = useRef(onDataChange);
+  onDataChangeRef.current = onDataChange;
+
   // Memoized step config
   const currentStepConfig = useMemo(() => {
     return steps[state.currentStep] || steps[0];
@@ -94,123 +103,143 @@ export function useWizardState<TData = unknown>({
 
   // Actions
   const updateData = useCallback((updates: Partial<TData>) => {
-    setState(prev => {
-      const newData = { ...prev.data, ...updates };
-      
-      // Trigger validation if handler provided
-      let newValidation = prev.validation;
-      if (onStepValidation && validateOnUpdate) {
-        const validation = onStepValidation(prev.currentStep, newData);
-        newValidation = {
-          ...prev.validation,
-          [prev.currentStep]: validation,
-        };
-      }
+    const prevState = stateRef.current;
+    const newData = { ...prevState.data, ...updates };
 
-      const newState = {
-        ...prev,
-        data: newData,
-        validation: newValidation,
+    // Trigger validation if handler provided
+    let newValidation = prevState.validation;
+    if (onStepValidationRef.current && validateOnUpdate) {
+      const validation = onStepValidationRef.current(prevState.currentStep, newData);
+      newValidation = {
+        ...prevState.validation,
+        [prevState.currentStep]: validation,
       };
+    }
 
-      // Call data change handler
-      if (onDataChange) {
-        onDataChange(newData);
-      }
+    const nextState: WizardState<TData> = {
+      ...prevState,
+      data: newData,
+      validation: newValidation,
+    };
 
-      return newState;
-    });
-  }, [onStepValidation, validateOnUpdate, onDataChange]);
+    stateRef.current = nextState;
+    setState(nextState);
+
+    // Call data change handler outside of the setState updater
+    if (onDataChangeRef.current) {
+      onDataChangeRef.current(newData);
+    }
+  }, [validateOnUpdate]);
 
   const goNext = useCallback(() => {
-    setState(prev => {
-      // Re-validate current step with current data before navigating
-      let currentStepValid = true;
-      let validation: WizardValidation | undefined;
-      if (onStepValidation) {
-        validation = onStepValidation(prev.currentStep, prev.data);
-        currentStepValid = validation.valid;
+    const prev = stateRef.current;
+    // Re-validate current step with current data before navigating
+    let currentStepValid = true;
+    let validation: WizardValidation | undefined;
+    if (onStepValidationRef.current) {
+      validation = onStepValidationRef.current(prev.currentStep, prev.data);
+      currentStepValid = validation.valid;
+    }
+    
+    // Only proceed if current step is valid and not processing
+    if (!currentStepValid || prev.isProcessing) {
+      if (validation) {
+        const nextState = {
+          ...prev,
+          validation: {
+            ...prev.validation,
+            [prev.currentStep]: validation,
+          },
+        };
+        stateRef.current = nextState;
+        setState(nextState);
       }
-      
-      // Only proceed if current step is valid and not processing
-      if (!currentStepValid || prev.isProcessing) {
-        return validation
-          ? {
-              ...prev,
-              validation: {
-                ...prev.validation,
-                [prev.currentStep]: validation,
-              },
-            }
-          : prev;
-      }
-      
-      const nextStep = Math.min(prev.currentStep + 1, steps.length - 1);
-      if (nextStep === prev.currentStep) {
-        return prev; // Already at last step
-      }
-      
-      return {
-        ...prev,
-        currentStep: nextStep,
-      };
-    });
-  }, [onStepValidation, steps.length]);
+      return;
+    }
+    
+    const nextStep = Math.min(prev.currentStep + 1, steps.length - 1);
+    if (nextStep === prev.currentStep) {
+      return; // Already at last step
+    }
+    
+    const nextState = {
+      ...prev,
+      currentStep: nextStep,
+    };
+    stateRef.current = nextState;
+    setState(nextState);
+  }, [steps.length]);
 
   const goBack = useCallback(() => {
-    if (!canGoBack) return;
+    const prev = stateRef.current;
+    if (prev.currentStep === 0) return;
 
-    setState(prev => ({
+    const nextState = {
       ...prev,
       currentStep: Math.max(prev.currentStep - 1, 0),
-    }));
-  }, [canGoBack]);
+    };
+    stateRef.current = nextState;
+    setState(nextState);
+  }, []);
 
   const goToStep = useCallback((stepIndex: number) => {
     if (stepIndex < 0 || stepIndex >= steps.length) return;
 
-    setState(prev => ({
+    const prev = stateRef.current;
+    const nextState = {
       ...prev,
       currentStep: stepIndex,
-    }));
+    };
+    stateRef.current = nextState;
+    setState(nextState);
   }, [steps.length]);
 
   const setValidation = useCallback((stepIndex: number, validation: WizardValidation) => {
-    setState(prev => ({
+    const prev = stateRef.current;
+    const nextState = {
       ...prev,
       validation: {
         ...prev.validation,
         [stepIndex]: validation,
       },
-    }));
+    };
+    stateRef.current = nextState;
+    setState(nextState);
   }, []);
 
   const setProcessing = useCallback((isProcessing: boolean) => {
-    setState(prev => ({
+    const prev = stateRef.current;
+    const nextState = {
       ...prev,
       isProcessing,
-    }));
+    };
+    stateRef.current = nextState;
+    setState(nextState);
   }, []);
 
   const setError = useCallback((key: string, error: string) => {
-    setState(prev => ({
+    const prev = stateRef.current;
+    const nextState = {
       ...prev,
       errors: {
         ...prev.errors,
         [key]: error,
       },
-    }));
+    };
+    stateRef.current = nextState;
+    setState(nextState);
   }, []);
 
   const clearError = useCallback((key: string) => {
-    setState(prev => {
-      const newErrors = { ...prev.errors };
-      delete newErrors[key];
-      return {
-        ...prev,
-        errors: newErrors,
-      };
-    });
+    const prev = stateRef.current;
+    const newErrors = { ...prev.errors };
+    delete newErrors[key];
+    const nextState = {
+      ...prev,
+      errors: newErrors,
+    };
+    stateRef.current = nextState;
+    setState(nextState);
   }, []);
 
   const reset = useCallback(
@@ -224,18 +253,20 @@ export function useWizardState<TData = unknown>({
       if (nextStep < 0 || nextStep >= steps.length) {
         nextStep = initialStep;
       }
-      setState({
+      const nextState: WizardState<TData> = {
         currentStep: nextStep,
         data: nextData,
         validation: newValidation ?? {},
         isProcessing: false,
         errors: {},
-      });
-      if (onDataChange) {
-        onDataChange(nextData);
+      };
+      stateRef.current = nextState;
+      setState(nextState);
+      if (onDataChangeRef.current) {
+        onDataChangeRef.current(nextData);
       }
     },
-    [initialData, initialStep, steps.length, onDataChange]
+    [initialData, initialStep, steps.length]
   );
 
   return {
