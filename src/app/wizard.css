@@ -1305,7 +1305,7 @@
 
 .wizard-review-card-head {
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-3);
@@ -1313,7 +1313,6 @@
 
 .wizard-review-card-meta {
   display: flex;
-  flex: 1 1 auto;
   flex-flow: row wrap;
   align-items: center;
   gap: var(--space-2);
