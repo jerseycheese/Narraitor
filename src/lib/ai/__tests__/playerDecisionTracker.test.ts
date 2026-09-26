@@ -37,6 +37,18 @@ describe('PlayerDecisionTracker - MVP Tests', () => {
       expect(worldDecisions).toHaveLength(1);
       expect(worldDecisions[0].choiceType).toBe('helpful');
     });
+
+    test('isolates decisions by session in getRelevantDecisions', () => {
+      tracker.recordDecision('Test 1', 'Choice 1', 'helpful', 'session-1', 'world-1');
+      
+      const relevant = tracker.getRelevantDecisions(
+        { worldId: 'world-1', sessionId: 'session-2' },
+        10,
+        { worldId: 'world-1', sessionId: 'session-2' }
+      );
+      
+      expect(relevant).toHaveLength(0);
+    });
   });
 
   describe('Choice Pattern Analysis', () => {

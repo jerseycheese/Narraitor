@@ -75,7 +75,7 @@ describe('enhancePromptWithPersonalization Integration', () => {
     expect(result).toContain('diplomatic');
   });
 
-  test('falls back to world decisions when session has no decisions', async () => {
+  test('does not fall back to other sessions in the same world when session has no decisions', async () => {
     // Setup: Real tracker with decisions in session-2 (different session)
     playerDecisionTracker.recordDecision(
       'Prompt 2',
@@ -93,9 +93,9 @@ describe('enhancePromptWithPersonalization Integration', () => {
       'session-1'
     );
 
-    // Assert
-    expect(result).toContain('choice 2');
-    expect(result).toContain('aggressive');
+    // Assert: session-1 has no decisions, so session-2's choices should not appear
+    expect(result).not.toContain('choice 2');
+    expect(result).not.toContain('aggressive');
   });
 
   test('uses world-wide decisions when sessionId is undefined', async () => {

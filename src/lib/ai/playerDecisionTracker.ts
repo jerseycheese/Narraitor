@@ -359,20 +359,12 @@ export class PlayerDecisionTracker {
       return [...this.decisions];
     }
 
-    const allDecisions = [...this.decisions];
-    let candidates = allDecisions;
+    let candidates = [...this.decisions];
 
     if (filters.sessionId) {
-      const sessionMatches = allDecisions.filter(
+      candidates = candidates.filter(
         decision => decision.sessionId === filters.sessionId
       );
-
-      // Prefer exact session matches when available, even if a world filter is provided
-      if (sessionMatches.length > 0) {
-        return sessionMatches;
-      }
-
-      candidates = allDecisions;
     }
 
     if (filters.worldId) {

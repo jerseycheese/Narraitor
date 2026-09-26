@@ -136,6 +136,47 @@ describe('buildChoicePrompt', () => {
     );
   });
 
+  it('does not include decision history from another session when current session has no decisions', () => {
+    const { playerDecisionTracker } = jest.requireMock('../playerDecisionTracker');
+    playerDecisionTracker.getRelevantDecisions.mockImplementation(
+      (
+        _context: unknown,
+        _limit: number,
+        filter: { worldId?: string; sessionId?: string }
+      ) => {
+        if (filter?.sessionId === 'session-A') {
+          return [{ id: 'decision-A' }];
+        }
+        if (!filter?.sessionId && filter?.worldId === 'world-1') {
+          return [{ id: 'decision-A' }];
+        }
+        return [];
+      }
+    );
+
+    const world = createMockWorld({ id: 'world-1' });
+    const prompt = buildChoicePrompt({
+      world,
+      worldId: 'world-1',
+      narrativeContext: {
+        ...narrativeContext,
+        sessionId: 'session-B',
+      },
+      characterIds: ['char-1'],
+      sessionId: 'session-B',
+      includeDecisionHistory: true,
+    });
+
+    expect(prompt).not.toContain('## Past Decision History');
+    expect(prompt).not.toContain('DECISION_HISTORY');
+    expect(playerDecisionTracker.getRelevantDecisions).not.toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      { worldId: 'world-1' }
+    );
+  });
+
+
   it('uses fields from the supplied SessionSnapshot rather than live stores', () => {
     const world = createMockWorld({
       id: 'world-1',

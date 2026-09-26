@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import Logger from '@/lib/utils/logger';
 import { formatPlainLanguageError } from '@/lib/utils/errorUtils';
+import { aiFetch } from '@/lib/ai/aiFetch';
 
 const logger = new Logger('useAIGeneration');
 
@@ -36,7 +37,7 @@ export function useAIGeneration<TRequest = Record<string, unknown>, TResponse = 
     setState(prev => ({ ...prev, isGenerating: true, error: null }));
     
     try {
-      const response = await fetch(options.endpoint, {
+      const response = await aiFetch(options.endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestData),
