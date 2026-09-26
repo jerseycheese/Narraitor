@@ -2,11 +2,14 @@
 
 import { useNarrativeStore } from '../narrativeStore';
 import { useWorldThreadStore } from '../worldThreadStore';
+import { useJournalStore } from '../journalStore';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import type {
   StoryEnding,
   EndingGenerationResult
 } from '../../types/narrative.types';
+import type { JournalEntry } from '../../types/journal.types';
+import type { StoreCharacter } from '../characterStore.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
 
 jest.mock('@/lib/featureFlags', () => ({
@@ -68,6 +71,56 @@ const defaultEndingContext = {
   worldId: 'world-789'
 };
 
+const createMockJournalEntry = (overrides?: Partial<JournalEntry>): JournalEntry => ({
+  id: 'entry-1',
+  sessionId: 'session-123',
+  worldId: 'world-789',
+  characterId: 'char-456',
+  type: 'character_event',
+  title: 'Action Log',
+  content: 'Chose to kick wildly, using the woven container to create a sudden splash and distraction.',
+  significance: 'minor',
+  isRead: false,
+  relatedEntities: [],
+  metadata: {
+    tags: ['action'],
+    automaticEntry: true,
+  },
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
+  ...overrides,
+});
+
+const createMockCharacter = (overrides?: Partial<StoreCharacter>): StoreCharacter => ({
+  id: 'char-456',
+  name: 'Mara Voss',
+  description: 'A test character',
+  worldId: 'world-789',
+  level: 1,
+  attributes: [],
+  skills: [],
+  derivedStats: [],
+  background: {
+    history: '',
+    personality: '',
+    goals: [],
+    fears: [],
+    relationships: [],
+  },
+  isPlayer: true,
+  status: { conditions: [] },
+  inventory: {
+    characterId: 'char-456',
+    items: [],
+    capacity: 20,
+    categories: [],
+    itemOrder: [],
+  },
+  createdAt: getTimestamp(),
+  updatedAt: getTimestamp(),
+  ...overrides,
+});
+
 describe('narrativeStore - Ending functionality', () => {
   beforeEach(() => {
     // Reset store state
@@ -82,6 +135,12 @@ describe('narrativeStore - Ending functionality', () => {
       endingError: null,
       loading: false,
       error: null
+    });
+    useJournalStore.setState({
+      entries: {},
+      sessionEntries: {},
+      error: null,
+      loading: false,
     });
     jest.clearAllMocks();
   });
@@ -147,6 +206,53 @@ describe('narrativeStore - Ending functionality', () => {
       expect(currentEnding?.type).toBe('session-limit');
       expect(endingError).toBeNull();
       expect(isGeneratingEnding).toBe(false);
+    });
+
+    it('should build a grammatical fallback legacy when journal action entries exist (#2176)', async () => {
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 500,
+        text: async () => 'Unable to load ending'
+      });
+
+      const entry = createMockJournalEntry({
+        sessionId: defaultEndingContext.sessionId,
+        content: 'Chose to kick wildly, using the woven container to create a sudden splash and distraction.',
+      });
+      useJournalStore.setState({
+        entries: { [entry.id]: entry },
+        sessionEntries: { [defaultEndingContext.sessionId]: [entry.id] },
+      });
+
+      await useNarrativeStore.getState().generateEnding('session-limit', {
+        ...defaultEndingContext,
+        character: createMockCharacter({ name: 'Mara Voss' }),
+      });
+
+      const { currentEnding } = useNarrativeStore.getState();
+      expect(currentEnding).not.toBeNull();
+      expect(currentEnding?.characterLegacy).toBe(
+        "Mara Voss's story is marked by this: Chose to kick wildly, using the woven container to create a sudden splash and distraction."
+      );
+    });
+
+    it('should use default fallback legacy when no journal entries exist (#2176)', async () => {
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 500,
+        text: async () => 'Unable to load ending'
+      });
+
+      await useNarrativeStore.getState().generateEnding('session-limit', {
+        ...defaultEndingContext,
+        character: createMockCharacter({ name: 'Mara Voss' }),
+      });
+
+      const { currentEnding } = useNarrativeStore.getState();
+      expect(currentEnding).not.toBeNull();
+      expect(currentEnding?.characterLegacy).toBe(
+        'Mara Voss leaves a mark on everyone they crossed paths with.'
+      );
     });
 
     it('should use custom prompt when provided', async () => {
