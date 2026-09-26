@@ -76,4 +76,31 @@ describe('decision tracker feeds the character prompt section', () => {
 
     expect(section).toContain('PREFERRED PLAY STYLE: diplomatic');
   });
+
+  it('does not include decisions from another session in the same world when querying for a session', () => {
+    tracker.recordDecision(
+      'What do you do?',
+      'Help the stranger',
+      'helpful',
+      'session-A',
+      'world-1'
+    );
+
+    const decisionsForSessionB = tracker.getRelevantDecisions(
+      { worldId: 'world-1', sessionId: 'session-B' },
+      10,
+      { worldId: 'world-1', sessionId: 'session-B' }
+    );
+    expect(decisionsForSessionB).toHaveLength(0);
+
+    const section = buildCharacterPromptSection({
+      name: 'Alex Archer',
+      goals: [],
+      decisions: decisionsForSessionB,
+    });
+
+    expect(section).not.toContain('Help the stranger');
+    expect(section).not.toContain('helpful');
+  });
 });
+

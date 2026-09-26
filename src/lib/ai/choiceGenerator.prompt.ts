@@ -459,19 +459,17 @@ const enhancePromptWithDecisionHistory = (
       sessionId: snapshot?.sessionId ?? sessionId,
     };
 
-    let decisions = playerDecisionTracker.getRelevantDecisions(
-      currentContext,
-      10,
-      { worldId: currentContext.worldId, sessionId: currentContext.sessionId }
-    );
-
-    if (decisions.length === 0) {
-      decisions = playerDecisionTracker.getRelevantDecisions(
-        currentContext,
-        10,
-        { worldId: currentContext.worldId }
-      );
-    }
+    const decisions = currentContext.sessionId
+      ? playerDecisionTracker.getRelevantDecisions(
+          currentContext,
+          10,
+          { worldId: currentContext.worldId, sessionId: currentContext.sessionId }
+        )
+      : playerDecisionTracker.getRelevantDecisions(
+          currentContext,
+          10,
+          { worldId: currentContext.worldId }
+        );
 
     if (decisions.length === 0) {
       return prompt;

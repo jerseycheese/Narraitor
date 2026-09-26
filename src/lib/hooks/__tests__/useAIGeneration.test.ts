@@ -1,6 +1,14 @@
 import { renderHook, act } from '@testing-library/react';
 import { useAIGeneration } from '../useAIGeneration';
 
+jest.mock('@/state/providerStore', () => ({
+  checkActiveProviderRateLimit: jest.fn(() => true),
+  getActiveProviderAdvancedSettings: jest.fn(() => null),
+  getActiveProviderKey: jest.fn().mockResolvedValue(null),
+  getActiveProviderModel: jest.fn(() => null),
+  getActiveProviderRouting: jest.fn(() => null),
+}));
+
 describe('useAIGeneration', () => {
   const originalFetch = global.fetch;
   let mockFetch: jest.Mock;
@@ -106,4 +114,30 @@ describe('useAIGeneration', () => {
     expect(result.current.error).toContain('Too many requests');
     expect(result.current.error).toContain('Wait a minute or so before trying again');
   });
+
+  it('forwards provider headers via aiFetch when an active provider key is configured', async () => {
+    const { getActiveProviderKey } = jest.requireMock('@/state/providerStore');
+    getActiveProviderKey.mockResolvedValueOnce('test-player-key');
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ portrait: { url: 'http://example.com/portrait.png' } }),
+    });
+
+    const { result } = renderHook(() =>
+      useAIGeneration({
+        endpoint: '/api/generate-portrait',
+      })
+    );
+
+    await act(async () => {
+      await result.current.generate({ prompt: 'hero portrait' });
+    });
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    const [, fetchOptions] = mockFetch.mock.calls[0];
+    const headers = new Headers(fetchOptions.headers);
+    expect(headers.get('x-provider-api-key')).toBe('test-player-key');
+  });
 });
+

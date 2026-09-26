@@ -39,22 +39,12 @@ export const enhancePromptWithPersonalization = async (
     >;
     let decisionHistory = '';
     if (sessionId) {
-      // Try session-specific decisions first
       const currentContext: SimpleNarrativeContext = { worldId, sessionId };
       relevantDecisions = playerDecisionTracker.getRelevantDecisions(
         currentContext,
         10,
         { worldId, sessionId }
       );
-
-      // Fallback to world-wide decisions if session has none
-      if (relevantDecisions.length === 0) {
-        relevantDecisions = playerDecisionTracker.getRelevantDecisions(
-          currentContext,
-          10,
-          { worldId }
-        );
-      }
 
       decisionHistory = formatDecisions(relevantDecisions);
     } else {
