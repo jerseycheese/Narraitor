@@ -371,13 +371,56 @@ describe('parameter clamping & error sanitization', () => {
         prompt: 'test prompt',
         config: { maxTokens: 99999 },
       }),
-      { errorContext: 'Test', maxTokens: 4096 }
+      { errorContext: 'Test' }
     );
 
     expect(global.fetch).toHaveBeenCalled();
     const callArgs = (global.fetch as jest.Mock).mock.calls[0];
     const sentBody = JSON.parse(callArgs[1].body);
     expect(sentBody.generationConfig.maxOutputTokens).toBe(4096);
+  });
+
+  it('honors client maxTokens up to server ceiling when options.maxTokens is lower', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        candidates: [{ content: { parts: [{ text: 'response text' }] } }],
+      }),
+    });
+
+    await processAITextRequest(
+      fakeRequest({
+        prompt: 'test prompt',
+        config: { maxTokens: 4096 },
+      }),
+      { errorContext: 'Test', maxTokens: 2048 }
+    );
+
+    expect(global.fetch).toHaveBeenCalled();
+    const callArgs = (global.fetch as jest.Mock).mock.calls[0];
+    const sentBody = JSON.parse(callArgs[1].body);
+    expect(sentBody.generationConfig.maxOutputTokens).toBe(4096);
+  });
+
+  it('defaults to options.maxTokens when client does not specify maxTokens', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        candidates: [{ content: { parts: [{ text: 'response text' }] } }],
+      }),
+    });
+
+    await processAITextRequest(
+      fakeRequest({
+        prompt: 'test prompt',
+      }),
+      { errorContext: 'Test', maxTokens: 2048 }
+    );
+
+    expect(global.fetch).toHaveBeenCalled();
+    const callArgs = (global.fetch as jest.Mock).mock.calls[0];
+    const sentBody = JSON.parse(callArgs[1].body);
+    expect(sentBody.generationConfig.maxOutputTokens).toBe(2048);
   });
 
   it('does not leak raw upstream error body to caller on upstream error', async () => {

@@ -26,11 +26,11 @@ const logger = new Logger('GoalExtractor');
  * This call answers with a JSON object, not prose, and the object grows with
  * the session: goals, then the thread ledger, then what the world took. On the
  * narrative panel's 2048 ceiling a late-session extraction ran past the limit
- * and came back with an unterminated fence, which parses as nothing at all —
- * the ledger then went a turn staler with every miss. Sized so the whole
- * object fits with room for a fat ledger.
+ * and came back with an unterminated fence, which parses as nothing at all -
+ * the ledger then went a turn staler with every miss. Sized to match the
+ * server output ceiling so the whole object fits with room for a fat ledger.
  */
-const EXTRACTION_MAX_OUTPUT_TOKENS = 6144;
+const EXTRACTION_MAX_OUTPUT_TOKENS = 4096;
 
 /** Gemini and the OpenAI-compatible providers both normalize to this. */
 const TRUNCATED_FINISH_REASON = 'MAX_TOKENS';

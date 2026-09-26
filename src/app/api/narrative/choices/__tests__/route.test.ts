@@ -48,7 +48,7 @@ describe('/api/narrative/choices', () => {
     expect(data.promptTokens).toBe(128);
   });
 
-  it('asks the non-streaming endpoint and clamps to the route ceiling', async () => {
+  it('asks the non-streaming endpoint and clamps to the server ceiling', async () => {
     const upstream = stubUpstreamJson(geminiTextPayload(CHOICES_JSON));
 
     await POST(choicesRequest({ prompt: 'Offer choices.', config: { maxTokens: 99999 } }));
@@ -56,6 +56,17 @@ describe('/api/narrative/choices', () => {
     const [url] = upstream.mock.calls[0] as [string];
     expect(url).toContain(':generateContent');
     expect(url).not.toContain('alt=sse');
+
+    const body = sentUpstreamBody(upstream) as {
+      generationConfig: { maxOutputTokens: number };
+    };
+    expect(body.generationConfig.maxOutputTokens).toBe(4096);
+  });
+
+  it('defaults to 2048 tokens when caller provides no maxTokens', async () => {
+    const upstream = stubUpstreamJson(geminiTextPayload(CHOICES_JSON));
+
+    await POST(choicesRequest({ prompt: 'Offer choices.' }));
 
     const body = sentUpstreamBody(upstream) as {
       generationConfig: { maxOutputTokens: number };

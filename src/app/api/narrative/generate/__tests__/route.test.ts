@@ -80,6 +80,28 @@ describe('/api/narrative/generate', () => {
     expect(body.generationConfig.maxOutputTokens).toBe(2048);
   });
 
+  it('honors caller maxTokens up to the server ceiling unclamped', async () => {
+    const upstream = stubUpstreamStream(geminiStreamFrames(['{"content":"Hello"}']));
+
+    await POST(generateRequest({ prompt: 'Extract goals.', config: { maxTokens: 4096 } }));
+
+    const body = sentUpstreamBody(upstream) as {
+      generationConfig: { maxOutputTokens: number };
+    };
+    expect(body.generationConfig.maxOutputTokens).toBe(4096);
+  });
+
+  it('clamps caller maxTokens exceeding the server ceiling to 4096', async () => {
+    const upstream = stubUpstreamStream(geminiStreamFrames(['{"content":"Hello"}']));
+
+    await POST(generateRequest({ prompt: 'Extract goals.', config: { maxTokens: 6144 } }));
+
+    const body = sentUpstreamBody(upstream) as {
+      generationConfig: { maxOutputTokens: number };
+    };
+    expect(body.generationConfig.maxOutputTokens).toBe(4096);
+  });
+
   it('answers NDJSON the client consumer can read line by line', async () => {
     stubUpstreamStream(
       geminiStreamFrames(['{"content":"The bridge ', 'held.","type":"scene"}'])
