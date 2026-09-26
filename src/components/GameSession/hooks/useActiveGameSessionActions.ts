@@ -210,6 +210,10 @@ export const useActiveGameSessionActions = ({
 
   const handleChoicesGenerated = useCallback((decision: Decision) => {
     if (!decision || !decision.options || (decision.options?.length || 0) === 0) {
+      if (choiceGenerationTimeoutRef.current) {
+        clearTimeout(choiceGenerationTimeoutRef.current);
+        choiceGenerationTimeoutRef.current = null;
+      }
       setIsGeneratingChoices(false);
       return;
     }

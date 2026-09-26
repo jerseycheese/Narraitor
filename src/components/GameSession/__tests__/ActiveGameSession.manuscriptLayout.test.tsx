@@ -615,8 +615,11 @@ describe('ActiveGameSession Manuscript Layout', () => {
     });
   });
 
-  describe('fatal ending flow after soft offer (#2168)', () => {
-    it('triggers fatal ending and transitions to Game Over loader and ending screen after dismissed soft offer', async () => {
+  describe('fatal ending screen transitions in ActiveGameSession (#2168)', () => {
+    // Note: regression coverage for useEndingDetection allowing fatal suggestions
+    // after a dismissed soft offer is in useEndingDetection.fatalBypass.test.ts.
+    // This test verifies ActiveGameSession UI transitions from active play to Game Over and EndingScreen.
+    it('transitions to Game Over loader and ending screen on fatal ending suggestion', async () => {
       const ActiveGameSessionNarrativeColumn = require('../ActiveGameSessionNarrativeColumn').default;
       const mockWorld = createMockWorld({ id: mockWorldId });
 

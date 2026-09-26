@@ -66,4 +66,54 @@ describe('useEndingDetection - fatal ending bypasses prior suggestion ref (#2168
       'story-complete'
     );
   });
+
+  it('does not repeat fatal ending suggestions within the same session', () => {
+    const onEndingSuggested = jest.fn();
+    const { result } = renderHook(() =>
+      useEndingDetection({
+        sessionId: 'test-session',
+        worldId: 'test-world',
+        segments: [makeSegment('1')],
+        onEndingSuggested,
+      })
+    );
+
+    act(() => {
+      result.current.suggestEnding('fatal: critical failure', 'story-complete');
+    });
+    expect(onEndingSuggested).toHaveBeenCalledTimes(1);
+
+    // Repeated fatal calls should be ignored
+    act(() => {
+      result.current.suggestEnding('fatal: narrative tag', 'story-complete');
+    });
+    expect(onEndingSuggested).toHaveBeenCalledTimes(1);
+  });
+
+  it('resets fatal suggestion gate when session ID changes', () => {
+    const onEndingSuggested = jest.fn();
+    let sessionId = 'session-1';
+    const { result, rerender } = renderHook(() =>
+      useEndingDetection({
+        sessionId,
+        worldId: 'test-world',
+        segments: [makeSegment('1')],
+        onEndingSuggested,
+      })
+    );
+
+    act(() => {
+      result.current.suggestEnding('fatal: critical failure', 'story-complete');
+    });
+    expect(onEndingSuggested).toHaveBeenCalledTimes(1);
+
+    // Change session
+    sessionId = 'session-2';
+    rerender();
+
+    act(() => {
+      result.current.suggestEnding('fatal: new session death', 'story-complete');
+    });
+    expect(onEndingSuggested).toHaveBeenCalledTimes(2);
+  });
 });
