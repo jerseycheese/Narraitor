@@ -69,6 +69,10 @@ jest.mock('../ManuscriptDecisionBlock', () => ({
   ManuscriptDecisionBlock: jest.fn(({ children }) => <div data-testid="manuscript-decision-block">{children}</div>),
 }));
 
+jest.mock('../EndingScreen', () => ({
+  EndingScreen: () => <div data-testid="ending-screen">Ending Screen</div>,
+}));
+
 describe('ActiveGameSession Manuscript Layout', () => {
   const mockWorldId = 'world-1';
   const mockSessionId = 'session-1';
@@ -610,4 +614,113 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(dismissedProps.hideChoices).toBe(false);
     });
   });
+
+  describe('fatal ending flow after soft offer (#2168)', () => {
+    it('triggers fatal ending and transitions to Game Over loader and ending screen after dismissed soft offer', async () => {
+      const ActiveGameSessionNarrativeColumn = require('../ActiveGameSessionNarrativeColumn').default;
+      const mockWorld = createMockWorld({ id: mockWorldId });
+
+      const generateEndingMock = jest.fn().mockResolvedValue(undefined);
+      let isGeneratingEnding = false;
+      let currentEnding: unknown = null;
+
+      (useNarrativeStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const state = {
+          segments: {
+            'seg-1': { id: 'seg-1', content: 'Story starts...', characterIds: [] },
+          },
+          sessionSegments: { [mockSessionId]: ['seg-1'] },
+          sessionDecisions: {},
+          decisions: {},
+          currentEnding,
+          isGeneratingEnding,
+          isSessionEnded: () => false,
+          generateEnding: generateEndingMock,
+          getSessionSegments: () => [],
+          getSessionDecisions: () => [],
+        };
+        return selector ? selector(state) : state;
+      });
+
+      const { rerender } = render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          world={mockWorld}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+
+      // 1. First, soft ending offer is suggested
+      const narrativeProps = (ActiveGameSessionNarrativeColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      act(() => {
+        narrativeProps.onEndingSuggested(
+          'Your quest reaches a natural resting place.',
+          'story-complete'
+        );
+      });
+
+      // Ending offer banner appears
+      expect(await screen.findByText('Your story could end here')).toBeInTheDocument();
+
+      // 2. Player dismisses the soft offer
+      fireEvent.click(screen.getByRole('button', { name: 'Continue Playing' }));
+
+      await waitFor(() => {
+        expect(screen.queryByText('Your story could end here')).not.toBeInTheDocument();
+      });
+
+      // 3. Later, a fatal outcome occurs
+      act(() => {
+        narrativeProps.onEndingSuggested(
+          'fatal: narrative segment marked the player as dead or incapacitated.',
+          'story-complete'
+        );
+      });
+
+      // generateEnding should be called with desiredTone: 'tragic'
+      expect(generateEndingMock).toHaveBeenCalledTimes(1);
+      expect(generateEndingMock).toHaveBeenCalledWith(
+        'story-complete',
+        expect.objectContaining({
+          sessionId: mockSessionId,
+          characterId: mockCharacterId,
+          worldId: mockWorldId,
+          desiredTone: 'tragic',
+        })
+      );
+
+      // 4. While generating ending, Game Over loading screen is shown instead of normal play
+      isGeneratingEnding = true;
+      rerender(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          world={mockWorld}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      expect(screen.getByText('Game Over')).toBeInTheDocument();
+      expect(screen.queryByTestId('manuscript-session-shell')).not.toBeInTheDocument();
+
+      // 5. Once currentEnding is set, EndingScreen is shown
+      isGeneratingEnding = false;
+      currentEnding = { id: 'ending-1', title: 'The Fall' };
+      rerender(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          world={mockWorld}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      expect(screen.getByTestId('ending-screen')).toBeInTheDocument();
+      expect(screen.queryByText('Game Over')).not.toBeInTheDocument();
+    });
+  });
 });
+

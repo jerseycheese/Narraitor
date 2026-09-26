@@ -8,6 +8,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { inferCustomActionSkillChecks } from '@/lib/ai/customActionSkillInference';
+import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
 import { generateUniqueId } from '@/lib/utils';
 import type { UseAutoSaveReturn } from '@/hooks/useAutoSave';
 
@@ -62,8 +63,6 @@ export const useActiveGameSessionActions = ({
     // Narrative segment was successfully generated
     setIsGenerating(false);
     setShouldTriggerGeneration(false); // Reset trigger
-    // Start generating choices
-    setIsGeneratingChoices(true);
 
     // Auto-create journal entry for significant narrative events
     if (characterId && segment.content) {
@@ -72,7 +71,13 @@ export const useActiveGameSessionActions = ({
       createJournalEntryFromSegment(segment, decisionWeight);
     }
 
-    scheduleChoiceFallback();
+    // Skip choices when the segment ends the session (fatal or ending)
+    if (isSessionEndingSegment(segment)) {
+      setIsGeneratingChoices(false);
+    } else {
+      setIsGeneratingChoices(true);
+      scheduleChoiceFallback();
+    }
 
     void autoSave.triggerSave('scene-change');
   }, [autoSave, characterId, createJournalEntryFromSegment, currentDecision, scheduleChoiceFallback, setIsGenerating, setIsGeneratingChoices, setShouldTriggerGeneration]);

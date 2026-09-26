@@ -122,13 +122,15 @@ export function useEndingDetection({
   }, [sessionId, worldId, characterId]);
 
   /**
-   * Fire onEndingSuggested at most once per session/world/character key. Used
-   * by callers (e.g. critical-failure and fatal-tag branches) that need to
-   * short-circuit the AI check and surface an ending immediately.
+   * Fire onEndingSuggested at most once per session/world/character key.
+   * Fatal outcomes bypass the one-suggestion gate so character deaths are
+   * never suppressed by an earlier soft offer the player declined.
    */
   const suggestEnding = useCallback(
     (reason: string, endingType: EndingType) => {
-      if (endingSuggestedRef.current || !onEndingSuggested) return;
+      const isFatal = reason.toLowerCase().startsWith('fatal:');
+      if (!isFatal && endingSuggestedRef.current) return;
+      if (!onEndingSuggested) return;
       endingSuggestedRef.current = true;
       onEndingSuggested(reason, endingType);
     },
