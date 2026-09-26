@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useWizardState, WizardStep } from '../useWizardState';
 
@@ -176,5 +177,69 @@ describe('useWizardState', () => {
     expect(result.current.state.currentStep).toBe(0);
     expect(result.current.state.data).toEqual(initialData);
     expect(result.current.state.validation).toEqual({});
+  });
+
+  it('does not execute onDataChange inside the setState updater', () => {
+    const onDataChange = jest.fn();
+    const { result } = renderHook(
+      () =>
+        useWizardState({
+          initialData,
+          steps: testSteps,
+          onDataChange,
+        }),
+      { wrapper: React.StrictMode }
+    );
+
+    act(() => {
+      result.current.updateData({ name: 'Bob' });
+    });
+
+    // In React.StrictMode, state updater functions are executed twice in DEV mode.
+    // If onDataChange were called inside the updater callback, it would run twice.
+    // Executing outside the updater guarantees exactly one invocation.
+    expect(onDataChange).toHaveBeenCalledTimes(1);
+    expect(onDataChange).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Bob' })
+    );
+  });
+
+  it('allows onDataChange to safely dispatch external state updates without render warnings', () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    const { result } = renderHook(
+      () => {
+        const [mirrorName, setMirrorName] = useState('');
+        const wizard = useWizardState({
+          initialData,
+          steps: testSteps,
+          onDataChange: (data) => {
+            setMirrorName(data.name);
+          },
+        });
+        return { wizard, mirrorName };
+      },
+      { wrapper: React.StrictMode }
+    );
+
+    act(() => {
+      result.current.wizard.updateData({ name: 'Charlie' });
+    });
+
+    expect(result.current.mirrorName).toBe('Charlie');
+    expect(result.current.wizard.state.data.name).toBe('Charlie');
+
+    // Confirm no React warnings such as "Cannot update a component while rendering a different component"
+    const badSetStateCalls = consoleErrorSpy.mock.calls.filter((call) =>
+      call.some(
+        (arg) =>
+          typeof arg === 'string' &&
+          (arg.includes('Cannot update a component') ||
+            arg.includes('Maximum update depth exceeded'))
+      )
+    );
+    expect(badSetStateCalls).toHaveLength(0);
+
+    consoleErrorSpy.mockRestore();
   });
 });

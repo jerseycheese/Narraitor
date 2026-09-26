@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { EntityID } from '@/types/common.types';
@@ -168,7 +168,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     if (targetWizardStep !== undefined && targetWizardStep !== wizard.state.currentStep) {
       wizard.goToStep(targetWizardStep);
     }
-  }, [stepIndex, isTourActive, isPaused, showRecoveryDialog, currentTour, wizard]);
+  }, [stepIndex, isTourActive, isPaused, showRecoveryDialog, currentTour, wizard.state.currentStep, wizard.goToStep]);
 
   // Point pool managers
   const { attributePool, skillPool } = useCharacterPointPools({
@@ -268,20 +268,26 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     setShowRecoveryDialog(false);
   };
 
-  const handleUpdate = (updates: Partial<CharacterCreationData>) => {
-    wizard.updateData(updates);
-  };
+  const handleUpdate = useCallback(
+    (updates: Partial<CharacterCreationData>) => {
+      wizard.updateData(updates);
+    },
+    [wizard.updateData]
+  );
 
-  const handleValidation = (valid: boolean, errors: string[]) => {
-    wizard.setValidation(wizard.state.currentStep, { valid, errors, touched: true });
-  };
+  const handleValidation = useCallback(
+    (valid: boolean, errors: string[]) => {
+      wizard.setValidation(wizard.state.currentStep, { valid, errors, touched: true });
+    },
+    [wizard.setValidation, wizard.state.currentStep]
+  );
 
-  const validateCurrentStep = () => {
+  const validateCurrentStep = useCallback(() => {
     const validator = stepValidators[wizard.state.currentStep];
     return validator
       ? validator(wizard.state.data)
       : { valid: true, errors: [], touched: true };
-  };
+  }, [stepValidators, wizard.state.currentStep, wizard.state.data]);
 
   const handleCreate = () => {
     // Validate all steps
