@@ -3,7 +3,6 @@
 import { useNarrativeStore } from '../narrativeStore';
 import { useWorldThreadStore } from '../worldThreadStore';
 import { useJournalStore } from '../journalStore';
-import { buildLocalEnding } from '../narrativeStore.endings';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import type {
   StoryEnding,
@@ -235,8 +234,6 @@ describe('narrativeStore - Ending functionality', () => {
       expect(currentEnding?.characterLegacy).toBe(
         "Mara Voss's story is marked by this: Chose to kick wildly, using the woven container to create a sudden splash and distraction."
       );
-      expect(currentEnding?.characterLegacy).not.toContain('remembered for Chose');
-      expect(currentEnding?.characterLegacy).not.toContain('is remembered for');
     });
 
     it('should use default fallback legacy when no journal entries exist (#2176)', async () => {
@@ -450,45 +447,4 @@ describe('narrativeStore - Ending functionality', () => {
       expect(postBody.worldClock).toBeUndefined();
     });
   });
-
-  describe('buildLocalEnding (#2176)', () => {
-    it('should frame character legacy around a full sentence action entry without grammar breaks', () => {
-      const entry = createMockJournalEntry({
-        content: 'Chose to kick wildly, using the woven container to create a sudden splash and distraction.',
-      });
-
-      const ending = buildLocalEnding({
-        endingType: 'story-complete',
-        params: {
-          ...defaultEndingContext,
-          character: createMockCharacter({ name: 'Mara Voss' }),
-        },
-        narrativeSegments: [],
-        journalEntries: [entry],
-      });
-
-      expect(ending.characterLegacy).toBe(
-        "Mara Voss's story is marked by this: Chose to kick wildly, using the woven container to create a sudden splash and distraction."
-      );
-      expect(ending.characterLegacy).not.toContain('remembered for Chose');
-      expect(ending.characterLegacy).not.toContain('is remembered for');
-    });
-
-    it('should use default fallback legacy when journal entries have no content', () => {
-      const ending = buildLocalEnding({
-        endingType: 'story-complete',
-        params: {
-          ...defaultEndingContext,
-          character: createMockCharacter({ name: 'Mara Voss' }),
-        },
-        narrativeSegments: [],
-        journalEntries: [],
-      });
-
-      expect(ending.characterLegacy).toBe(
-        'Mara Voss leaves a mark on everyone they crossed paths with.'
-      );
-    });
-  });
 });
-

@@ -16,7 +16,7 @@ import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.type
 
 const FALLBACK_ENDING_TONE: EndingTone = 'hopeful';
 
-export type EndingParams = {
+type EndingParams = {
   sessionId: EntityID;
   characterId: EntityID;
   worldId: EntityID;
@@ -26,7 +26,7 @@ export type EndingParams = {
   character?: StoreCharacter;
 };
 
-export const buildLocalEnding = ({
+const buildLocalEnding = ({
   endingType,
   params,
   narrativeSegments,
