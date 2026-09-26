@@ -129,16 +129,34 @@ describe('parseNarrativeResponse debris guard', () => {
     const parsed = parseNarrativeResponse({ content: raw }, 'scene');
 
     expect(parsed.actualContent).toBe(
-      'She whispered, \\"Run!\\", then paused. You have to move.'
+      'She whispered, "Run!", then paused. You have to move.'
     );
     expect(parsed.segmentType).toBe('action');
   });
 
-  it('cuts before trailing metadata even when type is not present', () => {
+  it('recovers content cleanly when JSON has raw newlines in a quoted-key response', () => {
     const raw =
-      'content: "You made it to the clearing.", "metadata": {"location": "Clearing"}';
+      '{"content": "The thing lunges.\nIts grip tightens. You have to move.", "type": "action", "metadata": {"mood": "tense, desperate", "majorEvent": "Player jabbed the creature in its eye and broke free of its grip"}}';
     const parsed = parseNarrativeResponse({ content: raw }, 'scene');
 
-    expect(parsed.actualContent).toBe('You made it to the clearing.');
+    expect(parsed.actualContent).toBe(
+      'The thing lunges.\nIts grip tightens. You have to move.'
+    );
+    expect(parsed.segmentType).toBe('action');
+    expect(parsed.actualContent).not.toContain('metadata');
+    expect(parsed.actualContent).not.toContain('majorEvent');
+  });
+
+  it('recovers content cleanly when a fenced JSON response has raw newlines in content', () => {
+    const raw =
+      '```json\n{"content": "The thing lunges.\nIts grip tightens. You have to move.", "type": "action", "metadata": {"mood": "tense, desperate", "majorEvent": "Player jabbed the creature in its eye and broke free of its grip"}}\n```';
+    const parsed = parseNarrativeResponse({ content: raw }, 'scene');
+
+    expect(parsed.actualContent).toBe(
+      'The thing lunges.\nIts grip tightens. You have to move.'
+    );
+    expect(parsed.segmentType).toBe('action');
+    expect(parsed.actualContent).not.toContain('metadata');
+    expect(parsed.actualContent).not.toContain('majorEvent');
   });
 });

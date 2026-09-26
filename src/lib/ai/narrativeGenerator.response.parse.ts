@@ -77,8 +77,13 @@ const extractFlattenedFields = (
   const closingQuoteIndex = findContentClosingQuoteIndex(afterMarker);
   if (closingQuoteIndex === -1) return null;
 
-  const content = afterMarker.slice(0, closingQuoteIndex);
-  if (isJsonDebris(content)) return null;
+  const rawContent = afterMarker.slice(0, closingQuoteIndex);
+  if (isJsonDebris(rawContent)) return null;
+
+  const content = rawContent
+    .replace(/\\"/g, '"')
+    .replace(/\\n/g, '\n')
+    .replace(/\\\\/g, '\\');
 
   const trailing = afterMarker.slice(closingQuoteIndex + 1);
   const typeMatch = trailing.match(
@@ -244,8 +249,9 @@ export const parseNarrativeResponse = (
       }
     } catch {
       try {
-        const contentStartMatch = actualContent.match(
-          /"content"\s*:\s*"(.+?)"\s*,\s*"/
+        const rawResponse = stripMarkdownFences(actualContent);
+        const contentStartMatch = rawResponse.match(
+          /"content"\s*:\s*"([\s\S]+?)"\s*,\s*"/
         );
         if (contentStartMatch && contentStartMatch[1]) {
           actualContent = contentStartMatch[1]
@@ -254,38 +260,57 @@ export const parseNarrativeResponse = (
             .replace(/\\\\/g, '\\');
           contentFromClosedField = true;
         } else {
-          const altContentMatch = actualContent.match(
-            /"content"\s*:\s*"([^"]*(?:"[^"]*"[^"]*)*)"/
-          );
-          if (altContentMatch && altContentMatch[1]) {
-            actualContent = altContentMatch[1];
-            contentFromClosedField = true;
+          const contentMarkerMatch = rawResponse.match(/"content"\s*:\s*"/);
+          if (contentMarkerMatch && contentMarkerMatch.index !== undefined) {
+            const afterMarker = rawResponse.slice(
+              contentMarkerMatch.index + contentMarkerMatch[0].length
+            );
+            const closingQuoteIndex = findContentClosingQuoteIndex(afterMarker);
+            if (closingQuoteIndex !== -1) {
+              actualContent = afterMarker
+                .slice(0, closingQuoteIndex)
+                .replace(/\\"/g, '"')
+                .replace(/\\n/g, '\n')
+                .replace(/\\\\/g, '\\');
+              contentFromClosedField = true;
+            }
           } else {
-            const finalContentMatch = actualContent.match(
-              /"content"\s*:\s*"(.+?)"\s*,\s*"(?:type|metadata)/
+            const finalContentMatch = rawResponse.match(
+              /"content"\s*:\s*"([\s\S]+?)"\s*,\s*"(?:type|metadata)/
             );
             if (finalContentMatch && finalContentMatch[1]) {
-              actualContent = finalContentMatch[1];
+              actualContent = finalContentMatch[1]
+                .replace(/\\"/g, '"')
+                .replace(/\\n/g, '\n')
+                .replace(/\\\\/g, '\\');
               contentFromClosedField = true;
             }
           }
         }
 
-        const locationMatch = actualContent.match(
+        const typeMatch = rawResponse.match(
+          /(?:^|[\s,])["']?type["']?\s*[:=]\s*["']?(\w+)["']?/i
+        );
+        const rawType = typeMatch ? typeMatch[1].toLowerCase() : undefined;
+        if (rawType && VALID_SEGMENT_TYPES.includes(rawType)) {
+          segmentType = rawType;
+        }
+
+        const locationMatch = rawResponse.match(
           /"location"\s*:\s*"((?:[^"\\]|\\.)*)"/
         );
         if (locationMatch && locationMatch[1]) {
           extractedMetadata.location = locationMatch[1].replace(/\\"/g, '"');
         }
 
-        const speakerMatch = actualContent.match(
+        const speakerMatch = rawResponse.match(
           /"speakerId"\s*:\s*"((?:[^"\\]|\\.)*)"/
         );
         if (speakerMatch && speakerMatch[1]) {
           extractedMetadata.speakerId = speakerMatch[1].replace(/\\"/g, '"');
         }
 
-        const moodMatch = actualContent.match(
+        const moodMatch = rawResponse.match(
           /"mood"\s*:\s*"((?:[^"\\]|\\.)*)"/
         );
         if (moodMatch && moodMatch[1]) {
