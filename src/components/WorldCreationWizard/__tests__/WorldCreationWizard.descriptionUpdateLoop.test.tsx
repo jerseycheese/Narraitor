@@ -1,8 +1,7 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import WorldCreationWizard from '../WorldCreationWizard';
-import { WORLD_DRAFT_STORAGE_KEY as DRAFT_STORAGE_KEY } from '../WizardState';
 
 const mockPush = jest.fn();
 const mockCreateWorld = jest.fn().mockReturnValue('world-123');
@@ -76,12 +75,13 @@ jest.mock('@/hooks/useDraftAutoSave', () => {
     ...actual,
     useDraftAutoSave: (options: unknown) => {
       const res = actual.useDraftAutoSave(options);
+      const { setData } = res;
       const stableSetData = React.useCallback(
         (...args: unknown[]) => {
           mockSetAutoSaveData(...args);
-          return res.setData(...args);
+          return setData(...args);
         },
-        [res.setData]
+        [setData]
       );
       return {
         ...res,
