@@ -99,7 +99,7 @@ describe('ActiveGameSessionChoicesColumn', () => {
     expect(container.querySelector('.manuscript-choices-skeleton')).toBeNull();
   });
 
-  it('keeps mobile top controls and End Story available when hideChoices is true under progressive disclosure', () => {
+  it('hides Suggested Actions toggle while keeping End Story available when hideChoices is true under progressive disclosure', () => {
     render(
       <ActiveGameSessionChoicesColumn
         {...baseProps}
@@ -110,8 +110,8 @@ describe('ActiveGameSessionChoicesColumn', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Suggested Actions' })
-    ).toBeInTheDocument();
+      screen.queryByRole('button', { name: 'Suggested Actions' })
+    ).toBeNull();
     expect(
       screen.getByRole('button', { name: 'End Story' })
     ).toBeInTheDocument();

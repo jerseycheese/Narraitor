@@ -142,16 +142,18 @@ const ActiveGameSessionChoicesColumn: React.FC<
         {/* Mobile-only top controls for Suggested Actions toggle and End Story */}
         {isProgressiveDisclosureEnabled && (
           <div className="manuscript-mobile-rail-top-controls">
-            <button
-              type="button"
-              className="manuscript-mobile-suggested-actions-toggle"
-              aria-expanded={showSuggestedActions}
-              onClick={() => setShowSuggestedActions(!showSuggestedActions)}
-            >
-              {showSuggestedActions
-                ? 'Hide Suggested Actions'
-                : 'Suggested Actions'}
-            </button>
+            {!hideChoices && (
+              <button
+                type="button"
+                className="manuscript-mobile-suggested-actions-toggle"
+                aria-expanded={showSuggestedActions}
+                onClick={() => setShowSuggestedActions(!showSuggestedActions)}
+              >
+                {showSuggestedActions
+                  ? 'Hide Suggested Actions'
+                  : 'Suggested Actions'}
+              </button>
+            )}
             <span className="manuscript-end-story-mobile">{renderEndStoryAction()}</span>
           </div>
         )}
