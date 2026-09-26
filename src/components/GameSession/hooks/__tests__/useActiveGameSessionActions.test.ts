@@ -344,4 +344,34 @@ describe('useActiveGameSessionActions', () => {
       expect(choiceGenerationTimeoutRef.current).toBeNull();
     });
   });
+
+  it('records a save on choice selection and scene change', () => {
+    const mockAutoSave = { triggerSave: jest.fn() } as unknown as UseAutoSaveReturn;
+    const { result } = renderHook(() =>
+      useActiveGameSessionActions(buildOptions({ autoSave: mockAutoSave }))
+    );
+
+    act(() => {
+      result.current.handleChoiceSelected('choice-1');
+    });
+
+    expect(mockAutoSave.triggerSave).toHaveBeenCalledWith('player-choice');
+
+    const segment = {
+      id: 'seg-1',
+      sessionId: 'session-1',
+      content: 'A new scene unfolds.',
+      type: 'scene' as const,
+      metadata: { characterIds: [], tags: [] },
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    act(() => {
+      result.current.handleNarrativeGenerated(segment);
+    });
+
+    expect(mockAutoSave.triggerSave).toHaveBeenCalledWith('scene-change');
+  });
 });

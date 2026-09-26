@@ -3,11 +3,12 @@
  */
 
 import React from 'react';
-import { SaveTriggerReason } from '@/lib/services/autoSaveService';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { clsx } from 'clsx';
 import { formatTime } from '@/lib/utils';
+
+export type SaveTriggerReason = 'player-choice' | 'scene-change' | 'manual';
 
 export interface SaveIndicatorProps {
   status: 'idle' | 'saving' | 'saved' | 'error';

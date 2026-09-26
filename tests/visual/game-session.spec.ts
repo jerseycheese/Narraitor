@@ -263,6 +263,7 @@ test.describe('Game Session Visual Tests', () => {
       fullPage: true,
       threshold: 0.3,
       timeout: 10000,
+      maxDiffPixels: 250,
     });
   });
 

@@ -68,6 +68,11 @@ export class ResilientStorageMiddleware {
         });
         return;
       }
+
+      // One-time sweep of legacy auto-save-* snapshot keys
+      if (typeof this.adapter.sweepAutoSaveSnapshots === 'function') {
+        void this.adapter.sweepAutoSaveSnapshots().catch(() => {});
+      }
     } catch (error) {
       logger.error('[Storage] IndexedDB unavailable, using memory storage:', error);
       this.adapter = null;
@@ -135,4 +140,30 @@ export class ResilientStorageMiddleware {
     }
     this.memoryStorage.delete(key);
   }
+
+  /**
+   * Sweeps legacy auto-save-* snapshot keys from storage
+   * @returns Promise resolving to the number of deleted snapshot keys
+   */
+  async sweepAutoSaveSnapshots(): Promise<number> {
+    let memoryDeleted = 0;
+    for (const key of Array.from(this.memoryStorage.keys())) {
+      if (key.startsWith('auto-save-')) {
+        this.memoryStorage.delete(key);
+        memoryDeleted++;
+      }
+    }
+
+    if (this.adapter && typeof this.adapter.sweepAutoSaveSnapshots === 'function') {
+      try {
+        const adapterDeleted = await this.adapter.sweepAutoSaveSnapshots();
+        return adapterDeleted + memoryDeleted;
+      } catch {
+        return memoryDeleted;
+      }
+    }
+
+    return memoryDeleted;
+  }
 }
+

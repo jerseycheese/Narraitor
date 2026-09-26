@@ -199,4 +199,63 @@ export class IndexedDBAdapter {
       }
     });
   }
+
+  /**
+   * Remove legacy auto-save snapshot keys starting with 'auto-save-'
+   * @returns Promise resolving to the number of swept snapshot keys
+   */
+  async sweepAutoSaveSnapshots(): Promise<number> {
+    if (!this.db) {
+      await this.initialize();
+    }
+
+    if (!this.db || typeof indexedDB === 'undefined') {
+      return 0;
+    }
+
+    return new Promise((resolve) => {
+      try {
+        const transaction = this.db!.transaction([this.storeName], 'readwrite');
+        const store = transaction.objectStore(this.storeName);
+
+        if (typeof store.getAllKeys === 'function') {
+          const request = store.getAllKeys();
+          request.onsuccess = () => {
+            const keys = (request.result || []) as IDBValidKey[];
+            let deletedCount = 0;
+            for (const key of keys) {
+              if (typeof key === 'string' && key.startsWith('auto-save-')) {
+                store.delete(key);
+                deletedCount++;
+              }
+            }
+            resolve(deletedCount);
+          };
+          request.onerror = () => resolve(0);
+        } else if (typeof store.openCursor === 'function') {
+          let deletedCount = 0;
+          const request = store.openCursor();
+          request.onsuccess = (event) => {
+            const cursor = (event.target as IDBRequest<IDBCursorWithValue | null>).result;
+            if (cursor) {
+              const key = cursor.key;
+              if (typeof key === 'string' && key.startsWith('auto-save-')) {
+                cursor.delete();
+                deletedCount++;
+              }
+              cursor.continue();
+            } else {
+              resolve(deletedCount);
+            }
+          };
+          request.onerror = () => resolve(deletedCount);
+        } else {
+          resolve(0);
+        }
+      } catch {
+        resolve(0);
+      }
+    });
+  }
 }
+

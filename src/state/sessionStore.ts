@@ -5,7 +5,7 @@ import { TutorialProgress, TutorialPhase } from '../types/tutorial.types';
 import { EntityID } from '../types/common.types';
 import { SessionLifecycleMetadata, SessionLifecycleStatus } from '../types/session.types';
 import Logger from '@/lib/utils/logger';
-import { createIndexedDBStorage } from './persistence';
+import { createIndexedDBStorage, sweepAutoSaveSnapshots } from './persistence';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import { writeRecoveryMarker, clearRecoveryMarker } from '@/lib/utils/sessionRecoveryMarker';
 import {
@@ -191,6 +191,10 @@ export const useSessionStore = create<SessionStore>()(
 
       // Mark the session live for crash recovery
       syncRecoveryMarker(get(), activationTimestamp);
+
+      // Sweep legacy auto-save snapshot keys
+      void sweepAutoSaveSnapshots().catch(() => {});
+
 
 
       // Session-start journal entry, created by the SESSION_STARTED subscriber
@@ -390,6 +394,8 @@ export const useSessionStore = create<SessionStore>()(
       });
       // Mark the resumed session live for crash recovery
       syncRecoveryMarker(get(), activationTimestamp);
+      // Sweep legacy auto-save snapshot keys
+      void sweepAutoSaveSnapshots().catch(() => {});
       return true;
     }
     return false;

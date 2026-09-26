@@ -1,23 +1,16 @@
 /**
- * Tests for useAutoSave hook - TDD Implementation
+ * Tests for useAutoSave hook
  */
 
 import { renderHook, act } from '@testing-library/react';
 import { useAutoSave } from '../useAutoSave';
 import { SessionStore } from '../../types/game.types';
 import { mockZustandStore, createMockSessionStore } from '@/lib/test-utils';
-
-// Mock the auto-save service
-const mockAutoSaveService = {
-  start: jest.fn(),
-  stop: jest.fn(),
-  triggerSave: jest.fn(),
-  isRunning: jest.fn(() => false),
-};
-
-jest.mock('../../lib/services/autoSaveService', () => ({
-  createAutoSave: jest.fn(() => mockAutoSaveService)
-}));
+import {
+  _setStorageStatusForTesting,
+  _resetStorageStatusForTesting,
+} from '@/state/persistence';
+import { StorageStatus } from '@/lib/storage/resilientStorage';
 
 const mockSessionStore: SessionStore = {
   id: 'test-session',
@@ -88,32 +81,6 @@ jest.mock('../../state/sessionStore');
 import { useSessionStore } from '../../state/sessionStore';
 mockZustandStore(useSessionStore as jest.MockedFunction<typeof useSessionStore>, createMockSessionStore(mockSessionStore));
 
-// Mock other stores
-jest.mock('../../state/worldStore', () => ({
-  useWorldStore: () => ({
-    worlds: { 'world-1': { id: 'world-1', name: 'Test World' } },
-  }),
-}));
-
-jest.mock('../../state/characterStore', () => ({
-  useCharacterStore: () => ({
-    characters: { 'char-1': { id: 'char-1', name: 'Test Character' } },
-  }),
-}));
-
-jest.mock('../../state/narrativeStore', () => ({
-  useNarrativeStore: () => ({
-    segments: {},
-    currentEnding: null,
-  }),
-}));
-
-jest.mock('../../state/journalStore', () => ({
-  useJournalStore: () => ({
-    entries: {},
-  }),
-}));
-
 // Mock useToast hook
 const mockToast = {
   success: jest.fn(),
@@ -133,64 +100,110 @@ jest.mock('../../components/ui/toast', () => ({
 describe('useAutoSave', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.useFakeTimers();
+    _resetStorageStatusForTesting();
+    mockSessionStore.autoSave.enabled = true;
+    mockSessionStore.autoSave.status = 'idle';
+    mockSessionStore.autoSave.lastSaveTime = null;
+    mockSessionStore.autoSave.errorMessage = null;
+    mockSessionStore.autoSave.totalSaves = 0;
+    mockSessionStore.status = 'active';
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    _resetStorageStatusForTesting();
   });
 
-  it('should initialize auto-save service when hook is used', () => {
+  it('should initialize with status from session store when storage is healthy', () => {
     const { result } = renderHook(() => useAutoSave());
 
     expect(result.current.isEnabled).toBe(true);
     expect(result.current.status).toBe('idle');
-  });
-
-  it('should start auto-save service automatically', () => {
-    mockAutoSaveService.isRunning.mockReturnValue(false);
-    const { result, rerender } = renderHook(() => useAutoSave());
-    
-    act(() => {
-      result.current.start();
-      mockAutoSaveService.isRunning.mockReturnValue(true);
-    });
-    
-    // Re-render to pick up the new isRunning state
-    rerender();
-    
-    expect(mockAutoSaveService.start).toHaveBeenCalled();
     expect(result.current.isRunning).toBe(true);
   });
 
-  it('forwards the triggerSave reason to the save service', async () => {
+  it('reflects error status and fallback notice when storage is unavailable', () => {
+    _setStorageStatusForTesting(StorageStatus.UNAVAILABLE, {
+      message: 'IndexedDB write failed: QuotaExceededError',
+    });
+
+    const { result } = renderHook(() => useAutoSave());
+
+    expect(result.current.status).toBe('error');
+    expect(result.current.errorMessage).toBe('IndexedDB write failed: QuotaExceededError');
+    expect(result.current.isRunning).toBe(false);
+  });
+
+  it('records auto-save and triggers success toast on manual save', async () => {
+    const { result } = renderHook(() => useAutoSave());
+
+    await act(async () => {
+      await result.current.triggerSave('manual');
+    });
+
+    expect(mockSessionStore.recordAutoSave).toHaveBeenCalled();
+    expect(mockToast.success).toHaveBeenCalledWith(
+      'Game saved successfully',
+      'Your progress has been saved'
+    );
+  });
+
+  it('shows error toast on manual save when storage is unavailable', async () => {
+    _setStorageStatusForTesting(StorageStatus.UNAVAILABLE, {
+      message: 'IndexedDB unavailable',
+    });
+
+    const { result } = renderHook(() => useAutoSave());
+
+    await act(async () => {
+      await result.current.triggerSave('manual');
+    });
+
+    expect(mockToast.error).toHaveBeenCalledWith('Save failed', 'IndexedDB unavailable');
+  });
+
+  it('records the save time on player-choice without a toast', async () => {
     const { result } = renderHook(() => useAutoSave());
 
     await act(async () => {
       await result.current.triggerSave('player-choice');
     });
 
-    // This only proves the hook wires the reason string through unchanged.
-    // Whether a given reason actually debounces or skips is the save
-    // service's own behavior, exercised against the real service (not
-    // mocked) in autoSaveService.test.ts.
-    expect(mockAutoSaveService.triggerSave).toHaveBeenCalledWith('player-choice');
-    expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('saving');
+    expect(mockSessionStore.recordAutoSave).toHaveBeenCalledTimes(1);
+    expect(mockToast.success).not.toHaveBeenCalled();
+    expect(mockToast.error).not.toHaveBeenCalled();
   });
 
-  it('should provide save status from session store', () => {
+  it.each(['saving', 'error'] as const)(
+    'settles a persisted %s status to idle when storage is healthy',
+    (legacyStatus) => {
+      mockSessionStore.autoSave.status = legacyStatus;
+
+      renderHook(() => useAutoSave());
+
+      expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('idle');
+    }
+  );
+
+  it('settles a persisted saving status to saved when a save time exists', () => {
+    mockSessionStore.autoSave.status = 'saving';
+    mockSessionStore.autoSave.lastSaveTime = '2026-01-01T00:00:00.000Z';
+
+    renderHook(() => useAutoSave());
+
+    expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('saved');
+  });
+
+  it('should provide save status and lastSaveTime from session store', () => {
     mockSessionStore.autoSave.status = 'saved';
-    mockSessionStore.autoSave.lastSaveTime = '2023-01-01T00:00:00.000Z';
-    
+    mockSessionStore.autoSave.lastSaveTime = '2026-01-01T00:00:00.000Z';
+
     const { result } = renderHook(() => useAutoSave());
-    
+
     expect(result.current.status).toBe('saved');
-    expect(result.current.lastSaveTime).toBe('2023-01-01T00:00:00.000Z');
+    expect(result.current.lastSaveTime).toBe('2026-01-01T00:00:00.000Z');
   });
 
   it('should allow enabling/disabling auto-save', () => {
-    // Let the store mock reflect the write, so the hook's reported isEnabled
-    // is read back from state rather than assumed from the call.
     (mockSessionStore.setAutoSaveEnabled as jest.Mock).mockImplementation((enabled: boolean) => {
       mockSessionStore.autoSave.enabled = enabled;
     });
@@ -213,4 +226,17 @@ describe('useAutoSave', () => {
     expect(result.current.isEnabled).toBe(true);
   });
 
+  it('retry calls triggerSave for manual save', async () => {
+    const { result } = renderHook(() => useAutoSave());
+
+    await act(async () => {
+      await result.current.retry();
+    });
+
+    expect(mockSessionStore.recordAutoSave).toHaveBeenCalled();
+    expect(mockToast.success).toHaveBeenCalledWith(
+      'Game saved successfully',
+      'Your progress has been saved'
+    );
+  });
 });
