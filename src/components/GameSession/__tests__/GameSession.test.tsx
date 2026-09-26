@@ -15,8 +15,13 @@ import {
 // shell or the resume dialog internals.
 jest.mock('../ActiveGameSession', () => ({
   __esModule: true,
-  default: (props: { status: string }) => (
-    <div data-testid="active-game-session" data-status={props.status} />
+  default: (props: { status: string; sessionId?: string; choices?: Array<{ id: string }> }) => (
+    <div
+      data-testid="active-game-session"
+      data-status={props.status}
+      data-session-id={props.sessionId}
+      data-choices-count={props.choices?.length ?? 0}
+    />
   ),
 }));
 jest.mock('../GameSessionLoading', () => ({
@@ -195,6 +200,48 @@ describe('GameSession', () => {
       sessionStore = createMockSessionStore({ status: 'active', error: 'Boom' });
       renderGameSession();
       expect(screen.getByTestId('game-session-error')).toHaveTextContent('Boom');
+    });
+
+    it('adopts sessionState.id once minted when disableAutoResume is true rather than locking to freshSessionId', () => {
+      sessionStore = createMockSessionStore({
+        status: 'active',
+        id: 'minted-session-abc',
+        playerChoices: [{ id: 'choice-1', text: 'Head into the forest', isSelected: false }],
+      });
+      renderGameSession({ worldId: 'world-1', disableAutoResume: true });
+      const activeSession = screen.getByTestId('active-game-session');
+      expect(activeSession).toHaveAttribute('data-session-id', 'minted-session-abc');
+      expect(activeSession).toHaveAttribute('data-choices-count', '1');
+    });
+
+    it('bypasses saved session resume prompt when disableAutoResume is true', () => {
+      sessionStore = createMockSessionStore({
+        status: 'initializing',
+        id: null,
+        savedSessions: {
+          'saved-1': {
+            id: 'saved-1',
+            worldId: 'world-1',
+            characterId: 'character-1',
+            lastPlayed: new Date().toISOString(),
+            narrativeCount: 2,
+          },
+        },
+      });
+      sessionStore.getSavedSession = jest.fn(() => sessionStore.savedSessions['saved-1']);
+
+      renderGameSession({ worldId: 'world-1', disableAutoResume: true });
+      expect(screen.queryByTestId('game-session-resume')).not.toBeInTheDocument();
+    });
+
+    it('preserves normal resume behavior when disableAutoResume is false', () => {
+      sessionStore = createMockSessionStore({
+        status: 'active',
+        id: 'resumed-session-123',
+      });
+      renderGameSession({ worldId: 'world-1', disableAutoResume: false });
+      const activeSession = screen.getByTestId('active-game-session');
+      expect(activeSession).toHaveAttribute('data-session-id', 'resumed-session-123');
     });
   });
 

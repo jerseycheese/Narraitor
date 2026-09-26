@@ -153,4 +153,20 @@ describe('useSessionStore', () => {
     // Assert again
     expect(useSessionStore.getState().status).toBe('active');
   });
+
+  it('mints a new session ID when force is true for a fresh session', async () => {
+    const worldId = 'test-world-id';
+    const characterId = 'test-character-id';
+    await useSessionStore.getState().initializeSession(worldId, characterId);
+    const initialSessionId = useSessionStore.getState().id;
+
+    // Small delay to ensure timestamp differs
+    await new Promise((r) => setTimeout(r, 10));
+
+    await useSessionStore.getState().initializeSession(worldId, characterId, undefined, true);
+    const freshSessionId = useSessionStore.getState().id;
+
+    expect(freshSessionId).toBeTruthy();
+    expect(freshSessionId).not.toBe(initialSessionId);
+  });
 });
