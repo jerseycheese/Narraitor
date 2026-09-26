@@ -1,7 +1,8 @@
 // src/lib/ai/providers/openai-compatible/client.ts
 
 import type { AIClient, AIGenerateOptions, AIResponse, AIServiceConfig } from '../../types';
-import type { ProviderDescriptor, TextGenerationSpec } from '../types';
+import type { ProviderAdapter, ProviderDescriptor, TextGenerationSpec } from '../types';
+import { getProviderAdapter } from '../adapterRegistry';
 import { openAICompatibleAdapter } from './adapter';
 import { generateProviderText } from '../core/request';
 import { parseContentRating } from '../../safety/contentRatingGuidance';
@@ -9,13 +10,10 @@ import { getGenerationConfig } from '../../config';
 import { isRetryableError } from '@/lib/utils/errorUtils';
 
 /**
- * `AIClient` over any OpenAI-compatible chat-completions endpoint.
+ * `AIClient` over any OpenAI-compatible chat-completions endpoint (or Claude Messages API).
  *
- * Sits beside `GeminiClient` under the same interface (`src/lib/ai/types.ts`),
- * so everything that takes an AIClient — the generators, the API routes —
- * works against either without knowing which one it holds. The wire format
- * lives entirely in the adapter; this class is retry policy and the
- * prompt-to-spec translation.
+ * Wire format lives in the adapter (resolved via `getProviderAdapter(descriptor.type) ?? openAICompatibleAdapter`);
+ * this class handles retry policy and prompt-to-spec translation.
  *
  * Text only. Image generation is a separate endpoint shape on every provider
  * that has one, and stays on Gemini, so `generateImage` is simply
@@ -23,13 +21,19 @@ import { isRetryableError } from '@/lib/utils/errorUtils';
  */
 export class OpenAICompatibleClient implements AIClient {
   private readonly descriptor: ProviderDescriptor;
+  private readonly adapter: ProviderAdapter;
   private readonly maxRetries: number;
   private readonly timeout: number;
   private readonly temperature: number;
   private readonly maxTokens: number;
 
-  constructor(descriptor: ProviderDescriptor, config: Pick<AIServiceConfig, 'maxRetries' | 'timeout'>) {
+  constructor(
+    descriptor: ProviderDescriptor,
+    config: Pick<AIServiceConfig, 'maxRetries' | 'timeout'>,
+    adapter?: ProviderAdapter
+  ) {
     this.descriptor = descriptor;
+    this.adapter = adapter ?? getProviderAdapter(descriptor.type) ?? openAICompatibleAdapter;
     this.maxRetries = config.maxRetries;
     this.timeout = config.timeout;
 
@@ -58,7 +62,7 @@ export class OpenAICompatibleClient implements AIClient {
 
       try {
         const result = await generateProviderText(
-          openAICompatibleAdapter,
+          this.adapter,
           this.descriptor,
           this.buildSpec(prompt),
           this.timeout

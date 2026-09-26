@@ -1,4 +1,7 @@
-import { parseNarrativeResponse } from '../narrativeGenerator.response.parse';
+import {
+  parseNarrativeResponse,
+  unescapeJsonString,
+} from '../narrativeGenerator.response.parse';
 
 describe('parseNarrativeResponse debris guard', () => {
   it('throws when the response is a bare opening brace', () => {
@@ -158,5 +161,45 @@ describe('parseNarrativeResponse debris guard', () => {
     expect(parsed.segmentType).toBe('action');
     expect(parsed.actualContent).not.toContain('metadata');
     expect(parsed.actualContent).not.toContain('majorEvent');
+  });
+});
+
+describe('unescapeJsonString', () => {
+  it('unescapes escaped quotes', () => {
+    expect(unescapeJsonString('She whispered, \\"Run!\\"')).toBe(
+      'She whispered, "Run!"'
+    );
+  });
+
+  it('unescapes escaped newlines', () => {
+    expect(unescapeJsonString('Line one\\nLine two')).toBe('Line one\nLine two');
+  });
+
+  it('leaves raw literal newlines untouched', () => {
+    expect(unescapeJsonString('Line one\nLine two')).toBe('Line one\nLine two');
+  });
+
+  it('unescapes escaped backslashes', () => {
+    expect(unescapeJsonString('path\\\\to\\\\file')).toBe('path\\to\\file');
+  });
+
+  it('does not corrupt an escaped backslash before n into a newline', () => {
+    // In raw string: \\\\n (an escaped backslash followed by the character n)
+    // Should decode to a single backslash followed by n: \n, NOT a newline character
+    expect(unescapeJsonString('pattern \\\\n test')).toBe('pattern \\n test');
+  });
+
+  it('decodes escaped backslash followed by escaped newline correctly', () => {
+    // In raw string: \\\\\\n (an escaped backslash followed by an escaped newline)
+    // Should decode to a single backslash followed by an actual newline
+    expect(unescapeJsonString('line one\\\\\\nline two')).toBe(
+      'line one\\\nline two'
+    );
+  });
+
+  it('handles carriage returns and tabs', () => {
+    expect(unescapeJsonString('col1\\tcol2\\r\\ncol3')).toBe(
+      'col1\tcol2\r\ncol3'
+    );
   });
 });
