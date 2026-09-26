@@ -53,6 +53,19 @@ export const subscribeStorageStatus = (
 };
 
 /**
+ * Sweeps legacy auto-save snapshot keys from persistent storage.
+ */
+export const sweepAutoSaveSnapshots = async (): Promise<number> => {
+  try {
+    const storage = await getResilientStorage();
+    return await storage.sweepAutoSaveSnapshots();
+  } catch {
+    return 0;
+  }
+};
+
+
+/**
  * Test-only helper to reset storage status state between tests.
  */
 export const _resetStorageStatusForTesting = (): void => {

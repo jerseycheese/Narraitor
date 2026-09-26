@@ -13,6 +13,8 @@ export interface MockStore {
   get: jest.Mock;
   put: jest.Mock;
   delete: jest.Mock;
+  getAllKeys?: jest.Mock;
+  openCursor?: jest.Mock;
 }
 
 export interface MockTransaction {
@@ -44,7 +46,8 @@ export const createMockDB = (): MockDB => ({
 export const createMockStore = (): MockStore => ({
   get: jest.fn(),
   put: jest.fn(),
-  delete: jest.fn()
+  delete: jest.fn(),
+  getAllKeys: jest.fn(),
 });
 
 /**
