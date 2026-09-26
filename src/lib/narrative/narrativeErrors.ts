@@ -5,7 +5,7 @@
  * the story, not as technical faults. This maps an error to genre-neutral,
  * jargon-free copy and frames the recovery action as a narrative choice.
  *
- * Scoped to the play surfaces on purpose — the global getUserFriendlyError copy
+ * Scoped to the play surfaces on purpose - the global getUserFriendlyError copy
  * stays generic because it is also used in non-narrative contexts (forms, etc.).
  */
 
@@ -59,30 +59,31 @@ const NARRATIVE_COPY: Record<
   [ErrorType.VALIDATION]: {
     title: 'That didn\'t fit the story',
     message: 'Part of what happened didn\'t come together as expected.',
-    suggestion: 'Try a different choice to continue.',
+    suggestion: 'Try to continue - if it keeps happening, refresh and resume.',
   },
   [ErrorType.UNKNOWN]: {
     title: 'The story stumbled',
     message: 'Something interrupted your story unexpectedly.',
-    suggestion: 'Try to continue — if it keeps happening, refresh and resume.',
+    suggestion: 'Try to continue - if it keeps happening, refresh and resume.',
   },
 };
 
 /**
  * Maps an error (or raw error string) to narrative-styled copy. Reuses the
- * shared categorization in errorUtils so retryability and severity stay
- * consistent with the rest of the app.
+ * shared categorization in errorUtils for severity and messaging, but failed
+ * generation turns that did not advance the story are retryable for every
+ * error type except AUTH.
  */
 export function getNarrativeError(error: Error | string): NarrativeError {
   const errorObj = typeof error === 'string' ? new Error(error) : error;
-  const { type, retryable, severity } = getUserFriendlyError(errorObj);
+  const { type, severity } = getUserFriendlyError(errorObj);
   const copy = NARRATIVE_COPY[type];
 
   return {
     title: copy.title,
     message: copy.message,
     suggestion: copy.suggestion,
-    retryable,
+    retryable: type !== ErrorType.AUTH,
     retryLabel: RETRY_LABEL,
     severity,
   };

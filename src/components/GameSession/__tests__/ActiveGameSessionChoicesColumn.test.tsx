@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import ActiveGameSessionChoicesColumn from '../ActiveGameSessionChoicesColumn';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import type { Decision } from '@/types/narrative.types';
+import { getNarrativeError } from '@/lib/narrative/narrativeErrors';
 
 // The stub renders whatever lands in inputActions, so a test can assert on the
 // controls the player would actually get rather than on the prop's existence.
@@ -226,6 +227,25 @@ describe('ActiveGameSessionChoicesColumn', () => {
       );
 
       expect(screen.queryByRole('alert')).toBeNull();
+    });
+
+    it('renders the retry button for an UNKNOWN narrative error (#2169)', () => {
+      const unknownError = getNarrativeError(new Error('something exploded unexpectedly'));
+      const onRetryGeneration = jest.fn();
+      render(
+        <ActiveGameSessionChoicesColumn
+          {...baseProps}
+          currentDecision={null}
+          generationError={unknownError}
+          onRetryGeneration={onRetryGeneration}
+        />
+      );
+
+      expect(screen.getByRole('alert')).toHaveTextContent('The story stumbled');
+      const retry = screen.getByRole('button', { name: 'Continue the story' });
+      expect(retry).toBeInTheDocument();
+      fireEvent.click(retry);
+      expect(onRetryGeneration).toHaveBeenCalledTimes(1);
     });
   });
 });
