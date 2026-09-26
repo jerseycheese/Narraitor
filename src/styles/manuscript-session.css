@@ -424,7 +424,7 @@ body.manuscript-overlay-open {
 .manuscript-characters-rail {
   display: block;
   box-sizing: border-box;
-  background: var(--color-overlay-surface);
+  background: var(--color-overlay-surface-strong);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: var(--space-3);
