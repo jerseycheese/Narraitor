@@ -345,7 +345,7 @@ describe('useActiveGameSessionActions', () => {
     });
   });
 
-  it('does not trigger redundant auto-save snapshots on choice selection or scene change', () => {
+  it('records a save on choice selection and scene change', () => {
     const mockAutoSave = { triggerSave: jest.fn() } as unknown as UseAutoSaveReturn;
     const { result } = renderHook(() =>
       useActiveGameSessionActions(buildOptions({ autoSave: mockAutoSave }))
@@ -355,7 +355,7 @@ describe('useActiveGameSessionActions', () => {
       result.current.handleChoiceSelected('choice-1');
     });
 
-    expect(mockAutoSave.triggerSave).not.toHaveBeenCalled();
+    expect(mockAutoSave.triggerSave).toHaveBeenCalledWith('player-choice');
 
     const segment = {
       id: 'seg-1',
@@ -372,6 +372,6 @@ describe('useActiveGameSessionActions', () => {
       result.current.handleNarrativeGenerated(segment);
     });
 
-    expect(mockAutoSave.triggerSave).not.toHaveBeenCalled();
+    expect(mockAutoSave.triggerSave).toHaveBeenCalledWith('scene-change');
   });
 });

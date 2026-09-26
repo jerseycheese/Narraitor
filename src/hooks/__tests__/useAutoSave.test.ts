@@ -140,7 +140,6 @@ describe('useAutoSave', () => {
       await result.current.triggerSave('manual');
     });
 
-    expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('saving');
     expect(mockSessionStore.recordAutoSave).toHaveBeenCalled();
     expect(mockToast.success).toHaveBeenCalledWith(
       'Game saved successfully',
@@ -162,15 +161,36 @@ describe('useAutoSave', () => {
     expect(mockToast.error).toHaveBeenCalledWith('Save failed', 'IndexedDB unavailable');
   });
 
-  it('handles player-choice and scene-change trigger gracefully without error', async () => {
+  it('records the save time on player-choice without a toast', async () => {
     const { result } = renderHook(() => useAutoSave());
 
     await act(async () => {
       await result.current.triggerSave('player-choice');
     });
 
-    // Does not show error toast or fail
+    expect(mockSessionStore.recordAutoSave).toHaveBeenCalledTimes(1);
+    expect(mockToast.success).not.toHaveBeenCalled();
     expect(mockToast.error).not.toHaveBeenCalled();
+  });
+
+  it.each(['saving', 'error'] as const)(
+    'settles a persisted %s status to idle when storage is healthy',
+    (legacyStatus) => {
+      mockSessionStore.autoSave.status = legacyStatus;
+
+      renderHook(() => useAutoSave());
+
+      expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('idle');
+    }
+  );
+
+  it('settles a persisted saving status to saved when a save time exists', () => {
+    mockSessionStore.autoSave.status = 'saving';
+    mockSessionStore.autoSave.lastSaveTime = '2026-01-01T00:00:00.000Z';
+
+    renderHook(() => useAutoSave());
+
+    expect(mockSessionStore.updateAutoSaveStatus).toHaveBeenCalledWith('saved');
   });
 
   it('should provide save status and lastSaveTime from session store', () => {

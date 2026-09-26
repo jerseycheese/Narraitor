@@ -1,16 +1,11 @@
-import { render, screen, act } from '@testing-library/react';
+/**
+ * Tests for SaveIndicator component - TDD Implementation
+ */
+
+import { render, screen } from '@testing-library/react';
 import { SaveIndicator } from '../SaveIndicator';
-import {
-  _setStorageStatusForTesting,
-  _resetStorageStatusForTesting,
-} from '@/state/persistence';
-import { StorageStatus } from '@/lib/storage/resilientStorage';
 
 describe('SaveIndicator', () => {
-  afterEach(() => {
-    _resetStorageStatusForTesting();
-  });
-
   it('should display idle status', () => {
     render(<SaveIndicator status="idle" />);
 
@@ -63,38 +58,5 @@ describe('SaveIndicator', () => {
     
     const saveButton = screen.getByText(/save now/i);
     expect(saveButton).toBeDisabled();
-  });
-
-  it('reflects error when storage is in fallback or memory mode', () => {
-    _setStorageStatusForTesting(StorageStatus.UNAVAILABLE, {
-      message: 'IndexedDB write failed: QuotaExceededError',
-    });
-
-    render(<SaveIndicator status="saved" />);
-
-    expect(screen.getByText(/storage error/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(/IndexedDB write failed: QuotaExceededError/)
-    ).toBeInTheDocument();
-  });
-
-  it('recovers when storage status transitions back to healthy', () => {
-    const { rerender } = render(<SaveIndicator status="saved" />);
-    expect(screen.getByText(/saved/i)).toBeInTheDocument();
-
-    act(() => {
-      _setStorageStatusForTesting(StorageStatus.UNAVAILABLE, {
-        message: 'Storage degraded',
-      });
-    });
-
-    expect(screen.getByText(/storage error/i)).toBeInTheDocument();
-
-    act(() => {
-      _setStorageStatusForTesting(null);
-    });
-
-    rerender(<SaveIndicator status="saved" />);
-    expect(screen.getByText(/saved/i)).toBeInTheDocument();
   });
 });

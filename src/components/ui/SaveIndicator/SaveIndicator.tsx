@@ -2,22 +2,16 @@
  * SaveIndicator component - Shows auto-save status and controls
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { clsx } from 'clsx';
 import { formatTime } from '@/lib/utils';
-import {
-  getStorageStatus,
-  getStorageFallbackNotice,
-  subscribeStorageStatus,
-} from '@/state/persistence';
-import { StorageStatus } from '@/lib/storage/resilientStorage';
 
-export type SaveTriggerReason = 'periodic' | 'player-choice' | 'scene-change' | 'manual';
+export type SaveTriggerReason = 'player-choice' | 'scene-change' | 'manual';
 
 export interface SaveIndicatorProps {
-  status?: 'idle' | 'saving' | 'saved' | 'error';
+  status: 'idle' | 'saving' | 'saved' | 'error';
   lastSaveTime?: string | null;
   errorMessage?: string | null;
   totalSaves?: number;
@@ -29,7 +23,7 @@ export interface SaveIndicatorProps {
 }
 
 export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
-  status = 'idle',
+  status,
   lastSaveTime,
   errorMessage,
   totalSaves = 0,
@@ -39,24 +33,8 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   className = '',
   compact = false,
 }) => {
-  const [resilientStatus, setResilientStatus] = useState<StorageStatus | null>(() => getStorageStatus());
-  const [fallbackNotice, setFallbackNotice] = useState(() => getStorageFallbackNotice());
-
-  useEffect(() => {
-    return subscribeStorageStatus((newStatus, notice) => {
-      setResilientStatus(newStatus);
-      setFallbackNotice(notice);
-    });
-  }, []);
-
-  const isStorageUnavailable = resilientStatus === StorageStatus.UNAVAILABLE;
-  const effectiveStatus = isStorageUnavailable ? 'error' : status;
-  const effectiveErrorMessage = isStorageUnavailable
-    ? (fallbackNotice?.message || errorMessage || 'Storage is unavailable. Changes will not be saved across sessions.')
-    : errorMessage;
-
   const getStatusText = () => {
-    if (effectiveStatus === 'saving') {
+    if (status === 'saving') {
       return 'Saving...';
     }
     if (lastSaveTime) {
@@ -66,14 +44,14 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   };
 
   // Handle error state with ErrorDisplay component
-  if (effectiveStatus === 'error') {
+  if (status === 'error') {
     return (
       <div className={clsx('save-indicator save-indicator-error', className)}>
         <ErrorDisplay
           variant={compact ? 'inline' : 'section'}
           severity="error"
-          title={compact ? undefined : 'Storage Error'}
-          message={effectiveErrorMessage || "Couldn't save your progress. Your recent moves aren't stored yet."}
+          title={compact ? undefined : 'Auto-Save Error'}
+          message={errorMessage || "Couldn't save your progress. Your recent moves aren't stored yet."}
           showRetry={retryable && !!onRetryError}
           onRetry={onRetryError}
           showDismiss={false}
@@ -83,7 +61,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   }
 
   // Handle saving state with LoadingState component
-  if (effectiveStatus === 'saving') {
+  if (status === 'saving') {
     return (
       <div className={clsx('save-indicator', compact && 'save-indicator-compact', className)}>
         <LoadingState

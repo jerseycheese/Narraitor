@@ -25,7 +25,7 @@ interface UseActiveGameSessionActionsOptions {
   choiceGenerationTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
   scheduleChoiceFallback: () => void;
   onChoiceSelected: (choiceId: string) => void;
-  autoSave?: UseAutoSaveReturn;
+  autoSave: UseAutoSaveReturn;
   isSessionEnded: (sessionId: string) => boolean;
   createDecisionJournalEntry: (decision: Decision, selectedChoiceId: string, isCustomChoice: boolean) => void;
   createJournalEntryFromSegment: (segment: NarrativeSegment, relatedDecisionWeight?: 'minor' | 'major' | 'critical') => void;
@@ -47,7 +47,7 @@ export const useActiveGameSessionActions = ({
   choiceGenerationTimeoutRef,
   scheduleChoiceFallback,
   onChoiceSelected,
-  autoSave: _autoSave,
+  autoSave,
   isSessionEnded,
   createDecisionJournalEntry,
   createJournalEntryFromSegment,
@@ -78,7 +78,9 @@ export const useActiveGameSessionActions = ({
       setIsGeneratingChoices(true);
       scheduleChoiceFallback();
     }
-  }, [characterId, createJournalEntryFromSegment, currentDecision, scheduleChoiceFallback, setIsGenerating, setIsGeneratingChoices, setShouldTriggerGeneration]);
+
+    void autoSave.triggerSave('scene-change');
+  }, [autoSave, characterId, createJournalEntryFromSegment, currentDecision, scheduleChoiceFallback, setIsGenerating, setIsGeneratingChoices, setShouldTriggerGeneration]);
 
   const handleChoiceSelected = useCallback((choiceId: string) => {
     // Check if session has ended - if so, prevent further generation
@@ -107,7 +109,9 @@ export const useActiveGameSessionActions = ({
 
     maybeCompleteFirstPlay();
     onChoiceSelected(choiceId);
-  }, [characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
+
+    void autoSave.triggerSave('player-choice');
+  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
 
   const handleCustomSubmit = useCallback(async (customText: string) => {
     // Check if session has ended - if so, prevent further generation
@@ -200,7 +204,9 @@ export const useActiveGameSessionActions = ({
 
     maybeCompleteFirstPlay();
     onChoiceSelected(customChoiceId);
-  }, [characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsEvaluatingAction, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
+
+    void autoSave.triggerSave('player-choice');
+  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsEvaluatingAction, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
 
   const handleChoicesGenerated = useCallback((decision: Decision) => {
     if (!decision || !decision.options || (decision.options?.length || 0) === 0) {

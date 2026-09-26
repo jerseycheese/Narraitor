@@ -42,6 +42,13 @@ export const useAutoSave = () => {
     if (initialStatus === StorageStatus.UNAVAILABLE) {
       const notice = getStorageFallbackNotice();
       handleStorageUpdate(initialStatus, notice);
+    } else {
+      // The removed snapshot service persisted transient statuses into sessionStore,
+      // and nothing here will replace them, so settle them on a healthy start.
+      const { status, lastSaveTime } = useSessionStore.getState().autoSave;
+      if (status === 'saving' || status === 'error') {
+        useSessionStore.getState().updateAutoSaveStatus(lastSaveTime ? 'saved' : 'idle');
+      }
     }
 
     return subscribeStorageStatus(handleStorageUpdate);
@@ -57,10 +64,10 @@ export const useAutoSave = () => {
         return;
       }
 
+      // Stores persist themselves through the persist middleware, so a healthy
+      // storage layer means the change is already written: record the time only.
+      useSessionStore.getState().recordAutoSave(getTimestamp());
       if (reason === 'manual') {
-        useSessionStore.getState().updateAutoSaveStatus('saving');
-        const timestamp = getTimestamp();
-        useSessionStore.getState().recordAutoSave(timestamp);
         toast.success('Game saved successfully', 'Your progress has been saved');
       }
     },
