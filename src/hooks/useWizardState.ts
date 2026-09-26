@@ -14,6 +14,14 @@ export interface WizardValidation {
   valid: boolean;
   errors: string[];
   touched: boolean;
+  /**
+   * Optional per-field error messages, keyed by field name. When a validator
+   * populates this, consuming components can show a field's error only once
+   * that specific field has been touched, instead of surfacing every
+   * failing field in the step as soon as any one of them changes. Falls back
+   * to the flat `errors` list (gated by `touched`) when omitted.
+   */
+  fieldErrors?: Record<string, string>;
 }
 
 interface WizardState<TData = unknown> {

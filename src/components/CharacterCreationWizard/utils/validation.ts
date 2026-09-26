@@ -122,11 +122,16 @@ export const validateBackground = (background: {
     minLength: 20,
     fieldName: 'Personality description'
   });
-  
+
   const allErrors = [...historyValidation.errors, ...personalityValidation.errors];
-  
+
+  const fieldErrors: Record<string, string> = {};
+  if (historyValidation.errors[0]) fieldErrors.history = historyValidation.errors[0];
+  if (personalityValidation.errors[0]) fieldErrors.personality = personalityValidation.errors[0];
+
   return {
     valid: allErrors.length === 0,
     errors: allErrors,
+    fieldErrors,
   };
 };

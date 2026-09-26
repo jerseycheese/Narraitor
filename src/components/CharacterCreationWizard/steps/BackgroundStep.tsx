@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { WizardFormSection } from '@/components/shared/wizard';
 import { ErrorBlock } from '@/components/shared';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import type { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
 import type { WizardValidation } from '@/hooks/useWizardState';
 import type { World } from '@/types/world.types';
+import { getVisibleFieldErrorMessages } from '@/lib/utils/wizardValidation';
 
 interface BackgroundStepData {
   characterData: CharacterCreationData;
@@ -16,9 +17,11 @@ interface BackgroundStepData {
 interface BackgroundStepProps {
   data: BackgroundStepData;
   onUpdate: (updates: Partial<CharacterCreationData>) => void;
-  onValidation: (valid: boolean, errors: string[]) => void;
+  onValidation: (valid: boolean, errors: string[], fieldErrors?: Record<string, string>) => void;
   validateStep: () => WizardValidation;
   worldConfig: World;
+  /** True once the player has pressed Next/Create while this step was invalid — show every field's error, not just touched ones. */
+  forceShowAllErrors?: boolean;
 }
 
 export const BackgroundStep: React.FC<BackgroundStepProps> = ({
@@ -26,14 +29,25 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
   onUpdate,
   onValidation,
   validateStep,
+  forceShowAllErrors = false,
 }) => {
+  // A field's "required"/length error only shows once the player has moved
+  // past (blurred) that specific field — not as soon as any other field in
+  // this step is blurred (see issue #2178).
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
+
   const updateBackground = (background: CharacterCreationData['background']) => {
     onUpdate({ background });
   };
 
-  const handleBlur = () => {
+  const handleFieldBlur = (field: string) => {
+    setTouchedFields((prev) => (prev.has(field) ? prev : new Set(prev).add(field)));
     const result = validateStep();
-    onValidation(result.valid, result.errors);
+    if (result.fieldErrors) {
+      onValidation(result.valid, result.errors, result.fieldErrors);
+    } else {
+      onValidation(result.valid, result.errors);
+    }
   };
 
   const handleHistoryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -66,7 +80,8 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
   };
 
   const validation = data.validation[3];
-  const showErrors = validation?.touched && !validation?.valid;
+  const visibleErrors = getVisibleFieldErrorMessages(validation, touchedFields, forceShowAllErrors);
+  const showErrors = visibleErrors.length > 0;
 
   return (
     <div className="component-background-step">
@@ -83,7 +98,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           data-tutorial="background-editor"
           value={data.characterData.background.history}
           onChange={handleHistoryChange}
-          onBlur={handleBlur}
+          onBlur={() => handleFieldBlur('history')}
           rows={6}
           placeholder="Describe your character's background and history... (minimum 50 characters)"
         />
@@ -100,7 +115,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           id="character-personality"
           value={data.characterData.background.personality}
           onChange={handlePersonalityChange}
-          onBlur={handleBlur}
+          onBlur={() => handleFieldBlur('personality')}
           rows={4}
           placeholder="Describe your character's personality traits... (minimum 30 characters)"
         />
@@ -118,7 +133,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           type="text"
           value={data.characterData.background.motivation}
           onChange={handleMotivationChange}
-          onBlur={handleBlur}
+          onBlur={() => handleFieldBlur('motivation')}
           placeholder="What drives your character?"
         />
         <p className="form-help-text">
@@ -134,7 +149,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           id="character-goals"
           value={data.characterData.background.goals.join('\n')}
           onChange={handleGoalsChange}
-          onBlur={handleBlur}
+          onBlur={() => handleFieldBlur('goals')}
           rows={3}
           placeholder="Enter your character's goals, one per line"
         />
@@ -142,7 +157,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
 
       {/* Validation errors */}
       {showErrors && (
-        <ErrorBlock errors={validation.errors} />
+        <ErrorBlock errors={visibleErrors} />
       )}
       </WizardFormSection>
     </div>

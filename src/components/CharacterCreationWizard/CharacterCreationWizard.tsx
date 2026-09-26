@@ -30,6 +30,7 @@ import {
 import { useTutorial } from '@/components/TutorialProvider';
 import { tourStepToWizardStep } from '@/lib/tutorial/characterCreationWizardTour';
 import type { WizardValidation } from '@/hooks/useWizardState';
+import { getVisibleStepError } from '@/lib/utils/wizardValidation';
 
 /**
  * Props for the CharacterCreationWizard component
@@ -66,6 +67,12 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       isValidDraft: isValidCharacterDraft,
     });
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
+
+  // Steps the player has explicitly tried to advance past (Next or Create)
+  // while invalid. Until then, a step's error banner stays hidden even
+  // though the underlying validation is marked `touched` by a field blur
+  // (see issue #2178) — per-field display is left to each step component.
+  const [attemptedSteps, setAttemptedSteps] = useState<Set<number>>(new Set());
 
   React.useEffect(() => {
     if (hasRecoveryData) {
@@ -193,6 +200,12 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   // Navigation handlers
   const handleNext = () => {
+    setAttemptedSteps((prev) => {
+      if (prev.has(wizard.state.currentStep)) return prev;
+      const next = new Set(prev);
+      next.add(wizard.state.currentStep);
+      return next;
+    });
     saveWizardState();
     wizard.goNext();
   };
@@ -276,8 +289,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   );
 
   const handleValidation = useCallback(
-    (valid: boolean, errors: string[]) => {
-      wizard.setValidation(wizard.state.currentStep, { valid, errors, touched: true });
+    (valid: boolean, errors: string[], fieldErrors?: Record<string, string>) => {
+      wizard.setValidation(wizard.state.currentStep, { valid, errors, touched: true, fieldErrors });
     },
     [wizard.setValidation, wizard.state.currentStep]
   );
@@ -298,6 +311,12 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         if (!validation.valid) {
           wizard.goToStep(i);
           wizard.setValidation(i, validation);
+          setAttemptedSteps((prev) => {
+            if (prev.has(i)) return prev;
+            const next = new Set(prev);
+            next.add(i);
+            return next;
+          });
           return;
         }
       }
@@ -354,7 +373,12 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       case 2:
         return <SkillsStep {...props} />;
       case 3:
-        return <BackgroundStep {...props} />;
+        return (
+          <BackgroundStep
+            {...props}
+            forceShowAllErrors={attemptedSteps.has(wizard.state.currentStep)}
+          />
+        );
       case 4:
         return <PortraitStep {...props} />;
       default:
@@ -363,8 +387,18 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   };
 
   const currentValidation = wizard.state.validation[wizard.state.currentStep];
-  const hasErrors = currentValidation?.touched && !currentValidation?.valid;
-  const error = hasErrors ? currentValidation.errors.join(',') : undefined;
+  // Only show the wizard-level banner once the player has tried to advance
+  // past this step; blurring a single field still validates (and gates
+  // Next on) the whole step, but shouldn't surface every other field's
+  // error at once (see issue #2178). Per-field display for the current
+  // step's own fields is handled inside that step component. Steps whose
+  // validator has no `fieldErrors` fall back to the previous all-or-nothing
+  // behavior via `getVisibleStepError`.
+  const error = getVisibleStepError(
+    currentValidation,
+    undefined,
+    attemptedSteps.has(wizard.state.currentStep)
+  );
 
   return (
     <>
