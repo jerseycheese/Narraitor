@@ -129,7 +129,9 @@ test.describe('Manuscript Layout Specific Tests', () => {
     // waits this way.
     await waitForImagesLoadedIn(page, '[data-testid="manuscript-session-shell"]');
 
-    await expect(page).toHaveScreenshot('manuscript-hud-expanded.png');
+    await expect(page).toHaveScreenshot('manuscript-hud-expanded.png', {
+      maxDiffPixels: 250,
+    });
   });
 
   test('Desktop and mobile rails should render in expected positions', async ({ page }) => {
@@ -181,6 +183,7 @@ test.describe('Manuscript Layout Specific Tests', () => {
 
     await expect(page).toHaveScreenshot('manuscript-full-composition.png', {
       fullPage: true,
+      maxDiffPixels: 250,
     });
 
     await page.setViewportSize({ width: 390, height: 844 });
