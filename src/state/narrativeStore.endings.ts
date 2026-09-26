@@ -16,7 +16,7 @@ import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.type
 
 const FALLBACK_ENDING_TONE: EndingTone = 'hopeful';
 
-type EndingParams = {
+export type EndingParams = {
   sessionId: EntityID;
   characterId: EntityID;
   worldId: EntityID;
@@ -26,7 +26,7 @@ type EndingParams = {
   character?: StoreCharacter;
 };
 
-const buildLocalEnding = ({
+export const buildLocalEnding = ({
   endingType,
   params,
   narrativeSegments,
@@ -57,7 +57,7 @@ const buildLocalEnding = ({
     | undefined;
 
   const characterLegacy = journalHighlight?.content
-    ? `${characterName} is remembered for ${journalHighlight.content}`
+    ? `${characterName}'s story is marked by this: ${journalHighlight.content}`
     : `${characterName} leaves a mark on everyone they crossed paths with.`;
 
   const worldImpact = `In ${worldName}, the ripples of this story linger, whispered about by those who witnessed it.`;
