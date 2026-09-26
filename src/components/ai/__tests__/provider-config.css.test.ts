@@ -26,4 +26,23 @@ describe('provider settings width', () => {
     expect(rule).toMatch(/max-width:\s*var\(--page-width-form\)/);
     expect(rule).not.toMatch(/max-width:\s*\d+(\.\d+)?(rem|px)/);
   });
+
+  describe('v1.8 nested border rules (#2171)', () => {
+    it('does not draw a 1px border on preset cards inside the wizard', () => {
+      const rule = ruleFor(providerConfigCss, '.provider-preset {');
+      expect(rule).toMatch(/border:\s*none;/);
+      expect(rule).not.toMatch(/border:\s*1px\s+solid/);
+    });
+
+    it('does not draw a 1px border on the key reveal toggle', () => {
+      const rule = ruleFor(providerConfigCss, '.provider-key-reveal {');
+      expect(rule).toMatch(/border:\s*none;/);
+      expect(rule).not.toMatch(/border:\s*1px\s+solid/);
+    });
+
+    it('does not draw a 1px border on the verify status block', () => {
+      const rule = ruleFor(providerConfigCss, '.provider-verify-status {');
+      expect(rule).not.toMatch(/border:\s*1px\s+solid/);
+    });
+  });
 });

@@ -114,22 +114,32 @@
   gap: var(--space-1);
   padding: var(--space-3);
   text-align: left;
-  border: 1px solid var(--color-border);
+  border: none;
+  border-left: 2px solid transparent;
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
   cursor: pointer;
   font-family: var(--font-interface);
   color: var(--color-text-primary);
+  transition: background 120ms ease, border-color 120ms ease;
 }
 
 .provider-preset:hover:not([disabled]) {
-  border-color: var(--color-accent);
   background: var(--color-surface-hover);
 }
 
+.provider-preset:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .provider-preset[data-selected='true'] {
-  border-color: var(--color-accent);
+  border-left-color: var(--color-accent);
   background: var(--color-accent-soft);
+}
+
+.provider-preset[data-selected='true'] .provider-preset-name {
+  color: var(--color-accent);
 }
 
 .provider-preset[disabled] {
@@ -170,9 +180,9 @@
   min-height: var(--control-height-touch);
 }
 
-/* Follows .wizard-nav-secondary — same surface, border, and focus ring, since
-   it sits in the same wizard step. The touch floor is shared with the input
-   above so the pair stays flush rather than the button standing proud. */
+/* Sits inside the bordered step panel, so it groups by tint alone rather than
+   drawing its own border (#2171). The touch floor is shared with the input
+   above so the pair stays flush. */
 .provider-key-reveal {
   display: inline-flex;
   align-items: center;
@@ -180,19 +190,19 @@
   flex-shrink: 0;
   min-height: var(--control-height-touch);
   padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
   color: var(--color-text-secondary);
   font-family: var(--font-interface);
   font-size: var(--font-size-sm);
   font-weight: 500;
   cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
 }
 
 .provider-key-reveal:hover {
   background: var(--color-surface-hover);
-  border-color: var(--color-border-strong);
   color: var(--color-text-primary);
 }
 
@@ -202,7 +212,7 @@
 }
 
 .provider-key-reveal[aria-pressed='true'] {
-  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
   color: var(--color-accent);
 }
 
@@ -249,19 +259,22 @@
 
 .provider-verify-status {
   padding: var(--space-3);
+  border-left: 2px solid transparent;
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
+  background: var(--color-canvas);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 
 .provider-verify-status[data-state='success'] {
-  border-color: var(--color-success);
+  border-left-color: var(--color-success);
+  background: var(--color-success-bg);
   color: var(--color-success);
 }
 
 .provider-verify-status[data-state='error'] {
-  border-color: var(--color-danger);
+  border-left-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
   color: var(--color-danger);
 }
 
