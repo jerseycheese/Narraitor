@@ -116,18 +116,30 @@ export function useEndingDetection({
   // the session/world/character key changes — matches the original reset
   // cadence in NarrativeController's mount effect.
   const endingSuggestedRef = useRef(false);
+  const fatalEndingSuggestedRef = useRef(false);
 
   useEffect(() => {
     endingSuggestedRef.current = false;
+    fatalEndingSuggestedRef.current = false;
   }, [sessionId, worldId, characterId]);
 
   /**
-   * Fire onEndingSuggested at most once per session/world/character key. Used
-   * by callers (e.g. critical-failure and fatal-tag branches) that need to
-   * short-circuit the AI check and surface an ending immediately.
+   * Fire onEndingSuggested at most once per session/world/character key.
+   * Fatal outcomes bypass the soft-offer gate so character deaths are
+   * never suppressed by an earlier soft offer the player declined, but
+   * fatal suggestions are still gated to fire at most once per key.
    */
   const suggestEnding = useCallback(
     (reason: string, endingType: EndingType) => {
+      const isFatal = reason.toLowerCase().startsWith('fatal:');
+      if (isFatal) {
+        if (fatalEndingSuggestedRef.current || !onEndingSuggested) return;
+        fatalEndingSuggestedRef.current = true;
+        endingSuggestedRef.current = true;
+        onEndingSuggested(reason, endingType);
+        return;
+      }
+
       if (endingSuggestedRef.current || !onEndingSuggested) return;
       endingSuggestedRef.current = true;
       onEndingSuggested(reason, endingType);

@@ -206,4 +206,142 @@ describe('useActiveGameSessionActions', () => {
       );
     });
   });
+
+  describe('handleNarrativeGenerated — session ending segments (#2168)', () => {
+    it('sets isGeneratingChoices to true and schedules fallback for normal scene segments', () => {
+      const setIsGenerating = jest.fn();
+      const setShouldTriggerGeneration = jest.fn();
+      const setIsGeneratingChoices = jest.fn();
+      const scheduleChoiceFallback = jest.fn();
+
+      const { result } = renderHook(() =>
+        useActiveGameSessionActions(
+          buildOptions({
+            setIsGenerating,
+            setShouldTriggerGeneration,
+            setIsGeneratingChoices,
+            scheduleChoiceFallback,
+          })
+        )
+      );
+
+      const segment = {
+        id: 'seg-normal',
+        sessionId: 'session-1',
+        content: 'You walk down the path.',
+        type: 'scene' as const,
+        metadata: { characterIds: [], tags: [] },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      act(() => {
+        result.current.handleNarrativeGenerated(segment);
+      });
+
+      expect(setIsGenerating).toHaveBeenCalledWith(false);
+      expect(setShouldTriggerGeneration).toHaveBeenCalledWith(false);
+      expect(setIsGeneratingChoices).toHaveBeenCalledWith(true);
+      expect(scheduleChoiceFallback).toHaveBeenCalledTimes(1);
+    });
+
+    it('sets isGeneratingChoices to false and skips scheduling fallback on fatal-outcome segments', () => {
+      const setIsGenerating = jest.fn();
+      const setShouldTriggerGeneration = jest.fn();
+      const setIsGeneratingChoices = jest.fn();
+      const scheduleChoiceFallback = jest.fn();
+
+      const { result } = renderHook(() =>
+        useActiveGameSessionActions(
+          buildOptions({
+            setIsGenerating,
+            setShouldTriggerGeneration,
+            setIsGeneratingChoices,
+            scheduleChoiceFallback,
+          })
+        )
+      );
+
+      const fatalSegment = {
+        id: 'seg-fatal',
+        sessionId: 'session-1',
+        content: 'The fall is fatal.',
+        type: 'scene' as const,
+        metadata: { tags: ['fatal-outcome'] },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      act(() => {
+        result.current.handleNarrativeGenerated(fatalSegment);
+      });
+
+      expect(setIsGenerating).toHaveBeenCalledWith(false);
+      expect(setShouldTriggerGeneration).toHaveBeenCalledWith(false);
+      expect(setIsGeneratingChoices).toHaveBeenCalledWith(false);
+      expect(scheduleChoiceFallback).not.toHaveBeenCalled();
+    });
+
+    it('sets isGeneratingChoices to false and skips scheduling fallback on ending-type segments', () => {
+      const setIsGeneratingChoices = jest.fn();
+      const scheduleChoiceFallback = jest.fn();
+
+      const { result } = renderHook(() =>
+        useActiveGameSessionActions(
+          buildOptions({
+            setIsGeneratingChoices,
+            scheduleChoiceFallback,
+          })
+        )
+      );
+
+      const endingSegment = {
+        id: 'seg-ending',
+        sessionId: 'session-1',
+        content: 'And so ends the tale.',
+        type: 'ending' as const,
+        metadata: { characterIds: [], tags: [] },
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      act(() => {
+        result.current.handleNarrativeGenerated(endingSegment);
+      });
+
+      expect(setIsGeneratingChoices).toHaveBeenCalledWith(false);
+      expect(scheduleChoiceFallback).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handleChoicesGenerated — empty or ending choices signal (#2168)', () => {
+    it('clears isGeneratingChoices and clears timeout when empty decision options arrive', () => {
+      const setIsGeneratingChoices = jest.fn();
+      const timeoutId = setTimeout(() => {}, 10000);
+      const choiceGenerationTimeoutRef = { current: timeoutId };
+
+      const { result } = renderHook(() =>
+        useActiveGameSessionActions(
+          buildOptions({
+            setIsGeneratingChoices,
+            choiceGenerationTimeoutRef,
+          })
+        )
+      );
+
+      act(() => {
+        result.current.handleChoicesGenerated({
+          id: '',
+          prompt: '',
+          options: [],
+        });
+      });
+
+      expect(setIsGeneratingChoices).toHaveBeenCalledWith(false);
+      expect(choiceGenerationTimeoutRef.current).toBeNull();
+    });
+  });
 });

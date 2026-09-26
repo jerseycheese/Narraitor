@@ -615,6 +615,13 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         onNarrativeGenerated(gatedSegment);
       }
 
+      if (turnResult.isFatal && onEndingSuggested) {
+        suggestEnding(
+          'fatal: narrative segment marked the player as dead or incapacitated.',
+          'story-complete'
+        );
+      }
+
       // Check for ending indicators. Deferred off the per-turn path: it's
       // an extra Gemini round-trip that only feeds onEndingSuggested, which
       // choice generation below doesn't wait on.
@@ -625,6 +632,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // choice generation reads the post-turn revision.
       if (generateChoices && isTurnSettled && !turnResult.isEnding) {
         generatePlayerChoices(turnResult.snapshot);
+      } else if (turnResult.isEnding) {
+        onChoicesGenerated?.({ id: '', prompt: '', options: [] });
       }
     } catch {
       // Error generating initial narrative (timeout, abort, network, etc.).
@@ -818,6 +827,13 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         onNarrativeGenerated(gatedSegment);
       }
 
+      if (turnResult.isFatal && onEndingSuggested) {
+        suggestEnding(
+          'fatal: narrative segment marked the player as dead or incapacitated.',
+          'story-complete'
+        );
+      }
+
       // Check for ending indicators. Deferred off the per-turn path: it's
       // an extra Gemini round-trip that only feeds onEndingSuggested, which
       // choice generation below doesn't wait on.
@@ -837,6 +853,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         !criticalFailureEndsSession
       ) {
         generatePlayerChoices(turnResult.snapshot);
+      } else if (turnResult.isEnding || criticalFailureEndsSession) {
+        onChoicesGenerated?.({ id: '', prompt: '', options: [] });
       }
     } catch (err) {
       // Error generating narrative. Classify the failure (transient network/
