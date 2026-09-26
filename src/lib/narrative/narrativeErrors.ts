@@ -72,7 +72,7 @@ const NARRATIVE_COPY: Record<
  * Maps an error (or raw error string) to narrative-styled copy. Reuses the
  * shared categorization in errorUtils for severity and messaging, but failed
  * generation turns that did not advance the story are retryable for every
- * error type except AUTH (Issue #2169).
+ * error type except AUTH.
  */
 export function getNarrativeError(error: Error | string): NarrativeError {
   const errorObj = typeof error === 'string' ? new Error(error) : error;
