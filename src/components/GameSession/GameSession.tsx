@@ -94,14 +94,14 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   // Create a stable session ID that won't change on re-renders
   const stableSessionId = useMemo(() => {
-    // If we're disabling auto-resume (fresh session requested), use the stable fresh session ID
-    if (disableAutoResume && freshSessionId) {
-      return freshSessionId;
-    }
-    
-    // First priority: Use session ID from session state (from store)
+    // First priority: Use session ID from session state (from store) once minted
     if (sessionState.id) {
       return sessionState.id;
+    }
+    
+    // Pre-start seed when fresh session is requested: use the stable fresh session ID
+    if (disableAutoResume && freshSessionId) {
+      return freshSessionId;
     }
     
     // Second priority: Check if store already has a session ID

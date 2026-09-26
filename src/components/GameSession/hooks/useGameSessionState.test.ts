@@ -205,4 +205,55 @@ describe('useGameSessionState', () => {
     expect(result.current.sessionState.status).toBe('loading');
     expect(result.current.sessionState.currentSceneId).toBe('initial-scene');
   });
+
+  test('forces initializeSession and bypasses saved session when disableAutoResume is true', () => {
+    const savedSessionData = {
+      id: 'saved-session-1',
+      worldId: 'test-world',
+      characterId: 'test-character-id',
+      lastPlayed: '2026-09-25T12:00:00Z',
+      narrativeCount: 3,
+    };
+    mockSessionStoreState.getSavedSession = jest.fn(() => savedSessionData);
+    mockSessionStoreState.status = 'initializing';
+
+    const { result } = renderHook(() => useGameSessionState({
+      worldId: 'test-world',
+      isClient: true,
+      disableAutoResume: true,
+      initialState: { status: 'initializing' },
+    }));
+
+    expect(result.current.savedSession).toBeUndefined();
+    expect(mockSessionStoreState.resumeSavedSession).not.toHaveBeenCalled();
+    expect(mockSessionStoreState.initializeSession).toHaveBeenCalledWith(
+      'test-world',
+      'test-character-id',
+      undefined,
+      true
+    );
+  });
+
+  test('preserves normal resume behavior and resumes saved session when disableAutoResume is false', () => {
+    const savedSessionData = {
+      id: 'saved-session-1',
+      worldId: 'test-world',
+      characterId: 'test-character-id',
+      lastPlayed: '2026-09-25T12:00:00Z',
+      narrativeCount: 3,
+    };
+    mockSessionStoreState.getSavedSession = jest.fn(() => savedSessionData);
+    mockSessionStoreState.status = 'initializing';
+
+    const { result } = renderHook(() => useGameSessionState({
+      worldId: 'test-world',
+      isClient: true,
+      disableAutoResume: false,
+      initialState: { status: 'initializing' },
+    }));
+
+    expect(result.current.savedSession).toEqual(savedSessionData);
+    expect(mockSessionStoreState.resumeSavedSession).toHaveBeenCalledWith('saved-session-1');
+    expect(mockSessionStoreState.initializeSession).not.toHaveBeenCalled();
+  });
 });

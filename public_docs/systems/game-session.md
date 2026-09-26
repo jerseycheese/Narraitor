@@ -55,8 +55,8 @@ A few things worth knowing about how the branches interact:
 
 The component derives a `stableSessionId` from a four-priority chain so the ID stays the same across re-renders:
 
-1. `disableAutoResume` set → use a freshly generated session ID (test/dev harness).
-2. `sessionState.id` if the store already has one.
+1. `sessionState.id` once the store has minted one.
+2. `disableAutoResume` set - use a freshly generated session ID as pre-start seed (test/dev harness or ?fresh=true).
 3. `useSessionStore.getState().id` if the store has an ID for this world.
 4. `savedSession.id` if we're about to resume.
 5. Any existing narrative segments belonging to this world.

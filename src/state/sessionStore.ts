@@ -126,7 +126,7 @@ export const useSessionStore = create<SessionStore>()(
     
     // Generate a new session ID for fresh sessions or when changing characters
     const isNewCharacterSession = currentState.characterId !== characterId;
-    const sessionId = (isNewCharacterSession || !currentState.id) 
+    const sessionId = (isNewCharacterSession || !currentState.id || force) 
       ? `session-${worldId}-${characterId}-${Date.now()}` 
       : currentState.id;
     
@@ -136,7 +136,7 @@ export const useSessionStore = create<SessionStore>()(
     // clears the new session's segments/decisions (isNewSession) and
     // inventoryStore clears the character inventory (isForcedFresh) — old
     // session data is still preserved when changing characters.
-    const isNewSession = isNewCharacterSession || !currentState.id;
+    const isNewSession = isNewCharacterSession || !currentState.id || force;
     if (sessionId && (isNewSession || force)) {
       await storeEvents.emit<SessionFreshStartEvent>(StoreEventTypes.SESSION_FRESH_START, {
         sessionId,
