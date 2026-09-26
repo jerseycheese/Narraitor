@@ -15,9 +15,10 @@ export const maxDuration = 60;
 // single-JSON-response path the other narrative routes use.
 export const POST = withAIRoute(async (request: NextRequest) => {
   return processAIStreamingTextRequest(request, {
-    // Matches lib/ai/config's default. A weighty beat asks for 3-4 paragraphs
-    // plus its JSON metadata, which crowds a 1024 ceiling and gets truncated
-    // mid-object — and a truncated response is unparseable, not just short.
+    // Default when caller specifies no maxTokens (matches lib/ai/config).
+    // Sized for standard narrative prose beats (3-4 paragraphs plus JSON metadata).
+    // Callers with heavier budgets (e.g. goal extraction) can request up to
+    // SERVER_MAX_OUTPUT_TOKENS (4096).
     maxTokens: 2048,
     temperature: 0.7,
     errorContext: 'Narrative generation'

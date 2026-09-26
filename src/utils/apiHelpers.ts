@@ -218,6 +218,11 @@ export async function makeGeminiRequest(
  * Options for a text generation request
  */
 export interface AITextRequestOptions {
+  /**
+   * Route-level default output token budget when the caller provides no maxTokens.
+   * Callers that supply requestData.config.maxTokens are clamped to
+   * SERVER_MAX_OUTPUT_TOKENS rather than this default.
+   */
   maxTokens?: number;
   temperature?: number;
   errorContext?: string; // For logging context (e.g., 'Narrative generation', 'Choice generation')

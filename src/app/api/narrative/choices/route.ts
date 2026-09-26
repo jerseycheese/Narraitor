@@ -11,6 +11,8 @@ export const maxDuration = 60;
 
 export const POST = withAIRoute(async (request: NextRequest) => {
   return processAITextRequest(request, {
+    // Default when caller specifies no maxTokens. Sized for choice option sets.
+    // Callers can request up to SERVER_MAX_OUTPUT_TOKENS (4096).
     maxTokens: 2048,
     temperature: 0.7,
     errorContext: 'Choice generation'
