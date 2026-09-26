@@ -16,6 +16,9 @@ jest.mock('../../geminiClient', () => ({
 
 import { createProviderClient } from '../factory';
 import { ClaudeClient } from '../claude/client';
+import { OpenAICompatibleClient } from '../openai-compatible/client';
+import { claudeAdapter } from '../claude/adapter';
+import { openAICompatibleAdapter } from '../openai-compatible/adapter';
 
 const GEMINI_DESCRIPTOR: ProviderDescriptor = {
   type: 'gemini',
@@ -75,9 +78,22 @@ describe('createProviderClient', () => {
     expect(mockGenerateContent.mock.calls[0][0]).toContain('Continue the story.');
   });
 
-  it('builds a ClaudeClient for a claude descriptor', () => {
+  it('builds a ClaudeClient with claudeAdapter for a claude descriptor', () => {
     const client = createProviderClient(CLAUDE_DESCRIPTOR);
 
     expect(client).toBeInstanceOf(ClaudeClient);
+    expect((client as unknown as { adapter: unknown }).adapter).toBe(claudeAdapter);
+  });
+
+  it('builds an OpenAICompatibleClient with openAICompatibleAdapter for an openai-compatible descriptor', () => {
+    const client = createProviderClient({
+      type: 'openai-compatible',
+      endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+      model: 'openai/gpt-4o',
+      apiKey: 'player-key',
+    });
+
+    expect(client).toBeInstanceOf(OpenAICompatibleClient);
+    expect((client as unknown as { adapter: unknown }).adapter).toBe(openAICompatibleAdapter);
   });
 });

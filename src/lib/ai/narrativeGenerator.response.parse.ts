@@ -47,6 +47,25 @@ const FLATTENED_FIELD_PATTERN =
 const SCHEMA_KEY_BOUNDARY_PATTERN =
   /^\s*,\s*["']?(?:type|metadata)(?:["']|\.\w+)?\s*[:=]/i;
 
+export const TYPE_FIELD_PATTERN =
+  /(?:^|[\s,])["']?type["']?\s*[:=]\s*["']?(\w+)["']?/i;
+
+/**
+ * Unescapes JSON string literals extracted from model responses.
+ * Uses a sentinel for escaped backslashes so that an escaped backslash
+ * before 'n' (\\n) decodes as a literal backslash followed by 'n',
+ * rather than getting corrupted into a newline character.
+ */
+export function unescapeJsonString(raw: string): string {
+  return raw
+    .replace(/\\\\/g, '\0')
+    .replace(/\\"/g, '"')
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\r')
+    .replace(/\\t/g, '\t')
+    .replace(/\0/g, '\\');
+}
+
 const findContentClosingQuoteIndex = (text: string): number => {
   for (let i = 0; i < text.length; i++) {
     if (text[i] === '"') {
@@ -80,15 +99,10 @@ const extractFlattenedFields = (
   const rawContent = afterMarker.slice(0, closingQuoteIndex);
   if (isJsonDebris(rawContent)) return null;
 
-  const content = rawContent
-    .replace(/\\"/g, '"')
-    .replace(/\\n/g, '\n')
-    .replace(/\\\\/g, '\\');
+  const content = unescapeJsonString(rawContent);
 
   const trailing = afterMarker.slice(closingQuoteIndex + 1);
-  const typeMatch = trailing.match(
-    /(?:^|[\s,])["']?type["']?\s*[:=]\s*["']?(\w+)["']?/i
-  );
+  const typeMatch = trailing.match(TYPE_FIELD_PATTERN);
   const rawType = typeMatch ? typeMatch[1].toLowerCase() : undefined;
   const type =
     rawType && VALID_SEGMENT_TYPES.includes(rawType) ? rawType : undefined;
@@ -123,9 +137,7 @@ export const parseNarrativeResponse = (
             /"content"\s*:\s*"([\s\S]*?)(?:",|\s*$)/
           );
           if (contentMatch && contentMatch[1]) {
-            actualContent = contentMatch[1]
-              .replace(/\\"/g, '"')
-              .replace(/\\n/g, '\n');
+            actualContent = unescapeJsonString(contentMatch[1]);
             // Same regex serves both endings, so the terminator is what says
             // whether the field closed or the response simply ran out.
             contentFromClosedField = contentMatch[0].endsWith('",');
@@ -254,10 +266,7 @@ export const parseNarrativeResponse = (
           /"content"\s*:\s*"([\s\S]+?)"\s*,\s*"/
         );
         if (contentStartMatch && contentStartMatch[1]) {
-          actualContent = contentStartMatch[1]
-            .replace(/\\"/g, '"')
-            .replace(/\\n/g, '\n')
-            .replace(/\\\\/g, '\\');
+          actualContent = unescapeJsonString(contentStartMatch[1]);
           contentFromClosedField = true;
         } else {
           const contentMarkerMatch = rawResponse.match(/"content"\s*:\s*"/);
@@ -267,11 +276,9 @@ export const parseNarrativeResponse = (
             );
             const closingQuoteIndex = findContentClosingQuoteIndex(afterMarker);
             if (closingQuoteIndex !== -1) {
-              actualContent = afterMarker
-                .slice(0, closingQuoteIndex)
-                .replace(/\\"/g, '"')
-                .replace(/\\n/g, '\n')
-                .replace(/\\\\/g, '\\');
+              actualContent = unescapeJsonString(
+                afterMarker.slice(0, closingQuoteIndex)
+              );
               contentFromClosedField = true;
             }
           } else {
@@ -279,18 +286,13 @@ export const parseNarrativeResponse = (
               /"content"\s*:\s*"([\s\S]+?)"\s*,\s*"(?:type|metadata)/
             );
             if (finalContentMatch && finalContentMatch[1]) {
-              actualContent = finalContentMatch[1]
-                .replace(/\\"/g, '"')
-                .replace(/\\n/g, '\n')
-                .replace(/\\\\/g, '\\');
+              actualContent = unescapeJsonString(finalContentMatch[1]);
               contentFromClosedField = true;
             }
           }
         }
 
-        const typeMatch = rawResponse.match(
-          /(?:^|[\s,])["']?type["']?\s*[:=]\s*["']?(\w+)["']?/i
-        );
+        const typeMatch = rawResponse.match(TYPE_FIELD_PATTERN);
         const rawType = typeMatch ? typeMatch[1].toLowerCase() : undefined;
         if (rawType && VALID_SEGMENT_TYPES.includes(rawType)) {
           segmentType = rawType;
