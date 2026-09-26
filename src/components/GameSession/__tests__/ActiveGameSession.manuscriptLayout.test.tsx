@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within, act } from '@testing-library/react';
 import { axe } from 'jest-axe';
 import ActiveGameSession from '../ActiveGameSession';
 import { useNarrativeStore } from '@/state/narrativeStore';
@@ -557,6 +557,57 @@ describe('ActiveGameSession Manuscript Layout', () => {
       const drawer = await screen.findByTestId('manuscript-drawer');
       expect(within(drawer).queryByText(/Session session-/)).not.toBeInTheDocument();
       expect(drawer.querySelector('.manuscript-drawer-subtitle')).toBeNull();
+    });
+  });
+
+  describe('ending suggestion choices suppression (#2175)', () => {
+    it('hides choices while ending offer is showing and restores them on dismiss', async () => {
+      const ActiveGameSessionChoicesColumn = require('../ActiveGameSessionChoicesColumn').default;
+      const ActiveGameSessionNarrativeColumn = require('../ActiveGameSessionNarrativeColumn').default;
+
+      render(
+        <ActiveGameSession
+          worldId={mockWorldId}
+          sessionId={mockSessionId}
+          onChoiceSelected={jest.fn()}
+        />
+      );
+
+      await screen.findByTestId('manuscript-session-shell');
+
+      // Initially choices are not hidden
+      const initialProps = (ActiveGameSessionChoicesColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      expect(initialProps.hideChoices).toBe(false);
+      expect(screen.queryByText('Your story could end here')).not.toBeInTheDocument();
+
+      // Simulate narrative column suggesting an ending
+      const narrativeProps = (ActiveGameSessionNarrativeColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      act(() => {
+        narrativeProps.onEndingSuggested(
+          'Your quest reaches a natural resting place.',
+          'story-complete'
+        );
+      });
+
+      // Ending banner appears
+      expect(await screen.findByText('Your story could end here')).toBeInTheDocument();
+      expect(screen.getByText('Your quest reaches a natural resting place.')).toBeInTheDocument();
+
+      // Choices column now has hideChoices set to true
+      const offerProps = (ActiveGameSessionChoicesColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      expect(offerProps.hideChoices).toBe(true);
+
+      // Player clicks "Continue Playing"
+      fireEvent.click(screen.getByRole('button', { name: 'Continue Playing' }));
+
+      // Ending banner is dismissed
+      await waitFor(() => {
+        expect(screen.queryByText('Your story could end here')).not.toBeInTheDocument();
+      });
+
+      // Choices column has hideChoices restored to false
+      const dismissedProps = (ActiveGameSessionChoicesColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      expect(dismissedProps.hideChoices).toBe(false);
     });
   });
 });

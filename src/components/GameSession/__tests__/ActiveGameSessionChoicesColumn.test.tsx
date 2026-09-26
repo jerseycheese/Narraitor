@@ -79,6 +79,45 @@ describe('ActiveGameSessionChoicesColumn', () => {
     expect(ChoiceSelector).not.toHaveBeenCalled();
   });
 
+  it('hides ChoiceSelector when hideChoices is true', () => {
+    render(<ActiveGameSessionChoicesColumn {...baseProps} hideChoices={true} />);
+
+    expect(screen.queryByTestId('choice-selector')).toBeNull();
+    expect(ChoiceSelector).not.toHaveBeenCalled();
+  });
+
+  it('hides the choices skeleton when hideChoices is true even without a decision', () => {
+    const { container } = render(
+      <ActiveGameSessionChoicesColumn
+        {...baseProps}
+        currentDecision={null}
+        segmentCount={0}
+        hideChoices={true}
+      />
+    );
+
+    expect(screen.queryByTestId('choice-selector')).toBeNull();
+    expect(container.querySelector('.manuscript-choices-skeleton')).toBeNull();
+  });
+
+  it('hides Suggested Actions toggle while keeping End Story available when hideChoices is true under progressive disclosure', () => {
+    render(
+      <ActiveGameSessionChoicesColumn
+        {...baseProps}
+        hideChoices={true}
+        isProgressiveDisclosureEnabled={true}
+        endStoryAction={<button type="button">End Story</button>}
+      />
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'Suggested Actions' })
+    ).toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'End Story' })
+    ).toBeInTheDocument();
+  });
+
   it('sets the tutorial anchor on the choices', () => {
     const { container } = render(<ActiveGameSessionChoicesColumn {...baseProps} />);
     const choicesContainer = container.querySelector('[data-tutorial="player-choices"]');
