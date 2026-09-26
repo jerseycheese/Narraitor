@@ -96,4 +96,18 @@ describe('WorldCreationWizard untouched-field validation (#2178)', () => {
 
     expect(screen.getByText(/world genre is required/i)).toBeInTheDocument();
   });
+
+  it('keeps Next usable after an optional edit so pressing it reveals the genre error', async () => {
+    const user = userEvent.setup();
+    render(<WorldCreationWizard />);
+
+    await user.type(await screen.findByTestId('world-name-input'), 'Aldenreach');
+    const nextButton = screen.getByRole('button', { name: /next/i });
+    expect(nextButton).toBeEnabled();
+
+    await user.click(nextButton);
+
+    expect(screen.getByText(/world genre is required/i)).toBeInTheDocument();
+    expect(screen.getByTestId('world-name-input')).toBeInTheDocument();
+  });
 });

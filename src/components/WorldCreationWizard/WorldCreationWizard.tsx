@@ -403,6 +403,15 @@ export default function WorldCreationWizard({
       return next;
     });
 
+    // Next stays enabled while the step is invalid so the player can ask why
+    // they can't advance: record the step's validation (which surfaces every
+    // error now that it's attempted) and stop before any AI call.
+    const stepValidation = handleStepValidation(wizard.state.currentStep, wizard.state.data);
+    if (!stepValidation.valid) {
+      wizard.setValidation(wizard.state.currentStep, stepValidation);
+      return;
+    }
+
     // Auto-generate attribute/skill suggestions when leaving the Description step (step 1)
     if (wizard.state.currentStep === 1 && !wizard.state.data.aiSuggestionsGenerated) {
       await generateAISuggestions();
@@ -411,8 +420,10 @@ export default function WorldCreationWizard({
     wizard.goNext();
   }, [
     wizard.state.currentStep,
-    wizard.state.data.aiSuggestionsGenerated,
+    wizard.state.data,
+    wizard.setValidation,
     wizard.goNext,
+    handleStepValidation,
     generateAISuggestions,
   ]);
 
@@ -656,14 +667,15 @@ export default function WorldCreationWizard({
           <WizardNavigation
             onCancel={handleCancel}
             onBack={wizard.canGoBack ? handleBack : undefined}
-            onNext={wizard.canGoNext && canProceedToNext() ? handleNext : undefined}
+            onNext={!wizard.isLastStep ? handleNext : undefined}
             onComplete={wizard.isLastStep ? handleComplete : undefined}
             currentStep={wizard.state.currentStep}
             totalSteps={WIZARD_STEPS.length}
             completeLabel="Create World"
             completeTestId="step-complete-button"
             completeDataTutorial="finalize-world"
-            disabled={!canProceedToNext()}
+            // Only Create is gated on validity; handleComplete doesn't re-validate.
+            disabled={wizard.isLastStep && !canProceedToNext()}
             isLoading={wizard.state.isProcessing || false}
           />
         </div>
