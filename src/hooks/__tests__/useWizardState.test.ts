@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { renderHook, act } from '@testing-library/react';
-import { useWizardState, WizardStep } from '../useWizardState';
+import { useWizardState, WizardStep, WizardValidation } from '../useWizardState';
 
 interface TestData {
   name: string;
@@ -205,7 +205,7 @@ describe('useWizardState', () => {
   });
 
   it('carries a validator-supplied fieldErrors map through to state untouched', () => {
-    const onStepValidation = jest.fn((stepIndex: number, data: TestData) => ({
+    const onStepValidation = jest.fn((stepIndex: number, data: TestData): WizardValidation => ({
       valid: data.name.length > 0,
       errors: data.name.length === 0 ? ['Name is required'] : [],
       touched: true,
