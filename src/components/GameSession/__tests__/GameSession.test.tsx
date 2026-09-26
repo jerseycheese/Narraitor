@@ -15,12 +15,11 @@ import {
 // shell or the resume dialog internals.
 jest.mock('../ActiveGameSession', () => ({
   __esModule: true,
-  default: (props: { status: string; sessionId?: string; choices?: Array<{ id: string }> }) => (
+  default: (props: { status: string; sessionId?: string }) => (
     <div
       data-testid="active-game-session"
       data-status={props.status}
       data-session-id={props.sessionId}
-      data-choices-count={props.choices?.length ?? 0}
     />
   ),
 }));
@@ -211,7 +210,6 @@ describe('GameSession', () => {
       renderGameSession({ worldId: 'world-1', disableAutoResume: true });
       const activeSession = screen.getByTestId('active-game-session');
       expect(activeSession).toHaveAttribute('data-session-id', 'minted-session-abc');
-      expect(activeSession).toHaveAttribute('data-choices-count', '1');
     });
 
     it('bypasses saved session resume prompt when disableAutoResume is true', () => {

@@ -242,23 +242,17 @@ export function EndingScreen() {
       key: 'new-story',
       text: 'New Story',
       onClick: async () => {
-        // Set the current character, end the session, clear the ending, then navigate to play
+        // Set the current character, save the current session, clear ending, and initialize a fresh session
         const { setCurrentCharacter } = useCharacterStore.getState();
-        const { clearEnding, clearSessionSegments, clearSessionDecisions } =
-          useNarrativeStore.getState();
-        const { endSession } = useSessionStore.getState();
-
-        // End the current session if it exists
-        if (currentEnding.sessionId) {
-          clearSessionSegments(currentEnding.sessionId);
-          clearSessionDecisions(currentEnding.sessionId);
-        }
+        const { clearEnding } = useNarrativeStore.getState();
+        const { endSession, initializeSession } = useSessionStore.getState();
 
         // End the current session to save it
         await endSession();
 
         setCurrentCharacter(currentEnding.characterId);
         clearEnding();
+        await initializeSession(currentEnding.worldId, currentEnding.characterId, undefined, true);
         router.push(`/worlds/${currentEnding.worldId}/play?fresh=true`);
       },
       variant: 'primary',

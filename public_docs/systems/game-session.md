@@ -53,7 +53,7 @@ A few things worth knowing about how the branches interact:
 - `pauseSession()` / `resumeSession()` — surfaced by `ActiveGameSession`'s controls, not by `GameSession` itself.
 - `setSessionId(id)` — `GameSession` calls this whenever it computes a new stable session ID, which keeps the store in sync with whichever session ID the UI is showing.
 
-The component derives a `stableSessionId` from a four-priority chain so the ID stays the same across re-renders:
+The component derives a `stableSessionId` from a six-priority chain so the ID stays the same across re-renders:
 
 1. `sessionState.id` once the store has minted one.
 2. `disableAutoResume` set - use a freshly generated session ID as pre-start seed (test/dev harness or ?fresh=true).
