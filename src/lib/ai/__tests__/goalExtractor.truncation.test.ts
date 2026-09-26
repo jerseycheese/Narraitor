@@ -70,6 +70,7 @@ describe('goalExtractor output budget and failure visibility', () => {
     );
     const options = mockGenerateContent.mock.calls[0][1];
     expect(options.maxTokens).toBeGreaterThan(NARRATIVE_MAX_OUTPUT_TOKENS);
+    expect(options.maxTokens).toBe(4096);
   });
 
   it('reports a response cut at the ceiling at error level, where production keeps it', async () => {

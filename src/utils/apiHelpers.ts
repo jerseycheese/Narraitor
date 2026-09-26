@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimiter';
-import { resolveProvider, type ProviderResolutionFailure } from '../lib/ai/resolveApiKey';
+import { resolveProvider, SERVER_MAX_OUTPUT_TOKENS, type ProviderResolutionFailure } from '../lib/ai/resolveApiKey';
 import { createAPIErrorResponse } from '../lib/utils/createAPIErrorResponse';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../lib/constants/aiTimeouts';
 import { requireProviderAdapter } from '../lib/ai/providers/adapterRegistry';
@@ -218,6 +218,11 @@ export async function makeGeminiRequest(
  * Options for a text generation request
  */
 export interface AITextRequestOptions {
+  /**
+   * Route-level default output token budget when the caller provides no maxTokens.
+   * Callers that supply requestData.config.maxTokens are clamped to
+   * SERVER_MAX_OUTPUT_TOKENS rather than this default.
+   */
   maxTokens?: number;
   temperature?: number;
   errorContext?: string; // For logging context (e.g., 'Narrative generation', 'Choice generation')
@@ -279,11 +284,12 @@ async function prepareTextRequest(
       : temperature;
 
   const rawTokens = requestData.config?.maxTokens;
-  const effectiveCeiling = Math.min(maxTokens, 4096);
+  const effectiveCeiling = SERVER_MAX_OUTPUT_TOKENS;
+  const defaultTokens = Math.max(1, Math.min(Math.floor(maxTokens), effectiveCeiling));
   const clampedMaxTokens =
     typeof rawTokens === 'number' && Number.isFinite(rawTokens)
       ? Math.max(1, Math.min(Math.floor(rawTokens), effectiveCeiling))
-      : effectiveCeiling;
+      : defaultTokens;
 
   return {
     ok: true,
