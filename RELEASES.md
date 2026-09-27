@@ -4,6 +4,58 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.10.0 - 2026-09-27
+
+v1.10 fixes what the September playtest round ([#1818](https://github.com/jerseycheese/Narraitor/issues/1818)) broke in the play loop: a session that locked on turn 1, a death that hung on "Writing your story...", failures with no retry, and prompt text leaking into the story. It also clears a set of wizard bugs. The milestone closes 11 issues, plus [#2172](https://github.com/jerseycheese/Narraitor/issues/2172) closed as a duplicate, across 21 commits since [v1.9.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.9.0).
+
+**What's in this release**
+
+Play-loop fixes from the September round:
+
+- A new session no longer locks on turn 1 until the page is reloaded. The game session now takes the session ID the store creates, and starting fresh creates a new ID instead of reusing the old one ([#2167](https://github.com/jerseycheese/Narraitor/issues/2167)).
+- When a turn ends in death, play moves to the ending screen. Before, the ending finished in the background while the screen stayed on "Writing your story..." ([#2168](https://github.com/jerseycheese/Narraitor/issues/2168)).
+- A generation failure with an error message the app doesn't recognise now offers a retry instead of ending the story ([#2169](https://github.com/jerseycheese/Narraitor/issues/2169)).
+- Response metadata and prompt text no longer get saved into the story. The parser had been cutting flattened content at the last quote mark in the response ([#2170](https://github.com/jerseycheese/Narraitor/issues/2170)).
+- A new session's first prompts only use that session's decisions, not decisions from other sessions in the same world ([#2180](https://github.com/jerseycheese/Narraitor/issues/2180)).
+- While an ending offer is showing, the choice list stays hidden until you pick Continue Playing ([#2175](https://github.com/jerseycheese/Narraitor/issues/2175)).
+- The fallback ending's sentence about the character's legacy reads correctly ([#2176](https://github.com/jerseycheese/Narraitor/issues/2176)).
+- The story-thread extractor can now get the output it asks for, up to the server's 4096-token ceiling. The narrative route had been capping it at 2048, which cut off its JSON, so threads never resolved ([#2185](https://github.com/jerseycheese/Narraitor/pull/2185), for [#2179](https://github.com/jerseycheese/Narraitor/issues/2179)). See Known incomplete.
+
+Wizards and screens:
+
+- Typing in World Creation's Description field no longer triggers a React update-depth loop, and the duplicate auto-save write behind it is gone ([#2174](https://github.com/jerseycheese/Narraitor/issues/2174)).
+- A wizard field's "required" error shows only after you've touched that field ([#2178](https://github.com/jerseycheese/Narraitor/issues/2178)).
+- The world and character wizards share one auto-save hook, `useDraftAutoSave`, instead of two ([#2158](https://github.com/jerseycheese/Narraitor/issues/2158)).
+- The character wizard's portrait step sends the player's provider key like every other generation call ([#2195](https://github.com/jerseycheese/Narraitor/pull/2195)).
+- The sticky header and the scene-status rail are opaque now, so scrolled content no longer shows through ([#2173](https://github.com/jerseycheese/Narraitor/issues/2173)).
+- On long descriptions, the skill-card toggle stays on the card instead of wrapping below it ([#2177](https://github.com/jerseycheese/Narraitor/issues/2177)).
+- The provider setup wizard follows the v1.8 design rules ([#2171](https://github.com/jerseycheese/Narraitor/issues/2171)).
+
+Saves:
+
+- The auto-save service's extra snapshots are gone, since store persistence already covers them. The save indicator now reflects whether storage is actually working ([#2191](https://github.com/jerseycheese/Narraitor/issues/2191)).
+
+Providers, tests and code health:
+
+- A native Claude adapter, built against the Messages API, is in the codebase but turned off. Its preset ships unavailable until it's been checked against a live key ([#2165](https://github.com/jerseycheese/Narraitor/pull/2165), for [#894](https://github.com/jerseycheese/Narraitor/issues/894)). A follow-up folded its client into the shared OpenAI-compatible client ([#2199](https://github.com/jerseycheese/Narraitor/pull/2199)).
+- The Jest stack is on 30.2 ([#797](https://github.com/jerseycheese/Narraitor/issues/797)).
+- Code-health sweep fixes: the five copies of the response parser's unescape chain are now one helper, which fixes a decode-order bug ([#2187](https://github.com/jerseycheese/Narraitor/issues/2187)), plus two smaller cleanups ([#2110](https://github.com/jerseycheese/Narraitor/issues/2110), [#2111](https://github.com/jerseycheese/Narraitor/issues/2111)).
+- The test audit now flags over-mocking and untested seams ([#2127](https://github.com/jerseycheese/Narraitor/pull/2127)).
+
+**Known incomplete**
+
+This release fixes the bugs from the September round, not its main finding. In four of five runs, the story still fell apart between turns 15 and 25: people who left came back, events replayed, and nothing broke a stall. That's v1.11's job.
+
+The extractor fix ([#2179](https://github.com/jerseycheese/Narraitor/issues/2179)) passes its tests but hasn't been checked in a live session past 15 turns yet. 4096 is the server's ceiling, not a budget anyone measured, so a long thread list could still get cut off.
+
+The Claude preset stays off, and [#894](https://github.com/jerseycheese/Narraitor/issues/894) stays open for the live check and a decision on image generation. No visual spec yet captures content scrolled under the sticky bars fixed in [#2173](https://github.com/jerseycheese/Narraitor/issues/2173). The rest of the code-health sweep in [#2187](https://github.com/jerseycheese/Narraitor/issues/2187) is still open, including the `unknown` character-draft payload behind 12 casts.
+
+**What's next**
+
+[v1.11](https://github.com/jerseycheese/Narraitor/milestone/12) goes after the round's main finding with a mechanism, not prompt wording. The turn resolver will own who's in the scene, where it is, and which beats have happened, and a stall-breaker will force the story forward ([#2203](https://github.com/jerseycheese/Narraitor/issues/2203)). The ending offer will read the thread ledger instead of event labels that are set on almost every turn ([#2204](https://github.com/jerseycheese/Narraitor/issues/2204)). A repeat of the 5-run round decides whether it ships ([#2205](https://github.com/jerseycheese/Narraitor/issues/2205)). The bar is blocks 2 and 3 averaging at least 3.0 on Crystal Lake cautious play.
+
+---
+
 ## v1.9.0 - 2026-09-24
 
 v1.9 runs the page-by-page pass v1.8's foundations were built for: wizards, lists, detail pages, edit pages, dashboard, journal and ending, settings and providers, and the public pages, each carrying its own dark and mobile baselines. The milestone closes 8 issues across 33 commits since [v1.8.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.8.0).
