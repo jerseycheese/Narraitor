@@ -8,11 +8,16 @@ description: Narraitor's adapter for the generic `backlog-routing` skill (jersey
 The stages, the routing table, and the brief and tracker templates live in the generic
 `backlog-routing` skill. This file only fills in what's specific to Narraitor.
 
-**Load the generic skill first.** If it isn't installed (a fresh cloud session, say), read it from
-the public repo. Anonymous clones work in cloud:
+**Load the generic skill first.** If it isn't installed (a fresh cloud session, say), fetch it from
+the public repo **at the pinned, reviewed commit**, not the branch head. That way an upstream change
+can't quietly rewrite this workflow, including its human-only merge rule. Anonymous fetches work in
+cloud:
 
 ```bash
-git clone --depth 1 https://github.com/jerseycheese/agent-skills "$TMPDIR/agent-skills"
+AGENT_SKILLS_REV=80b59aacd31160f1aad0cb0195ed3c58495355ae  # bump only after reviewing the agent-skills diff since this commit
+git init -q "$TMPDIR/agent-skills" && cd "$TMPDIR/agent-skills" \
+  && git fetch -q --depth 1 https://github.com/jerseycheese/agent-skills "$AGENT_SKILLS_REV" \
+  && git checkout -q FETCH_HEAD
 # then read skills/backlog-routing/SKILL.md and skills/backlog-routing/templates/*
 ```
 
@@ -33,7 +38,7 @@ Also run these, depending on what changed:
 |---|---|
 | any `.css` | `npm run lint:css`, `npm run audit:css` |
 | files added/removed, exports changed | `npm run knip` |
-| imports crossing domains | `npm run deps:validate` (and `deps:check` if a violation was fixed) |
+| imports crossing domains | `npm run deps:validate` (and `npm run deps:check` if a violation was fixed) |
 | page layouts | `npm run lint:layout-usage` |
 | design-system surfaces | `npm run lint:ds-canon` |
 | build config, `next.config.*`, `src/app/` routing | `npm run build` |
