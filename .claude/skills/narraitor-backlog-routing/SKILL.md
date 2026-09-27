@@ -14,7 +14,7 @@ can't quietly rewrite this workflow, including its human-only merge rule. Anonym
 cloud:
 
 ```bash
-AGENT_SKILLS_REV=78dd2742d4ad12b818f0c790952dc8c02f77f5ec  # bump only after reviewing the agent-skills diff since this commit
+AGENT_SKILLS_REV=a021ce38e673813abc0a515a0b14af1f0cbd3e98  # bump only after reviewing the agent-skills diff since this commit
 git init -q "$TMPDIR/agent-skills" && cd "$TMPDIR/agent-skills" \
   && git fetch -q --depth 1 https://github.com/jerseycheese/agent-skills "$AGENT_SKILLS_REV" \
   && git checkout -q FETCH_HEAD
