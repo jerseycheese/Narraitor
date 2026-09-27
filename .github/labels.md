@@ -75,6 +75,13 @@ model available," not "must use model X."
 - `status:in-review` - Implementation complete, awaiting review
 - `status:blocked` - Blocked by another issue or external factor
 
+## Workflow Labels
+
+Used by the `narraitor-backlog-routing` skill when working a milestone with several agents.
+
+- `needs-local` - The fix can only be proven on the maintainer's machine (macOS visual baselines, live Gemini or provider keys, a person walking a flow)
+- `run-tracker` - The tracker issue for a milestone run: waves, batches, the review queue, and paste-ready briefs
+
 ## Label Colors
 
 For consistent visual styling, use these hex colors for labels:
@@ -90,3 +97,5 @@ For consistent visual styling, use these hex colors for labels:
 - Complexity labels: `#bfd4f2` (light blue)
 - Model Power labels: `#fbca04` (gold)
 - Status labels: `#c2e0c6` (light green)
+- `needs-local`: `#fbca04` (gold)
+- `run-tracker`: `#c2e0c6` (light green)

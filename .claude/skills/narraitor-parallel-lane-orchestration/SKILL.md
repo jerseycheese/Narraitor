@@ -17,6 +17,11 @@ The mechanism that works here is the **in-harness Agent tool**, not `claude -p` 
 
 ## 2. When to use
 
+For a whole milestone (intake, shaping, batches of issues per PR, Codex or Gemini lanes, cloud vs local,
+the release), use `narraitor-backlog-routing` instead. It builds on this skill, and §6 below stays the
+canonical trap list for both.
+
+
 - "Work the next N most important issues in parallel."
 - A backlog push where serial execution would waste hours of wall clock.
 - Any time a batch is big enough that batch *selection* is itself a real decision.
