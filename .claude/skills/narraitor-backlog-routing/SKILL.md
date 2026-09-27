@@ -14,11 +14,11 @@ can't quietly rewrite this workflow, including its human-only merge rule. Anonym
 cloud:
 
 ```bash
-AGENT_SKILLS_REV=80b59aacd31160f1aad0cb0195ed3c58495355ae  # bump only after reviewing the agent-skills diff since this commit
+AGENT_SKILLS_REV=78dd2742d4ad12b818f0c790952dc8c02f77f5ec  # bump only after reviewing the agent-skills diff since this commit
 git init -q "$TMPDIR/agent-skills" && cd "$TMPDIR/agent-skills" \
   && git fetch -q --depth 1 https://github.com/jerseycheese/agent-skills "$AGENT_SKILLS_REV" \
   && git checkout -q FETCH_HEAD
-# then read skills/backlog-routing/SKILL.md and skills/backlog-routing/templates/*
+# then read skills/backlog-routing/SKILL.md, its templates/*, and skills/route/SKILL.md
 ```
 
 ## Branches and the human gate
@@ -85,9 +85,10 @@ Unit tests, type-check, lint, knip, deps, and `npm run build` all work in cloud.
 Everything comes from `.github/labels.md`. Never invent a label.
 
 - **Type:** `bug`, `enhancement`, `user-story`, `epic`, `technical-debt`, `documentation`.
-- **Size:** `priority:*`, `complexity:*`, `model-power:*`. `model-power` is the routing axis.
-  Labels were applied in one retroactive pass, so if a label contradicts the issue body, trust the
-  body.
+- **Size:** `priority:*`, `complexity:*`, `model-power:*`. Model choice comes from `route`, not
+  from these labels. `model-power` is only the fallback when `route` can't run, and it's also what
+  `route` reads as the task's difficulty. Labels were applied in one retroactive pass, so if a
+  label contradicts the issue body, trust the body.
 - **This workflow:**
   - `needs-local`: the fix can only be proven on the maintainer's machine.
   - `run-tracker`: the per-milestone tracker issue.
@@ -130,17 +131,25 @@ ln -sf CLAUDE.md GEMINI.md
 mkdir -p .agents/skills && for d in .claude/skills/*/; do ln -sfn "../../$d" ".agents/skills/$(basename "$d")"; done
 ```
 
-Also install the generic `backlog-routing` skill wherever each tool looks for user skills (see the
-agent-skills README install table).
+Also install the generic `backlog-routing` and `route` skills wherever each tool looks for user
+skills (see the agent-skills README install table). `route` needs your routing table at
+`~/.agents/ai-routing.md` (or `$AI_ROUTING_TABLE`), and `AI_BUDGET_DIR` exported to the folder
+holding `read-burn.sh` and `log-route.sh`.
 
 Antigravity's skill discovery varies by version. If it doesn't pick up `.agents/skills`, paste the
 brief: it's written to stand on its own.
 
 ## Orchestrator session
 
-- Run the orchestrator as a Claude session on the advanced tier (or the most capable model
-  available), in cloud or local.
-- It never implements. It runs the stages, keeps the tracker current, runs the review gate, and
-  answers the maintainer.
-- While batches are open, it keeps an hourly check-in scheduled (`send_later` in cloud, `/loop`
-  locally). A quiet check-in writes nothing.
+- **Where it runs:** run `plan` and `dispatch` on the Mac, where `route` can read burn. A cloud
+  orchestrator has no routing table or burn reader, so it has to ask for a reading, and its picks
+  have no usage data behind them.
+- **What model:** the stages are mostly bookkeeping, so use the table's default seat. Escalate
+  only for a hard `plan` (many collisions, dependent batches), and only if `route` agrees.
+- **What it does:** it never implements. It runs the stages, keeps the tracker current, runs the
+  review gate, and answers the maintainer.
+- **How often it checks in:** while batches are open, it keeps an hourly check-in scheduled
+  (`/loop` locally, `send_later` in cloud). A quiet check-in writes nothing.
+- **Where batches usually land:** for Narraitor, most implementation lands on Antigravity (one
+  issue per brief) or Codex. Cloud Claude batches spend the same Claude window as the
+  orchestrator, so they're for work `route` puts on Claude on purpose.
