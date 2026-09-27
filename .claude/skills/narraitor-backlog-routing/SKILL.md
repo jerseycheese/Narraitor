@@ -14,7 +14,7 @@ can't quietly rewrite this workflow, including its human-only merge rule. Anonym
 cloud:
 
 ```bash
-AGENT_SKILLS_REV=a021ce38e673813abc0a515a0b14af1f0cbd3e98  # bump only after reviewing the agent-skills diff since this commit
+AGENT_SKILLS_REV=47cb0b9b8beb74fa9dd94fb28850d9038807690d  # bump only after reviewing the agent-skills diff since this commit
 git init -q "$TMPDIR/agent-skills" && cd "$TMPDIR/agent-skills" \
   && git fetch -q --depth 1 https://github.com/jerseycheese/agent-skills "$AGENT_SKILLS_REV" \
   && git checkout -q FETCH_HEAD
@@ -138,6 +138,25 @@ holding `read-burn.sh` and `log-route.sh`.
 
 Antigravity's skill discovery varies by version. If it doesn't pick up `.agents/skills`, paste the
 brief: it's written to stand on its own.
+
+## Watching a run
+
+The generic skill ships a read-only dashboard (`skills/backlog-routing/dashboard/index.html` in
+agent-skills). For Narraitor, open it with:
+
+```
+?repo=jerseycheese/Narraitor&milestone=vX.Y
+```
+
+- **Local:** open the file from your agent-skills checkout.
+- **Hosted:** use `https://jerseycheese.github.io/agent-skills/skills/backlog-routing/dashboard/`,
+  once GitHub Pages is on for agent-skills. That works from a phone.
+
+The repo is public, so it works without a token. A fine-grained read-only token (Issues, Pull
+requests, Checks) turns on auto-refresh and unresolved-thread counts.
+
+The dashboard only knows what the tracker's `backlog-routing:state` block says. So the
+orchestrator has to rewrite that block every time it edits the tracker.
 
 ## Orchestrator session
 
