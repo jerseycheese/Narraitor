@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -13,6 +13,7 @@ import {
   alwaysValid,
   validateFields,
   createValidationRules,
+  getVisibleStepError,
 } from '@/lib/utils/wizardValidation';
 import { 
   WizardContainer, 
@@ -157,6 +158,15 @@ export default function WorldCreationWizard({
 
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
 
+  // Per-field "has the player touched this field" tracking, keyed by step
+  // index, plus which steps the player has explicitly tried to advance past
+  // (clicked Next while invalid). A field's own error only surfaces once
+  // it's been touched, unless the step was attempted, in which case every
+  // failing field's error shows (see issue #2178).
+  const [touchedFieldsByStep, setTouchedFieldsByStep] = useState<Record<number, Set<string>>>({});
+  const [attemptedSteps, setAttemptedSteps] = useState<Set<number>>(new Set());
+  const wizardDataRef = useRef(initialWorldData);
+
   React.useEffect(() => {
     if (hasRecoveryData) {
       setShowRecoveryModal(true);
@@ -193,6 +203,8 @@ export default function WorldCreationWizard({
     onStepValidation: handleStepValidation,
   });
 
+  wizardDataRef.current = wizard.state.data;
+
   const prevAutoSaveRef = React.useRef<{ step: number; data: WorldCreationData } | null>(null);
 
   React.useEffect(() => {
@@ -226,11 +238,15 @@ export default function WorldCreationWizard({
       );
       dismissRecovery();
     }
+    setTouchedFieldsByStep({});
+    setAttemptedSteps(new Set());
     setShowRecoveryModal(false);
   }, [autoSaveData, wizard.reset, dismissRecovery]);
 
   const handleDismissRecovery = useCallback(() => {
     clearAutoSave();
+    setTouchedFieldsByStep({});
+    setAttemptedSteps(new Set());
     setShowRecoveryModal(false);
   }, [clearAutoSave]);
 
@@ -378,6 +394,24 @@ export default function WorldCreationWizard({
   }, [wizard.updateData]);
 
   const handleNext = useCallback(async () => {
+    // The player explicitly tried to advance past this step: from here on,
+    // show every failing field's error for it, not just touched ones.
+    setAttemptedSteps((prev) => {
+      if (prev.has(wizard.state.currentStep)) return prev;
+      const next = new Set(prev);
+      next.add(wizard.state.currentStep);
+      return next;
+    });
+
+    // Next stays enabled while the step is invalid so the player can ask why
+    // they can't advance: record the step's validation (which surfaces every
+    // error now that it's attempted) and stop before any AI call.
+    const stepValidation = handleStepValidation(wizard.state.currentStep, wizard.state.data);
+    if (!stepValidation.valid) {
+      wizard.setValidation(wizard.state.currentStep, stepValidation);
+      return;
+    }
+
     // Auto-generate attribute/skill suggestions when leaving the Description step (step 1)
     if (wizard.state.currentStep === 1 && !wizard.state.data.aiSuggestionsGenerated) {
       await generateAISuggestions();
@@ -386,8 +420,10 @@ export default function WorldCreationWizard({
     wizard.goNext();
   }, [
     wizard.state.currentStep,
-    wizard.state.data.aiSuggestionsGenerated,
+    wizard.state.data,
+    wizard.setValidation,
     wizard.goNext,
+    handleStepValidation,
     generateAISuggestions,
   ]);
 
@@ -516,8 +552,26 @@ export default function WorldCreationWizard({
   ]);
 
   const updateWorldData = useCallback((updates: Partial<World>) => {
+    // Step components spread the entire step data plus one changed value
+    // into `updates`, so diff against the last known data to find which
+    // field(s) actually changed rather than treating every key as touched.
+    const prevData = wizardDataRef.current as unknown as Record<string, unknown>;
+    const updatesRecord = updates as unknown as Record<string, unknown>;
+    const changedKeys = Object.keys(updatesRecord).filter(
+      (key) => updatesRecord[key] !== prevData[key]
+    );
+
+    if (changedKeys.length > 0) {
+      const stepIndex = wizard.state.currentStep;
+      setTouchedFieldsByStep((prev) => {
+        const nextSet = new Set(prev[stepIndex]);
+        changedKeys.forEach((key) => nextSet.add(key));
+        return { ...prev, [stepIndex]: nextSet };
+      });
+    }
+
     wizard.updateData(updates);
-  }, [wizard.updateData]);
+  }, [wizard.updateData, wizard.state.currentStep]);
 
   const stepProps = {
     worldData: wizard.state.data,
@@ -589,7 +643,11 @@ export default function WorldCreationWizard({
   }));
 
   const currentValidation = wizard.state.validation[wizard.state.currentStep];
-  const currentError = currentValidation?.touched && !currentValidation?.valid ? currentValidation.errors.join(', ') : undefined;
+  const currentError = getVisibleStepError(
+    currentValidation,
+    touchedFieldsByStep[wizard.state.currentStep],
+    attemptedSteps.has(wizard.state.currentStep)
+  );
 
   return (
     <WizardContainer title="Create New World">
@@ -609,14 +667,15 @@ export default function WorldCreationWizard({
           <WizardNavigation
             onCancel={handleCancel}
             onBack={wizard.canGoBack ? handleBack : undefined}
-            onNext={wizard.canGoNext && canProceedToNext() ? handleNext : undefined}
+            onNext={!wizard.isLastStep ? handleNext : undefined}
             onComplete={wizard.isLastStep ? handleComplete : undefined}
             currentStep={wizard.state.currentStep}
             totalSteps={WIZARD_STEPS.length}
             completeLabel="Create World"
             completeTestId="step-complete-button"
             completeDataTutorial="finalize-world"
-            disabled={!canProceedToNext()}
+            // Only Create is gated on validity; handleComplete doesn't re-validate.
+            disabled={wizard.isLastStep && !canProceedToNext()}
             isLoading={wizard.state.isProcessing || false}
           />
         </div>

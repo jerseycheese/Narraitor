@@ -59,6 +59,7 @@ describe('useCharacterCreationWizard validation', () => {
       valid: true,
       errors: [],
       touched: true,
+      fieldErrors: {},
     });
   });
 });

@@ -30,16 +30,25 @@ function applyRules<V>(value: V, rules: ValidationRule<V>[]): string[] {
 
 /**
  * Build a validator from per-field rule arrays.
+ *
+ * Alongside the flat `errors` list, the result carries `fieldErrors` (first
+ * error message per invalid field name), so callers can show a field's error
+ * only once that field has been touched rather than all at once.
  */
 export function validateFields<T>(rules: FieldValidationRules<T>): Validator<T> {
   return (data: T): WizardValidation => {
     const errors: string[] = [];
+    const fieldErrors: Record<string, string> = {};
     for (const [fieldName, fieldRules] of Object.entries(rules)) {
       if (!Array.isArray(fieldRules)) continue;
       const value = data[fieldName as keyof T];
-      errors.push(...applyRules(value, fieldRules as ValidationRule<unknown>[]));
+      const fieldErrorList = applyRules(value, fieldRules as ValidationRule<unknown>[]);
+      if (fieldErrorList.length > 0) {
+        fieldErrors[fieldName] = fieldErrorList[0];
+      }
+      errors.push(...fieldErrorList);
     }
-    return { valid: errors.length === 0, errors, touched: true };
+    return { valid: errors.length === 0, errors, touched: true, fieldErrors };
   };
 }
 
@@ -51,6 +60,47 @@ export const alwaysValid: Validator<unknown> = () => ({
   errors: [],
   touched: true,
 });
+
+/**
+ * Picks which of a step's validation errors should actually be shown.
+ *
+ * - No validation, or a valid step: nothing to show.
+ * - The step was attempted (the player pressed Next/Create while invalid):
+ *   show every error for the step.
+ * - The validator didn't provide `fieldErrors` (older/holistic validators
+ *   that don't validate a single named field): fall back to the previous
+ *   behavior of showing all errors once `touched`.
+ * - Otherwise: show only the errors for fields the player has touched.
+ */
+export function getVisibleFieldErrorMessages(
+  validation: WizardValidation | undefined,
+  touchedFields: Set<string> | undefined,
+  stepAttempted: boolean
+): string[] {
+  if (!validation || validation.valid) return [];
+
+  if (!validation.fieldErrors) {
+    return validation.touched ? validation.errors : [];
+  }
+
+  if (stepAttempted) {
+    return Object.values(validation.fieldErrors);
+  }
+
+  return Object.entries(validation.fieldErrors)
+    .filter(([field]) => touchedFields?.has(field))
+    .map(([, message]) => message);
+}
+
+/** Same as {@link getVisibleFieldErrorMessages}, joined into one banner string. */
+export function getVisibleStepError(
+  validation: WizardValidation | undefined,
+  touchedFields: Set<string> | undefined,
+  stepAttempted: boolean
+): string | undefined {
+  const visible = getVisibleFieldErrorMessages(validation, touchedFields, stepAttempted);
+  return visible.length > 0 ? visible.join(', ') : undefined;
+}
 
 export const createValidationRules = {
   required: <T>(message: string = 'This field is required'): ValidationRule<T> => ({

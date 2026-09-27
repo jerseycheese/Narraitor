@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { renderHook, act } from '@testing-library/react';
-import { useWizardState, WizardStep } from '../useWizardState';
+import { useWizardState, WizardStep, WizardValidation } from '../useWizardState';
 
 interface TestData {
   name: string;
@@ -202,6 +202,37 @@ describe('useWizardState', () => {
     expect(onDataChange).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Bob' })
     );
+  });
+
+  it('carries a validator-supplied fieldErrors map through to state untouched', () => {
+    const onStepValidation = jest.fn((stepIndex: number, data: TestData): WizardValidation => ({
+      valid: data.name.length > 0,
+      errors: data.name.length === 0 ? ['Name is required'] : [],
+      touched: true,
+      fieldErrors: data.name.length === 0 ? { name: 'Name is required' } : {},
+    }));
+
+    const { result } = renderHook(() =>
+      useWizardState({
+        initialData,
+        steps: testSteps,
+        onStepValidation,
+      })
+    );
+
+    act(() => {
+      result.current.updateData({ name: '' });
+    });
+
+    expect(result.current.state.validation[0]?.fieldErrors).toEqual({
+      name: 'Name is required',
+    });
+
+    act(() => {
+      result.current.updateData({ name: 'Ada' });
+    });
+
+    expect(result.current.state.validation[0]?.fieldErrors).toEqual({});
   });
 
   it('allows onDataChange to safely dispatch external state updates without render warnings', () => {

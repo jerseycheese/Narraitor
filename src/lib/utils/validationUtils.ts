@@ -6,6 +6,8 @@
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
+  /** Optional first error message per field name, for touched-field display filtering. */
+  fieldErrors?: Record<string, string>;
 }
 
 /**
