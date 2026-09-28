@@ -13,10 +13,14 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { truncate } from '@/lib/utils';
 import { safeParseNarrativeAnalysis } from '@/lib/ai/parseNarrativeResponse';
 import { stripMarkdownFences } from '@/lib/ai/parseJSON';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { useWorldThreadStore } from '@/state/worldThreadStore';
+import { selectEndingBlockers } from '@/lib/narrative/worldClock';
 import type {
   EndingType,
   NarrativeSegment,
 } from '@/types/narrative.types';
+import type { WorldThread } from '@/types/worldThread.types';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('UseEndingDetection');
@@ -175,13 +179,31 @@ export function useEndingDetection({
               )}\n\n`
             : '';
 
-        const openThreads = collectOpenThreads(allSegments);
-        const openThreadsContext =
-          openThreads.length > 0
-            ? `Threads this story put in play (each one is unfinished business unless the recent narrative settled it on the page):\n${openThreads
-                .map((thread) => `- ${thread}`)
-                .join('\n')}\n\n`
-            : '';
+        const useLedger = isFeatureEnabled('ENDING_GATE_THREAD_LEDGER');
+        
+        let openThreadsContext = '';
+        let oldOpenThreads: string[] = [];
+        let ledgerBlockers: WorldThread[] = [];
+        let hasBlockers = false;
+
+        if (useLedger) {
+          const storeThreads = useWorldThreadStore.getState().getOpenThreadsBySession(sessionId);
+          if (storeThreads.length > 0) {
+            openThreadsContext = `World threads currently open in the story's ledger:\n${storeThreads
+              .map((t) => `- [${t.kind.toUpperCase()}] ${t.summary}`)
+              .join('\n')}\n\n`;
+          }
+          ledgerBlockers = selectEndingBlockers(storeThreads, allSegments.length);
+          hasBlockers = ledgerBlockers.length > 0;
+        } else {
+          oldOpenThreads = collectOpenThreads(allSegments);
+          if (oldOpenThreads.length > 0) {
+            hasBlockers = true;
+            openThreadsContext = `Threads this story put in play (each one is unfinished business unless the recent narrative settled it on the page):\n${oldOpenThreads
+              .map((thread) => `- ${thread}`)
+              .join('\n')}\n\n`;
+          }
+        }
 
         const analysisPrompt = `You are a narrative expert analyzing a story in progress. Determine if this story has reached a natural conclusion point where the player would feel satisfied ending.
 
@@ -236,11 +258,11 @@ Respond with JSON format:
           // check runs again on later segments.
           const unresolvedThreats = readUnresolvedThreats(response.content);
           if (
-            openThreads.length > 0 &&
+            hasBlockers &&
             (unresolvedThreats === null || unresolvedThreats.length > 0)
           ) {
             logger.debug('Holding the ending offer back, threads still open', {
-              openThreads,
+              ...(useLedger ? { ledgerBlockers } : { openThreads: oldOpenThreads }),
               unresolvedThreats,
             });
             return;
@@ -257,7 +279,7 @@ Respond with JSON format:
         logger.error('Failed to analyze ending indicators with AI:', error);
       }
     },
-    [segments, onEndingSuggested]
+    [segments, onEndingSuggested, sessionId]
   );
 
   return { checkForEndingIndicators, suggestEnding };

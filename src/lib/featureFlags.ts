@@ -47,6 +47,8 @@ const FEATURE_FLAG_DEFAULTS = {
   // Attributes world costs to the player decision that directly incurred them.
   // Shipped default-on following successful paired live evaluation (#2020).
   DECISION_ATTRIBUTED_WORLD_COSTS: true,
+  // Decide 'is the story done' from the thread ledger, not from the last six majorEvent strings.
+  ENDING_GATE_THREAD_LEDGER: false,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAG_DEFAULTS;
@@ -91,6 +93,10 @@ const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
   DECISION_ATTRIBUTED_WORLD_COSTS: resolve(
     process.env.NEXT_PUBLIC_FEATURE_DECISION_ATTRIBUTED_WORLD_COSTS,
     FEATURE_FLAG_DEFAULTS.DECISION_ATTRIBUTED_WORLD_COSTS
+  ),
+  ENDING_GATE_THREAD_LEDGER: resolve(
+    process.env.NEXT_PUBLIC_FEATURE_ENDING_GATE_THREAD_LEDGER,
+    FEATURE_FLAG_DEFAULTS.ENDING_GATE_THREAD_LEDGER
   ),
 });
 
