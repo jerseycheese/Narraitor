@@ -48,7 +48,7 @@ export default function LandingWorldPane({ world }: { world: ShowcaseWorld }) {
 
       <div className="component-landing-exchange">
         <h2 className="component-landing-heading">
-          From a single sentence to a living world.
+          From a premise to a living world.
         </h2>
         <div className="component-landing-pipeline">
           {/* Workbench: Setting + Rules */}

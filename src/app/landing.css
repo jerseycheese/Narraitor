@@ -231,19 +231,29 @@
 /* ─── World switcher ─── */
 
 .component-landing-selector {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  align-items: end;
+  gap: var(--space-5);
 }
 
 .component-landing-showing {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
   margin: 0;
+  padding-block-end: var(--space-3);
+  border-block-end: 1px solid var(--color-border);
   font-family: var(--font-system);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+}
+
+.component-landing-selector-title {
+  font-family: var(--font-narrative);
+  font-size: 2.05rem;
+  line-height: 1.15;
+  color: var(--color-text-primary);
 }
 
 .component-landing-label {
@@ -259,6 +269,8 @@
 .component-landing-plates {
   position: relative;
   display: grid;
+  grid-column: 2;
+  grid-row: 1;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-4);
   margin: 0;
@@ -268,6 +280,18 @@
   /* Fieldsets default to min-inline-size: min-content, which ignores the
      grid and overflows at 320px. */
   min-inline-size: 0;
+}
+
+@media (width < 900px) {
+  .component-landing-selector {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .component-landing-plates {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
 
 @media (width < 640px) {
@@ -369,7 +393,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.8fr) auto minmax(0, 2.2fr);
   gap: var(--space-4);
-  align-items: stretch;
+  align-items: start;
 }
 
 @media (width < 900px) {
@@ -383,10 +407,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-5);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
 }
 
 .component-landing-stage-block {
@@ -439,6 +459,7 @@
 
 .component-landing-pipeline-arrow {
   display: flex;
+  align-self: center;
   align-items: center;
   justify-content: center;
   color: var(--color-accent);
