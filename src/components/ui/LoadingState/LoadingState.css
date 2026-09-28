@@ -3,9 +3,19 @@
  * The `pulse`, `dots`, and `skeleton` variants rendered bare unclassed <div> elements
  * with no CSS backing anywhere in the repo — a Tailwind-removal regression (#1051) that
  * stripped `animate-pulse` and friends — so every screen using them showed only floating
- * text on a blank page. `spinner` was repaired in #1467; this finishes the other three.
+ * text on a blank page. #1467 bounded the `spinner` variant's size, but never gave it a
+ * rotation — it has rendered as a static ring since before that fix. Added here alongside
+ * finishing the other three.
  * Token-based per the active `data-theme` scope; no hardcoded colors.
  */
+
+@keyframes component-loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+.component-loading-spinner {
+  animation: component-loading-spin 1s linear infinite;
+}
 
 @keyframes component-loading-pulse-fade {
   0%, 100% { opacity: 1; }

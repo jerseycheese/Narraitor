@@ -31,17 +31,20 @@ describe('RecoveryNotification', () => {
       expect(screen.getByText(/Last saved:/i)).toBeInTheDocument();
     });
 
-    test('renders warning icon with bounded dimensions', () => {
-      render(<RecoveryNotification {...defaultProps} />);
+    test('renders a warning icon when recovering would overwrite current data', () => {
+      render(<RecoveryNotification {...defaultProps} hasCurrentData={true} />);
 
-      const contentDiv = document.getElementById('recovery-notification-content');
-      expect(contentDiv).toBeInTheDocument();
+      expect(
+        document.querySelector('.recovery-notification-warning-icon'),
+      ).toBeInTheDocument();
+    });
 
-      const icon = contentDiv?.querySelector('svg');
-      expect(icon).toBeInTheDocument();
-      expect(icon).toHaveAttribute('width', '48');
-      expect(icon).toHaveAttribute('height', '48');
-      expect(icon).toHaveClass('recovery-notification-icon');
+    test('omits the conflict warning when there is no current data to overwrite', () => {
+      render(<RecoveryNotification {...defaultProps} hasCurrentData={false} />);
+
+      expect(
+        document.querySelector('.recovery-notification-warning-icon'),
+      ).not.toBeInTheDocument();
     });
 
     test('opts out of a dialog description when no custom description is provided', () => {

@@ -459,8 +459,8 @@ body > * {
 }
 
 .dark-mode-toggle-option svg {
-  width: 14px;
-  height: 14px;
+  width: var(--space-3_5);
+  height: var(--space-3_5);
 }
 
 .dark-mode-toggle-option:hover {

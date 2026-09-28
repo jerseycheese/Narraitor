@@ -96,8 +96,8 @@ export function SimpleModal({
         }}
       >
         {hasHeaderContent && (
-          <div>
-            <div>
+          <div className="dialog-header">
+            <div className="dialog-header-text">
               {title && <DialogTitle>{title}</DialogTitle>}
               {/* asChild keeps this a div: description accepts arbitrary
                   nodes (some callers pass <p> blocks), which the default

@@ -1,0 +1,79 @@
+/* RecoveryNotification — styles for src/components/shared/RecoveryNotification.tsx
+ *
+ * Shipped with no classes on its body content (only the dialog shell itself was
+ * styled), so it rendered as bare stacked divs — flagged during a browser
+ * walkthrough as "generally unstyled". Token-driven per the active `data-theme`
+ * scope; no hardcoded colors.
+ */
+
+.recovery-notification-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius-md);
+}
+
+.recovery-notification-warning p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.recovery-notification-warning-icon {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-warning);
+}
+
+.recovery-notification-preview {
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.recovery-notification-preview h4 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.recovery-notification-preview dl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.recovery-notification-preview-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.recovery-notification-preview-row dt {
+  color: var(--color-text-muted);
+}
+
+.recovery-notification-preview-row dd {
+  margin: 0;
+  font-weight: 500;
+  text-align: right;
+}
+
+.recovery-notification-last-saved {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.recovery-notification-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
