@@ -197,7 +197,7 @@ export interface UseSkillPointPoolOptions {
 }
 
 export interface UseSkillPointPoolReturn
-  extends Omit<UsePointPoolManagerReturn<SkillPointPoolItem>, 'items'> {
+  extends Omit<UsePointPoolManagerReturn<SkillPointPoolItem>, 'items' | 'setItems'> {
   skills: SkillPointPoolItem[];
   toggleSkillSelection: (skillId: string) => void;
   selectedSkillsCount: number;
