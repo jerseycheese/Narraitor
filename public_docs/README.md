@@ -33,7 +33,9 @@ Full index in [architecture-decisions.md](./architecture/architecture-decisions.
 - [ADR-009: Guided Onboarding System](./architecture/ADR-009-guided-onboarding-system.md)
 - [ADR-010: Decision Relevance Simplification](./architecture/ADR-010-decision-relevance-simplification.md)
 - [ADR-011: Three Design Systems (DS1/DS2/DS3) (superseded by ADR-013)](./architecture/ADR-011-three-design-systems.md)
+- [ADR-012: Storybook as the single canon surface](./architecture/ADR-012-storybook-single-canon-surface.md)
 - [ADR-013: Collapse to a single design system (DS3)](./architecture/ADR-013-collapse-to-single-design-system-ds3.md)
+- [ADR-014: Browser-local until a named trigger](./architecture/ADR-014-browser-local-until-named-trigger.md)
 - [Mock Components for Storybook (superseded)](./architecture/mock-components-for-storybook.md)
 
 ## Systems

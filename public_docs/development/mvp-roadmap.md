@@ -1,24 +1,19 @@
 # Narraitor MVP Roadmap
 
 ## Where We Are
-**Major Milestone**: The core MVP is basically complete. AI storytelling, world creation, character building, session persistence, and navigation all work, and a player can go end to end through the loop.
+**Major Milestone**: The core MVP is complete and past it. AI storytelling, world creation, character building, session persistence, navigation, and multi-provider AI (Gemini, OpenRouter, Ollama, OpenAI live; Claude adapter built but off pending a live-key check, #894) all work, and a player can go end to end through the loop.
 
-**Current Status**: v1.1 shipped on 2026-08-10. v1.0 went out on 2026-08-04 and v1.1 followed as the
-first post-launch pass, finishing the visual identity (the bolder DS3 redesign, #1543), closing the
-two accessibility gaps v1.0 named as incomplete (#276 keyboard control, #1477 touch targets), adding
-client-side error reporting (#1641), and fixing the story-loop problems found in playtesting (#1680,
-#1585, #1681).
+**Current Status**: v1.10.0 shipped on 2026-09-27. It fixed the play-loop bugs a September playtest round (#1818) surfaced — a session locking on turn 1, a death hanging on "Writing your story...", failures with no retry, prompt text leaking into the story — plus a batch of wizard fixes. See [RELEASES.md](../../RELEASES.md) for the full v1.2-through-v1.10 shipped history; this doc no longer tracks it issue-by-issue.
 
-Next up is the `v1.2` milestone: AI providers other than Gemini (#878, scoped to #890/#895/#896),
-plus turn-level analytics so play depth is actually measurable. Images stay Gemini-only for now.
+Next up is [v1.11](https://github.com/jerseycheese/Narraitor/milestone/12), going after that playtest round's main finding: in 4 of 5 runs the story still fell apart between turns 15-25. The turn resolver will own scene/location/beat state and a stall-breaker will force the story forward (#2203), the ending offer will read a thread ledger instead of per-turn event labels (#2204), and a repeat playtest round decides whether it ships (#2205).
 
-Landed along the way: the three-design-system migration
+Landed since v1.1: the three-design-system migration
 ([ADR-011](../architecture/ADR-011-three-design-systems.md)), later collapsed to a single design
 system ([ADR-013](../architecture/ADR-013-collapse-to-single-design-system-ds3.md));
-bring-your-own-key provider config (#891/#892/#893); Playwright visual-regression testing; the
-dashboard home page; the guided onboarding tutorial; table views for the list screens; the
-lore entity-management work (fuzzy matching, aliases, deduplication, resolution); and real SSE
-streaming for narrative generation (#1476).
+bring-your-own-key provider config, now genuinely multi-provider (Gemini, OpenRouter, Ollama, OpenAI);
+Playwright visual-regression testing; the dashboard home page; the guided onboarding tutorial; table
+views for the list screens; the lore entity-management work (fuzzy matching, aliases, deduplication,
+resolution); and real SSE streaming for narrative generation (#1476).
 
 Narraitor is single-player and browser-local, with the player supplying their own provider key. No
 accounts, no server-side sync. Whether that ever changes is an open decision (#1744), and
@@ -107,9 +102,7 @@ This is about getting ready for broader use beyond just personal development.
 
 ## Current Priority Queue
 
-The next release to main is **v1.2**, tracked in the `v1.2` GitHub milestone. The earlier
-Immediate / High Priority / Medium Priority queues are kept below as a record of what shipped and
-what didn't. This roadmap is a running log, not a snapshot.
+The next release to main is **v1.11**, tracked in the [v1.11 GitHub milestone](https://github.com/jerseycheese/Narraitor/milestone/12) — see "Where We Are" above for its scope. Everything below through v1.2 has since shipped; the queues are kept as a record of what shipped and what didn't. This roadmap is a running log, not a snapshot. For the detailed shipped history from v1.2 through v1.10, see [RELEASES.md](../../RELEASES.md).
 
 ### Recently shipped (prior queues, kept for history)
 
@@ -135,10 +128,10 @@ what didn't. This roadmap is a running log, not a snapshot.
 - [x] Token usage tracking (#326) and token-estimation optimization (#319)
 - [ ] Visual diff tooling (#652), Docker cross-platform visual consistency (#653), snapshot governance (#655), visual performance metrics (#656) — still open, not blocking 1.0
 
-### v1.2 — active (next release to main)
+### v1.2 — shipped
 
-Nine issues, in three groups. Lane A runs in order because each story builds on the last; the
-other two are independent and can go in parallel.
+Nine issues, in three groups. Lane A ran in order because each story built on the last; the
+other two were independent and ran in parallel.
 
 **Multi-provider AI (in order)**
 - Provider abstraction layer, plus splitting the Gemini-shaped `apiHelpers.ts` (#890)
@@ -187,11 +180,12 @@ of the 1.0 gate.
 
 Still deferred: session pacing and reading milestones (#805).
 
-### Partly shipped: Multi-Provider AI (Epic #878)
-Gemini-only through v1.1. Shipped: secure key storage (#891), provider config UI (#892), Gemini
-refactor to the provider pattern (#893), error handling (#902). The BYO-key plumbing turned out to
-be genuinely provider-neutral, so what's left is a dispatch layer: #890, #895 and #896, all in the
-v1.2 milestone. Native SDKs, multi-provider images and the rest live in #879.
+### Shipped: Multi-Provider AI (Epic #878)
+Gemini-only through v1.1. Shipped since: secure key storage (#891), provider config UI (#892),
+Gemini refactor to the provider pattern (#893), error handling (#902), and the dispatch layer
+(#890, #895, #896) that made OpenRouter and Ollama live presets alongside Gemini and OpenAI. Native
+Claude SDK support is built but unavailable pending a live-key check (#894, see RELEASES.md v1.10).
+Multi-provider images and the rest of the epic live in #879.
 
 ## Technical Debt & Infrastructure
 - Playwright visual regression testing — done (`tests/visual/`, runs in CI)
@@ -241,4 +235,6 @@ server that has never been decided on, and that decision now lives in #1744.
 - [ ] Marketing materials ready
 
 ---
-*Last Updated: 2026-08-01 - Correctness pass (#1638). Moved the merged Phase A and visual-test items to "Shipped for v1.0"; the active queue now matches the open milestone. #495 is no longer a 1.0 gate.*
+*Last Updated: 2026-09-28 - Doc-rot pass. Status was frozen at v1.1/"v1.2 active" while the repo had
+shipped through v1.10; brought current status and priority queue up to date and pointed to
+RELEASES.md for the v1.2-v1.10 shipped detail this doc no longer duplicates.*

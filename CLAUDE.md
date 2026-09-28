@@ -123,7 +123,7 @@ for generic), `state/` (Zustand stores — the source of truth for app data, plu
   production is wrong. `00-Foundation/Design System Showcase` is the foundation story. The
   toolbar has a light/dark switcher; verify any visual change in both before merging.
 - `DESIGN.md` is the AI-readable map of tokens, components, and the don'ts list. Treat it as
-  authoritative, but note it flags its own stale DS1-era type-scale values inline.
+  authoritative.
 
 ### AI integration
 
