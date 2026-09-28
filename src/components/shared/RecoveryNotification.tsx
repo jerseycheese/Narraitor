@@ -35,6 +35,7 @@ import { AlertTriangle } from 'lucide-react';
 import { Button } from '../ui/button';
 import { SimpleModal } from './SimpleModal';
 import { formatDateTime } from '@/lib/utils';
+import './RecoveryNotification.css';
 
 /**
  * Recovery data structure containing analyzed save information for preview display
@@ -158,85 +159,82 @@ export function RecoveryNotification({
       title={title || "Character Creation Progress Found"}
       description={description}
       showCloseButton={true}
+      contentClassName="component-recovery-notification"
     >
-      <div id="recovery-notification-content">
-        <div
-          className="recovery-notification-icon-wrapper"
-          style={{ display: 'flex', justifyContent: 'center' }}
-        >
+      {hasCurrentData && (
+        <div className="recovery-notification-warning" role="note">
           <AlertTriangle
-            size={48}
-            className="recovery-notification-icon"
-            style={{ color: 'var(--color-warning, #f59e0b)' }}
+            className="recovery-notification-warning-icon"
             aria-hidden="true"
           />
+          <p>
+            <strong>Warning:</strong> recovering will replace any current form
+            data you&apos;ve entered.
+          </p>
         </div>
-      </div>
+      )}
 
-      <div>
-        <p>
-          {hasCurrentData && (
-            <span>
-              <AlertTriangle aria-hidden="true" />
-              <span>Warning:</span>
-              <span>
-                Recovering will replace any current form data you&apos;ve
-                entered.
-              </span>
-            </span>
-          )}
-        </p>
-
-        {/* Recovery Data Preview */}
-        {recoveryData && (
-          <div>
-            <h4>Saved Progress Preview:</h4>
-            <div>
-              {recoveryData.name && (
-                <div>
-                  Name: <span>{recoveryData.name}</span>
-                </div>
-              )}
-              {recoveryData.genre && (
-                <div>
-                  Genre: <span>{recoveryData.genre}</span>
-                </div>
-              )}
-              {recoveryData.currentStep !== undefined && (
-                <div>
-                  Progress:{' '}
-                  <span>{getStepDescription(recoveryData.currentStep)}</span>
-                </div>
-              )}
-              {recoveryData.hasAttributes &&
-                (recoveryData.totalAttributePoints !== undefined || recoveryData.attributeCount !== undefined) && (
-                  <div>
+      {recoveryData && (
+        <div className="recovery-notification-preview">
+          <h4>Saved Progress Preview</h4>
+          <dl>
+            {recoveryData.name && (
+              <div className="recovery-notification-preview-row">
+                <dt>Name</dt>
+                <dd>{recoveryData.name}</dd>
+              </div>
+            )}
+            {recoveryData.genre && (
+              <div className="recovery-notification-preview-row">
+                <dt>Genre</dt>
+                <dd>{recoveryData.genre}</dd>
+              </div>
+            )}
+            {recoveryData.currentStep !== undefined && (
+              <div className="recovery-notification-preview-row">
+                <dt>Progress</dt>
+                <dd>{getStepDescription(recoveryData.currentStep)}</dd>
+              </div>
+            )}
+            {recoveryData.hasAttributes &&
+              (recoveryData.totalAttributePoints !== undefined || recoveryData.attributeCount !== undefined) && (
+                <div className="recovery-notification-preview-row">
+                  <dt>Attributes</dt>
+                  <dd>
                     {recoveryData.totalAttributePoints !== undefined
-                      ? `Attribute points allocated: ${recoveryData.totalAttributePoints}`
-                      : `Attributes: ${recoveryData.attributeCount}`}
-                  </div>
-                )}
-              {recoveryData.hasSkills &&
-                (recoveryData.selectedSkillCount !== undefined || recoveryData.skillCount !== undefined) && (
-                  <div>
-                    {recoveryData.selectedSkillCount !== undefined
-                      ? `Skills selected: ${recoveryData.selectedSkillCount}`
-                      : `Skills: ${recoveryData.skillCount}`}
-                  </div>
-                )}
-              {recoveryData.hasBackground && (
-                <div>
-                  Background: <span>Completed</span>
+                      ? `${recoveryData.totalAttributePoints} points allocated`
+                      : recoveryData.attributeCount}
+                  </dd>
                 </div>
               )}
-            </div>
-          </div>
-        )}
+            {recoveryData.hasSkills &&
+              (recoveryData.selectedSkillCount !== undefined || recoveryData.skillCount !== undefined) && (
+                <div className="recovery-notification-preview-row">
+                  <dt>Skills</dt>
+                  <dd>
+                    {recoveryData.selectedSkillCount !== undefined
+                      ? `${recoveryData.selectedSkillCount} selected`
+                      : recoveryData.skillCount}
+                  </dd>
+                </div>
+              )}
+            {recoveryData.hasBackground && (
+              <div className="recovery-notification-preview-row">
+                <dt>Background</dt>
+                <dd>Completed</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      )}
 
-        {validDate && <p>Last saved: {validDate}</p>}
-      </div>
+      {validDate && (
+        <p className="recovery-notification-last-saved">
+          Last saved: {validDate}
+        </p>
+      )}
 
-      <div>
+      <div className="recovery-notification-actions">
         <Button ref={recoverButtonRef} onClick={onRecover}>
           Recover Progress
         </Button>
