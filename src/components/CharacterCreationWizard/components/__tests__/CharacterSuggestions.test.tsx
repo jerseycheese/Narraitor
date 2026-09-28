@@ -60,10 +60,10 @@ function mockFetchOk(data: unknown) {
   }) as jest.Mock;
 }
 
-function renderPanel(onAdopt = jest.fn()) {
+function renderPanel(onAdopt = jest.fn(), customWorld = world) {
   render(
     <CharacterSuggestions
-      world={world}
+      world={customWorld}
       concept={characterData.description}
       characterData={characterData}
       onAdopt={onAdopt}
@@ -199,5 +199,66 @@ describe('CharacterSuggestions', () => {
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Generation exploded');
     });
+  });
+
+  it('blocks adoption and shows warning when attribute exceeds pool budget', async () => {
+    // Generate a suggestion that is natively over the budget limit
+    const smallPoolWorld = {
+      ...world,
+      settings: { ...world.settings, attributePointPool: 5 },
+    };
+    
+    mockFetchOk({
+      ...generated,
+      attributes: [{ id: 'attr-1', value: 8 }] // 8 is > 5
+    });
+    renderPanel(jest.fn(), smallPoolWorld);
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Suggest character details' })
+    );
+    await screen.findByRole('article', { name: 'Attributes suggestion' });
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Edit Attributes suggestion' })
+    );
+
+    // Check for warning message immediately since 35 > 30 budget
+    await waitFor(() => {
+      expect(screen.getByText(/Over budget by/)).toBeInTheDocument();
+    });
+
+    const adoptBtn = screen.getByRole('button', { name: 'Adopt Attributes suggestion' });
+    expect(adoptBtn).toBeDisabled();
+  });
+
+  it('allows adoption when attribute is within pool budget', async () => {
+    mockFetchOk(generated);
+    const onAdopt = renderPanel();
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Suggest character details' })
+    );
+    await screen.findByRole('article', { name: 'Attributes suggestion' });
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Edit Attributes suggestion' })
+    );
+
+    const input = screen.getByLabelText('Strength value');
+    await userEvent.clear(input);
+    await userEvent.type(input, '10'); // Within the pool budget of 30
+
+    // Should not have the warning
+    expect(screen.queryByText(/Over budget by/)).not.toBeInTheDocument();
+
+    const adoptBtn = screen.getByRole('button', { name: 'Adopt Attributes suggestion' });
+    expect(adoptBtn).not.toBeDisabled();
+
+    await userEvent.click(adoptBtn);
+
+    const call = onAdopt.mock.calls.find((c) => c[0]?.attributes);
+    expect(call).toBeDefined();
+    expect(call![0].attributes[0].value).toBe(10);
   });
 });
