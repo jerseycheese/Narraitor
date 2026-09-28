@@ -95,7 +95,7 @@ export default function Landing() {
             data-world={world.id}
           >
             <span className="component-landing-label">Now showing</span>
-            {world.caption}
+            <span className="component-landing-selector-title">{world.caption}</span>
           </p>
         ))}
 

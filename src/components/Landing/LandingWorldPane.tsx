@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import { ArrowDown, ArrowRight } from 'lucide-react';
 import type { ShowcaseWorld } from './homepageShowcase.generated';
 
 /**
@@ -44,21 +45,32 @@ export default function LandingWorldPane({ world }: { world: ShowcaseWorld }) {
       data-world={world.id}
       aria-label={world.caption}
     >
+
       <div className="component-landing-exchange">
         <h2 className="component-landing-heading">
-          You wrote this. It built the world from it.
+          From a premise to a living world.
         </h2>
-        <div className="component-landing-exchange-grid">
-          <div className="component-landing-authored">
-            <div className="component-landing-typed">
-              <p className="component-landing-label">What you wrote</p>
-              <p className="component-landing-typed-text">{world.typed}</p>
+        <div className="component-landing-pipeline">
+          {/* Workbench: Setting + Rules */}
+          <div className="component-landing-workbench">
+            <div className="component-landing-stage-block">
+              <span className="component-landing-stage-label">Your Premise</span>
+              <div className="component-landing-typed">
+                <p className="component-landing-typed-text">{world.typed}</p>
+              </div>
             </div>
 
-            {/* The bridge the page used to skip. The skill named in the failed
-                check below is one of these, so a visitor meets it here first. */}
-            <div className="component-landing-built">
-              <p className="component-landing-label">What it built</p>
+            <div className="component-landing-flow-divider-split" aria-hidden="true">
+              <span className="component-landing-flow-split-line" />
+              <div className="component-landing-flow-split-badge">
+                <ArrowDown className="component-landing-flow-icon" size={14} strokeWidth={2} />
+                <span>Generates</span>
+              </div>
+              <span className="component-landing-flow-split-line" />
+            </div>
+
+            <div className="component-landing-stage-block">
+              <span className="component-landing-stage-label">World Rules</span>
               <dl className="component-landing-traits">
                 <dt className="component-landing-trait-term">Attributes</dt>
                 <dd className="component-landing-trait-list">
@@ -70,10 +82,6 @@ export default function LandingWorldPane({ world }: { world: ShowcaseWorld }) {
                 </dd>
                 <dt className="component-landing-trait-term">Skills</dt>
                 <dd className="component-landing-trait-list">
-                  {/* The skill that fails below is deliberately NOT marked here.
-                      A highlight the visitor can't explain yet is worse than the
-                      connection it buys, and the check block makes it anyway by
-                      naming a skill they've already read. */}
                   {world.skillNames.map((name) => (
                     <span key={name} className="component-landing-trait">
                       {name}
@@ -83,12 +91,20 @@ export default function LandingWorldPane({ world }: { world: ShowcaseWorld }) {
               </dl>
             </div>
           </div>
-          <div className="component-landing-returned">
-            <p className="component-landing-label">What came back</p>
-            <p className="component-landing-prose">{world.opening}</p>
+
+          {/* Mechanical Arrow Divider */}
+          <div className="component-landing-pipeline-arrow" aria-hidden="true">
+            <ArrowRight className="component-landing-pipeline-arrow-icon" size={24} strokeWidth={2} />
+          </div>
+
+          {/* Manuscript Stage */}
+          <div className="component-landing-manuscript-stage">
+            <span className="component-landing-stage-label">The Opening Scene</span>
+            <p className="component-landing-prose component-landing-prose-illuminated">{world.opening}</p>
           </div>
         </div>
       </div>
+
 
       <div className="component-landing-decision">
         <h2 className="component-landing-heading">And then you have to decide.</h2>

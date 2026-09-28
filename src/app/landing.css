@@ -231,19 +231,29 @@
 /* ─── World switcher ─── */
 
 .component-landing-selector {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  align-items: end;
+  gap: var(--space-5);
 }
 
 .component-landing-showing {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
   margin: 0;
+  padding-block-end: var(--space-3);
+  border-block-end: 1px solid var(--color-border);
   font-family: var(--font-system);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+}
+
+.component-landing-selector-title {
+  font-family: var(--font-narrative);
+  font-size: 2.05rem;
+  line-height: 1.15;
+  color: var(--color-text-primary);
 }
 
 .component-landing-label {
@@ -259,6 +269,8 @@
 .component-landing-plates {
   position: relative;
   display: grid;
+  grid-column: 2;
+  grid-row: 1;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-4);
   margin: 0;
@@ -268,6 +280,18 @@
   /* Fieldsets default to min-inline-size: min-content, which ignores the
      grid and overflows at 320px. */
   min-inline-size: 0;
+}
+
+@media (width < 900px) {
+  .component-landing-selector {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .component-landing-plates {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
 
 @media (width < 640px) {
@@ -364,17 +388,110 @@
   color: var(--color-text-primary);
 }
 
-.component-landing-exchange-grid {
+.component-landing-exchange-grid,
+.component-landing-pipeline {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-  gap: var(--space-6);
+  grid-template-columns: minmax(0, 1.8fr) auto minmax(0, 2.2fr);
+  gap: var(--space-4);
   align-items: start;
 }
 
-@media (width < 768px) {
-  .component-landing-exchange-grid {
+@media (width < 900px) {
+  .component-landing-exchange-grid,
+  .component-landing-pipeline {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.component-landing-workbench {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-landing-stage-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.component-landing-stage-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-system);
+  font-size: var(--font-size-2xs);
+  font-weight: 600;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.component-landing-flow-divider-split {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+  width: 100%;
+}
+
+.component-landing-flow-split-line {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.component-landing-flow-split-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1_5);
+  font-family: var(--font-interface);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.component-landing-flow-icon {
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+.component-landing-pipeline-arrow {
+  display: flex;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  user-select: none;
+}
+
+@media (width < 900px) {
+  .component-landing-pipeline-arrow {
+    padding: var(--space-2) 0;
+    transform: rotate(90deg);
+  }
+}
+
+.component-landing-manuscript-stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--brand-page-wash);
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.component-landing-prose-illuminated::first-letter {
+  float: left;
+  padding-top: var(--space-1);
+  padding-right: var(--space-2);
+  font-family: var(--font-narrative);
+  font-size: 3rem;
+  line-height: 0.85;
+  color: var(--color-accent);
 }
 
 .component-landing-typed,

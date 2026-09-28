@@ -231,7 +231,6 @@ test.describe('Hero contrast over world art', () => {
  */
 const SOLID_TEXT_RUNS = [
   '.component-landing-typed-text',
-  '.component-landing-typed .component-landing-label',
   '.component-landing-choice-mark',
   '.component-landing-closing-text',
 ] as const;
