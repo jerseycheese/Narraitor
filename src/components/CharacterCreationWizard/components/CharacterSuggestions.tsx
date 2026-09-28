@@ -10,6 +10,8 @@ import { World } from '@/types/world.types';
 import { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
 import type { GeneratedCharacterData } from '@/lib/generators/characterGenerator';
 import { characterApi } from '@/lib/api/characterApi';
+import { usePointPoolManager, PointPoolItem } from '@/hooks/usePointPoolManager';
+import { wizardStyles } from '@/components/shared/wizard';
 
 type CardKey = 'description' | 'background' | 'attributes' | 'skills';
 
@@ -52,8 +54,16 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
     motivation: '',
     physicalDescription: '',
   });
-  const [editAttributes, setEditAttributes] = useState<Record<string, number>>({});
-  const [editSkills, setEditSkills] = useState<Record<string, number>>({});
+
+  const attributePool = usePointPoolManager<PointPoolItem>({
+    totalPoints: world.settings.attributePointPool || 0,
+    items: [],
+  });
+
+  const skillPool = usePointPoolManager<PointPoolItem>({
+    totalPoints: world.settings.skillPointPool || 0,
+    items: [],
+  });
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -175,11 +185,23 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
         physicalDescription: suggestion.background.physicalDescription || '',
       });
     } else if (key === 'attributes') {
-      setEditAttributes(
-        Object.fromEntries(attributeSuggestions.map((a) => [a.id, a.value]))
+      attributePool.setItems(
+        attributeSuggestions.map(a => ({
+          id: a.id,
+          value: a.value,
+          minValue: a.minValue,
+          maxValue: a.maxValue,
+        }))
       );
     } else if (key === 'skills') {
-      setEditSkills(Object.fromEntries(skillSuggestions.map((s) => [s.id, s.level])));
+      skillPool.setItems(
+        skillSuggestions.map(s => ({
+          id: s.id,
+          value: s.level,
+          minValue: s.minLevel,
+          maxValue: s.maxLevel,
+        }))
+      );
     }
     setEditingCard(key);
   };
@@ -334,10 +356,11 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
               cardKey="attributes"
               title="Attributes"
               editing={editingCard === 'attributes'}
+              adoptDisabled={editingCard === 'attributes' && !attributePool.isValidDistribution}
               onAdopt={() =>
                 adoptAttributes(
                   editingCard === 'attributes'
-                    ? editAttributes
+                    ? Object.fromEntries(attributePool.items.map((a) => [a.id, a.value]))
                     : Object.fromEntries(attributeSuggestions.map((a) => [a.id, a.value]))
                 )
               }
@@ -345,6 +368,16 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
               onCancel={() => setEditingCard(null)}
               onDismiss={() => dismiss('attributes')}
             >
+              {editingCard === 'attributes' && (
+                <div className="character-suggestion-pool-status">
+                  <span className="character-suggestion-pool-remaining">Points remaining: {attributePool.pool.remaining}</span>
+                  {!attributePool.isValidDistribution && (
+                    <span className={`character-suggestion-pool-error ${wizardStyles.form.error}`} role="alert">
+                      Over budget by {Math.abs(attributePool.pool.remaining)} points. Reduce attributes to adopt.
+                    </span>
+                  )}
+                </div>
+              )}
               <ul className="character-suggestion-stats">
                 {attributeSuggestions.map((attr) => (
                   <li key={attr.id} className="character-suggestion-stat">
@@ -355,13 +388,8 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
                         aria-label={`${attr.name} value`}
                         min={attr.minValue}
                         max={attr.maxValue}
-                        value={editAttributes[attr.id] ?? attr.value}
-                        onChange={(e) =>
-                          setEditAttributes((p) => ({
-                            ...p,
-                            [attr.id]: Number(e.target.value),
-                          }))
-                        }
+                        value={attributePool.getItemById(attr.id)?.value ?? attr.value}
+                        onChange={(e) => attributePool.setValue(attr.id, Number(e.target.value))}
                         className="character-suggestion-stat-input"
                       />
                     ) : (
@@ -379,10 +407,11 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
               cardKey="skills"
               title="Skills"
               editing={editingCard === 'skills'}
+              adoptDisabled={editingCard === 'skills' && !skillPool.isValidDistribution}
               onAdopt={() =>
                 adoptSkills(
                   editingCard === 'skills'
-                    ? editSkills
+                    ? Object.fromEntries(skillPool.items.map((s) => [s.id, s.value]))
                     : Object.fromEntries(skillSuggestions.map((s) => [s.id, s.level]))
                 )
               }
@@ -390,6 +419,16 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
               onCancel={() => setEditingCard(null)}
               onDismiss={() => dismiss('skills')}
             >
+              {editingCard === 'skills' && (
+                <div className="character-suggestion-pool-status">
+                  <span className="character-suggestion-pool-remaining">Points remaining: {skillPool.pool.remaining}</span>
+                  {!skillPool.isValidDistribution && (
+                    <span className={`character-suggestion-pool-error ${wizardStyles.form.error}`} role="alert">
+                      Over budget by {Math.abs(skillPool.pool.remaining)} points. Reduce skills to adopt.
+                    </span>
+                  )}
+                </div>
+              )}
               <ul className="character-suggestion-stats">
                 {skillSuggestions.map((skill) => (
                   <li key={skill.id} className="character-suggestion-stat">
@@ -400,13 +439,8 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
                         aria-label={`${skill.name} level`}
                         min={skill.minLevel}
                         max={skill.maxLevel}
-                        value={editSkills[skill.id] ?? skill.level}
-                        onChange={(e) =>
-                          setEditSkills((p) => ({
-                            ...p,
-                            [skill.id]: Number(e.target.value),
-                          }))
-                        }
+                        value={skillPool.getItemById(skill.id)?.value ?? skill.level}
+                        onChange={(e) => skillPool.setValue(skill.id, Number(e.target.value))}
                         className="character-suggestion-stat-input"
                       />
                     ) : (
@@ -431,6 +465,7 @@ interface SuggestionCardProps {
   onEdit: () => void;
   onCancel: () => void;
   onDismiss: () => void;
+  adoptDisabled?: boolean;
   children: React.ReactNode;
 }
 
@@ -442,6 +477,7 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
   onEdit,
   onCancel,
   onDismiss,
+  adoptDisabled,
   children,
 }) => (
   <article
@@ -457,6 +493,7 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
         variant="success"
         size="sm"
         onClick={onAdopt}
+        disabled={adoptDisabled}
         aria-label={`Adopt ${title} suggestion`}
       >
         Adopt

@@ -127,3 +127,18 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+/* Point Pool Status */
+.character-suggestion-pool-status {
+  margin-bottom: var(--space-2);
+}
+
+.character-suggestion-pool-remaining {
+  display: block;
+  font-weight: 500;
+}
+
+.character-suggestion-pool-error {
+  display: block;
+  margin-top: var(--space-1);
+}

@@ -30,6 +30,7 @@ export interface UsePointPoolManagerReturn<T extends PointPoolItem> {
   updateItem: (itemId: string, updater: (item: T) => T) => void;
   resetItem: (itemId: string) => void;
   resetAll: () => void;
+  setItems: React.Dispatch<React.SetStateAction<T[]>>;
   getItemById: (itemId: string) => T | undefined;
   hasPointsRemaining: boolean;
   isValidDistribution: boolean;
@@ -179,6 +180,7 @@ export function usePointPoolManager<T extends PointPoolItem>({
     updateItem,
     resetItem,
     resetAll,
+    setItems,
     getItemById,
     hasPointsRemaining,
     isValidDistribution,
@@ -195,7 +197,7 @@ export interface UseSkillPointPoolOptions {
 }
 
 export interface UseSkillPointPoolReturn
-  extends Omit<UsePointPoolManagerReturn<SkillPointPoolItem>, 'items'> {
+  extends Omit<UsePointPoolManagerReturn<SkillPointPoolItem>, 'items' | 'setItems'> {
   skills: SkillPointPoolItem[];
   toggleSkillSelection: (skillId: string) => void;
   selectedSkillsCount: number;
