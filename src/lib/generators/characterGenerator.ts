@@ -2,10 +2,15 @@ import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
 import { validateWorld } from '@/lib/utils/typeGuards';
 import { extractJsonObject } from '@/lib/ai/parseJSON';
+import { truncate } from '@/lib/utils/formatters';
 import type { ProviderCredential } from '@/lib/ai/providers/types';
 
 // Character level range for generated characters
 const CHARACTER_LEVEL_RANGE = { min: 1, max: 5 };
+
+// Must stay under validateText's default maxLength (see validateBackground),
+// which is what history/personality are checked against once adopted.
+const MAX_BACKGROUND_TEXT_LENGTH = 1000;
 
 export interface GeneratedCharacterData {
   name: string;
@@ -111,8 +116,8 @@ Generate a character and return ONLY a valid JSON object:
 {
   "name": "Character Name",
   "background": {
-    "description": "Their complete history and background story",
-    "personality": "Their personality traits and behavioral patterns",
+    "description": "Their complete history and background story (under 1000 characters)",
+    "personality": "Their personality traits and behavioral patterns (under 1000 characters)",
     "motivation": "What drives them and their goals",
     "fears": ["List 2-3 specific fears or anxieties this character has"],
     "physicalDescription": "Their appearance including age, race/ethnicity, height, build, hair, eyes, and typical clothing"
@@ -327,9 +332,12 @@ CRITICAL INSTRUCTIONS:
     if (!characterData.background.description || typeof characterData.background.description !== 'string') {
       characterData.background.description = 'A mysterious character with an unknown past.';
     }
+    characterData.background.description = truncate(characterData.background.description, MAX_BACKGROUND_TEXT_LENGTH - 3);
+
     if (!characterData.background.personality || typeof characterData.background.personality !== 'string') {
       characterData.background.personality = 'Determined and resourceful.';
     }
+    characterData.background.personality = truncate(characterData.background.personality, MAX_BACKGROUND_TEXT_LENGTH - 3);
     if (!characterData.background.motivation || typeof characterData.background.motivation !== 'string') {
       characterData.background.motivation = 'Seeking their place in the world.';
     }
