@@ -51,6 +51,35 @@ test.describe('Manuscript Layout Specific Tests', () => {
     
     // Slight wait for any animations to settle
     await page.waitForTimeout(500);
+
+    // Assert geometry: the skeleton header must be contained within the shell.
+    // We temporarily push the body down to prove the fixed header moves with the
+    // shell (contained) rather than sticking to the viewport (escaped).
+    const geometry = await page.evaluate(() => {
+      document.body.style.paddingTop = '100px';
+      
+      const shell = document.querySelector('.manuscript-loading-shell');
+      const header = document.querySelector('.manuscript-skeleton-header');
+      if (!shell || !header) return null;
+      
+      const shellRect = shell.getBoundingClientRect();
+      const headerRect = header.getBoundingClientRect();
+      
+      document.body.style.paddingTop = '';
+      
+      return {
+        headerTop: headerRect.top,
+        shellTop: shellRect.top,
+      };
+    });
+    
+    expect(geometry).not.toBeNull();
+    if (geometry) {
+      // If escaped to viewport, headerTop would be 0 while shellTop is 100.
+      // If contained, they move together.
+      expect(Math.abs(geometry.headerTop - geometry.shellTop)).toBeLessThan(5);
+      expect(geometry.headerTop).toBeGreaterThanOrEqual(100);
+    }
     
     await hideDynamicContent(page);
     
