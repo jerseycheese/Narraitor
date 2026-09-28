@@ -25,6 +25,7 @@ jest.mock('@/state/worldThreadStore', () => ({
 
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
+import type { WorldThread } from '@/types/worldThread.types';
 
 const segment = (
   id: string,
@@ -192,13 +193,14 @@ describe('useEndingDetection open-threat gate', () => {
     expect(prompt).toContain('unresolvedThreats');
   });
 });
+
 describe('useEndingDetection ENDING_GATE_THREAD_LEDGER', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'ENDING_GATE_THREAD_LEDGER');
   });
 
-  const mockStore = (threads: any[]) => {
+  const mockStore = (threads: WorldThread[]) => {
     (useWorldThreadStore.getState as jest.Mock).mockReturnValue({
       getOpenThreadsBySession: () => threads,
     });
@@ -231,9 +233,9 @@ describe('useEndingDetection ENDING_GATE_THREAD_LEDGER', () => {
       openedAtTurn: 1,
       lastAdvancedAtTurn: 1,
       dueByTurn: 2 // Overdue if currentTurn > 2
-    }]);
+    } as WorldThread]);
     mockGenerateContent.mockResolvedValue({
-      content: endingOffer(), // null census
+      content: endingOffer({ unresolvedThreats: ['The bomb'] }),
     });
 
     const story = Array.from({ length: 4 }).map((_, i) => segment(`${i + 1}`));
@@ -256,9 +258,9 @@ describe('useEndingDetection ENDING_GATE_THREAD_LEDGER', () => {
       openedAtTurn: 1,
       lastAdvancedAtTurn: 1,
       // no dueByTurn
-    }]);
+    } as WorldThread]);
     mockGenerateContent.mockResolvedValue({
-      content: endingOffer(), 
+      content: endingOffer(),
     });
 
     // We need currentTurn - lastAdvanced > 5. So length 9.
@@ -269,9 +271,32 @@ describe('useEndingDetection ENDING_GATE_THREAD_LEDGER', () => {
 
     // Should not block because it's older than OPEN_ASK_QUIET_TURNS
     expect(onEndingSuggested).toHaveBeenCalledWith(expect.any(String), 'story-complete');
-    
+
     // Check if the prompt contained the old guy
     const prompt = mockGenerateContent.mock.calls[0][0] as string;
     expect(prompt).toContain('Old guy');
+  });
+
+  it('blocker present with the model reporting unresolvedThreats: [] -> offer goes through', async () => {
+    mockStore([{
+      id: 'thread-3',
+      kind: 'actor',
+      status: 'open',
+      summary: 'Active guy',
+      openedAtTurn: 8,
+      lastAdvancedAtTurn: 8,
+    } as WorldThread]);
+
+    // Model reports empty array of unresolved threats
+    mockGenerateContent.mockResolvedValue({
+      content: endingOffer({ unresolvedThreats: [] }),
+    });
+
+    const story = Array.from({ length: 9 }).map((_, i) => segment(`${i + 1}`));
+    const { result, onEndingSuggested } = renderDetection(story.slice(0, 8));
+
+    await result.current.checkForEndingIndicators(story[8]);
+
+    expect(onEndingSuggested).toHaveBeenCalledWith(expect.any(String), 'story-complete');
   });
 });

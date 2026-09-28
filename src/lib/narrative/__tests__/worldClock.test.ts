@@ -12,6 +12,7 @@ import {
   selectThreadsForPrompt,
   summarizeLedgerForSegment,
   turnsSinceWorldMoved,
+  selectEndingBlockers,
 } from '../worldClock';
 import type { NarrativeSegment } from '@/types/narrative.types';
 import type { WorldThread } from '@/types/worldThread.types';
@@ -282,5 +283,21 @@ describe('worldClock', () => {
       advanced: [],
       resolved: ['B'],
     });
+  });
+
+  test('selectEndingBlockers holds overdue and recently moved threads, but ignores old untouched threads', () => {
+    const overdue = makeThread({ id: 'overdue', openedAtTurn: 1, lastAdvancedAtTurn: 1, dueByTurn: 2 });
+    const recentlyMoved = makeThread({ id: 'recent', openedAtTurn: 1, lastAdvancedAtTurn: 10 });
+    const untouched = makeThread({ id: 'untouched', openedAtTurn: 1, lastAdvancedAtTurn: 1 });
+    const resolved = makeThread({ id: 'resolved', openedAtTurn: 1, lastAdvancedAtTurn: 10, status: 'resolved' });
+
+    // OPEN_ASK_QUIET_TURNS = 5. currentTurn = 12.
+    // overdue: 12 > 2 => isOverdue = true
+    // recentlyMoved: 12 - 10 = 2 <= 5 => blocks
+    // untouched: 12 - 1 = 11 > 5 => doesn't block
+    // resolved: status !== 'open' => doesn't block
+
+    const blockers = selectEndingBlockers([overdue, recentlyMoved, untouched, resolved], 12);
+    expect(blockers.map((t) => t.id)).toEqual(['overdue', 'recent']);
   });
 });

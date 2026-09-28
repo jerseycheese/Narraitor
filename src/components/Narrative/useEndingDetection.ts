@@ -15,7 +15,7 @@ import { safeParseNarrativeAnalysis } from '@/lib/ai/parseNarrativeResponse';
 import { stripMarkdownFences } from '@/lib/ai/parseJSON';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
-import { selectEndingBlockers } from '@/lib/narrative/worldClock';
+import { selectEndingBlockers, countWorldClockTurns } from '@/lib/narrative/worldClock';
 import type {
   EndingType,
   NarrativeSegment,
@@ -193,7 +193,7 @@ export function useEndingDetection({
               .map((t) => `- [${t.kind.toUpperCase()}] ${t.summary}`)
               .join('\n')}\n\n`;
           }
-          ledgerBlockers = selectEndingBlockers(storeThreads, allSegments.length);
+          ledgerBlockers = selectEndingBlockers(storeThreads, countWorldClockTurns(allSegments));
           hasBlockers = ledgerBlockers.length > 0;
         } else {
           oldOpenThreads = collectOpenThreads(allSegments);
