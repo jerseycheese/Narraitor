@@ -540,8 +540,8 @@
 }
 
 .breadcrumbs-item svg {
-  width: 0.875rem;
-  height: 0.875rem;
+  width: var(--space-3_5);
+  height: var(--space-3_5);
 }
 
 .breadcrumbs-separator {
@@ -772,8 +772,8 @@
 }
 
 .card-action-group button svg {
-  width: 0.875rem;
-  height: 0.875rem;
+  width: var(--space-3_5);
+  height: var(--space-3_5);
 
   /* Flex centering puts the icon box on the line box, whose middle sits above
      the label's cap line, so the icon reads high next to its text. The nudge

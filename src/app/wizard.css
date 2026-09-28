@@ -630,8 +630,8 @@
 }
 
 .wizard-toggle svg {
-  width: 0.875rem;
-  height: 0.875rem;
+  width: var(--space-3_5);
+  height: var(--space-3_5);
   flex-shrink: 0;
 }
 
