@@ -372,7 +372,7 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
                 <div className="character-suggestion-pool-status">
                   <span className="character-suggestion-pool-remaining">Points remaining: {attributePool.pool.remaining}</span>
                   {!attributePool.isValidDistribution && (
-                    <span className={`character-suggestion-pool-error ${wizardStyles.form.error}`} role="alert" style={{ display: 'block', marginTop: '0.25rem' }}>
+                    <span className={`character-suggestion-pool-error ${wizardStyles.form.error}`} role="alert">
                       Over budget by {Math.abs(attributePool.pool.remaining)} points. Reduce attributes to adopt.
                     </span>
                   )}
@@ -423,7 +423,7 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
                 <div className="character-suggestion-pool-status">
                   <span className="character-suggestion-pool-remaining">Points remaining: {skillPool.pool.remaining}</span>
                   {!skillPool.isValidDistribution && (
-                    <span className={`character-suggestion-pool-error ${wizardStyles.form.error}`} role="alert" style={{ display: 'block', marginTop: '0.25rem' }}>
+                    <span className={`character-suggestion-pool-error ${wizardStyles.form.error}`} role="alert">
                       Over budget by {Math.abs(skillPool.pool.remaining)} points. Reduce skills to adopt.
                     </span>
                   )}

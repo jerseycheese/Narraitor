@@ -210,7 +210,7 @@ describe('CharacterSuggestions', () => {
     
     mockFetchOk({
       ...generated,
-      attributes: [{ id: 'attr-1', value: 8 }] // 8 is > 5
+      attributes: [{ id: 'attr-1', value: 8 }] // 8 is > 5 budget limit
     });
     renderPanel(jest.fn(), smallPoolWorld);
 
@@ -223,7 +223,7 @@ describe('CharacterSuggestions', () => {
       screen.getByRole('button', { name: 'Edit Attributes suggestion' })
     );
 
-    // Check for warning message immediately since 35 > 30 budget
+    // Check for warning message immediately since 8 > 5 budget
     await waitFor(() => {
       expect(screen.getByText(/Over budget by/)).toBeInTheDocument();
     });

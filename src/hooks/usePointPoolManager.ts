@@ -197,9 +197,8 @@ export interface UseSkillPointPoolOptions {
 }
 
 export interface UseSkillPointPoolReturn
-  extends Omit<UsePointPoolManagerReturn<SkillPointPoolItem>, 'items' | 'setItems'> {
+  extends Omit<UsePointPoolManagerReturn<SkillPointPoolItem>, 'items'> {
   skills: SkillPointPoolItem[];
-  setItems: React.Dispatch<React.SetStateAction<SkillPointPoolItem[]>>;
   toggleSkillSelection: (skillId: string) => void;
   selectedSkillsCount: number;
   canSelectMoreSkills: boolean;
@@ -242,7 +241,6 @@ export function useSkillPointPool({
     updateItem: pool.updateItem,
     resetItem: pool.resetItem,
     resetAll: pool.resetAll,
-    setItems: pool.setItems,
     getItemById: pool.getItemById,
     hasPointsRemaining: pool.hasPointsRemaining,
     isValidDistribution: pool.isValidDistribution,
