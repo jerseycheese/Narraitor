@@ -136,6 +136,19 @@ export const turnsSinceWorldMoved = (threads: WorldThread[], currentTurn: number
 };
 
 /**
+ * A thread blocks the ending offer if it is overdue or if it moved recently.
+ * Threads that sat untouched for many turns shape the ending text but don't
+ * block it.
+ */
+export const selectEndingBlockers = (threads: WorldThread[], currentTurn: number): WorldThread[] =>
+  threads.filter(
+    (thread) =>
+      thread.status === 'open' &&
+      (isOverdue(thread, currentTurn) ||
+        currentTurn - Math.max(thread.lastAdvancedAtTurn, thread.openedAtTurn) <= OPEN_ASK_QUIET_TURNS)
+  );
+
+/**
  * Overdue threads first (the debts the story is most behind on), then the
  * oldest open ones, capped so a long ledger can't swamp the scene prompt.
  */

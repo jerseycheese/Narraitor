@@ -13,6 +13,19 @@ jest.mock('@/lib/ai/defaultGeminiClient', () => ({
   createDefaultGeminiClient: () => ({ generateContent: mockGenerateContent }),
 }));
 
+jest.mock('@/lib/featureFlags', () => ({
+  isFeatureEnabled: jest.fn(),
+}));
+
+jest.mock('@/state/worldThreadStore', () => ({
+  useWorldThreadStore: {
+    getState: jest.fn(),
+  },
+}));
+
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { useWorldThreadStore } from '@/state/worldThreadStore';
+
 const segment = (
   id: string,
   metadata: Partial<NarrativeSegment['metadata']> = {}
@@ -61,6 +74,7 @@ const endingOffer = (extra: Record<string, unknown> = {}) =>
 describe('useEndingDetection open-threat gate', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (isFeatureEnabled as jest.Mock).mockReturnValue(false);
   });
 
   it('holds the offer back when the model reports an unresolved threat', async () => {
@@ -176,5 +190,88 @@ describe('useEndingDetection open-threat gate', () => {
     const prompt = mockGenerateContent.mock.calls[0][0] as string;
     expect(prompt).toContain('A shape moves in the woods beyond the treeline');
     expect(prompt).toContain('unresolvedThreats');
+  });
+});
+describe('useEndingDetection ENDING_GATE_THREAD_LEDGER', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'ENDING_GATE_THREAD_LEDGER');
+  });
+
+  const mockStore = (threads: any[]) => {
+    (useWorldThreadStore.getState as jest.Mock).mockReturnValue({
+      getOpenThreadsBySession: () => threads,
+    });
+  };
+
+  it('six segments with majorEvent but zero open threads -> offer not held', async () => {
+    mockStore([]);
+    // no census -> old logic blocked if openThreads > 0. New logic unblocks if hasBlockers == false.
+    mockGenerateContent.mockResolvedValue({
+      content: endingOffer(), 
+    });
+    
+    const story = Array.from({ length: 6 }).map((_, i) =>
+      segment(`${i + 1}`, { majorEvent: `Event ${i + 1}` })
+    );
+    const { result, onEndingSuggested } = renderDetection(story.slice(0, 5));
+
+    await result.current.checkForEndingIndicators(story[5]);
+
+    expect(onEndingSuggested).toHaveBeenCalledWith(expect.any(String), 'story-complete');
+  });
+
+  it('an overdue open thread -> the offer is held', async () => {
+    // A thread that is overdue blocks the offer.
+    mockStore([{
+      id: 'thread-1',
+      kind: 'deadline',
+      status: 'open',
+      summary: 'The bomb',
+      openedAtTurn: 1,
+      lastAdvancedAtTurn: 1,
+      dueByTurn: 2 // Overdue if currentTurn > 2
+    }]);
+    mockGenerateContent.mockResolvedValue({
+      content: endingOffer(), // null census
+    });
+
+    const story = Array.from({ length: 4 }).map((_, i) => segment(`${i + 1}`));
+    const { result, onEndingSuggested } = renderDetection(story.slice(0, 3));
+
+    // At turn 4 (segment 4), dueByTurn 2 is overdue
+    await result.current.checkForEndingIndicators(story[3]);
+
+    expect(onEndingSuggested).not.toHaveBeenCalled();
+  });
+
+  it('a thread untouched for many turns -> doesn\'t block, but appears in ending context', async () => {
+    // OPEN_ASK_QUIET_TURNS = 5
+    // If it hasn't advanced for 6 turns, it shouldn't block.
+    mockStore([{
+      id: 'thread-2',
+      kind: 'actor',
+      status: 'open',
+      summary: 'Old guy',
+      openedAtTurn: 1,
+      lastAdvancedAtTurn: 1,
+      // no dueByTurn
+    }]);
+    mockGenerateContent.mockResolvedValue({
+      content: endingOffer(), 
+    });
+
+    // We need currentTurn - lastAdvanced > 5. So length 9.
+    const story = Array.from({ length: 9 }).map((_, i) => segment(`${i + 1}`));
+    const { result, onEndingSuggested } = renderDetection(story.slice(0, 8));
+
+    await result.current.checkForEndingIndicators(story[8]);
+
+    // Should not block because it's older than OPEN_ASK_QUIET_TURNS
+    expect(onEndingSuggested).toHaveBeenCalledWith(expect.any(String), 'story-complete');
+    
+    // Check if the prompt contained the old guy
+    const prompt = mockGenerateContent.mock.calls[0][0] as string;
+    expect(prompt).toContain('Old guy');
   });
 });
