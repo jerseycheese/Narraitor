@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check, Plus } from 'lucide-react';
 import { wizardStyles } from '../styles/wizardStyles';
 
 export interface ToggleButtonProps {
@@ -40,6 +41,7 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
         isActive ? wizardStyles.toggle.active : wizardStyles.toggle.inactive
       } ${className}`.trim()}
     >
+      {isActive ? <Check aria-hidden="true" /> : <Plus aria-hidden="true" />}
       {isActive ? activeLabel : inactiveLabel}
     </button>
   );
