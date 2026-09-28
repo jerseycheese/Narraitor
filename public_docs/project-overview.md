@@ -2,7 +2,7 @@
 title: Narraitor Project Overview
 tags: [narraitor, overview]
 created: 2025-04-27
-updated: 2025-06-26
+updated: 2026-09-28
 ---
 
 # Narraitor Project Overview
@@ -13,13 +13,13 @@ I built this AI storytelling app that lets you play RPG narratives in any fictio
 Middle Earth, the beaches of Normandy, something you invented last week: all fair game. It's designed for solo play when you want a narrative RPG experience but don't have a group or game master available.
 
 ## Current Status
-The core functionality is working and stable. All the main systems (world creation, character building, AI narrative generation, session persistence) are operational. Currently in the polish phase: fixing UI edge cases, optimizing performance, and preparing for broader use.
+As of v1.10.0 (2026-09-27), the app is past MVP: all the main systems (world creation, character building, AI narrative generation, session persistence, multi-provider AI) are operational and have shipped through ten releases. Current work (v1.11) targets long-session story coherence — a September playtest round found the story falling apart between turns 15-25 in 4 of 5 runs, so a turn resolver and stall-breaker are going in to fix that mechanically rather than by tweaking prompt wording. See [MVP Roadmap](./development/mvp-roadmap.md) and [RELEASES.md](../RELEASES.md) for the running detail.
 
 ## Technical Foundation
 
 The stack:
 - **Framework**: Next.js 15 (15.5.x) with App Router
-- **AI Integration**: Google Gemini, with the player supplying their own key (encrypted in the browser, proxied through server-side routes)
+- **AI Integration**: BYO-key, multi-provider (Gemini, OpenRouter, Ollama, and OpenAI live; more scaffolded), with the player's key encrypted in the browser and proxied through server-side routes
 - **State Management**: Zustand stores with IndexedDB persistence
 - **UI**: Plain CSS driven by design tokens (no Tailwind); components are shadcn-derived (Radix primitives) but styled with semantic CSS classes
 - **Testing**: Jest, React Testing Library, Storybook
@@ -29,9 +29,7 @@ The stack:
 
 **World Creation**: The multi-step wizard lets you define any fictional universe. Describe what you have in mind and you get suggested attributes and skills tuned to that theme, all of them editable. Want "Force Sensitivity" as an attribute? No problem.
 
-**Character Building**: Point-allocation system that adapts to your world's rules. Create characters with backgrounds that make sense for your setting. The wizard guides you through attribute allocation, skill selection, and story background.
-
-**Shared World, Multi-Character Play**: Maintain parallel protagonists inside the same persistent world. The character roster now shows per-character thread summaries and cross-character relationships, while the narrative engine cross-references your other characters so their choices actually acknowledge one another.
+**Character Building**: Point-allocation system that adapts to your world's rules. Create characters with backgrounds that make sense for your setting. The wizard guides you through attribute allocation, skill selection, and story background. You can build multiple characters in the same world and switch between them, but each plays their own session — the player controls one character at a time; everyone else in the story is an NPC.
 
 **Adaptive AI Narratives**: This is the interesting part. The AI doesn't just generate random fantasy stories. It maintains context about your world's rules, your character's abilities, and the ongoing story to create narratives that feel consistent with your setting.
 
@@ -51,7 +49,7 @@ Built primarily for personal use: solo narrative RPG experiences when you want t
 **KISS approach**: Simple, maintainable code over clever solutions. **TDD workflow**: Tests before implementation to catch issues early. **Component-first**: Build in Storybook isolation before integration. **Domain boundaries**: Keep related functionality together.
 
 ## Current Focus
-Polishing the user experience: responsive design, performance optimization, edge case handling. The core functionality works well, so now it's about making it smooth and reliable for broader use.
+Long-session story coherence for v1.11: a turn resolver to track scene/location/beat state and break stalls mechanically, plus an ending detector that reads a thread ledger instead of per-turn event labels. See [MVP Roadmap](./development/mvp-roadmap.md) for the active queue.
 
 ## Technical Architecture
 Domain-driven structure with Zustand stores for each area (World, Character, Narrative, etc.). Shared component patterns for wizards and forms. AI service abstractions handle prompt management and context building. Everything's type-safe with validation.

@@ -2,7 +2,7 @@
 title: AI Systems
 tags: [ai, narrative, world-creation, choices, inventory]
 created: 2025-06-26
-updated: 2026-07-21
+updated: 2026-09-28
 ---
 
 # AI Systems
@@ -31,6 +31,14 @@ The AI requests all go through server-side routes, with player-owned provider ke
 - **Player provider keys**: saved through `/settings/providers`, encrypted in `useProviderStore`, decrypted just in time, and sent to Narraitor's same-origin API routes as `x-provider-api-key`
 - **Server fallback**: `GEMINI_API_KEY` never reaches the browser and is used only when a request has no player provider key
 - **Proxy pattern**: Client-side code calls Next.js API routes, which handle the actual AI communication
+
+## Provider Architecture
+
+Gemini is the default, but it's no longer the only path. Narraitor is BYO-key: players configure a provider under `/settings/providers`, and requests route through whichever one is active.
+
+As of 2026-09-28 (`develop`), `src/lib/ai/presets.ts` lists nine provider presets, four of which work end-to-end today (`available: true`): Google Gemini, OpenRouter, Ollama (self-hosted), and OpenAI. The rest — Anthropic Claude, Deepseek, Mistral, Together AI, Groq, and Perplexity — have adapters scaffolded (`src/lib/ai/providers/`) but ship `available: false` until someone runs a live streamed-turn check against each; see `RELEASES.md` and issue #894 for the Claude adapter's status specifically. Most non-Gemini providers share one OpenAI-compatible adapter (`src/lib/ai/providers/openai-compatible/`); Gemini and Claude each have their own (`providers/gemini/`, `providers/claude/`).
+
+Image generation stays on Gemini regardless of which provider handles text — see each preset's `capabilities.images` flag in `presets.ts`.
 
 ## AI Service Integration
 
