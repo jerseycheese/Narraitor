@@ -513,6 +513,7 @@ body.manuscript-overlay-open {
 
 .manuscript-loading-shell {
   position: relative;
+  contain: layout;
   min-height: 100vh;
 }
 
