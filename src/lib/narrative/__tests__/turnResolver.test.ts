@@ -7,6 +7,7 @@ import { isResolverManaged } from '../resolverGuard';
 import { assembleSessionSnapshot } from '../sessionSnapshotAssembler';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { useSceneStore } from '@/state/sceneStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
@@ -1455,6 +1456,33 @@ describe('resolverManaged guard', () => {
 describe('sessionSnapshotAssembler', () => {
   beforeEach(() => {
     seedStores();
+    useSceneStore.setState({ scenes: {} });
+    const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+    (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+  });
+
+  it('keeps the full snapshot equal with the scene flag off and exposes frozen scene facts when on', () => {
+    const originalSnapshot = assembleSessionSnapshot('session-1');
+    const store = useSceneStore.getState();
+    store.setLocation('session-1', 'Kitchen');
+    store.setPresentNpcIds('session-1', ['npc-1']);
+    store.recordBeat('session-1', { id: 'arrival', text: 'The bus arrived', turnIndex: 11 });
+    store.setLocation('session-2', 'Council room');
+
+    expect(assembleSessionSnapshot('session-1')).toEqual(originalSnapshot);
+
+    const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+    (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+    const snapshot = assembleSessionSnapshot('session-1');
+    expect(snapshot.sceneState).toEqual({
+      location: 'Kitchen',
+      presentNpcIds: ['npc-1'],
+      completedBeats: [{ id: 'arrival', text: 'The bus arrived', turnIndex: 11 }],
+    });
+    expect(Object.isFrozen(snapshot.sceneState)).toBe(true);
+    expect(Object.isFrozen(snapshot.sceneState?.presentNpcIds)).toBe(true);
+    expect(Object.isFrozen(snapshot.sceneState?.completedBeats[0])).toBe(true);
+    expect(assembleSessionSnapshot('session-3').sceneState).toBeUndefined();
   });
 
   it('assembles a frozen snapshot from current store state', () => {

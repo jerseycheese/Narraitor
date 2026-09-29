@@ -7,6 +7,7 @@ import type { InventoryItem, ItemUsageResult } from './inventory.types';
 import type { WorldThread } from './worldThread.types';
 import type { WorldState } from './world-state.types';
 import type { NPC } from './npc.types';
+import type { SceneState } from './scene.types';
 import type { ReconciledSegmentNotes } from '@/lib/narrative/applyWorldClockUpdates';
 
 /**
@@ -34,6 +35,7 @@ export interface SessionSnapshot {
   /** Flattened from character.status.conditions for quick access. */
   readonly conditions: readonly string[];
   readonly endedSessions: Readonly<Record<EntityID, boolean>>;
+  readonly sceneState?: Readonly<SceneState>;
 }
 
 /**

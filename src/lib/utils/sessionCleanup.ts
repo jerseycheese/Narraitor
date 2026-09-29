@@ -8,6 +8,7 @@
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useJournalStore } from '@/state/journalStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { useSceneStore } from '@/state/sceneStore';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('SessionCleanup');
@@ -47,7 +48,8 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
   // Cleanup order is important for data integrity:
   // 1. Narrative data (segments and decisions)
   // 2. Journal entries
-  // 3. Session record (last to maintain referential integrity)
+  // 3. Scene state
+  // 4. Session record (last to maintain referential integrity)
 
   // Clean up narrative segments
   try {
@@ -74,6 +76,12 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
   }
 
   // Remove session record last to maintain referential integrity
+  try {
+    useSceneStore.getState().clearScene(sessionId);
+  } catch (error) {
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
+
   try {
     const sessionStore = useSessionStore.getState();
     sessionStore.deleteSavedSession(sessionId);
