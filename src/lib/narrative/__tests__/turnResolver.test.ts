@@ -305,6 +305,116 @@ describe('TurnResolver', () => {
   });
 
   describe('resolveTurn', () => {
+    it('keeps a departed NPC absent until an explicit return, including the relationship gate', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const npcId = 'npc-guard';
+      const generator = makeMockGenerator();
+      (generator.generateSegment as jest.Mock)
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard joins you at the gate.',
+          metadata: { characterIds: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }))
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard leaves the courtyard.',
+          metadata: { characterIds: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }))
+        .mockResolvedValueOnce(makeGenerationResult({ content: 'You wait alone.' }))
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard calls out and acts from beyond the gate.',
+          metadata: { characterIds: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }))
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard returns to the courtyard.',
+          metadata: { characterIds: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }));
+      const command = makeCommand({ sessionId, worldId, characterId });
+      await resolveTurn(command, generator);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).toContain(npcId);
+      await resolveTurn(command, generator);
+      await resolveTurn(command, generator);
+      await resolveTurn(command, generator);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).not.toContain(npcId);
+
+      const selectRelationshipChoice = async (optionId: string) => {
+        const decisionId = useNarrativeStore.getState().addDecision(sessionId, {
+          prompt: 'What do you do?',
+          options: [{ id: optionId, text: 'Help Guard', alignment: 'neutral', consequences: [
+            { type: 'relationship', action: 'add', targetId: npcId, value: 10 },
+          ] }],
+        });
+        await useNarrativeStore.getState().selectDecisionOption(decisionId, optionId, characterId);
+      };
+      await selectRelationshipChoice('choice-absent');
+      expect(useWorldStore.getState().getWorldState(worldId).npcRelationships[npcId]).toBeUndefined();
+
+      await resolveTurn(command, generator);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).toContain(npcId);
+      await selectRelationshipChoice('choice-returned');
+      expect(useWorldStore.getState().getWorldState(worldId).npcRelationships[npcId].trust).toBe(60);
+    });
+
+    it('waits for scene hydration before assembling the first prompt snapshot', async () => {
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const hydration = deferred<void>();
+      const hydratedSpy = jest.spyOn(useSceneStore.persist, 'hasHydrated').mockReturnValue(false);
+      const rehydrateSpy = jest.spyOn(useSceneStore.persist, 'rehydrate').mockImplementation(async () => {
+        await hydration.promise;
+        useSceneStore.setState({ scenes: {
+          'session-1': { location: null, presentNpcIds: ['npc-guard'], completedBeats: [] },
+        } });
+      });
+      try {
+        const generator = makeMockGenerator();
+        const turn = resolveTurn(makeCommand(), generator);
+        await Promise.resolve();
+        expect(generator.generateSegment).not.toHaveBeenCalled();
+        hydration.resolve();
+        const result = await turn;
+        expect(result.status).toBe('settled');
+        expect(rehydrateSpy).toHaveBeenCalledTimes(1);
+        expect(result.snapshot.sceneState?.presentNpcIds).toContain('npc-guard');
+      } finally {
+        hydratedSpy.mockRestore();
+        rehydrateSpy.mockRestore();
+      }
+    });
+
+    it('waits for scene hydration before applying a relationship choice', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const npcId = 'npc-guard';
+      await resolveTurn(makeCommand({ sessionId, worldId, characterId }), makeMockGenerator());
+      useSceneStore.setState({ scenes: {} });
+      const decisionId = useNarrativeStore.getState().addDecision(sessionId, {
+        prompt: 'Help the guard?',
+        options: [{ id: 'help', text: 'Help', alignment: 'neutral', consequences: [
+          { type: 'relationship', action: 'add', targetId: npcId, value: 10 },
+        ] }],
+      });
+      const hydration = deferred<void>();
+      const hydratedSpy = jest.spyOn(useSceneStore.persist, 'hasHydrated')
+        .mockReturnValueOnce(false).mockReturnValueOnce(false).mockReturnValue(true);
+      const rehydrateSpy = jest.spyOn(useSceneStore.persist, 'rehydrate').mockImplementation(async () => {
+        await hydration.promise;
+        useSceneStore.getState().setPresentNpcIds(sessionId, [npcId]);
+      });
+      try {
+        const selection = useNarrativeStore.getState().selectDecisionOption(decisionId, 'help', characterId);
+        expect(useWorldStore.getState().getWorldState(worldId).npcRelationships[npcId]).toBeUndefined();
+        hydration.resolve();
+        await selection;
+        expect(rehydrateSpy).toHaveBeenCalledTimes(1);
+        expect(useWorldStore.getState().getWorldState(worldId).npcRelationships[npcId].trust).toBe(60);
+      } finally {
+        hydratedSpy.mockRestore();
+        rehydrateSpy.mockRestore();
+      }
+    });
     it('commits a segment and returns a settled result', async () => {
       const generator = makeMockGenerator();
       const command = makeCommand();

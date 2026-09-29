@@ -56,3 +56,10 @@ export const useSceneStore = create<SceneStore>()(
     }
   )
 );
+
+/** Waits for persisted scene facts before a resolver or decision reads them. */
+export async function waitForSceneStoreHydration(): Promise<void> {
+  if (!useSceneStore.persist.hasHydrated()) {
+    await useSceneStore.persist.rehydrate();
+  }
+}

@@ -7,6 +7,8 @@ import { logger } from '../lib/utils/logger';
 import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
 import { useWorldStore } from './worldStore';
 import { useCharacterStore } from './characterStore';
+import { useSceneStore, waitForSceneStoreHydration } from './sceneStore';
+import { isFeatureEnabled } from '../lib/featureFlags';
 import {
   extractWorldStateImpacts,
   extractDecisionContext,
@@ -65,6 +67,11 @@ export const createNarrativeDecisionActions = (
   }),
 
   selectDecisionOption: (decisionId: EntityID, optionId: EntityID, characterId?: EntityID) => {
+    if (isFeatureEnabled('SCENE_STATE') && !useSceneStore.persist.hasHydrated()) {
+      return waitForSceneStoreHydration().then(() =>
+        get().selectDecisionOption(decisionId, optionId, characterId)
+      );
+    }
     let worldStatePayload: DecisionWorldStatePayload | undefined;
 
     set((state) => {
@@ -144,17 +151,16 @@ export const createNarrativeDecisionActions = (
       if (sessionId && worldId) {
         const impacts = extractWorldStateImpacts(decision, selectedOption, characterId);
 
-        // Gate NPC relationship updates on scene presence. An NPC counts as
-        // present if its id appears in the latest segment's characterIds (the
-        // same model useNarrativeParticipants uses for the Scene Status panel).
         const segmentIds = state.sessionSegments[sessionId] || [];
         const latestSegment = segmentIds.length
           ? state.segments[segmentIds[segmentIds.length - 1]]
           : undefined;
-        const presentNpcIds = new Set<EntityID>([
-          ...(latestSegment?.metadata?.characterIds ?? []),
-          ...(latestSegment?.characterIds ?? []),
-        ]);
+        const presentNpcIds = isFeatureEnabled('SCENE_STATE')
+          ? new Set(useSceneStore.getState().scenes[sessionId]?.presentNpcIds ?? [])
+          : new Set<EntityID>([
+              ...(latestSegment?.metadata?.characterIds ?? []),
+              ...(latestSegment?.characterIds ?? []),
+            ]);
 
         const gatedRelationships: Record<EntityID, typeof impacts.relationships[EntityID]> = {};
         for (const [npcId, update] of Object.entries(impacts.relationships)) {

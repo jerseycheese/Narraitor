@@ -51,6 +51,7 @@ import {
 } from '@/lib/narrative/turnTags';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldStore } from '@/state/worldStore';
+import { useSceneStore, waitForSceneStoreHydration } from '@/state/sceneStore';
 import {
   buildUsageNarrative,
   generateItemUsageNarrative,
@@ -210,6 +211,7 @@ async function resolveTurnInner(
 ): Promise<TurnResult> {
   const { sessionId, worldId, characterId } = command;
   const ids = { worldId, characterId };
+  if (isFeatureEnabled('SCENE_STATE')) await waitForSceneStoreHydration();
 
   // Pre-turn snapshot for prompt context
   const preTurnSnapshot = assembleSessionSnapshot(sessionId, ids);
@@ -313,6 +315,7 @@ async function resolveInitialTurnInner(
 ): Promise<TurnResult> {
   const { sessionId, worldId, characterId } = command;
   const ids = { worldId, characterId };
+  if (isFeatureEnabled('SCENE_STATE')) await waitForSceneStoreHydration();
 
   // Recheck inside the lock: if another instance already committed an
   // opening segment while this request was queued, skip generation.
@@ -358,6 +361,7 @@ async function resolveItemUseTurnInner(
   generator: NarrativeGenerator
 ): Promise<ItemUseTurnOutcome> {
   const { sessionId, worldId, characterId, itemId } = command;
+  if (isFeatureEnabled('SCENE_STATE')) await waitForSceneStoreHydration();
   const generationError = useNarrativeStore.getState().generationError;
   const activeSessionId = useSessionStore.getState().id;
 
@@ -610,6 +614,9 @@ async function commitAndSettleGeneratedTurn({
   );
   const storedSegment =
     useNarrativeStore.getState().segments[storedSegmentId] ?? newSegment;
+  if (isFeatureEnabled('SCENE_STATE')) {
+    reconcileScenePresence(sessionId, characterId, storedSegment);
+  }
   const { notes, errors, acquiredItems } = await reconcileCoreSideEffects({
     segment: storedSegment,
     segmentId: storedSegmentId,
@@ -660,6 +667,44 @@ async function commitAndSettleGeneratedTurn({
     reconciledNotes: notes ?? undefined,
     reconciliationErrors: errors,
   };
+}
+
+function reconcileScenePresence(
+  sessionId: EntityID,
+  playerId: EntityID,
+  segment: NarrativeSegment
+): void {
+  const segments = useNarrativeStore.getState().getSessionSegments(sessionId);
+  const earlierSegments = segments.slice(0, -1);
+  const previouslySeen = new Set(
+    earlierSegments.flatMap((earlier) => earlier.metadata?.characterIds ?? [])
+  );
+  const names = new Map<EntityID, string>();
+  for (const entry of segments) {
+    for (const character of entry.metadata?.characters ?? []) {
+      names.set(character.id, character.name);
+    }
+  }
+  const current = new Set(useSceneStore.getState().scenes[sessionId]?.presentNpcIds ?? []);
+  const candidates = new Set([
+    ...current,
+    ...(segment.metadata?.characterIds ?? []),
+    ...previouslySeen,
+  ]);
+  const prose = segment.content ?? '';
+  for (const npcId of candidates) {
+    if (npcId === playerId) continue;
+    const name = names.get(npcId) ?? npcId;
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const subject = `\\b${escapedName}\\b`;
+    const hasExit = new RegExp(`${subject}\\s+(?:leaves?|left|departs?|departed|exits?|exited|walks? away)\\b`, 'i').test(prose);
+    const hasReturn = new RegExp(`${subject}\\s+(?:returns?|returned|re-enters?|re-entered|enters?|entered|arrives?|arrived|comes? back|came back)\\b`, 'i').test(prose);
+    if (hasExit) current.delete(npcId);
+    else if (hasReturn || (!previouslySeen.has(npcId) && segment.metadata?.characterIds?.includes(npcId))) {
+      current.add(npcId);
+    }
+  }
+  useSceneStore.getState().setPresentNpcIds(sessionId, [...current]);
 }
 
 /**

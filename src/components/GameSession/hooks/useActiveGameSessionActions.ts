@@ -10,6 +10,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { inferCustomActionSkillChecks } from '@/lib/ai/customActionSkillInference';
 import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
 import { generateUniqueId } from '@/lib/utils';
+import { logger } from '@/lib/utils/logger';
 import type { UseAutoSaveReturn } from '@/hooks/useAutoSave';
 
 interface UseActiveGameSessionActionsOptions {
@@ -84,8 +85,6 @@ export const useActiveGameSessionActions = ({
     // Player choice was selected
     setIsGenerating(true);
     setIsGeneratingChoices(true); // Start generating new choices
-    setLocalSelectedChoiceId(choiceId);
-    setShouldTriggerGeneration(true); // Trigger narrative generation
 
     // Create decision journal entry
     if (currentDecision && characterId) {
@@ -93,14 +92,25 @@ export const useActiveGameSessionActions = ({
     }
 
     // If we have a current decision, update its selected option
-    if (currentDecision) {
-      useNarrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId, characterId || undefined);
+    const finishSelection = () => {
+      setLocalSelectedChoiceId(choiceId);
+      setShouldTriggerGeneration(true);
+      maybeCompleteFirstPlay();
+      onChoiceSelected(choiceId);
+      void autoSave.triggerSave('player-choice');
+    };
+    const selection = currentDecision
+      ? useNarrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId, characterId || undefined)
+      : undefined;
+    if (selection) {
+      void selection.then(finishSelection).catch((error) => {
+        logger.warn('Failed to select choice after scene hydration:', error);
+        setIsGenerating(false);
+        setIsGeneratingChoices(false);
+      });
+    } else {
+      finishSelection();
     }
-
-    maybeCompleteFirstPlay();
-    onChoiceSelected(choiceId);
-
-    void autoSave.triggerSave('player-choice');
   }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
 
   const handleCustomSubmit = useCallback(async (customText: string) => {
@@ -178,7 +188,7 @@ export const useActiveGameSessionActions = ({
         options: [...currentDecision.options, customOption],
         selectedOptionId: customChoiceId,
       });
-      useNarrativeStore.getState().selectDecisionOption(
+      await useNarrativeStore.getState().selectDecisionOption(
         currentDecision.id,
         customChoiceId,
         characterId || undefined
