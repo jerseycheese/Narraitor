@@ -9,6 +9,8 @@ import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { useSceneStore } from '@/state/sceneStore';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 import { getLoreContextForPrompt } from '@/lib/ai/loreContextHelper';
 import { countWorldClockTurns } from '@/lib/narrative/worldClock';
 
@@ -84,6 +86,10 @@ export function assembleSessionSnapshot(
       ? narrativeState.getSessionDecisions(sessionId)
       : [];
 
+  const sceneState = isFeatureEnabled('SCENE_STATE')
+    ? useSceneStore.getState().scenes[sessionId]
+    : undefined;
+
   const snapshot: SessionSnapshot = {
     sessionId,
     worldId,
@@ -101,6 +107,15 @@ export function assembleSessionSnapshot(
     npcs: Object.freeze([...npcs]),
     conditions: Object.freeze([...conditions]),
     endedSessions: Object.freeze({ ...(narrativeState?.endedSessions ?? {}) }),
+    ...(sceneState
+      ? {
+          sceneState: Object.freeze({
+            ...sceneState,
+            presentNpcIds: Object.freeze([...sceneState.presentNpcIds]),
+            completedBeats: Object.freeze(sceneState.completedBeats.map((beat) => Object.freeze({ ...beat }))),
+          }),
+        }
+      : {}),
   };
 
   return snapshot;

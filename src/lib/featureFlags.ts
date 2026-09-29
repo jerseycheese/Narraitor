@@ -23,6 +23,8 @@ const FEATURE_FLAG_DEFAULTS = {
   // (narraitor-feature-experiment-lifecycle/memos/1822-world-clock.md); the
   // env var is the kill switch.
   WORLD_CLOCK: true,
+  // Holds authoritative scene facts for later resolver work; off until measured.
+  SCENE_STATE: false,
   // The world can take something from the character: the post-segment
   // extraction records a cost (a condition written to the character, an item
   // loss attributed to the thread that took it) and the scene prompt carries
@@ -73,6 +75,10 @@ const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
   WORLD_CLOCK: resolve(
     process.env.NEXT_PUBLIC_FEATURE_WORLD_CLOCK,
     FEATURE_FLAG_DEFAULTS.WORLD_CLOCK
+  ),
+  SCENE_STATE: resolve(
+    process.env.NEXT_PUBLIC_FEATURE_SCENE_STATE,
+    FEATURE_FLAG_DEFAULTS.SCENE_STATE
   ),
   WORLD_COST: resolve(
     process.env.NEXT_PUBLIC_FEATURE_WORLD_COST,
