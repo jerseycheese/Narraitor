@@ -441,7 +441,8 @@ export class NarrativeGenerator {
     narrativeContext: NarrativeContext,
     characterIds: string[],
     sessionId?: EntityID,
-    snapshot?: SessionSnapshot
+    snapshot?: SessionSnapshot,
+    options?: { signal?: AbortSignal }
   ): Promise<Decision> {
     try {
       const result = await generateChoices(this.geminiClient, {
@@ -453,6 +454,7 @@ export class NarrativeGenerator {
         maxOptions: 3,
         useAlignedChoices: true,
         snapshot,
+        signal: options?.signal,
       });
 
       return result;

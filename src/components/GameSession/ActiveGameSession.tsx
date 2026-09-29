@@ -86,11 +86,19 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     }
   }, [isGenerating]);
   const [initialized, setInitialized] = React.useState(false);
-  const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
+  // The decision on offer is the session's latest decision in narrativeStore,
+  // the single source of truth (also what a resumed session shows). The choices
+  // column already hides it while a turn or choice generation is in flight.
+  // Only loading/error flags stay local.
+  const currentDecision: Decision | null = useNarrativeStore((state) => {
+    const decisionIds = state.sessionDecisions[sessionId];
+    return decisionIds?.length
+      ? state.decisions[decisionIds[decisionIds.length - 1]] ?? null
+      : null;
+  });
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
   const [retryToken, setRetryToken] = React.useState(0);
-  const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // Track choice generation for UI state
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
@@ -320,18 +328,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   );
   useKeyboardShortcuts(gameSessionShortcuts, isGameReady && !isModalOpen);
 
-  const { scheduleChoiceFallback } = useActiveGameSessionEffects({
+  useActiveGameSessionEffects({
     sessionId,
-    worldId,
     controllerKey,
-    initialized,
-    isGenerating,
-    segmentCount,
     setIsGenerating,
     setInitialized,
-    setCurrentDecision,
     setIsGeneratingChoices,
-    choiceGenerationTimeoutRef,
   });
 
   const {
@@ -343,14 +345,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     sessionId,
     characterId: characterId || undefined,
     currentDecision,
-    setCurrentDecision,
     setIsGenerating,
     setShouldTriggerGeneration,
     setIsGeneratingChoices,
     setIsEvaluatingAction,
     setLocalSelectedChoiceId,
-    choiceGenerationTimeoutRef,
-    scheduleChoiceFallback,
     onChoiceSelected,
     autoSave,
     isSessionEnded,
@@ -388,30 +387,40 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     );
   }
 
-  // Show skeleton until the first narrative segment exists, but
-  // always mount the hidden NarrativeController to drive generation.
+  // The one controller that drives generation for the whole active session.
+  // It sits first in a fragment shared by the skeleton and the play surface, so
+  // React keeps the same instance when the first segment lands. A second mount
+  // there would unmount the controller while the opening turn is still
+  // reconciling, and its onNarrativeGenerated callback would be dropped.
+  const narrativeController = (
+    <div aria-hidden="true" className="active-game-session-controller">
+      <NarrativeController
+        key={`generator-${controllerKey}`}
+        worldId={worldId}
+        sessionId={sessionId}
+        characterId={characterId || undefined}
+        decisionWeight={currentDecision?.decisionWeight}
+        triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration}
+        choiceId={localSelectedChoiceId || selectedChoiceId}
+        onNarrativeGenerated={handleNarrativeGenerated}
+        onChoicesGenerated={handleChoicesGenerated}
+        onEndingSuggested={handleEndingSuggested}
+        generateChoices={true}
+        hideHistory={true}
+        retryToken={retryToken}
+        onStreamingPreviewChange={setStreamingPreview}
+      />
+    </div>
+  );
+
   if (!isGameReady) {
     return (
-      <div className="manuscript-loading-shell">
-        <GameSessionSkeleton />
-        {/* Hidden controller that actually performs generation while skeleton shows */}
-        <div aria-hidden="true" className="sr-only">
-          <NarrativeController
-            key={`generator-${controllerKey}`}
-            worldId={worldId}
-            sessionId={sessionId}
-            characterId={characterId || undefined}
-            decisionWeight={currentDecision?.decisionWeight}
-            triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration}
-            choiceId={localSelectedChoiceId || selectedChoiceId}
-            onNarrativeGenerated={handleNarrativeGenerated}
-            onChoicesGenerated={handleChoicesGenerated}
-            onEndingSuggested={handleEndingSuggested}
-            generateChoices={true}
-            hideHistory={true}
-          />
+      <>
+        {narrativeController}
+        <div className="manuscript-loading-shell">
+          <GameSessionSkeleton />
         </div>
-      </div>
+      </>
     );
   }
 
@@ -451,6 +460,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   );
 
   return (
+    <>
+    {narrativeController}
     <ManuscriptSessionShell
       hud={
         <ManuscriptFloatingHud
@@ -488,23 +499,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     >
       <ActiveGameSessionNarrativeColumn
         controllerKey={controllerKey}
-        worldId={worldId}
         sessionId={sessionId}
-        characterId={characterId || undefined}
-        decisionWeight={currentDecision?.decisionWeight}
-        triggerGeneration={triggerGeneration}
-        initialized={initialized}
-        shouldTriggerGeneration={shouldTriggerGeneration}
-        localSelectedChoiceId={localSelectedChoiceId}
-        selectedChoiceId={selectedChoiceId}
-        onNarrativeGenerated={handleNarrativeGenerated}
-        onChoicesGenerated={handleChoicesGenerated}
-        onEndingSuggested={handleEndingSuggested}
         segmentCount={segmentCount}
-        retryToken={retryToken}
         isGenerating={isGenerating}
         streamingContent={streamingPreview}
-        onStreamingPreviewChange={setStreamingPreview}
       />
 
       {storyBeatNotes}
@@ -614,6 +612,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         onOpenChange={setIsShortcutsHelpOpen}
       />
     </ManuscriptSessionShell>
+    </>
   );
 };
 

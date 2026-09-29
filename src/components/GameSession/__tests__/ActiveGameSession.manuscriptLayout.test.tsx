@@ -62,7 +62,7 @@ jest.mock('../GameSessionSkeleton', () => ({
 }));
 
 jest.mock('@/components/Narrative/NarrativeController', () => ({
-  NarrativeController: () => <div data-testid="narrative-controller" />,
+  NarrativeController: jest.fn(() => <div data-testid="narrative-controller" />),
 }));
 
 jest.mock('../ManuscriptDecisionBlock', () => ({
@@ -489,6 +489,8 @@ describe('ActiveGameSession Manuscript Layout', () => {
         'seg-1': { id: 'seg-1', content: 'Story starts...', characterIds: ['npc-1'] },
       },
       sessionSegments: { [mockSessionId]: ['seg-1'] },
+      sessionDecisions: {},
+      decisions: {},
       currentEnding: null,
       isGeneratingEnding: false,
       isSessionEnded: () => false,
@@ -567,7 +569,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
   describe('ending suggestion choices suppression (#2175)', () => {
     it('hides choices while ending offer is showing and restores them on dismiss', async () => {
       const ActiveGameSessionChoicesColumn = require('../ActiveGameSessionChoicesColumn').default;
-      const ActiveGameSessionNarrativeColumn = require('../ActiveGameSessionNarrativeColumn').default;
+      const { NarrativeController } = require('@/components/Narrative/NarrativeController');
 
       render(
         <ActiveGameSession
@@ -585,7 +587,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
       expect(screen.queryByText('Your story could end here')).not.toBeInTheDocument();
 
       // Simulate narrative column suggesting an ending
-      const narrativeProps = (ActiveGameSessionNarrativeColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      const narrativeProps = (NarrativeController as jest.Mock).mock.calls.slice(-1)[0][0];
       act(() => {
         narrativeProps.onEndingSuggested(
           'Your quest reaches a natural resting place.',
@@ -620,7 +622,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
     // after a dismissed soft offer is in useEndingDetection.fatalBypass.test.ts.
     // This test verifies ActiveGameSession UI transitions from active play to Game Over and EndingScreen.
     it('transitions to Game Over loader and ending screen on fatal ending suggestion', async () => {
-      const ActiveGameSessionNarrativeColumn = require('../ActiveGameSessionNarrativeColumn').default;
+      const { NarrativeController } = require('@/components/Narrative/NarrativeController');
       const mockWorld = createMockWorld({ id: mockWorldId });
 
       const generateEndingMock = jest.fn().mockResolvedValue(undefined);
@@ -657,7 +659,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
       await screen.findByTestId('manuscript-session-shell');
 
       // 1. First, soft ending offer is suggested
-      const narrativeProps = (ActiveGameSessionNarrativeColumn as jest.Mock).mock.calls.slice(-1)[0][0];
+      const narrativeProps = (NarrativeController as jest.Mock).mock.calls.slice(-1)[0][0];
       act(() => {
         narrativeProps.onEndingSuggested(
           'Your quest reaches a natural resting place.',

@@ -30,6 +30,8 @@ export interface ChoiceGenerationParams {
   useAlignedChoices?: boolean;
   includeDecisionHistory?: boolean;
   snapshot?: SessionSnapshot;
+  /** Cancels the in-flight provider request. */
+  signal?: AbortSignal;
 }
 
 /**
@@ -52,6 +54,7 @@ export async function generateChoices(
       useAlignedChoices = false,
       includeDecisionHistory = true,
       snapshot,
+      signal,
     } = params;
 
     const world = getWorld(worldId);
@@ -67,12 +70,15 @@ export async function generateChoices(
       snapshot,
     });
 
+    // Only pass options when there is a signal to cancel with
+    const requestOptions = signal ? ([{ signal }] as const) : ([] as const);
+
     // Prefer the explicit choices entry point when the client has one (the
     // browser proxy routes it to /api/narrative/choices); server-side clients
     // hit the SDK directly so generateContent is equivalent there.
     const response = aiClient.generateChoices
-      ? await aiClient.generateChoices(prompt)
-      : await aiClient.generateContent(prompt);
+      ? await aiClient.generateChoices(prompt, ...requestOptions)
+      : await aiClient.generateContent(prompt, ...requestOptions);
 
     recordRequestCalibration(prompt, response);
 
