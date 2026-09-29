@@ -86,16 +86,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     }
   }, [isGenerating]);
   const [initialized, setInitialized] = React.useState(false);
-  // The decision on offer is the session's latest unanswered decision in
-  // narrativeStore, the single source of truth. Once an option is selected the
-  // decision stops being on offer, so stale choices never show during the next
-  // turn. Only loading/error flags stay local.
+  // The decision on offer is the session's latest decision in narrativeStore,
+  // the single source of truth (also what a resumed session shows). The choices
+  // column already hides it while a turn or choice generation is in flight.
+  // Only loading/error flags stay local.
   const currentDecision: Decision | null = useNarrativeStore((state) => {
     const decisionIds = state.sessionDecisions[sessionId];
-    const latest = decisionIds?.length
-      ? state.decisions[decisionIds[decisionIds.length - 1]]
-      : undefined;
-    return latest && !latest.selectedOptionId ? latest : null;
+    return decisionIds?.length
+      ? state.decisions[decisionIds[decisionIds.length - 1]] ?? null
+      : null;
   });
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
