@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
-import type { Decision } from '@/types/narrative.types';
+import type { Dispatch, SetStateAction } from 'react';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import Logger from '@/lib/utils/logger';
 
@@ -10,61 +9,44 @@ const logger = new Logger('ActiveGameSessionEffects');
 
 interface UseActiveGameSessionEffectsOptions {
   sessionId: string;
-  worldId: string;
-  controllerKey?: string;
-  initialized: boolean;
-  isGenerating: boolean;
-  segmentCount: number;
+  controllerKey: string;
   setIsGenerating: Dispatch<SetStateAction<boolean>>;
   setInitialized: Dispatch<SetStateAction<boolean>>;
   setIsGeneratingChoices: Dispatch<SetStateAction<boolean>>;
-  setCurrentDecision?: Dispatch<SetStateAction<Decision | null>>;
-  choiceGenerationTimeoutRef?: MutableRefObject<NodeJS.Timeout | null>;
 }
 
 /**
- * Drives session initialization and narrativeStore synchronization.
- * Scene fallbacks are owned exclusively by NarrativeController, and choice
- * fallbacks are owned exclusively by usePlayerChoices / narrativeStore.
+ * Drives session initialization and keeps the choice-loading flag in step with
+ * narrativeStore. The decision itself is read from the store, and fallbacks
+ * have one owner each: NarrativeController for the opening scene, and
+ * usePlayerChoices for choices.
  */
 export const useActiveGameSessionEffects = ({
   sessionId,
   controllerKey,
   setIsGenerating,
   setInitialized,
-  setCurrentDecision,
   setIsGeneratingChoices,
-  choiceGenerationTimeoutRef,
 }: UseActiveGameSessionEffectsOptions) => {
-  // Initialize the narrative session state once per session
+  // Initialize the session once instead of clearing and recreating each time
   useEffect(() => {
     let isMounted = true;
     setIsGenerating(true);
 
     const setupNarrative = async () => {
       try {
+        // Imported dynamically to avoid circular dependencies
         const { useNarrativeStore } = await import('@/state/narrativeStore');
         if (!isMounted) return;
 
-        const existingSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
-        const hasInitialScene = existingSegments.some((seg) =>
-          seg.metadata?.tags?.includes('intro')
-        );
+        // Any existing segments mean a resumed session; keep its history.
+        const hasSegments =
+          useNarrativeStore.getState().getSessionSegments(sessionId).length > 0;
 
-        const existingDecisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
-        if (existingDecisions.length > 0 && setCurrentDecision) {
-          const latestDecision = existingDecisions[existingDecisions.length - 1];
-          setCurrentDecision(latestDecision);
-        }
-
-        if (hasInitialScene || existingSegments.length > 0) {
-          setInitialized(true);
-          setIsGenerating(false);
-        } else {
-          setInitialized(true);
-          setIsGenerating(true);
-        }
+        setInitialized(true);
+        setIsGenerating(!hasSegments);
       } catch (error) {
+        // Stop the generating state so the UI recovers instead of spinning forever.
         logger.error('Failed to set up narrative', error);
         setInitialized(true);
         setIsGenerating(false);
@@ -75,53 +57,41 @@ export const useActiveGameSessionEffects = ({
 
     return () => {
       isMounted = false;
-      if (choiceGenerationTimeoutRef?.current) {
-        clearTimeout(choiceGenerationTimeoutRef.current);
-        choiceGenerationTimeoutRef.current = null;
-      }
     };
-  }, [sessionId, controllerKey, setIsGenerating, setInitialized, setCurrentDecision, choiceGenerationTimeoutRef]);
+  }, [sessionId, controllerKey, setIsGenerating, setInitialized]);
 
-  // Keep isGeneratingChoices and decisions synchronized with narrativeStore
+  // Track choice loading from the store: a decision ends it, and a session with
+  // narrative but no decision is waiting on choices. Gated on this session's
+  // decision and segment lists, since segments stream in token by token.
   useEffect(() => {
     let initialized = false;
     let prevDecisionIds: unknown;
-    let prevLatestDecision: unknown;
+    let prevSegmentIds: unknown;
 
     const unsubscribe = useNarrativeStore.subscribe((state) => {
       const decisionIds = state.sessionDecisions[sessionId];
-      const ids = decisionIds || [];
-      const latestId = ids[ids.length - 1];
-      const latestDecision = latestId ? (state.decisions[latestId] || null) : null;
+      const segmentIds = state.sessionSegments[sessionId];
 
       if (
         initialized &&
         decisionIds === prevDecisionIds &&
-        latestDecision === prevLatestDecision
+        segmentIds === prevSegmentIds
       ) {
         return;
       }
       initialized = true;
       prevDecisionIds = decisionIds;
-      prevLatestDecision = latestDecision;
+      prevSegmentIds = segmentIds;
 
-      if (latestId) {
-        if (setCurrentDecision) {
-          setCurrentDecision(latestDecision);
-        }
+      if ((decisionIds?.length ?? 0) > 0) {
         setIsGeneratingChoices(false);
+      } else if ((segmentIds?.length ?? 0) > 0) {
+        setIsGeneratingChoices(true);
       }
     });
 
     return () => {
       unsubscribe();
     };
-  }, [sessionId, setCurrentDecision, setIsGeneratingChoices]);
-
-  // Collapsed: choice fallback is owned by usePlayerChoices
-  const scheduleChoiceFallback = () => {};
-
-  return {
-    scheduleChoiceFallback,
-  };
+  }, [sessionId, setIsGeneratingChoices]);
 };

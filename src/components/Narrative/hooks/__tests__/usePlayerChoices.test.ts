@@ -3,6 +3,7 @@ import { usePlayerChoices } from '../usePlayerChoices';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { createMockNarrativeStore, mockZustandStore } from '@/lib/test-utils';
 import type { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
+import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 
 jest.mock('@/state/narrativeStore', () => ({ useNarrativeStore: jest.fn() }));
 
@@ -106,7 +107,8 @@ describe('usePlayerChoices', () => {
       expect.any(Object),
       ['c1'],
       's1',
-      expect.any(Object)
+      expect.any(Object),
+      { signal: expect.any(AbortSignal) }
     );
 
     // Read the decision back through the same getter the store exposes,
@@ -156,7 +158,8 @@ describe('usePlayerChoices', () => {
       }),
       ['c1'],
       's1',
-      explicitSnapshot
+      explicitSnapshot,
+      { signal: expect.any(AbortSignal) }
     );
     expect(onChoicesGenerated).toHaveBeenCalledTimes(1);
   });
@@ -173,6 +176,30 @@ describe('usePlayerChoices', () => {
     });
 
     expect(aiGenerate).toHaveBeenCalledTimes(1);
+  });
+
+  it('cancels the request at the shared budget and stores exactly one fallback decision', async () => {
+    const { addDecision } = setupStore();
+    const { result, aiGenerate } = renderPlayerChoices();
+
+    let requestSignal: AbortSignal | undefined;
+    aiGenerate.mockImplementation(
+      (...args: unknown[]) =>
+        new Promise((_resolve, reject) => {
+          requestSignal = (args[5] as { signal: AbortSignal }).signal;
+          requestSignal.addEventListener('abort', () => reject(new Error('aborted')));
+        })
+    );
+
+    await act(async () => {
+      const pending = result.current.generatePlayerChoices();
+      jest.advanceTimersByTime(AI_GENERATION_TIMEOUT_MS + 1);
+      await pending;
+    });
+
+    expect(requestSignal?.aborted).toBe(true);
+    expect(addDecision).toHaveBeenCalledTimes(1);
+    expect(addDecision.mock.calls[0][1].options).toHaveLength(3);
   });
 
   it('returns early without an AI call when the session has no segments', async () => {

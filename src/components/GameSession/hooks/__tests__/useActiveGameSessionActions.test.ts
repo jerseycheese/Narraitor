@@ -56,14 +56,11 @@ const buildOptions = (overrides = {}) => ({
   sessionId: 'session-1',
   characterId: 'character-1',
   currentDecision: null,
-  setCurrentDecision: jest.fn(),
   setIsGenerating: jest.fn(),
   setShouldTriggerGeneration: jest.fn(),
   setIsGeneratingChoices: jest.fn(),
   setIsEvaluatingAction: jest.fn(),
   setLocalSelectedChoiceId: jest.fn(),
-  choiceGenerationTimeoutRef: { current: null },
-  scheduleChoiceFallback: jest.fn(),
   onChoiceSelected: jest.fn(),
   autoSave: { triggerSave: jest.fn() } as unknown as UseAutoSaveReturn,
   isSessionEnded: jest.fn(() => false),
@@ -208,11 +205,10 @@ describe('useActiveGameSessionActions', () => {
   });
 
   describe('handleNarrativeGenerated — session ending segments (#2168)', () => {
-    it('sets isGeneratingChoices to true and schedules fallback for normal scene segments', () => {
+    it('sets isGeneratingChoices to true for normal scene segments', () => {
       const setIsGenerating = jest.fn();
       const setShouldTriggerGeneration = jest.fn();
       const setIsGeneratingChoices = jest.fn();
-      const scheduleChoiceFallback = jest.fn();
 
       const { result } = renderHook(() =>
         useActiveGameSessionActions(
@@ -220,7 +216,6 @@ describe('useActiveGameSessionActions', () => {
             setIsGenerating,
             setShouldTriggerGeneration,
             setIsGeneratingChoices,
-            scheduleChoiceFallback,
           })
         )
       );
@@ -243,14 +238,12 @@ describe('useActiveGameSessionActions', () => {
       expect(setIsGenerating).toHaveBeenCalledWith(false);
       expect(setShouldTriggerGeneration).toHaveBeenCalledWith(false);
       expect(setIsGeneratingChoices).toHaveBeenCalledWith(true);
-      expect(scheduleChoiceFallback).toHaveBeenCalledTimes(1);
     });
 
-    it('sets isGeneratingChoices to false and skips scheduling fallback on fatal-outcome segments', () => {
+    it('sets isGeneratingChoices to false on fatal-outcome segments', () => {
       const setIsGenerating = jest.fn();
       const setShouldTriggerGeneration = jest.fn();
       const setIsGeneratingChoices = jest.fn();
-      const scheduleChoiceFallback = jest.fn();
 
       const { result } = renderHook(() =>
         useActiveGameSessionActions(
@@ -258,7 +251,6 @@ describe('useActiveGameSessionActions', () => {
             setIsGenerating,
             setShouldTriggerGeneration,
             setIsGeneratingChoices,
-            scheduleChoiceFallback,
           })
         )
       );
@@ -281,18 +273,15 @@ describe('useActiveGameSessionActions', () => {
       expect(setIsGenerating).toHaveBeenCalledWith(false);
       expect(setShouldTriggerGeneration).toHaveBeenCalledWith(false);
       expect(setIsGeneratingChoices).toHaveBeenCalledWith(false);
-      expect(scheduleChoiceFallback).not.toHaveBeenCalled();
     });
 
-    it('sets isGeneratingChoices to false and skips scheduling fallback on ending-type segments', () => {
+    it('sets isGeneratingChoices to false on ending-type segments', () => {
       const setIsGeneratingChoices = jest.fn();
-      const scheduleChoiceFallback = jest.fn();
 
       const { result } = renderHook(() =>
         useActiveGameSessionActions(
           buildOptions({
             setIsGeneratingChoices,
-            scheduleChoiceFallback,
           })
         )
       );
@@ -313,21 +302,17 @@ describe('useActiveGameSessionActions', () => {
       });
 
       expect(setIsGeneratingChoices).toHaveBeenCalledWith(false);
-      expect(scheduleChoiceFallback).not.toHaveBeenCalled();
     });
   });
 
   describe('handleChoicesGenerated — empty or ending choices signal (#2168)', () => {
-    it('clears isGeneratingChoices and clears timeout when empty decision options arrive', () => {
+    it('clears isGeneratingChoices when empty decision options arrive', () => {
       const setIsGeneratingChoices = jest.fn();
-      const timeoutId = setTimeout(() => {}, 10000);
-      const choiceGenerationTimeoutRef = { current: timeoutId };
 
       const { result } = renderHook(() =>
         useActiveGameSessionActions(
           buildOptions({
             setIsGeneratingChoices,
-            choiceGenerationTimeoutRef,
           })
         )
       );
@@ -341,7 +326,6 @@ describe('useActiveGameSessionActions', () => {
       });
 
       expect(setIsGeneratingChoices).toHaveBeenCalledWith(false);
-      expect(choiceGenerationTimeoutRef.current).toBeNull();
     });
   });
 

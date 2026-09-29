@@ -95,6 +95,8 @@ describe('ActiveGameSession confirmation dialog exclusion (#1536)', () => {
         'seg-1': { id: 'seg-1', content: 'Story starts...', characterIds: [] },
       },
       sessionSegments: { [mockSessionId]: ['seg-1'] },
+      sessionDecisions: {},
+      decisions: {},
       currentEnding: null,
       isGeneratingEnding: false,
       isSessionEnded: () => false,

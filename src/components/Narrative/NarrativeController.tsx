@@ -4,8 +4,6 @@ import React, {
   useRef,
   useMemo,
   useCallback,
-  useImperativeHandle,
-  forwardRef,
 } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
 import { useSessionPacing } from './hooks/useSessionPacing';
@@ -44,13 +42,8 @@ import type {
 } from '@/types/turnResolver.types';
 import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
 
-export interface NarrativeControllerHandle {
-  submitChoice: (choiceId: string) => Promise<void>;
-  retry: () => void;
-}
-
 const EMPTY_NPC_IDS: string[] = [];
-export interface NarrativeControllerProps {
+interface NarrativeControllerProps {
   worldId: string;
   sessionId: string;
   characterId?: string;
@@ -89,29 +82,23 @@ export interface NarrativeControllerProps {
   enableSessionPacing?: boolean;
 }
 
-export const NarrativeController = forwardRef<
-  NarrativeControllerHandle,
-  NarrativeControllerProps
->(function NarrativeController(
-  {
-    worldId,
-    sessionId,
-    characterId,
-    onNarrativeGenerated,
-    onChoicesGenerated,
-    onEndingSuggested,
-    onSkillCheckPerformed,
-    triggerGeneration = true,
-    choiceId,
-    className,
-    generateChoices = true,
-    hideHistory = false,
-    retryToken = 0,
-    onStreamingPreviewChange,
-    enableSessionPacing = true,
-  },
-  ref
-) {
+export const NarrativeController: React.FC<NarrativeControllerProps> = ({
+  worldId,
+  sessionId,
+  characterId,
+  onNarrativeGenerated,
+  onChoicesGenerated,
+  onEndingSuggested,
+  onSkillCheckPerformed,
+  triggerGeneration = true,
+  choiceId,
+  className,
+  generateChoices = true,
+  hideHistory = false,
+  retryToken = 0,
+  onStreamingPreviewChange,
+  enableSessionPacing = true,
+}) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -251,16 +238,6 @@ export const NarrativeController = forwardRef<
   const initialGenerationInitiated = useRef(false);
   // Prevent duplicate initial-scene generation in dev StrictMode (effects can run twice across remounts)
   const initialGenerationLocksRef = useRef(new Set<string>());
-  // Track active AbortController so unmounts cancel in-flight network requests
-  const activeAbortControllerRef = useRef<AbortController | null>(null);
-  // Track last choice ID for deliberate submitChoice or retry
-  const lastChoiceIdRef = useRef<string | undefined>(choiceId);
-
-  useEffect(() => {
-    if (choiceId) {
-      lastChoiceIdRef.current = choiceId;
-    }
-  }, [choiceId]);
 
   const { checkForEndingIndicators, suggestEnding } = useEndingDetection({
     sessionId,
@@ -324,10 +301,6 @@ export const NarrativeController = forwardRef<
     return () => {
       mountedRef.current = false;
       initialGenerationInitiated.current = false; // Reset generation init flag
-      if (activeAbortControllerRef.current) {
-        activeAbortControllerRef.current.abort();
-        activeAbortControllerRef.current = null;
-      }
       // NOTE: We intentionally do NOT delete initialGenerationLocksRef here.
       // The lock is owned by the in-flight generation (released in its finally
       // block); releasing it on unmount allows a remounted instance to start a
@@ -600,7 +573,6 @@ export const NarrativeController = forwardRef<
       // (store writes + world-cost extraction) runs unraced so a slow
       // reconciliation doesn't trigger a duplicate fallback segment.
       const generationAbort = new AbortController();
-      activeAbortControllerRef.current = generationAbort;
       generationTimeoutId = setTimeout(() => {
         generationAbort.abort();
       }, AI_GENERATION_TIMEOUT_MS);
@@ -807,7 +779,6 @@ export const NarrativeController = forwardRef<
       // runs unraced so a slow side-effect pass doesn't trigger a spurious
       // error + Retry while the segment was already committed.
       const segmentAbort = new AbortController();
-      activeAbortControllerRef.current = segmentAbort;
       segmentTimeoutId = setTimeout(() => {
         segmentAbort.abort();
       }, AI_GENERATION_TIMEOUT_MS);
@@ -907,44 +878,22 @@ export const NarrativeController = forwardRef<
     setError(null);
     clearGenerationError();
 
-    const activeChoiceId = lastChoiceIdRef.current || choiceId;
-
     // If we have no segments, retry initial generation
     if (segments.length === 0) {
       generateInitialNarrative();
-    } else if (activeChoiceId && processedChoices.has(activeChoiceId)) {
+    } else if (choiceId && processedChoices.has(choiceId)) {
       // If we were trying to generate from a choice, remove it from processed and retry
       setProcessedChoices((prev) => {
         const updated = new Set(prev);
-        updated.delete(activeChoiceId);
+        updated.delete(choiceId);
         return updated;
       });
-      generateNextSegment(activeChoiceId);
+      generateNextSegment(choiceId);
     } else {
       // Otherwise just clear the error
       setError(null);
     }
   };
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      submitChoice: async (triggeringChoiceId: string) => {
-        lastChoiceIdRef.current = triggeringChoiceId;
-        setProcessedChoices((prev) => {
-          const updated = new Set(prev);
-          updated.add(triggeringChoiceId);
-          return updated;
-        });
-        await generateNextSegment(triggeringChoiceId);
-      },
-      retry: () => {
-        handleRetry();
-      },
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sessionId, worldId, characterId, segments.length]
-  );
 
   // Re-run the failed generation when an external surface bumps retryToken
   // (e.g. the choices column's Retry button). Skips the initial 0 value so a
@@ -1013,6 +962,4 @@ export const NarrativeController = forwardRef<
       )}
     </div>
   );
-});
-
-NarrativeController.displayName = 'NarrativeController';
+};

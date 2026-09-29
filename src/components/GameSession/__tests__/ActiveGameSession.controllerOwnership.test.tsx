@@ -105,6 +105,7 @@ describe('ActiveGameSession — controller mount and callback lifecycle (#2232)'
     segmentsList = [];
 
     mockNarrativeState = {
+      _hasHydrated: true,
       segments: {} as Record<string, NarrativeSegment>,
       sessionSegments: { [mockSessionId]: [] as string[] },
       sessionDecisions: { [mockSessionId]: [] as string[] },
@@ -195,6 +196,7 @@ describe('ActiveGameSession — controller mount and callback lifecycle (#2232)'
         id: 'seg-1',
         content: 'The journey begins.',
         type: 'scene',
+        metadata: { tags: [] },
         sessionId: mockSessionId,
         worldId: mockWorldId,
         timestamp: new Date(),
@@ -249,6 +251,7 @@ describe('ActiveGameSession — controller mount and callback lifecycle (#2232)'
       id: 'seg-1',
       content: 'A cold wind blows through the ancient ruins.',
       type: 'scene',
+      metadata: { tags: [] },
       sessionId: mockSessionId,
       worldId: mockWorldId,
       timestamp: new Date(),

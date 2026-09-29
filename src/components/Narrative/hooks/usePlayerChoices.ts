@@ -34,9 +34,40 @@ interface UsePlayerChoicesResult {
 }
 
 /**
- * Owns player-choice generation for the active session: the AI call with an
- * abortable signal path, single fallback owner on timeout/failure, and decision
- * persistence.
+ * The single fallback decision for a failed choice generation. Both the
+ * generation-failure path and the unexpected-error path build it here.
+ */
+function buildFallbackDecision(contextSummary: string): Decision {
+  const fallbackId = `decision-fallback-${Date.now()}`;
+  return {
+    id: fallbackId,
+    prompt: 'What will you do?',
+    options: [
+      {
+        id: `option-${fallbackId}-1`,
+        text: 'Investigate further',
+        alignment: 'neutral',
+      },
+      {
+        id: `option-${fallbackId}-2`,
+        text: 'Talk to nearby characters',
+        alignment: 'lawful',
+      },
+      {
+        id: `option-${fallbackId}-3`,
+        text: 'Move to a new location',
+        alignment: 'neutral',
+      },
+    ],
+    decisionWeight: 'minor',
+    contextSummary,
+  };
+}
+
+/**
+ * Owns player-choice generation for the active session: the AI call (with an
+ * abortable timeout and one stored fallback), decision persistence, and the overlap
+ * guard.
  */
 export function usePlayerChoices({
   sessionId,
@@ -51,18 +82,16 @@ export function usePlayerChoices({
   const [isGeneratingChoices, setIsGeneratingChoices] = useState(false);
   // Prevent overlapping choice generation (more reliable than state).
   const choiceGenerationInProgress = useRef(false);
-  // AbortController for in-flight choice generation
-  const activeAbortControllerRef = useRef<AbortController | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
-  // Reset the overlap guard and abort in-flight requests when session changes or on unmount
+  // Reset the overlap guard when the session changes or the component unmounts,
+  // mirroring the controller's original mount-effect resets.
   useEffect(() => {
     choiceGenerationInProgress.current = false;
     return () => {
       choiceGenerationInProgress.current = false;
-      if (activeAbortControllerRef.current) {
-        activeAbortControllerRef.current.abort();
-        activeAbortControllerRef.current = null;
-      }
+      abortRef.current?.abort();
+      abortRef.current = null;
     };
   }, [sessionId, worldId, characterId]);
 
@@ -77,186 +106,177 @@ export function usePlayerChoices({
         return;
       }
 
-      // Prevent overlapping choice generation using ref (more reliable than state)
-      if (choiceGenerationInProgress.current) {
-        return;
-      }
+    // Prevent overlapping choice generation using ref (more reliable than state)
+    if (choiceGenerationInProgress.current) {
+      return;
+    }
 
-      choiceGenerationInProgress.current = true;
+    choiceGenerationInProgress.current = true;
 
-      const snapshot =
-        providedSnapshot ??
-        assembleSessionSnapshot(targetSessionId, {
-          worldId,
-          characterId: characterId || '',
-        });
+    const snapshot =
+      providedSnapshot ??
+      assembleSessionSnapshot(targetSessionId, {
+        worldId,
+        characterId: characterId || '',
+      });
 
-      if (snapshot.segments.length === 0) {
-        choiceGenerationInProgress.current = false;
-        return;
-      }
-      setIsGeneratingChoices(true);
+    if (snapshot.segments.length === 0) {
+      choiceGenerationInProgress.current = false;
+      return;
+    }
+    setIsGeneratingChoices(true);
 
-      const recentSegments = [...snapshot.segments.slice(-5)];
-      const lastSegment = recentSegments[recentSegments.length - 1];
+    const recentSegments = [...snapshot.segments.slice(-5)];
+    const lastSegment = recentSegments[recentSegments.length - 1];
 
-      // Single fallback decision owner for choice failures
-      const fallbackId = `decision-fallback-${Date.now()}`;
-      const fallbackDecision: Decision = {
-        id: fallbackId,
-        prompt: 'What will you do?',
-        options: [
-          {
-            id: `option-${fallbackId}-1`,
-            text: 'Investigate further',
-            alignment: 'neutral',
-          },
-          {
-            id: `option-${fallbackId}-2`,
-            text: 'Talk to nearby characters',
-            alignment: 'lawful',
-          },
-          {
-            id: `option-${fallbackId}-3`,
-            text: 'Move to a new location',
-            alignment: 'neutral',
-          },
-        ],
-        decisionWeight: 'minor',
-        contextSummary:
-          recentSegments.length > 0
-            ? `${lastSegment?.metadata?.location || 'Unknown location'}: ${truncate(lastSegment?.content || 'Making a decision', 100)}`
-            : 'Making a decision in an unknown location.',
+    // One fallback decision, stored once if generation fails or comes back invalid
+    let usedFallbackDecision = false;
+    const fallbackDecision = buildFallbackDecision(
+      recentSegments.length > 0
+        ? `${lastSegment?.metadata?.location || 'Unknown location'}: ${truncate(lastSegment?.content || 'Making a decision', 100)}`
+        : 'Making a decision in an unknown location.'
+    );
+
+    try {
+      const choiceCharacterIds = snapshot.characterId
+        ? [snapshot.characterId]
+        : characterId
+          ? [characterId]
+          : [];
+
+      // Create narrative context for choice generation
+      const narrativeContext: NarrativeContext = {
+        worldId: snapshot.worldId || worldId,
+        currentSceneId: `scene-${Date.now()}`,
+        characterIds: choiceCharacterIds,
+        previousSegments: recentSegments,
+        currentTags: lastSegment?.metadata?.tags || [],
+        sessionId: snapshot.sessionId,
+        recentSegments,
+        currentLocation: lastSegment?.metadata?.location || undefined,
       };
 
-      // Abort previous in-flight generation if any
-      if (activeAbortControllerRef.current) {
-        activeAbortControllerRef.current.abort();
-      }
-      const abortController = new AbortController();
-      activeAbortControllerRef.current = abortController;
-
-      let timeoutId: NodeJS.Timeout | undefined;
-
+      // The request is cancelled, not just abandoned, when the budget runs out
+      // or the controller unmounts.
+      const generationAbort = new AbortController();
+      abortRef.current = generationAbort;
+      const timeoutId = setTimeout(
+        () => generationAbort.abort(),
+        AI_GENERATION_TIMEOUT_MS
+      );
+      let decision;
       try {
-        const choiceCharacterIds = snapshot.characterId
-          ? [snapshot.characterId]
-          : characterId
-            ? [characterId]
-            : [];
-
-        // Create narrative context for choice generation
-        const narrativeContext: NarrativeContext = {
-          worldId: snapshot.worldId || worldId,
-          currentSceneId: `scene-${Date.now()}`,
-          characterIds: choiceCharacterIds,
-          previousSegments: recentSegments,
-          currentTags: lastSegment?.metadata?.tags || [],
-          sessionId: snapshot.sessionId,
-          recentSegments,
-          currentLocation: lastSegment?.metadata?.location || undefined,
-        };
-
-        let decision: Decision;
-        try {
-          const timeoutPromise = new Promise<never>((_, reject) => {
-            timeoutId = setTimeout(() => {
-              abortController.abort();
-              reject(
-                new Error(
-                  `AI choice generation timed out after ${AI_GENERATION_TIMEOUT_MS}ms`
-                )
-              );
-            }, AI_GENERATION_TIMEOUT_MS);
-          });
-
-          const abortPromise = new Promise<never>((_, reject) => {
-            if (abortController.signal.aborted) {
-              reject(new Error('Choice generation aborted'));
-            }
-            abortController.signal.addEventListener('abort', () => {
-              reject(new Error('Choice generation aborted'));
-            });
-          });
-
-          decision = await Promise.race([
-            // Pass signal in case narrativeGenerator supports it
-            (narrativeGenerator as any).generatePlayerChoices(
-              snapshot.worldId || worldId,
-              narrativeContext,
-              choiceCharacterIds,
-              snapshot.sessionId,
-              snapshot,
-              abortController.signal
-            ),
-            timeoutPromise,
-            abortPromise,
-          ]);
-        } catch (error) {
-          logger.warn('Choice generation failed, using fallback choices', error);
-          decision = fallbackDecision;
-        } finally {
-          if (timeoutId) {
-            clearTimeout(timeoutId);
-          }
+        decision = await narrativeGenerator.generatePlayerChoices(
+          snapshot.worldId || worldId,
+          narrativeContext,
+          choiceCharacterIds,
+          snapshot.sessionId,
+          snapshot,
+          { signal: generationAbort.signal }
+        );
+      } catch (error) {
+        logger.warn('Choice generation failed, using fallback choices', error);
+        decision = fallbackDecision;
+        usedFallbackDecision = true;
+      } finally {
+        clearTimeout(timeoutId);
+        if (abortRef.current === generationAbort) {
+          abortRef.current = null;
         }
+      }
 
-        // Skip if component unmounted during async operation
-        if (!mountedRef.current) {
-          return;
-        }
+      // Skip if component unmounted during async operation
+      if (!mountedRef.current) {
+        return;
+      }
 
-        // Verify decision structure and use fallback if invalid
-        if (
-          !decision ||
-          !decision.options ||
-          (decision.options?.length || 0) === 0
-        ) {
-          decision = fallbackDecision;
-        }
+      // Verify decision structure and use fallback if invalid
+      if (
+        !decision ||
+        !decision.options ||
+        (decision.options?.length || 0) === 0
+      ) {
+        decision = fallbackDecision;
+        usedFallbackDecision = true;
+      }
 
-        // Add decision to store and get the actual stored ID (stored once)
-        const storedDecisionId = useNarrativeStore
-          .getState()
-          .addDecision(snapshot.sessionId, {
-            prompt: decision.prompt,
-            options: decision.options,
-            decisionWeight: decision.decisionWeight,
-            contextSummary: decision.contextSummary,
-            debugInfo: decision.debugInfo,
-          });
+      // Add decision to store and get the actual stored ID
+      const storedDecisionId = useNarrativeStore
+        .getState()
+        .addDecision(snapshot.sessionId, {
+          prompt: decision.prompt,
+          options: decision.options,
+          decisionWeight: decision.decisionWeight,
+          contextSummary: decision.contextSummary,
+          // Dev-mode only (#1829 round 6) - without this, the persisted
+          // decision never carries the prompt/response a later playtest
+          // round would need to check the model's actual compliance.
+          debugInfo: decision.debugInfo,
+        });
 
-        decision.id = storedDecisionId;
+      // Update the decision with the stored ID before passing to parent
+      decision.id = storedDecisionId;
 
-        // Notify parent callback with the stored selectable decision
-        if (onChoicesGenerated && mountedRef.current) {
+      // Only notify parent component if we have AI-generated choices (not fallback)
+      if (!usedFallbackDecision) {
+        if (onChoicesGenerated) {
           try {
+            // Create a deep copy of the decision to ensure React state updates
             const decisionCopy = structuredClone(decision);
             onChoicesGenerated(decisionCopy);
           } catch (error) {
             logger.error('Error calling onChoicesGenerated callback:', error);
           }
         }
-      } catch (error) {
-        onError(getNarrativeError(error as Error).message);
-      } finally {
-        choiceGenerationInProgress.current = false;
-        if (mountedRef.current) {
-          setIsGeneratingChoices(false);
-        }
       }
-    },
-    [
-      sessionId,
-      worldId,
-      characterId,
-      onChoicesGenerated,
-      narrativeGenerator,
-      warnMissingSessionId,
-      mountedRef,
-      onError,
-    ]
-  );
+    } catch (error) {
+      // Unhandled error in generatePlayerChoices
+      onError(getNarrativeError(error as Error).message);
+
+      // Even if we get an unhandled error, try to provide fallback choices
+
+      try {
+        // Only try to create fallback choices if we haven't already added any for this session
+        const existingDecisions = useNarrativeStore
+          .getState()
+          .getSessionDecisions(targetSessionId);
+
+        if (existingDecisions.length === 0 && mountedRef.current) {
+          const fallbackDecision = buildFallbackDecision(
+            'Error occurred during choice generation.'
+          );
+          fallbackDecision.id = useNarrativeStore
+            .getState()
+            .addDecision(targetSessionId, {
+              prompt: fallbackDecision.prompt,
+              options: fallbackDecision.options,
+              decisionWeight: fallbackDecision.decisionWeight,
+              contextSummary: fallbackDecision.contextSummary,
+            });
+
+          if (onChoicesGenerated && mountedRef.current) {
+            onChoicesGenerated(structuredClone(fallbackDecision));
+          }
+        }
+      } catch {
+        // Failed to provide fallback choices
+      }
+    } finally {
+      choiceGenerationInProgress.current = false;
+      if (mountedRef.current) {
+        setIsGeneratingChoices(false);
+      }
+    }
+  }, [
+    sessionId,
+    worldId,
+    characterId,
+    onChoicesGenerated,
+    narrativeGenerator,
+    warnMissingSessionId,
+    mountedRef,
+    onError,
+  ]);
 
   return { isGeneratingChoices, generatePlayerChoices };
 }

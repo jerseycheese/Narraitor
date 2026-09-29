@@ -2,11 +2,13 @@ import { SINGLE_ATTEMPT_TEXT_TIMEOUT_MS } from './aiTimeouts';
 
 /**
  * Centralized AI-generation and loading-safety timeouts (milliseconds).
- *
- * Derived from the server-side route budget in aiTimeouts.ts (30s attempt + 15s headroom).
  */
 
-/** Hard ceiling on a single AI narrative/choice generation call before falling back. */
+/**
+ * Browser ceiling on a single AI narrative or choice generation call. Derived
+ * from the server route budget in aiTimeouts.ts so the client never gives up
+ * on a request the server is still allowed to finish.
+ */
 export const AI_GENERATION_TIMEOUT_MS = SINGLE_ATTEMPT_TEXT_TIMEOUT_MS;
 
 /** Safety timeout to auto-clear a stuck navigation loading state. */

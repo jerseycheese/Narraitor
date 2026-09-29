@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import type { Decision, DecisionRequirement, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -16,16 +16,12 @@ interface UseActiveGameSessionActionsOptions {
   sessionId: string;
   characterId?: string;
   currentDecision: Decision | null;
-  setCurrentDecision?: Dispatch<SetStateAction<Decision | null>>;
   setIsGenerating: Dispatch<SetStateAction<boolean>>;
-  setShouldTriggerGeneration?: Dispatch<SetStateAction<boolean>>;
+  setShouldTriggerGeneration: Dispatch<SetStateAction<boolean>>;
   setIsGeneratingChoices: Dispatch<SetStateAction<boolean>>;
   setIsEvaluatingAction: Dispatch<SetStateAction<boolean>>;
-  setLocalSelectedChoiceId?: Dispatch<SetStateAction<string | undefined>>;
-  choiceGenerationTimeoutRef?: MutableRefObject<NodeJS.Timeout | null>;
-  scheduleChoiceFallback?: () => void;
+  setLocalSelectedChoiceId: Dispatch<SetStateAction<string | undefined>>;
   onChoiceSelected: (choiceId: string) => void;
-  submitChoice?: (choiceId: string) => Promise<void> | void;
   autoSave: UseAutoSaveReturn;
   isSessionEnded: (sessionId: string) => boolean;
   createDecisionJournalEntry: (decision: Decision, selectedChoiceId: string, isCustomChoice: boolean) => void;
@@ -39,15 +35,12 @@ export const useActiveGameSessionActions = ({
   sessionId,
   characterId,
   currentDecision,
-  setCurrentDecision,
   setIsGenerating,
   setShouldTriggerGeneration,
   setIsGeneratingChoices,
   setIsEvaluatingAction,
   setLocalSelectedChoiceId,
-  choiceGenerationTimeoutRef,
   onChoiceSelected,
-  submitChoice,
   autoSave,
   isSessionEnded,
   createDecisionJournalEntry,
@@ -63,7 +56,7 @@ export const useActiveGameSessionActions = ({
   const handleNarrativeGenerated = useCallback((segment: NarrativeSegment) => {
     // Narrative segment was successfully generated
     setIsGenerating(false);
-    setShouldTriggerGeneration?.(false); // Reset trigger
+    setShouldTriggerGeneration(false); // Reset trigger
 
     // Auto-create journal entry for significant narrative events
     if (characterId && segment.content) {
@@ -91,32 +84,24 @@ export const useActiveGameSessionActions = ({
     // Player choice was selected
     setIsGenerating(true);
     setIsGeneratingChoices(true); // Start generating new choices
-    setLocalSelectedChoiceId?.(choiceId);
-    setShouldTriggerGeneration?.(true); // Trigger narrative generation
+    setLocalSelectedChoiceId(choiceId);
+    setShouldTriggerGeneration(true); // Trigger narrative generation
 
     // Create decision journal entry
     if (currentDecision && characterId) {
       createDecisionJournalEntry(currentDecision, choiceId, false);
     }
 
-    // If we have a current decision, update its selected option in the store
+    // If we have a current decision, update its selected option
     if (currentDecision) {
       useNarrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId, characterId || undefined);
     }
 
-    // Clear current decision if local setter provided
-    setCurrentDecision?.(null);
-
     maybeCompleteFirstPlay();
     onChoiceSelected(choiceId);
 
-    // Deliberate turn submission
-    if (submitChoice) {
-      void submitChoice(choiceId);
-    }
-
     void autoSave.triggerSave('player-choice');
-  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration, submitChoice]);
+  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
 
   const handleCustomSubmit = useCallback(async (customText: string) => {
     // Check if session has ended - if so, prevent further generation
@@ -139,11 +124,16 @@ export const useActiveGameSessionActions = ({
     }
 
     // Disable input immediately; the inference + roll happen before generation.
+    // The choice id itself is published further down, once the option it names
+    // exists on the decision: NarrativeController starts a turn the moment it
+    // sees a new choice id, and reads that option's requirements to roll.
     setIsGenerating(true);
     setIsGeneratingChoices(true);
 
     // Phase 1: infer skill checks for the typed action so custom
-    // actions get the same d20 treatment as predefined choices.
+    // actions get the same d20 treatment as predefined choices. The resulting
+    // requirements are attached to the option below; NarrativeController then
+    // rolls them via its existing skill-check evaluation.
     let inferredRequirements: DecisionRequirement[] = [];
     if (currentDecision && characterId) {
       const character = useCharacterStore.getState().characters[characterId];
@@ -183,6 +173,7 @@ export const useActiveGameSessionActions = ({
       };
 
       // Update the decision in the store with the new custom option and select it
+      // so decision tracking, AI choice type inference, and world state updates apply.
       useNarrativeStore.getState().updateDecision(currentDecision.id, {
         options: [...currentDecision.options, customOption],
         selectedOptionId: customChoiceId,
@@ -194,60 +185,34 @@ export const useActiveGameSessionActions = ({
       );
     }
 
-    setCurrentDecision?.(null);
-
     // Trigger narrative generation with the custom choice
-    setLocalSelectedChoiceId?.(customChoiceId);
-    setShouldTriggerGeneration?.(true);
+    setLocalSelectedChoiceId(customChoiceId);
+    setShouldTriggerGeneration(true);
 
     maybeCompleteFirstPlay();
     onChoiceSelected(customChoiceId);
 
-    // Deliberate turn submission
-    if (submitChoice) {
-      void submitChoice(customChoiceId);
-    }
-
     void autoSave.triggerSave('player-choice');
-  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setCurrentDecision, setIsEvaluatingAction, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration, submitChoice]);
+  }, [autoSave, characterId, createDecisionJournalEntry, currentDecision, isSessionEnded, maybeCompleteFirstPlay, onChoiceSelected, sessionId, setIsEvaluatingAction, setIsGenerating, setIsGeneratingChoices, setLocalSelectedChoiceId, setShouldTriggerGeneration]);
 
+  // The decision itself lives in narrativeStore, where usePlayerChoices wrote
+  // it. This only ends the loading state and mirrors the options into the
+  // session store for save/resume.
   const handleChoicesGenerated = useCallback((decision: Decision) => {
-    if (!decision || !decision.options || (decision.options?.length || 0) === 0) {
-      if (choiceGenerationTimeoutRef?.current) {
-        clearTimeout(choiceGenerationTimeoutRef.current);
-        choiceGenerationTimeoutRef.current = null;
-      }
-      setIsGeneratingChoices(false);
+    setIsGeneratingChoices(false);
+
+    if (!decision?.options?.length) {
       return;
     }
 
-    if (choiceGenerationTimeoutRef?.current) {
-      clearTimeout(choiceGenerationTimeoutRef.current);
-      choiceGenerationTimeoutRef.current = null;
-    }
-
-    const decisionCopy: Decision = {
-      id: decision.id,
-      prompt: decision.prompt,
-      options: [...decision.options],
-      selectedOptionId: decision.selectedOptionId,
-      decisionWeight: decision.decisionWeight,
-      contextSummary: decision.contextSummary,
-      debugInfo: decision.debugInfo,
-    };
-
-    setCurrentDecision?.(decisionCopy);
-    setIsGeneratingChoices(false);
-
-    // Convert AI-generated decision to player choices format for the session store
-    const playerChoices = decision.options.map(option => ({
-      id: option.id,
-      text: option.text,
-      isSelected: option.id === decision.selectedOptionId,
-    }));
-
-    useSessionStore.getState().setPlayerChoices(playerChoices);
-  }, [choiceGenerationTimeoutRef, setCurrentDecision, setIsGeneratingChoices]);
+    useSessionStore.getState().setPlayerChoices(
+      decision.options.map(option => ({
+        id: option.id,
+        text: option.text,
+        isSelected: option.id === decision.selectedOptionId,
+      }))
+    );
+  }, [setIsGeneratingChoices]);
 
   return {
     handleNarrativeGenerated,

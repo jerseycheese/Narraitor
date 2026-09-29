@@ -1,52 +1,34 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react';
-import type { Decision } from '@/types/narrative.types';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { useActiveGameSessionEffects } from './useActiveGameSessionEffects';
 
 describe('useActiveGameSessionEffects', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
-  it('creates a fallback decision when choice generation stalls', () => {
+  it('ends choice loading when a decision lands in the narrative store', () => {
     const { result } = renderHook(() => {
-      const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
       const [isGenerating, setIsGenerating] = React.useState(false);
       const [initialized, setInitialized] = React.useState(false);
       const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(true);
-      const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-      const { scheduleChoiceFallback } = useActiveGameSessionEffects({
+      useActiveGameSessionEffects({
         sessionId: 'session-1',
-        worldId: 'world-1',
         controllerKey: 'controller-1',
-        initialized,
-        isGenerating,
-        segmentCount: 0,
         setIsGenerating,
         setInitialized,
-        setCurrentDecision,
         setIsGeneratingChoices,
-        choiceGenerationTimeoutRef,
       });
 
-      return {
-        currentDecision,
-        isGeneratingChoices,
-        scheduleChoiceFallback,
-      };
+      return { isGenerating, initialized, isGeneratingChoices };
     });
 
     act(() => {
-      result.current.scheduleChoiceFallback();
-      jest.advanceTimersByTime(15000);
+      useNarrativeStore.getState().addDecision('session-1', {
+        prompt: 'What will you do?',
+        options: [{ id: 'option-1', text: 'Look around', alignment: 'neutral' }],
+        decisionWeight: 'minor',
+      });
     });
 
-    expect(result.current.currentDecision?.prompt).toBe('What will you do?');
     expect(result.current.isGeneratingChoices).toBe(false);
   });
 });
