@@ -55,6 +55,13 @@ describe('AttributeReviewStep', () => {
     expect(screen.getByText(/attributes selected: 1 \/ 6/i)).toBeInTheDocument();
   });
 
+  test('treats a suggestion with no accepted flag as accepted', () => {
+    const { accepted: _omit, ...noFlag } = suggestion('Strength');
+    render(<Harness initial={baseData([noFlag as AttributeSuggestion])} />);
+
+    expect(screen.getByTestId('attribute-toggle-0')).toHaveTextContent('Selected');
+  });
+
   test('toggling updates the saved attributes', () => {
     render(<Harness initial={baseData([suggestion('Strength'), suggestion('Agility', false)])} />);
 

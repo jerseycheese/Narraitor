@@ -91,7 +91,8 @@ export default function AttributeReviewStep({
     let openSlots = maxAttributes - customAttributes.length;
     commit(
       suggestions.map((s) => {
-        const accepted = s.accepted && openSlots > 0;
+        // Analyzer output can omit `accepted`; treat that as accepted.
+        const accepted = (s.accepted ?? true) && openSlots > 0;
         if (accepted) openSlots -= 1;
         return { ...s, id: s.id ?? generateUniqueId('attribute'), accepted };
       })
