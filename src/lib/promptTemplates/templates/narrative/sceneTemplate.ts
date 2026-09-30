@@ -259,7 +259,7 @@ Response Format:
   "type": "dialogue" | "action" | "transition" | "scene",
   "metadata": {
     "characterIds": ["npc-id-1", "npc-id-2"],
-${scenePresenceEnabled ? '    "sceneEntries": [],\n    "sceneExits": [],\n    "sceneTransition": {"to":"new place"},\n' : ''}    "speakerId": "npc-id-1",
+${scenePresenceEnabled ? '    "sceneEntries": [],\n    "sceneExits": [],\n' : ''}    "speakerId": "npc-id-1",
     "characters": [
       {
         "id": "npc-id-1",

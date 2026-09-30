@@ -1,4 +1,5 @@
-import { NarrativeSegment, NarrativeMetadata } from '../types/narrative.types';
+import { FIRST_SEGMENT_LOCATION } from '../types/narrative.types';
+import type { NarrativeSegment, NarrativeMetadata } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId, getTimestamp, safeTrim } from '../lib/utils';
 import { logger } from '../lib/utils/logger';
@@ -64,7 +65,8 @@ export const createNarrativeSegmentActions = (
     const isSceneStateEnabled = isFeatureEnabled('SCENE_STATE');
 
     if (isSceneStateEnabled) {
-      const currentPlace = useSceneStore.getState().scenes[sessionId]?.location;
+      const recordedPlace = useSceneStore.getState().scenes[sessionId]?.location;
+      const currentPlace = recordedPlace === FIRST_SEGMENT_LOCATION ? null : recordedPlace;
       const rawTransitionTo = metadata?.sceneTransition?.to;
       const transitionTo = typeof rawTransitionTo === 'string'
         ? safeTrim(rawTransitionTo).replace(/\s+/g, ' ')
@@ -72,8 +74,14 @@ export const createNarrativeSegmentActions = (
       const label = typeof metadata?.location === 'string'
         ? safeTrim(metadata.location).replace(/\s+/g, ' ')
         : '';
-      const location = transitionTo || currentPlace || previousSegment?.metadata?.location || label;
-      if (location) metadata = { ...(metadata ?? { tags: [] }), location };
+      const previousLocation = previousSegment?.metadata?.location;
+      const location = [transitionTo, currentPlace, previousLocation, label]
+        .find((place) => place && place !== FIRST_SEGMENT_LOCATION);
+      if (location) {
+        metadata = { ...(metadata ?? { tags: [] }), location };
+      } else if (metadata?.location) {
+        metadata = { ...metadata, location: undefined };
+      }
     } else if (metadata?.location) {
       const cleanedLocation = safeTrim(metadata.location).replace(/\s+/g, ' ');
 

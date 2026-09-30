@@ -1,6 +1,7 @@
 // src/lib/narrative/turnResolver.ts
 
 import type { EntityID } from '@/types/common.types';
+import { FIRST_SEGMENT_LOCATION } from '@/types/narrative.types';
 import type {
   LostItemMetadata,
   NarrativeGenerationResult,
@@ -36,7 +37,7 @@ import {
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { computeTurnsSinceComplication } from '@/lib/narrative/turnsSinceComplication';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
-import { assembleSessionSnapshot } from '@/lib/narrative/sessionSnapshotAssembler';
+import { assembleSessionSnapshot, latestSegmentNpcIds } from '@/lib/narrative/sessionSnapshotAssembler';
 import { extractStructuredLore } from '@/lib/ai/structuredLoreExtractor';
 import {
   getLoreContextForPrompt,
@@ -620,13 +621,19 @@ async function commitAndSettleGeneratedTurn({
   const storedSegment =
     useNarrativeStore.getState().segments[storedSegmentId] ?? newSegment;
   if (isFeatureEnabled('SCENE_STATE')) {
+    const hadSceneRecord = Boolean(useSceneStore.getState().scenes[sessionId]);
     const currentPlace = useSceneStore.getState().scenes[sessionId]?.location;
     const transitionTo = storedSegment.metadata.sceneTransition?.to;
-    const nextPlace = typeof transitionTo === 'string' && transitionTo.trim()
-      ? transitionTo.trim()
-      : !currentPlace ? storedSegment.metadata.location : undefined;
-    if (nextPlace) useSceneStore.getState().setLocation(sessionId, nextPlace);
-    reconcileScenePresence(sessionId, characterId, storedSegment);
+    const transitionTarget = typeof transitionTo === 'string' ? transitionTo.trim() : '';
+    const nextPlace = transitionTarget && transitionTarget !== FIRST_SEGMENT_LOCATION
+      ? transitionTarget
+      : !currentPlace || currentPlace === FIRST_SEGMENT_LOCATION
+        ? storedSegment.metadata.location
+        : undefined;
+    if (nextPlace && nextPlace !== FIRST_SEGMENT_LOCATION) {
+      useSceneStore.getState().setLocation(sessionId, nextPlace);
+    }
+    reconcileScenePresence(sessionId, characterId, storedSegment, hadSceneRecord);
   }
   const { notes, errors, acquiredItems } = await reconcileCoreSideEffects({
     segment: storedSegment,
@@ -683,14 +690,17 @@ async function commitAndSettleGeneratedTurn({
 function reconcileScenePresence(
   sessionId: EntityID,
   playerId: EntityID,
-  segment: NarrativeSegment
+  segment: NarrativeSegment,
+  hadSceneRecord: boolean
 ): void {
   const segments = useNarrativeStore.getState().getSessionSegments(sessionId);
   const earlierSegments = segments.slice(0, -1);
   const previouslySeen = new Set(
     earlierSegments.flatMap((earlier) => earlier.metadata?.characterIds ?? [])
   );
-  const current = new Set(useSceneStore.getState().scenes[sessionId]?.presentNpcIds ?? []);
+  const current = new Set(hadSceneRecord
+    ? useSceneStore.getState().scenes[sessionId]?.presentNpcIds ?? []
+    : latestSegmentNpcIds(earlierSegments, playerId));
   const knownNpcIds = new Set([
     ...current,
     ...(segment.metadata?.characterIds ?? []),

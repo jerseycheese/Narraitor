@@ -8,8 +8,8 @@ import {
   normalizeCharacterIds,
   getWorldGenre,
   getMoodForGenre,
-  FIRST_SEGMENT_LOCATION,
 } from './narrativeGenerator.response.helpers';
+import { FIRST_SEGMENT_LOCATION } from '@/types/narrative.types';
 import { safeTrim } from '@/lib/utils';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 

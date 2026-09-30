@@ -8,6 +8,9 @@ import type { ContinuitySegmentNote } from './continuity.types';
 import type { WorldClockPromptContext, WorldClockSegmentNote } from './worldThread.types';
 import type { WorldCostSegmentNote } from './worldCost.types';
 
+/** Placeholder used by legacy response formatting before a place is established. */
+export const FIRST_SEGMENT_LOCATION = 'Starting Location';
+
 /**
  * Represents a segment of narrative in the game
  */

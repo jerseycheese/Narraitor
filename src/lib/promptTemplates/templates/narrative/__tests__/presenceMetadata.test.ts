@@ -54,7 +54,7 @@ it('renders recorded scene facts and transition guidance in the scene template o
     expect(flagOn).toContain('CURRENT PLACE: Muddy Lake');
     expect(flagOn).toContain('PRESENT NPCS: Guard');
     expect(flagOn).toContain('metadata.sceneTransition');
-    expect(flagOn).toContain('"sceneTransition": {"to":"new place"}');
+    expect(flagOn).not.toContain('"sceneTransition":');
   } finally {
     (isFeatureEnabled as jest.Mock).mockReturnValue(false);
   }

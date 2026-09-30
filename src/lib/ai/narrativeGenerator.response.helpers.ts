@@ -126,9 +126,6 @@ export const getMoodForGenre = (
   }
 };
 
-/** Stands in for a place only on the first segment, before the story names one. */
-export const FIRST_SEGMENT_LOCATION = 'Starting Location';
-
 /**
  * The place the story was in as of the last segment that named one.
  *
