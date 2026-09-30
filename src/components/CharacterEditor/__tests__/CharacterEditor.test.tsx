@@ -214,6 +214,28 @@ describe('CharacterEditor MVP Tests', () => {
     });
   });
 
+  test('shows the same spend as the save guard for a skill whose world skill was removed', async () => {
+    // No matching world skill: both sides fall back to a minimum of 1, so level 5 costs 4.
+    const orphanWorld = {
+      ...mockWorld,
+      skills: [],
+      settings: { ...mockWorld.settings, skillPointPool: 4 },
+    };
+    mockZustandStore(
+      useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+      createMockWorldStore({ worlds: { 'test-world-1': orphanWorld } })
+    );
+
+    render(<CharacterEditor characterId="test-char-1" />);
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('Test Character')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Remaining: 0')).toBeInTheDocument();
+    expect(screen.queryByText(/Over budget/)).not.toBeInTheDocument();
+    expect(screen.getByText('Save Changes').closest('button')).not.toBeDisabled();
+  });
+
   // Acceptance Criteria 5: Users can cancel edits without saving changes
   test('cancels edits without saving changes', async () => {
     const mockUpdateCharacter = jest.fn();
