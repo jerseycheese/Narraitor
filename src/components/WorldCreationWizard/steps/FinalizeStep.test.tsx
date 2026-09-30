@@ -61,7 +61,7 @@ describe('FinalizeStep', () => {
     render(
       <FinalizeStep
         worldData={mockWorldData}
-        onUpdateWorldData={jest.fn()}
+        onUpdate={jest.fn()}
       />
     );
 
@@ -78,7 +78,7 @@ describe('FinalizeStep', () => {
     render(
       <FinalizeStep
         worldData={{ name: 'Empty World' }}
-        onUpdateWorldData={jest.fn()}
+        onUpdate={jest.fn()}
       />
     );
 

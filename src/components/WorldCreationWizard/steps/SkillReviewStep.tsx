@@ -1,11 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { World, WorldSkill } from '@/types/world.types';
-import { SkillSuggestion } from '@/types/ai-suggestions.types';
+import { WorldSkill } from '@/types/world.types';
+import {
+  SkillSuggestion,
+  WorldCreationData,
+  WIZARD_MAX_SKILLS,
+  adoptLegacyEntries,
+} from '../WizardState';
+import type { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import SkillRangeEditor from '@/components/forms/SkillRangeEditor';
 import { SkillEditor } from '@/components/world/SkillEditor';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   MIN_SKILL_VALUE as SKILL_MIN_VALUE,
@@ -22,33 +29,25 @@ import {
   WizardSelect,
 } from '@/components/shared/wizard';
 import { Button } from '@/components/ui/button';
-import type { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 
-interface ExtendedSkillSuggestion extends SkillSuggestion {
-  showDetails?: boolean;
-  selectedAttributeNames?: string[];
-}
-
-interface WorldDataWithMeta extends Partial<World> {
-  aiSuggestionMeta?: {
-    source: AIGuidanceSource;
-    generatedAt?: string;
-    descriptionSnapshot?: string;
-  };
+/** A skill suggestion plus the edit tracking the review step keeps on it. */
+interface ReviewedSkill extends SkillSuggestion {
+  isModified?: boolean;
+  originalName?: string;
+  originalDescription?: string;
+  originalDifficulty?: SkillDifficulty;
 }
 
 /**
  * Props for the SkillReviewStep component
  */
 interface SkillReviewStepProps {
-  /** Current world data being created */
-  worldData: WorldDataWithMeta;
-  /** AI-generated skill suggestions to review */
-  suggestions: SkillSuggestion[];
+  /** Current world data being created; suggestions come from `aiSuggestions.skills` */
+  worldData: WorldCreationData;
   /** Validation errors for the form */
   errors: Record<string, string>;
   /** Callback to update world data */
-  onUpdate: (updates: Partial<World>) => void;
+  onUpdate: (updates: Partial<WorldCreationData>) => void;
   /** Callback to clear AI suggestions */
   onClearSuggestions?: () => void;
 }
@@ -75,7 +74,7 @@ const difficultyBadgeClass = (difficulty: string): string => {
  * - Manage multi-attribute skill linking
  *
  * Key features:
- * - Up to 12 skills total (suggested + custom)
+ * - Up to settings.maxSkills skills total (suggested + custom)
  * - Multi-attribute linking support for complex skills
  * - Real-time validation and progress tracking
  * - Intuitive UX with "Customize" buttons and progress indicators
@@ -85,277 +84,136 @@ const difficultyBadgeClass = (difficulty: string): string => {
  */
 export default function SkillReviewStep({
   worldData,
-  suggestions,
   errors,
   onUpdate,
   onClearSuggestions,
 }: SkillReviewStepProps) {
-  /**
-   * Helper function to convert attribute names to IDs for skill linking
-   *
-   * This is necessary because the UI works with human-readable attribute names,
-   * but the data model requires attribute IDs for proper relational linking.
-   *
-   * @param attributeNames - Array of attribute names to convert
-   * @returns Array of corresponding attribute IDs
-   */
-  const convertAttributeNamesToIds = (attributeNames: string[]): string[] => {
-    return attributeNames
-      .map(
-        (name) => worldData.attributes?.find((attr) => attr.name === name)?.id
-      )
-      .filter(Boolean) as string[];
-  };
+  const suggestions: ReviewedSkill[] = worldData.aiSuggestions?.skills ?? [];
+  const attributes = worldData.attributes ?? [];
+  const maxSkills = worldData.settings?.maxSkills ?? WIZARD_MAX_SKILLS;
+  const suggestionIds = new Set(suggestions.map((s) => s.id));
+  const customSkills = (worldData.skills ?? []).filter(
+    (s) => !suggestionIds.has(s.id)
+  );
+  const acceptedCount =
+    suggestions.filter((s) => s.accepted).length + customSkills.length;
 
-  /**
-   * Helper function to merge accepted AI skills with custom skills
-   *
-   * This centralizes the merge logic to ensure consistency across all handlers
-   * and reduces code duplication. Uses stable IDs to prevent unnecessary re-renders.
-   *
-   * @param acceptedSuggestions - AI-generated skill suggestions that are accepted
-   * @param customSkillsList - Custom skills to merge (defaults to current state)
-   * @returns Combined array of accepted AI skills and custom skills
-   */
-  const mergeAllSkills = (
-    acceptedSuggestions: ExtendedSkillSuggestion[],
-    customSkillsList = customSkills
-  ): WorldSkill[] => {
-    const acceptedAISkills: WorldSkill[] = acceptedSuggestions
-      .filter((s) => s.accepted)
-      .map((s) => {
-        // Use stable ID based on skill name to prevent unnecessary re-renders
-        const existingSkill = worldData.skills?.find(
-          (skill) => skill.name === s.name
-        );
-        return {
-          id: existingSkill?.id || generateUniqueId('skill'),
-          worldId: '',
-          name: s.name,
-          description: s.description,
-          difficulty: s.difficulty,
-          category: s.category,
-          baseValue: SKILL_DEFAULT_VALUE,
-          minValue: SKILL_MIN_VALUE,
-          maxValue: SKILL_MAX_VALUE,
-          attributeIds: convertAttributeNamesToIds(
-            s.selectedAttributeNames || s.linkedAttributeNames || []
-          ),
-        };
-      });
-
-    return [...acceptedAISkills, ...customSkillsList];
-  };
-
-  // Custom skill management state - initialize from existing world data when editing
-  const [customSkills, setCustomSkills] = useState<WorldSkill[]>(() => {
-    // When editing, identify existing custom skills (those not in AI suggestions)
-    if (worldData.skills && worldData.skills.length > 0) {
-      const suggestionNames = new Set(suggestions.map((s) => s.name));
-      return worldData.skills.filter(
-        (skill) => !suggestionNames.has(skill.name)
-      );
-    }
-    return [];
-  });
+  const [expanded, setExpanded] = useState<Set<number>>(() => new Set([0]));
   const [isCreatingCustomSkill, setIsCreatingCustomSkill] = useState(false);
   const [editingCustomSkillId, setEditingCustomSkillId] = useState<
     string | null
   >(null);
   const [showClearConfirmation, setShowClearConfirmation] = useState(false);
 
-  /**
-   * Helper function to initialize a suggestion with original values for modification tracking
-   */
-  const initializeSuggestionWithTracking = (
-    suggestion: SkillSuggestion,
-    accepted: boolean,
-    showDetails: boolean
-  ): ExtendedSkillSuggestion => {
-    const initialAttributeNames = suggestion.linkedAttributeNames || [];
-
-    return {
-      ...suggestion,
-      accepted,
-      showDetails,
-      selectedAttributeNames: initialAttributeNames,
-      // Store original values for modification tracking
-      originalName: suggestion.originalName || suggestion.name,
-      originalDescription:
-        suggestion.originalDescription || suggestion.description,
-      originalDifficulty:
-        suggestion.originalDifficulty || suggestion.difficulty,
-      isModified: false,
-    };
-  };
-
-  /**
-   * Initialize local suggestions state with all skills accepted by default
-   *
-   * This provides a better UX by starting with all AI suggestions selected,
-   * allowing users to deselect what they don't want rather than having to
-   * manually select everything they do want.
-   */
-  const [localSuggestions, setLocalSuggestions] = useState<
-    ExtendedSkillSuggestion[]
-  >(() => {
-    // Start with all suggestions accepted by default for better UX
-    return suggestions.map((suggestion, index) => {
-      // Use the suggestion's accepted value, defaulting to true if not specified
-      const accepted =
-        suggestion.accepted !== undefined ? suggestion.accepted : true;
-      const showDetails = index === 0; // Show details only for the first one
-
-      return initializeSuggestionWithTracking(
-        suggestion,
-        accepted,
-        showDetails
-      );
-    });
+  // Links to attributes that were later excluded are dropped from the saved
+  // skill but kept on the suggestion, so re-including the attribute restores them.
+  const toWorldSkill = (s: ReviewedSkill): WorldSkill => ({
+    id: s.id ?? generateUniqueId('skill'),
+    worldId: '',
+    name: s.name,
+    description: s.description,
+    difficulty: s.difficulty,
+    category: s.category,
+    baseValue: s.baseValue,
+    minValue: SKILL_MIN_VALUE,
+    maxValue: SKILL_MAX_VALUE,
+    attributeIds: (s.attributeIds ?? []).filter((id) =>
+      attributes.some((a) => a.id === id)
+    ),
   });
 
-  // Update local state only on initial load or when suggestions change
-  useEffect(() => {
-    // This should only run on initial mount or when suggestions change from parent
-    // Not on every worldData update to prevent overriding user toggles
-    if (suggestions.length > 0) {
-      const newSuggestions = suggestions.map((suggestion, index) => {
-        // Use the suggestion's accepted value, defaulting to true if not specified
-        const accepted =
-          suggestion.accepted !== undefined ? suggestion.accepted : true;
-        const showDetails = index === 0; // Show details for the first one
-
-        return initializeSuggestionWithTracking(
-          suggestion,
-          accepted,
-          showDetails
-        );
-      });
-
-      setLocalSuggestions(newSuggestions);
-
-      // Automatically save the initially selected skills to parent state
-      const acceptedSkills = newSuggestions
-        .filter((s) => s.accepted)
-        .map((s) => ({
-          id: generateUniqueId('skill'),
-          worldId: '',
-          name: s.name,
-          description: s.description,
-          difficulty: s.difficulty,
-          category: s.category,
-          baseValue: SKILL_DEFAULT_VALUE,
-          minValue: SKILL_MIN_VALUE,
-          maxValue: SKILL_MAX_VALUE,
-          attributeIds: convertAttributeNamesToIds(
-            s.selectedAttributeNames || s.linkedAttributeNames || []
-          ),
-        }));
-
-      // Only update if we don't already have skills or if the count is different
-      if (
-        !worldData.skills ||
-        worldData.skills.length !== acceptedSkills.length
-      ) {
-        onUpdate({ ...worldData, skills: acceptedSkills });
-      }
-    } else {
-      // Clear AI suggestions when they are removed (preserves custom skills)
-      setLocalSuggestions([]);
-
-      // Update worldData to only contain custom skills (preserving user's manual work)
-      // Only update if skills have actually changed to prevent infinite loop
-      const currentSkillIds = (worldData.skills || [])
-        .map((s) => s.id)
-        .sort()
-        .join(',');
-      const customSkillIds = customSkills
-        .map((s) => s.id)
-        .sort()
-        .join(',');
-
-      if (currentSkillIds !== customSkillIds) {
-        onUpdate({ ...worldData, skills: customSkills });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suggestions]); // Only depend on suggestions, not worldData.skills
-
-  const handleToggleSkill = (index: number) => {
-    // Toggle the state in a new array
-    const updatedSuggestions = [...localSuggestions];
-    const currentSuggestion = updatedSuggestions[index];
-
-    updatedSuggestions[index] = {
-      ...currentSuggestion,
-      accepted: !currentSuggestion.accepted,
-      // Keep existing isModified state - modification status persists
-    };
-
-    // Update local state
-    setLocalSuggestions(updatedSuggestions);
-
-    // Calculate and update world skills immediately
-    const allSkills = mergeAllSkills(updatedSuggestions, customSkills);
-    onUpdate({ ...worldData, skills: allSkills });
+  const commit = (
+    nextSuggestions: ReviewedSkill[],
+    nextCustom: WorldSkill[] = customSkills
+  ) => {
+    onUpdate({
+      ...(worldData.aiSuggestions && {
+        aiSuggestions: { ...worldData.aiSuggestions, skills: nextSuggestions },
+      }),
+      skills: [
+        ...nextSuggestions.filter((s) => s.accepted).map(toWorldSkill),
+        ...nextCustom,
+      ],
+    });
   };
 
-  /**
-   * Helper function to check if a skill has been modified from its original values
-   */
-  const isSkillModified = (suggestion: ExtendedSkillSuggestion): boolean => {
-    return (
-      suggestion.name !== suggestion.originalName ||
-      suggestion.description !== suggestion.originalDescription ||
-      suggestion.difficulty !== suggestion.originalDifficulty
+  const updateSuggestion = (index: number, changes: Partial<ReviewedSkill>) => {
+    commit(suggestions.map((s, i) => (i === index ? { ...s, ...changes } : s)));
+  };
+
+  // First visit after suggestions arrive: give each one a stable id, resolve
+  // its linked attribute names to ids, and accept as many as the world limit
+  // allows. Later visits find the ids already in worldData and change nothing.
+  useEffect(() => {
+    if (suggestions.length === 0 || suggestions.every((s) => s.id)) return;
+    // A draft saved before suggestions carried ids still has the saved
+    // skills; adopt them by name so they aren't mistaken for custom ones.
+    const { adopted, remaining } = adoptLegacyEntries(suggestions, customSkills);
+    let openSlots = maxSkills - remaining.length - adopted.size;
+    commit(
+      suggestions.map((s) => {
+        const match = adopted.get(s);
+        // Analyzer output can omit `accepted`; treat that as accepted.
+        const accepted = match ? true : (s.accepted ?? true) && openSlots > 0;
+        if (accepted && !match) openSlots -= 1;
+        return {
+          ...s,
+          id: match?.id ?? s.id ?? generateUniqueId('skill'),
+          accepted,
+          baseValue: match?.baseValue ?? SKILL_DEFAULT_VALUE,
+          attributeIds:
+            match?.attributeIds ??
+            (s.linkedAttributeNames ?? [])
+              .map((name) => attributes.find((a) => a.name === name)?.id)
+              .filter((id): id is string => Boolean(id)),
+          originalName: s.name,
+          originalDescription: s.description,
+          originalDifficulty: s.difficulty,
+          isModified: false,
+        };
+      }),
+      remaining
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestions]);
+
+  const handleToggleSkill = (index: number) => {
+    const target = suggestions[index];
+    if (!target.accepted && acceptedCount >= maxSkills) return;
+    updateSuggestion(index, { accepted: !target.accepted });
   };
 
   const handleModifySkill = (
     index: number,
-    field: keyof SkillSuggestion,
+    field: 'name' | 'description' | 'difficulty',
     value: string
   ) => {
-    const updatedSuggestions = [...localSuggestions];
-    const updatedSuggestion = { ...updatedSuggestions[index], [field]: value };
-
-    // Check if the skill is now modified
-    updatedSuggestion.isModified = isSkillModified(updatedSuggestion);
-
-    updatedSuggestions[index] = updatedSuggestion;
-    setLocalSuggestions(updatedSuggestions);
-
-    // Calculate and update world skills immediately
-    const allSkills = mergeAllSkills(updatedSuggestions, customSkills);
-    onUpdate({ ...worldData, skills: allSkills });
+    const updated = { ...suggestions[index], [field]: value };
+    updateSuggestion(index, {
+      [field]: value,
+      isModified:
+        updated.name !== updated.originalName ||
+        updated.description !== updated.originalDescription ||
+        updated.difficulty !== updated.originalDifficulty,
+    });
   };
 
-  const handleAttributeToggle = (skillIndex: number, attributeName: string) => {
-    const updatedSuggestions = [...localSuggestions];
-    const currentAttributes =
-      updatedSuggestions[skillIndex].selectedAttributeNames || [];
+  const handleAttributeToggle = (skillIndex: number, attributeId: string) => {
+    const current = suggestions[skillIndex].attributeIds ?? [];
+    updateSuggestion(skillIndex, {
+      attributeIds: current.includes(attributeId)
+        ? current.filter((id) => id !== attributeId)
+        : [...current, attributeId],
+    });
+  };
 
-    let newAttributes: string[];
-    if (currentAttributes.includes(attributeName)) {
-      // Remove attribute
-      newAttributes = currentAttributes.filter(
-        (name) => name !== attributeName
-      );
-    } else {
-      // Add attribute
-      newAttributes = [...currentAttributes, attributeName];
-    }
-
-    updatedSuggestions[skillIndex] = {
-      ...updatedSuggestions[skillIndex],
-      selectedAttributeNames: newAttributes,
-    };
-
-    setLocalSuggestions(updatedSuggestions);
-
-    // Calculate and update world skills immediately
-    const allSkills = mergeAllSkills(updatedSuggestions, customSkills);
-    onUpdate({ ...worldData, skills: allSkills });
+  const toggleDetails = (index: number) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
   };
 
   // Custom skill handlers
@@ -365,25 +223,13 @@ export default function SkillReviewStep({
   };
 
   const handleSaveCustomSkill = (skill: WorldSkill) => {
-    let updatedCustomSkills: WorldSkill[];
+    const updatedCustomSkills = editingCustomSkillId
+      ? customSkills.map((s) => (s.id === editingCustomSkillId ? skill : s))
+      : [...customSkills, skill];
 
-    if (editingCustomSkillId) {
-      // Edit existing custom skill
-      updatedCustomSkills = customSkills.map((s) =>
-        s.id === editingCustomSkillId ? skill : s
-      );
-    } else {
-      // Add new custom skill
-      updatedCustomSkills = [...customSkills, skill];
-    }
-
-    setCustomSkills(updatedCustomSkills);
     setIsCreatingCustomSkill(false);
     setEditingCustomSkillId(null);
-
-    // Recalculate world skills
-    const allSkills = mergeAllSkills(localSuggestions, updatedCustomSkills);
-    onUpdate({ ...worldData, skills: allSkills });
+    commit(suggestions, updatedCustomSkills);
   };
 
   const handleEditCustomSkill = (skillId: string) => {
@@ -392,12 +238,10 @@ export default function SkillReviewStep({
   };
 
   const handleDeleteCustomSkill = (skillId: string) => {
-    const updatedCustomSkills = customSkills.filter((s) => s.id !== skillId);
-    setCustomSkills(updatedCustomSkills);
-
-    // Recalculate world skills
-    const allSkills = mergeAllSkills(localSuggestions, updatedCustomSkills);
-    onUpdate({ ...worldData, skills: allSkills });
+    commit(
+      suggestions,
+      customSkills.filter((s) => s.id !== skillId)
+    );
   };
 
   const handleCancelCustomSkill = () => {
@@ -415,14 +259,11 @@ export default function SkillReviewStep({
   const showClearButton =
     worldData.aiSuggestionMeta?.source === 'ai' && suggestions.length > 0;
 
-  const acceptedCount =
-    localSuggestions.filter((s) => s.accepted).length + customSkills.length;
-
   return (
     <div data-testid="skill-review-step">
       <WizardFormSection
         title="Review Skills"
-        description="Keep the skills that fit your world. At least one, up to 12."
+        description={`Keep the skills that fit your world. At least one, up to ${maxSkills}.`}
         dataTutorial="skill-editor"
       >
         {showClearButton && (
@@ -440,7 +281,7 @@ export default function SkillReviewStep({
         )}
 
         <div className="wizard-review-list">
-          {(localSuggestions.length > 0 || customSkills.length > 0) && (
+          {(suggestions.length > 0 || customSkills.length > 0) && (
             <div
               className="wizard-difficulty-legend"
               data-testid="skill-difficulty-legend"
@@ -458,7 +299,7 @@ export default function SkillReviewStep({
             </div>
           )}
           <div className="wizard-review-suggestions">
-            {localSuggestions.length === 0 ? (
+            {suggestions.length === 0 ? (
               <div className="wizard-empty-state">
                 <p>No skill suggestions available</p>
                 <p>
@@ -466,7 +307,7 @@ export default function SkillReviewStep({
                 </p>
               </div>
             ) : (
-              localSuggestions.map((suggestion, index) => (
+              suggestions.map((suggestion, index) => (
                 <div
                   key={index}
                   className={`${wizardStyles.card.base} wizard-review-card`}
@@ -482,13 +323,15 @@ export default function SkillReviewStep({
                         {suggestion.difficulty}
                       </span>
                       {suggestion.isModified && <span>Modified</span>}
-                      {suggestion.selectedAttributeNames &&
-                        suggestion.selectedAttributeNames.length > 0 && (
-                          <span>
-                            Linked:{' '}
-                            {suggestion.selectedAttributeNames.join(', ')}
-                          </span>
-                        )}
+                      {attributes.some((a) => suggestion.attributeIds?.includes(a.id)) && (
+                        <span>
+                          Linked:{' '}
+                          {attributes
+                            .filter((a) => suggestion.attributeIds?.includes(a.id))
+                            .map((a) => a.name)
+                            .join(', ')}
+                        </span>
+                      )}
                     </div>
 
                     <div className="wizard-review-card-tools">
@@ -498,15 +341,10 @@ export default function SkillReviewStep({
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          const newSuggestions = [...localSuggestions];
-                          newSuggestions[index] = {
-                            ...newSuggestions[index],
-                            showDetails: !newSuggestions[index].showDetails,
-                          };
-                          setLocalSuggestions(newSuggestions);
+                          toggleDetails(index);
                         }}
                       >
-                        {suggestion.showDetails ? 'Hide details' : 'Customize'}
+                        {expanded.has(index) ? 'Hide details' : 'Customize'}
                       </Button>
                       <Button
                         type="button"
@@ -515,13 +353,14 @@ export default function SkillReviewStep({
                         variant="outline"
                         size="sm"
                         aria-pressed={suggestion.accepted}
+                        disabled={!suggestion.accepted && acceptedCount >= maxSkills}
                       >
                         {suggestion.accepted ? 'Selected' : 'Excluded'}
                       </Button>
                     </div>
                   </div>
 
-                  {suggestion.showDetails && (
+                  {expanded.has(index) && (
                     <div
                       key={`skill-expanded-${index}`}
                       className="wizard-review-card-detail"
@@ -574,9 +413,8 @@ export default function SkillReviewStep({
                               className="wizard-skill-attr-grid"
                               data-testid={`skill-attributes-${index}`}
                             >
-                              {worldData.attributes &&
-                              worldData.attributes.length > 0 ? (
-                                worldData.attributes.map((attribute) => (
+                              {attributes.length > 0 ? (
+                                attributes.map((attribute) => (
                                   <div
                                     key={attribute.id}
                                     className="wizard-skill-attr-option"
@@ -584,14 +422,14 @@ export default function SkillReviewStep({
                                     <Checkbox
                                       id={`skill-${index}-attribute-${attribute.id}`}
                                       checked={
-                                        suggestion.selectedAttributeNames?.includes(
-                                          attribute.name
+                                        suggestion.attributeIds?.includes(
+                                          attribute.id
                                         ) || false
                                       }
                                       onChange={() =>
                                         handleAttributeToggle(
                                           index,
-                                          attribute.name
+                                          attribute.id
                                         )
                                       }
                                       label={attribute.name}
@@ -615,43 +453,13 @@ export default function SkillReviewStep({
 
                       {/* Default Value Range Editor */}
                       <div>
-                        {/* Create a temporary skill object for the range editor */}
-                        {worldData.skills?.some(
-                          (skill) => skill.name === suggestion.name
-                        ) && (
+                        {suggestion.accepted && (
                           <SkillRangeEditor
-                            skill={{
-                              id:
-                                worldData.skills.find(
-                                  (skill) => skill.name === suggestion.name
-                                )?.id || '',
-                              worldId: '',
-                              name: suggestion.name,
-                              description: suggestion.description,
-                              difficulty: suggestion.difficulty,
-                              baseValue:
-                                worldData.skills.find(
-                                  (skill) => skill.name === suggestion.name
-                                )?.baseValue || SKILL_DEFAULT_VALUE,
-                              minValue: SKILL_MIN_VALUE,
-                              maxValue: SKILL_MAX_VALUE,
-                              category: suggestion.category,
-                              attributeIds:
-                                worldData.skills.find(
-                                  (skill) => skill.name === suggestion.name
-                                )?.attributeIds || [],
-                            }}
+                            skill={toWorldSkill(suggestion)}
                             onChange={(updates) => {
-                              // Find the skill in the worldData and update it
-                              const updatedSkills = worldData.skills?.map(
-                                (skill) => {
-                                  if (skill.name === suggestion.name) {
-                                    return { ...skill, ...updates };
-                                  }
-                                  return skill;
-                                }
-                              );
-                              onUpdate({ ...worldData, skills: updatedSkills });
+                              if (updates.baseValue !== undefined) {
+                                updateSuggestion(index, { baseValue: updates.baseValue });
+                              }
                             }}
                             showLevelDescriptions={true}
                           />
@@ -675,7 +483,7 @@ export default function SkillReviewStep({
                 <h3 className="wizard-subheading">Custom Skills</h3>
                 <p>
                   Create your own unique skills for this world ({acceptedCount}
-                  /12 slots used)
+                  /{maxSkills} slots used)
                 </p>
               </div>
               <Button
@@ -684,7 +492,7 @@ export default function SkillReviewStep({
                 variant="outline"
                 size="sm"
                 data-testid="add-custom-skill-button"
-                disabled={acceptedCount >= 12}
+                disabled={acceptedCount >= maxSkills}
               >
                 + Add Custom Skill
               </Button>
@@ -694,8 +502,8 @@ export default function SkillReviewStep({
               <div className="wizard-empty-state">
                 <p>No custom skills yet</p>
                 <p>
-                  {acceptedCount < 12
-                    ? `You have ${12 - acceptedCount} skill slot${12 - acceptedCount !== 1 ? 's' : ''} available for custom skills`
+                  {acceptedCount < maxSkills
+                    ? `You have ${maxSkills - acceptedCount} skill slot${maxSkills - acceptedCount !== 1 ? 's' : ''} available for custom skills`
                     : 'Remove some suggested skills to add custom ones'}
                 </p>
               </div>
@@ -721,7 +529,7 @@ export default function SkillReviewStep({
                                                           {skill.attributeIds
                                                             .map(
                                                               (attrId) =>
-                                                                worldData.attributes?.find(
+                                                                attributes.find(
                                                                   (attr) => attr.id === attrId
                                                                 )?.name
                                                             )
@@ -763,12 +571,9 @@ export default function SkillReviewStep({
                   worldId={worldData.id || ''}
                   mode={editingCustomSkillId ? 'edit' : 'create'}
                   skillId={editingCustomSkillId || undefined}
-                  existingSkills={[
-                    ...customSkills,
-                    ...(worldData.skills || []),
-                  ]}
-                  existingAttributes={worldData.attributes || []}
-                  maxSkills={12}
+                  existingSkills={worldData.skills ?? []}
+                  existingAttributes={attributes}
+                  maxSkills={maxSkills}
                   onSave={handleSaveCustomSkill}
                   onDelete={
                     editingCustomSkillId ? handleDeleteCustomSkill : undefined
@@ -787,18 +592,18 @@ export default function SkillReviewStep({
         >
           <div className="wizard-slot-summary-text">
             <div className="wizard-slot-summary-count">
-              <span>Skills Selected: {acceptedCount} / 12</span>
-              {acceptedCount >= 12 && <span>(Maximum reached)</span>}
+              <span>Skills Selected: {acceptedCount} / {maxSkills}</span>
+              {acceptedCount >= maxSkills && <span>(Maximum reached)</span>}
             </div>
             <div className="wizard-slot-summary-note">
-              {acceptedCount < 12
-                ? `${12 - acceptedCount} slot${12 - acceptedCount !== 1 ? 's' : ''} available`
+              {acceptedCount < maxSkills
+                ? `${maxSkills - acceptedCount} slot${maxSkills - acceptedCount !== 1 ? 's' : ''} available`
                 : 'All slots filled'}
             </div>
           </div>
           <div className="wizard-slot-meter-wrap">
             <div className="wizard-slot-meter">
-              {Array.from({ length: 12 }).map((_, i) => (
+              {Array.from({ length: maxSkills }).map((_, i) => (
                 <div
                   key={i}
                   className={
@@ -817,45 +622,16 @@ export default function SkillReviewStep({
         <div className={wizardStyles.form.error}>{errors.skills}</div>
       )}
 
-      {/* Clear Suggestions Confirmation Dialog */}
-      {showClearConfirmation && (
-        <div
-          className="wizard-dialog-overlay"
-          data-testid="clear-suggestions-dialog"
-          role="alertdialog"
-          aria-modal="true"
-          aria-labelledby="clear-skills-dialog-title"
-        >
-          <div className="wizard-dialog-panel">
-            <h3 id="clear-skills-dialog-title">Clear Suggestions?</h3>
-            <p>
-              This will remove all skill suggestions. You can still add custom
-              skills or regenerate suggestions later.
-            </p>
-            <div className="wizard-dialog-actions">
-              <Button
-                type="button"
-                onClick={() => setShowClearConfirmation(false)}
-                variant="outline"
-                size="sm"
-                data-testid="cancel-clear-button"
-                autoFocus
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleClearSuggestions}
-                variant="destructive"
-                size="sm"
-                data-testid="confirm-clear-button"
-              >
-                Clear Suggestions
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmationDialog
+        isOpen={showClearConfirmation}
+        onClose={() => setShowClearConfirmation(false)}
+        onConfirm={handleClearSuggestions}
+        title="Clear Suggestions?"
+        message="This removes every suggested attribute and skill, on both review steps. Custom attributes and skills you added stay. You can generate new suggestions from the description step."
+        variant="destructive"
+        confirmText="Clear Suggestions"
+        cancelText="Cancel"
+      />
     </div>
   );
 }

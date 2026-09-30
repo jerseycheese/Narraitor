@@ -109,31 +109,6 @@
   },
   {
     "type": "cycle",
-    "from": "src/components/WorldCreationWizard/steps/AttributeReviewStep.tsx",
-    "to": "src/components/WorldCreationWizard/WorldCreationWizard.tsx",
-    "rule": {
-      "severity": "warn",
-      "name": "no-circular"
-    },
-    "cycle": [
-      {
-        "name": "src/components/WorldCreationWizard/WorldCreationWizard.tsx",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      },
-      {
-        "name": "src/components/WorldCreationWizard/steps/AttributeReviewStep.tsx",
-        "dependencyTypes": [
-          "local",
-          "import"
-        ]
-      }
-    ]
-  },
-  {
-    "type": "cycle",
     "from": "src/components/WorldCreationWizard/WorldCreationWizard.tsx",
     "to": "src/lib/ai/worldAnalyzerClient.ts",
     "rule": {
