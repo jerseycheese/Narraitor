@@ -1,37 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SkillReviewStep from './SkillReviewStep';
-import { SkillSuggestion } from '@/types/ai-suggestions.types';
-import { World } from '@/types/world.types';
+import { SkillSuggestion, WorldCreationData } from '../WizardState';
 
-const mockOnUpdate = jest.fn();
+const skill = (name: string, accepted: boolean, linked: string[]): SkillSuggestion => ({
+  name,
+  description: `${name} description`,
+  difficulty: 'medium',
+  category: 'General',
+  linkedAttributeNames: linked,
+  accepted,
+  baseValue: 3,
+  minValue: 1,
+  maxValue: 5,
+});
 
-const mockSuggestions: SkillSuggestion[] = [
-  {
-    name: 'Combat',
-    description: 'Ability to fight in battle',
-    difficulty: 'medium',
-    category: 'Combat',
-    linkedAttributeNames: ['Strength'],
-    accepted: true,
-    baseValue: 3,
-    minValue: 1,
-    maxValue: 5,
-  },
-  {
-    name: 'Stealth',
-    description: 'Ability to move unseen',
-    difficulty: 'hard',
-    category: 'Physical',
-    linkedAttributeNames: ['Dexterity'],
-    accepted: false,
-    baseValue: 2,
-    minValue: 1,
-    maxValue: 5,
-  },
-];
-
-const defaultWorldData: Partial<World> = {
+const baseData = (skills: SkillSuggestion[]): WorldCreationData => ({
   name: 'Test World',
   genre: 'fantasy',
   attributes: [
@@ -45,121 +29,61 @@ const defaultWorldData: Partial<World> = {
       maxValue: 10,
     },
   ],
-  skills: [],
+  aiSuggestions: { attributes: [], skills },
+});
+
+let latest: WorldCreationData;
+
+/** Holds worldData the way the wizard does, so the step re-renders from its own updates. */
+const Harness = ({
+  initial,
+  errors = {},
+}: {
+  initial: WorldCreationData;
+  errors?: Record<string, string>;
+}) => {
+  const [data, setData] = useState(initial);
+  latest = data;
+  return (
+    <SkillReviewStep
+      worldData={data}
+      errors={errors}
+      onUpdate={(updates) => setData((prev) => ({ ...prev, ...updates }))}
+    />
+  );
 };
 
 describe('SkillReviewStep', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  it('saves accepted suggestions linked to attribute ids', () => {
+    render(
+      <Harness initial={baseData([skill('Combat', true, ['Strength']), skill('Stealth', false, [])])} />
+    );
+
+    expect(screen.getByText('Review Skills')).toBeInTheDocument();
+    expect(screen.getByTestId('skill-toggle-1')).toHaveTextContent('Excluded');
+    expect(latest.skills).toEqual([
+      expect.objectContaining({ name: 'Combat', attributeIds: ['attr-1'] }),
+    ]);
   });
 
-  describe('Core Functionality', () => {
-    it('displays skill suggestions and allows selection toggle', () => {
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={mockSuggestions}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
+  it('toggles skill selection when clicked', () => {
+    render(<Harness initial={baseData([skill('Combat', true, [])])} />);
 
-      expect(screen.getByText('Review Skills')).toBeInTheDocument();
-      expect(screen.getByText('Combat')).toBeInTheDocument();
-      expect(screen.getByText('Stealth')).toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByTestId('skill-toggle-0'));
 
-    it('toggles skill selection when clicked', () => {
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={mockSuggestions}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      const toggleButton = screen.getByTestId('skill-toggle-0');
-      expect(toggleButton).toHaveTextContent('Selected');
-      
-      fireEvent.click(toggleButton);
-      expect(toggleButton).toHaveTextContent('Excluded');
-      
-      expect(mockOnUpdate).toHaveBeenCalledWith(expect.objectContaining({
-        skills: expect.any(Array)
-      }));
-    });
-
-    it('handles skill interaction workflow', () => {
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={mockSuggestions}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      // Should render with skills displayed
-      expect(screen.getByText('Combat')).toBeInTheDocument();
-      expect(screen.getByText('Stealth')).toBeInTheDocument();
-      
-      // onUpdate should be called during rendering due to auto-applying suggestions
-      expect(mockOnUpdate).toHaveBeenCalled();
-    });
+    expect(screen.getByTestId('skill-toggle-0')).toHaveTextContent('Excluded');
+    expect(latest.skills).toEqual([]);
   });
 
-  describe('Validation', () => {
-    it('displays validation errors when present', () => {
-      const errors = {
-        skills: 'At least one skill must be selected'
-      };
+  it('displays validation errors and handles no suggestions', () => {
+    render(
+      <Harness
+        initial={baseData([])}
+        errors={{ skills: 'At least one skill must be selected' }}
+      />
+    );
 
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={[]}
-          errors={errors}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      expect(screen.getByText('At least one skill must be selected')).toBeInTheDocument();
-    });
-
-    it('handles empty suggestions gracefully', () => {
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={[]}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      expect(screen.getByText('Review Skills')).toBeInTheDocument();
-      // Should not crash with empty suggestions
-    });
-  });
-
-  describe('Integration', () => {
-    it('updates world data with skills from suggestions', () => {
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={mockSuggestions}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      // Component should auto-apply accepted suggestions and call onUpdate
-      expect(mockOnUpdate).toHaveBeenCalledWith(expect.objectContaining({
-        skills: expect.any(Array)
-      }));
-      
-      // Should display the skill content
-      expect(screen.getByText('Combat')).toBeInTheDocument();
-    });
+    expect(screen.getByText('At least one skill must be selected')).toBeInTheDocument();
+    expect(screen.getByText('No skill suggestions available')).toBeInTheDocument();
   });
 });

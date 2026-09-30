@@ -11,6 +11,8 @@ export interface AttributeSuggestion {
   baseValue: number;
   category?: string;
   accepted: boolean;
+  /** Assigned when the review step first sees the suggestion; shared with the saved attribute. */
+  id?: string;
 }
 
 export interface SkillSuggestion {
@@ -23,7 +25,19 @@ export interface SkillSuggestion {
   baseValue: number;
   minValue: number;
   maxValue: number;
+  /** Assigned when the review step first sees the suggestion; shared with the saved skill. */
+  id?: string;
+  /** Linked attribute ids, resolved from linkedAttributeNames when the suggestion is first reviewed. */
+  attributeIds?: string[];
 }
+
+/**
+ * Per-world selection limits the wizard seeds into `settings`. The settings
+ * values are the source of truth once seeded: worldStore and the world
+ * editor enforce them, and the review steps read them back.
+ */
+export const WIZARD_MAX_ATTRIBUTES = 6;
+export const WIZARD_MAX_SKILLS = 12;
 
 export const WIZARD_STEPS = [
   { id: 'basic-info', label: 'Basic Information' },
@@ -49,6 +63,22 @@ export interface WorldCreationData extends Partial<World> {
     source: AIGuidanceSource;
     generatedAt?: string;
     descriptionSnapshot?: string;
+  };
+}
+
+/**
+ * Drops the attributes and skills that came from reviewed AI suggestions,
+ * keeping the player's custom ones. Used when suggestions are cleared or
+ * regenerated, since those entries no longer have a suggestion behind them.
+ */
+export function withoutSuggestedEntries(
+  data: WorldCreationData
+): Pick<WorldCreationData, 'attributes' | 'skills'> {
+  const attributeIds = new Set(data.aiSuggestions?.attributes.map((s) => s.id));
+  const skillIds = new Set(data.aiSuggestions?.skills.map((s) => s.id));
+  return {
+    attributes: data.attributes?.filter((a) => !attributeIds.has(a.id)),
+    skills: data.skills?.filter((s) => !skillIds.has(s.id)),
   };
 }
 

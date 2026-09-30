@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useProviderStore } from '@/state/providerStore';
-import { World } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
 import {
@@ -39,6 +38,9 @@ import {
   isValidWorldDraft,
   analyzeWorldDraftRecovery,
   hasWorldDraftData,
+  withoutSuggestedEntries,
+  WIZARD_MAX_ATTRIBUTES,
+  WIZARD_MAX_SKILLS,
 } from './WizardState';
 import { AIGuidanceSource } from '@/lib/constants/worldGuidance';
 import { generateWorldImage } from '@/lib/ai/worldImageGenerator';
@@ -110,8 +112,8 @@ export default function WorldCreationWizard({
   // allowing external components to override any default values
   const initialWorldData: WorldCreationData = useMemo(() => ({
     settings: {
-      maxAttributes: 10,
-      maxSkills: 10,
+      maxAttributes: WIZARD_MAX_ATTRIBUTES,
+      maxSkills: WIZARD_MAX_SKILLS,
       attributePointPool: 20,
       skillPointPool: 20
     },
@@ -314,6 +316,7 @@ export default function WorldCreationWizard({
 
   // Cancel confirmation dialog state
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
   // Dirty state detection - check if user has made meaningful changes
   const isDirty = useMemo(() => {
     const currentData = wizard.state.data;
@@ -348,6 +351,7 @@ export default function WorldCreationWizard({
       const suggestions = await analyzeWorldDescriptionClient(description);
       
       wizard.updateData({ 
+        ...withoutSuggestedEntries(wizardDataRef.current),
         aiSuggestions: suggestions,
         aiSuggestionsGenerated: true,
         aiSuggestionMeta: buildSuggestionMeta(description, 'ai'),
@@ -358,6 +362,7 @@ export default function WorldCreationWizard({
       // Use default suggestions as fallback
       const defaultSuggestions = getDefaultSuggestions();
       wizard.updateData({ 
+        ...withoutSuggestedEntries(wizardDataRef.current),
         aiSuggestions: defaultSuggestions,
         aiSuggestionsGenerated: true,
         aiSuggestionMeta: buildSuggestionMeta(description, 'fallback'),
@@ -384,12 +389,13 @@ export default function WorldCreationWizard({
   ]);
 
   const clearAISuggestions = useCallback(() => {
+    // Removes suggested attributes and skills on both review steps; custom
+    // entries the player added stay.
     wizard.updateData({
+      ...withoutSuggestedEntries(wizardDataRef.current),
       aiSuggestions: undefined,
       aiSuggestionsGenerated: false,
       aiSuggestionMeta: undefined,
-      // Note: Don't clear attributes/skills here - let the step components
-      // preserve custom attributes/skills that the user manually created
     });
   }, [wizard.updateData]);
 
@@ -483,11 +489,12 @@ export default function WorldCreationWizard({
   }, [onComplete, router]);
 
   const handleComplete = useCallback(async () => {
-    clearAutoSave();
     const data = wizard.state.data;
+    setCreateError(null);
 
     // If the world was already created (e.g. returning to finalize), just finish.
     if (data.createdWorldId) {
+      clearAutoSave();
       finishWizard(data.createdWorldId);
       return;
     }
@@ -513,6 +520,7 @@ export default function WorldCreationWizard({
 
       // Store the world ID in wizard state
       wizard.updateData({ createdWorldId: worldId });
+      clearAutoSave();
 
       // Generate world image asynchronously after creation (only if no image was already generated)
       if (!data.image?.url) {
@@ -537,11 +545,9 @@ export default function WorldCreationWizard({
 
       finishWizard(worldId);
     } catch (error) {
-      // Fallback error handling — log so failures are observable
-      logger.error('[WorldCreationWizard] handleComplete failed, using fallback world id:', error);
-      const worldId = `world-${Date.now()}`;
-      wizard.updateData({ createdWorldId: worldId });
-      finishWizard(worldId);
+      // Stay on this step with the draft intact so the player can retry.
+      logger.error('[WorldCreationWizard] createWorld failed:', error);
+      setCreateError("We couldn't create this world. Your progress is saved here, so try Create World again.");
     }
   }, [
     wizard.state.data,
@@ -551,7 +557,7 @@ export default function WorldCreationWizard({
     clearAutoSave,
   ]);
 
-  const updateWorldData = useCallback((updates: Partial<World>) => {
+  const updateWorldData = useCallback((updates: Partial<WorldCreationData>) => {
     // Step components spread the entire step data plus one changed value
     // into `updates`, so diff against the last known data to find which
     // field(s) actually changed rather than treating every key as touched.
@@ -605,7 +611,6 @@ export default function WorldCreationWizard({
           <div>
             <AttributeReviewStep
               {...stepProps}
-              suggestions={wizard.state.data.aiSuggestions?.attributes || []}
               onClearSuggestions={clearAISuggestions}
             />
           </div>
@@ -615,7 +620,6 @@ export default function WorldCreationWizard({
           <div>
             <SkillReviewStep
               {...stepProps}
-              suggestions={wizard.state.data.aiSuggestions?.skills || []}
               onClearSuggestions={clearAISuggestions}
             />
           </div>
@@ -623,13 +627,7 @@ export default function WorldCreationWizard({
       case 4:
         return (
           <div>
-            <FinalizeStep
-              {...stepProps}
-              onComplete={handleComplete}
-              onBack={handleBack}
-              onCancel={handleCancel}
-              onUpdateWorldData={updateWorldData}
-            />
+            <FinalizeStep {...stepProps} />
           </div>
         );
       default:
@@ -658,7 +656,7 @@ export default function WorldCreationWizard({
         />
         
         <div className="wizard-surface">
-          <WizardStep error={currentError}>
+          <WizardStep error={currentError ?? createError}>
             <div key="wizard-content" data-testid="wizard-content">
               {renderCurrentStep()}
             </div>
