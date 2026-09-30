@@ -328,10 +328,9 @@ describe('TurnResolver', () => {
       expect(result.segment.metadata.location).toBe('Muddy Lake');
       expect(result.snapshot.sceneState?.location).toBe('Muddy Lake');
       expect(result.snapshot.sceneState?.presentNpcIds).toContain('npc-guard');
-      const promptContext = (generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext.currentSituation;
-      expect(promptContext).toContain('CURRENT PLACE: Muddy Lake');
-      expect(promptContext).toContain('PRESENT NPCS: Guard');
-      expect(promptContext).toContain('metadata.sceneTransition');
+      const promptContext = (generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext;
+      expect(promptContext.currentSituation).toBe('Player chose: "Head north"');
+      expect(promptContext.sceneState).toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'] });
     });
 
     it('moves the recorded place only for a structured transition', async () => {
@@ -351,6 +350,41 @@ describe('TurnResolver', () => {
       const result = await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
       expect(result.segment.metadata.location).toBe('Old Mill');
       expect(result.snapshot.sceneState?.location).toBe('Old Mill');
+    });
+
+    it('uses the transition target when the stored location label conflicts', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().setLocation(sessionId, 'Muddy Lake');
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const generator = makeMockGenerator(makeGenerationResult({
+        metadata: {
+          characterIds: [], tags: [], location: "the kitchen's",
+          sceneTransition: { to: 'Council room' },
+        },
+      }));
+      const addSegment = useNarrativeStore.getState().addSegment;
+      const addSegmentSpy = jest.spyOn(useNarrativeStore.getState(), 'addSegment').mockImplementation(
+        (...args) => {
+          const id = addSegment(...args);
+          const segment = useNarrativeStore.getState().segments[id];
+          useNarrativeStore.setState((state) => ({
+            segments: {
+              ...state.segments,
+              [id]: { ...segment, metadata: { ...segment.metadata, location: "the kitchen's" } },
+            },
+          }));
+          return id;
+        }
+      );
+      try {
+        const result = await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
+        expect(result.snapshot.sceneState?.location).toBe('Council room');
+      } finally {
+        addSegmentSpy.mockRestore();
+        useNarrativeStore.setState({ addSegment });
+      }
     });
 
     it('keeps the existing location label behavior with SCENE_STATE off', async () => {

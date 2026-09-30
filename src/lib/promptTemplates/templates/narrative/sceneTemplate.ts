@@ -131,7 +131,10 @@ ${worldDescriptionSection}${backgroundSection}
 STORY SO FAR:
 ${recentContent}
 
-${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
+${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}${scenePresenceEnabled && narrativeContext?.sceneState ? `
+CURRENT PLACE: ${narrativeContext.sceneState.location ?? 'not yet established'}
+PRESENT NPCS: ${narrativeContext.sceneState.presentNpcNames.join(', ') || 'none'}
+When the action moves to a new place, report metadata.sceneTransition as {"to":"new place"}; otherwise omit it. metadata.location is only a label.` : ''}
 
 ${skillResult ? `
 SKILL CHECK RESULT GUIDANCE:
@@ -256,7 +259,7 @@ Response Format:
   "type": "dialogue" | "action" | "transition" | "scene",
   "metadata": {
     "characterIds": ["npc-id-1", "npc-id-2"],
-${scenePresenceEnabled ? '    "sceneEntries": [],\n    "sceneExits": [],\n' : ''}    "speakerId": "npc-id-1",
+${scenePresenceEnabled ? '    "sceneEntries": [],\n    "sceneExits": [],\n    "sceneTransition": {"to":"new place"},\n' : ''}    "speakerId": "npc-id-1",
     "characters": [
       {
         "id": "npc-id-1",

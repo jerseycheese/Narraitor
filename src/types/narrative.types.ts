@@ -352,6 +352,7 @@ export interface NarrativeContext {
   turnsSinceComplication?: number;
   currentLocation?: string;
   currentSituation?: string;
+  sceneState?: { location: string | null; presentNpcNames: string[] };
   importantEntities?: Array<{
     id: EntityID;
     type: string;
