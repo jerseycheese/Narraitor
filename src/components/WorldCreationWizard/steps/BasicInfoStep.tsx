@@ -178,7 +178,6 @@ export default function BasicInfoStep({
         <ToneSettingsForm
           toneSettings={worldData.toneSettings || DEFAULT_TONE_SETTINGS}
           onToneSettingsChange={(toneSettings) => onUpdate({ ...worldData, toneSettings })}
-          showSaveButton={false}
           showHeader={false}
         />
       </WizardFormSection>

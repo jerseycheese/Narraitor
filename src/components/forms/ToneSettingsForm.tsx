@@ -22,8 +22,6 @@ import { createFormUpdater } from '@/lib/utils/formHelpers';
 export interface ToneSettingsFormProps {
   toneSettings?: ToneSettings;
   onToneSettingsChange: (toneSettings: ToneSettings) => void;
-  /** No-op. Kept only until WorldCreationWizard's BasicInfoStep stops passing it. */
-  showSaveButton?: boolean;
   showHeader?: boolean;
 }
 
