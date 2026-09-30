@@ -31,21 +31,37 @@ export interface SkillBounds {
   maxLevel: number;
 }
 
+/**
+ * The slice of a world that skill bounds and selection limits read. A full
+ * `World` satisfies it.
+ */
+export interface SkillRulesWorld {
+  skills: Array<Pick<World['skills'][number], 'id' | 'minValue' | 'maxValue'>>;
+  settings?: Partial<Pick<World['settings'], 'maxSkills'>>;
+}
+
+type SkillBoundsInput = Pick<WizardSkillInput, 'skillId' | 'level' | 'minLevel' | 'maxLevel'>;
+
 const DEFAULT_MIN_LEVEL = 1;
 
+/** Hard ceiling on starting skill selections, whatever the world allows. */
+export const MAX_SKILL_SELECTION_LIMIT = 8;
+
 const warnMissingWorldSkill = (skillId: EntityID, message: string) => {
-  if (process.env.NODE_ENV !== 'production') {
-    logger.warn(`[CharacterCreationWizard] ${message}`, { skillId });
-  }
+  logger.warn(`[CharacterCreationWizard] ${message}`, { skillId });
 };
 
-const resolveWorldSkill = (world: World | undefined, skillId: EntityID) => {
+const resolveWorldSkill = (world: SkillRulesWorld | undefined, skillId: EntityID) => {
   return world?.skills.find((ws) => ws.id === skillId);
 };
 
-const buildBounds = (
-  skill: WizardSkillInput,
-  world: World | undefined
+/**
+ * Resolves a skill's min/max level: the skill's own bounds win, then the
+ * world skill's, then a default.
+ */
+export const getSkillBounds = (
+  skill: SkillBoundsInput,
+  world: SkillRulesWorld | undefined
 ): SkillBounds => {
   const worldSkill = resolveWorldSkill(world, skill.skillId);
 
@@ -86,7 +102,7 @@ export const normalizeSkillBounds = (
   world: World | undefined
 ): WizardSkillData[] => {
   return skills.map((skill) => {
-    const { minLevel, maxLevel } = buildBounds(skill, world);
+    const { minLevel, maxLevel } = getSkillBounds(skill, world);
     const normalizedLevel = Number.isFinite(skill.level)
       ? Math.min(Math.max(skill.level, minLevel), maxLevel)
       : minLevel;
@@ -104,14 +120,14 @@ export const normalizeSkillBounds = (
  * Calculates the spent and remaining skill points relative to the configured pool.
  */
 export const calculateSkillPointPool = (
-  skills: WizardSkillInput[],
-  world: World | undefined,
+  skills: Array<SkillBoundsInput & { isSelected: boolean }>,
+  world: SkillRulesWorld | undefined,
   totalPoints: number
 ): SkillPointPool => {
   const selectedSkills = skills.filter((skill) => skill.isSelected);
 
   const spent = selectedSkills.reduce((sum, skill) => {
-    const { minLevel } = buildBounds(skill, world);
+    const { minLevel } = getSkillBounds(skill, world);
     return sum + Math.max(0, (skill.level ?? minLevel) - minLevel);
   }, 0);
 
@@ -122,7 +138,9 @@ export const calculateSkillPointPool = (
   };
 };
 
-export const getSkillBounds = (
-  skill: WizardSkillInput,
-  world: World | undefined
-): SkillBounds => buildBounds(skill, world);
+/**
+ * How many skills a character may select: the world's `maxSkills`, capped by
+ * MAX_SKILL_SELECTION_LIMIT.
+ */
+export const getMaxSkillSelections = (world: SkillRulesWorld | undefined): number =>
+  Math.min(world?.settings?.maxSkills ?? MAX_SKILL_SELECTION_LIMIT, MAX_SKILL_SELECTION_LIMIT);

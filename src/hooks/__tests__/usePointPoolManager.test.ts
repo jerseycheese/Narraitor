@@ -188,9 +188,9 @@ describe('useSkillPointPool', () => {
       })
     );
 
-    // Only combat (5) and magic (4) should count, stealth (3) is not selected
-    expect(result.current.pool.spent).toBe(9);
-    expect(result.current.pool.remaining).toBe(11);
+    // Spend is counted above each minimum (1): combat 4 + magic 3; stealth is not selected
+    expect(result.current.pool.spent).toBe(7);
+    expect(result.current.pool.remaining).toBe(13);
   });
 
   it('should update pool when toggling skill selection', () => {
@@ -207,7 +207,7 @@ describe('useSkillPointPool', () => {
 
     expect(result.current.skills.find(s => s.id === 'stealth')?.isSelected).toBe(true);
     expect(result.current.selectedSkillsCount).toBe(3);
-    expect(result.current.pool.spent).toBe(12); // Now includes stealth (3)
+    expect(result.current.pool.spent).toBe(9); // Now includes stealth (2)
 
     act(() => {
       result.current.toggleSkillSelection('combat');
@@ -215,7 +215,7 @@ describe('useSkillPointPool', () => {
 
     expect(result.current.skills.find(s => s.id === 'combat')?.isSelected).toBe(false);
     expect(result.current.selectedSkillsCount).toBe(2);
-    expect(result.current.pool.spent).toBe(7); // combat (5) no longer counted
+    expect(result.current.pool.spent).toBe(5); // combat (4) no longer counted
   });
 
   it('should sync skill values with point pool operations', () => {
@@ -232,7 +232,7 @@ describe('useSkillPointPool', () => {
 
     const combatSkill = result.current.skills.find(s => s.id === 'combat');
     expect(combatSkill?.value).toBe(7);
-    expect(result.current.pool.spent).toBe(11); // 7 + 4 (combat + magic)
+    expect(result.current.pool.spent).toBe(9); // 6 + 3 (combat + magic)
   });
 
   it('should provide skill-specific helpers', () => {

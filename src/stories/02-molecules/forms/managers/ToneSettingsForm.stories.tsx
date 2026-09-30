@@ -23,19 +23,10 @@ const meta = {
     onToneSettingsChange: {
       description: 'Callback fired when tone settings change',
       action: 'toneSettingsChanged'
-    },
-    onSave: {
-      description: 'Callback fired when save button is clicked',
-      action: 'saved'
-    },
-    showSaveButton: {
-      description: 'Whether to show the save button',
-      control: 'boolean'
     }
   },
   args: {
-    onToneSettingsChange: fn(),
-    onSave: fn()
+    onToneSettingsChange: fn()
   }
 } satisfies Meta<typeof ToneSettingsForm>;
 
@@ -44,8 +35,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    toneSettings: DEFAULT_TONE_SETTINGS,
-    showSaveButton: true
+    toneSettings: DEFAULT_TONE_SETTINGS
   }
 };
 
@@ -56,8 +46,7 @@ export const MatureContent: Story = {
       narrativeStyle: 'serious',
       languageComplexity: 'literary',
       customInstructions: 'Include mature themes and complex moral dilemmas.'
-    },
-    showSaveButton: true
+    }
   }
 };
 
@@ -68,14 +57,6 @@ export const LightAndSimple: Story = {
       narrativeStyle: 'lighthearted',
       languageComplexity: 'simple',
       customInstructions: 'Keep the tone upbeat and family-friendly.'
-    },
-    showSaveButton: true
-  }
-};
-
-export const WithoutSaveButton: Story = {
-  args: {
-    toneSettings: DEFAULT_TONE_SETTINGS,
-    showSaveButton: false
+    }
   }
 };

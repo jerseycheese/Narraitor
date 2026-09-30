@@ -190,10 +190,6 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       currentStep: wizard.state.currentStep,
       worldId: wizard.state.data.worldId,
       validation: wizard.state.validation,
-      pointPools: {
-        attributes: attributePool.pool,
-        skills: skillPool,
-      },
     };
     setData(newData);
   };

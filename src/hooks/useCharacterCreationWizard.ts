@@ -99,11 +99,7 @@ export function useCharacterCreationWizard({
         const result = validateSkills(
           data.skills,
           world?.settings.skillPointPool || 0,
-          world?.skills?.map(skill => ({
-            id: skill.id,
-            minValue: skill.minValue,
-            maxValue: skill.maxValue,
-          })) || []
+          world
         );
         return { ...result, touched: true };
       },

@@ -14,6 +14,7 @@ import { BackgroundForm } from './components/BackgroundForm';
 import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
 import { generatePortrait } from '@/lib/api/generatePortrait';
+import { calculateSkillPointPool } from '@/components/CharacterCreationWizard/utils/skillAllocation';
 
 import { formatPlainLanguageError } from '@/lib/utils/errorUtils';
 
@@ -88,7 +89,16 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     if (!editingCharacter || !world) return true;
 
     const attributePointsSpent = editingCharacter.attributes.reduce((sum, attr) => sum + attr.baseValue, 0);
-    const skillPointsSpent = editingCharacter.skills.reduce((sum, skill) => sum + skill.level, 0);
+    // Same rule as the creation wizard: spend is counted above each skill's minimum.
+    const { spent: skillPointsSpent } = calculateSkillPointPool(
+      editingCharacter.skills.map(skill => ({
+        skillId: skill.worldSkillId || skill.id,
+        level: skill.level,
+        isSelected: true,
+      })),
+      world,
+      world.settings.skillPointPool
+    );
 
     const isAttributesValid = attributePointsSpent <= world.settings.attributePointPool;
     const isSkillsValid = skillPointsSpent <= world.settings.skillPointPool;

@@ -12,6 +12,7 @@ import type { GeneratedCharacterData } from '@/lib/generators/characterGenerator
 import { characterApi } from '@/lib/api/characterApi';
 import { usePointPoolManager, PointPoolItem } from '@/hooks/usePointPoolManager';
 import { wizardStyles } from '@/components/shared/wizard';
+import { getSkillBounds } from '../utils/skillAllocation';
 
 type CardKey = 'description' | 'background' | 'attributes' | 'skills';
 
@@ -158,8 +159,15 @@ export const CharacterSuggestions: React.FC<CharacterSuggestionsProps> = ({
         .map((s) => {
           const worldSkill = world.skills.find((ws) => ws.id === s.id);
           const wizardSkill = characterData.skills.find((cs) => cs.skillId === s.id);
-          const minLevel = wizardSkill?.minLevel ?? worldSkill?.minValue ?? 0;
-          const maxLevel = wizardSkill?.maxLevel ?? worldSkill?.maxValue ?? 10;
+          const { minLevel, maxLevel } = getSkillBounds(
+            {
+              skillId: s.id,
+              level: s.level,
+              minLevel: wizardSkill?.minLevel,
+              maxLevel: wizardSkill?.maxLevel,
+            },
+            world
+          );
           return worldSkill
             ? {
                 id: s.id,

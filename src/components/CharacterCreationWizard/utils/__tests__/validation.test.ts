@@ -88,7 +88,7 @@ describe('Character Creation Validation', () => {
 
     it('returns error when no skills selected', () => {
       const noSelectedSkills = mockSkills.map(s => ({ ...s, isSelected: false }));
-      const result = validateSkills(noSelectedSkills, 3, mockWorldSkills);
+      const result = validateSkills(noSelectedSkills, 3, { skills: mockWorldSkills });
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Select at least one skill');
     });
@@ -100,25 +100,34 @@ describe('Character Creation Validation', () => {
         level: 1,
         isSelected: true,
       }));
-      const result = validateSkills(manySkills, 0, mockWorldSkills);
+      const result = validateSkills(manySkills, 0, { skills: mockWorldSkills });
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Maximum 8 skills allowed');
     });
 
+    it("enforces the world's maxSkills when it is below the hard limit", () => {
+      const result = validateSkills(mockSkills, 3, {
+        skills: mockWorldSkills,
+        settings: { maxSkills: 1 },
+      });
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('Maximum 1 skills allowed');
+    });
+
     it('validates successfully with valid skill selection', () => {
-      const result = validateSkills(mockSkills, 3, mockWorldSkills);
+      const result = validateSkills(mockSkills, 3, { skills: mockWorldSkills });
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
 
     it('allows under-spending skill points within the pool', () => {
-      const result = validateSkills(mockSkills, 6, mockWorldSkills);
+      const result = validateSkills(mockSkills, 6, { skills: mockWorldSkills });
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
 
     it('returns error when skill points exceed the pool', () => {
-      const result = validateSkills(mockSkills, 2, mockWorldSkills);
+      const result = validateSkills(mockSkills, 2, { skills: mockWorldSkills });
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('You have allocated more skill points than available.');
     });
@@ -126,7 +135,7 @@ describe('Character Creation Validation', () => {
     it('flags skills that cannot be leveled due to identical bounds', () => {
       const stagnantSkill = [{ skillId: 'skill-locked', name: 'Locked Skill', level: 1, isSelected: true }];
       const worldMeta = [{ id: 'skill-locked', minValue: 1, maxValue: 1 }];
-      const result = validateSkills(stagnantSkill, 0, worldMeta);
+      const result = validateSkills(stagnantSkill, 0, { skills: worldMeta });
 
       expect(result.valid).toBe(false);
       expect(result.errors).toContain(
@@ -143,7 +152,7 @@ describe('Character Creation Validation', () => {
         { id: 'skill-1', minValue: 1, maxValue: 5 },
         { id: 'skill-2', minValue: 1, maxValue: 5 },
       ];
-      const result = validateSkills(highPoolSkills, 20, worldMeta);
+      const result = validateSkills(highPoolSkills, 20, { skills: worldMeta });
 
       expect(result.valid).toBe(true);
     });
@@ -157,7 +166,7 @@ describe('Character Creation Validation', () => {
         { id: 'skill-1', minValue: 1, maxValue: 5 },
         { id: 'skill-2', minValue: 1, maxValue: 5 },
       ];
-      const result = validateSkills(highPoolSkills, 20, worldMeta);
+      const result = validateSkills(highPoolSkills, 20, { skills: worldMeta });
 
       expect(result.valid).toBe(true);
     });

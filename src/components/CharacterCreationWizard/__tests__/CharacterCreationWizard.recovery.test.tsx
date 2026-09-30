@@ -177,10 +177,6 @@ describe('CharacterCreationWizard recovery modal', () => {
         validation: {
           0: { valid: true, touched: true, errors: [] },
         },
-        pointPools: {
-          attributes: 0,
-          skills: 0,
-        },
       },
       setData: jest.fn(),
       clearAutoSave: mockClearAutoSave,

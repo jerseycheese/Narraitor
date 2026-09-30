@@ -117,10 +117,10 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           onChange={handlePersonalityChange}
           onBlur={() => handleFieldBlur('personality')}
           rows={4}
-          placeholder="Describe your character's personality traits... (minimum 30 characters)"
+          placeholder="Describe your character's personality traits... (minimum 20 characters)"
         />
         <p className="form-help-text">
-          {data.characterData.background.personality.length} / 30 characters minimum
+          {data.characterData.background.personality.length} / 20 characters minimum
         </p>
       </div>
 

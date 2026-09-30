@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
@@ -23,7 +22,7 @@ import { createFormUpdater } from '@/lib/utils/formHelpers';
 export interface ToneSettingsFormProps {
   toneSettings?: ToneSettings;
   onToneSettingsChange: (toneSettings: ToneSettings) => void;
-  onSave?: () => void;
+  /** No-op. Kept only until WorldCreationWizard's BasicInfoStep stops passing it. */
   showSaveButton?: boolean;
   showHeader?: boolean;
 }
@@ -31,8 +30,6 @@ export interface ToneSettingsFormProps {
 export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
   toneSettings = DEFAULT_TONE_SETTINGS,
   onToneSettingsChange,
-  onSave,
-  showSaveButton = false,
   showHeader = true
 }) => {
   // Create form updater utilities
@@ -137,16 +134,6 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           <ErrorBlock errors={validationResult.errors} />
         )}
 
-        {showSaveButton && onSave && (
-          <div>
-            <Button 
-              onClick={onSave}
-              disabled={!validationResult.valid}
-            >
-              Save Tone Settings
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );

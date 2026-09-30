@@ -4,6 +4,7 @@ import RangeSlider from '@/components/ui/RangeSlider';
 import { Label } from '@/components/ui/label';
 import { useSkillPointPool } from '@/hooks/usePointPoolManager';
 import { PointPoolDisplay } from './PointPoolDisplay';
+import { getSkillBounds } from '@/components/CharacterCreationWizard/utils/skillAllocation';
 
 interface CharacterSkill {
   skillId: string;
@@ -31,12 +32,16 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
   } = useSkillPointPool({
     totalPoints: world.settings.skillPointPool,
     skills: skills.map(skill => {
-      const worldSkill = world.skills.find(ws => ws.id === skill.skillId);
+      // Same bounds (and orphaned-skill fallback) as the editor's save guard.
+      const { minLevel, maxLevel } = getSkillBounds(
+        { skillId: skill.skillId, level: skill.level },
+        world
+      );
       return {
         id: skill.skillId,
         value: skill.level,
-        minValue: worldSkill?.minValue || 0,
-        maxValue: worldSkill?.maxValue || 10,
+        minValue: minLevel,
+        maxValue: maxLevel,
         isSelected: true, // All skills in editor count toward pool
       };
     }),
