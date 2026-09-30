@@ -6,6 +6,7 @@ import {
   SkillSuggestion,
   WorldCreationData,
   WIZARD_MAX_SKILLS,
+  adoptLegacyEntries,
 } from '../WizardState';
 import type { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -145,26 +146,33 @@ export default function SkillReviewStep({
   // allows. Later visits find the ids already in worldData and change nothing.
   useEffect(() => {
     if (suggestions.length === 0 || suggestions.every((s) => s.id)) return;
-    let openSlots = maxSkills - customSkills.length;
+    // A draft saved before suggestions carried ids still has the saved
+    // skills; adopt them by name so they aren't mistaken for custom ones.
+    const { adopted, remaining } = adoptLegacyEntries(suggestions, customSkills);
+    let openSlots = maxSkills - remaining.length - adopted.size;
     commit(
       suggestions.map((s) => {
+        const match = adopted.get(s);
         // Analyzer output can omit `accepted`; treat that as accepted.
-        const accepted = (s.accepted ?? true) && openSlots > 0;
-        if (accepted) openSlots -= 1;
+        const accepted = match ? true : (s.accepted ?? true) && openSlots > 0;
+        if (accepted && !match) openSlots -= 1;
         return {
           ...s,
-          id: s.id ?? generateUniqueId('skill'),
+          id: match?.id ?? s.id ?? generateUniqueId('skill'),
           accepted,
-          baseValue: SKILL_DEFAULT_VALUE,
-          attributeIds: (s.linkedAttributeNames ?? [])
-            .map((name) => attributes.find((a) => a.name === name)?.id)
-            .filter((id): id is string => Boolean(id)),
+          baseValue: match?.baseValue ?? SKILL_DEFAULT_VALUE,
+          attributeIds:
+            match?.attributeIds ??
+            (s.linkedAttributeNames ?? [])
+              .map((name) => attributes.find((a) => a.name === name)?.id)
+              .filter((id): id is string => Boolean(id)),
           originalName: s.name,
           originalDescription: s.description,
           originalDifficulty: s.difficulty,
           isModified: false,
         };
-      })
+      }),
+      remaining
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestions]);

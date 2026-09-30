@@ -74,12 +74,42 @@ export interface WorldCreationData extends Partial<World> {
 export function withoutSuggestedEntries(
   data: WorldCreationData
 ): Pick<WorldCreationData, 'attributes' | 'skills'> {
-  const attributeIds = new Set(data.aiSuggestions?.attributes.map((s) => s.id));
-  const skillIds = new Set(data.aiSuggestions?.skills.map((s) => s.id));
-  return {
-    attributes: data.attributes?.filter((a) => !attributeIds.has(a.id)),
-    skills: data.skills?.filter((s) => !skillIds.has(s.id)),
+  // Suggestions without an id come from a draft saved before ids existed;
+  // their saved entries can only be recognized by name.
+  const isSuggested = (suggestions: { id?: string; name: string }[] = []) => {
+    const ids = new Set(suggestions.filter((s) => s.id).map((s) => s.id));
+    const legacyNames = new Set(suggestions.filter((s) => !s.id).map((s) => s.name));
+    return (entry: { id: string; name: string }) =>
+      ids.has(entry.id) || legacyNames.has(entry.name);
   };
+  const attributeSuggested = isSuggested(data.aiSuggestions?.attributes);
+  const skillSuggested = isSuggested(data.aiSuggestions?.skills);
+  return {
+    attributes: data.attributes?.filter((a) => !attributeSuggested(a)),
+    skills: data.skills?.filter((s) => !skillSuggested(s)),
+  };
+}
+
+/**
+ * Pairs id-less suggestions (from a draft saved before suggestions carried
+ * ids) with the saved entries they produced, matched by name the way the
+ * old review steps identified them. `remaining` is what's left: the
+ * genuinely custom entries.
+ */
+export function adoptLegacyEntries<
+  S extends { id?: string; name: string },
+  E extends { id: string; name: string },
+>(suggestions: S[], entries: E[]): { adopted: Map<S, E>; remaining: E[] } {
+  const adopted = new Map<S, E>();
+  let remaining = entries;
+  for (const suggestion of suggestions) {
+    if (suggestion.id) continue;
+    const match = remaining.find((e) => e.name === suggestion.name);
+    if (!match) continue;
+    adopted.set(suggestion, match);
+    remaining = remaining.filter((e) => e !== match);
+  }
+  return { adopted, remaining };
 }
 
 export interface WorldCreationDraft {

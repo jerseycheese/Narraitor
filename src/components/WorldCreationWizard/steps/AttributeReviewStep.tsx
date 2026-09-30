@@ -6,6 +6,7 @@ import {
   AttributeSuggestion,
   WorldCreationData,
   WIZARD_MAX_ATTRIBUTES,
+  adoptLegacyEntries,
 } from '../WizardState';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { AttributeEditor } from '@/components/world/AttributeEditor/AttributeEditor';
@@ -88,14 +89,20 @@ export default function AttributeReviewStep({
   // already in worldData and leave everything as the player left it.
   useEffect(() => {
     if (suggestions.length === 0 || suggestions.every((s) => s.id)) return;
-    let openSlots = maxAttributes - customAttributes.length;
+    // A draft saved before suggestions carried ids still has the saved
+    // entries; adopt them by name so they aren't mistaken for custom ones.
+    const { adopted, remaining } = adoptLegacyEntries(suggestions, customAttributes);
+    let openSlots = maxAttributes - remaining.length - adopted.size;
     commit(
       suggestions.map((s) => {
+        const match = adopted.get(s);
+        if (match) return { ...s, id: match.id, baseValue: match.baseValue, accepted: true };
         // Analyzer output can omit `accepted`; treat that as accepted.
         const accepted = (s.accepted ?? true) && openSlots > 0;
         if (accepted) openSlots -= 1;
         return { ...s, id: s.id ?? generateUniqueId('attribute'), accepted };
-      })
+      }),
+      remaining
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestions]);

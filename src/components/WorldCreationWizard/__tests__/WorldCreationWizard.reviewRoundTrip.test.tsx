@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import WorldCreationWizard from '../WorldCreationWizard';
-import type { WorldCreationData } from '../WizardState';
+import { withoutSuggestedEntries, type WorldCreationData } from '../WizardState';
 
 const mockPush = jest.fn();
 const mockCreateWorld = jest.fn();
@@ -135,6 +135,44 @@ describe('WorldCreationWizard review steps', () => {
     expect(created.skills[0].attributeIds).toEqual([created.attributes[0].id]);
   });
 
+  it('adopts saved entries from a draft whose suggestions have no ids', async () => {
+    const saved = (id: string, name: string) => ({
+      id, worldId: '', name, description: `${name} description`, baseValue: 7, minValue: 1, maxValue: 10,
+    });
+    const savedSkill = {
+      id: 'skill-old', worldId: '', name: 'Brawling', description: 'x', difficulty: 'medium' as const,
+      baseValue: 3, minValue: 1, maxValue: 5, attributeIds: ['attribute-old-might'],
+    };
+    render(
+      <WorldCreationWizard
+        initialStep={2}
+        initialData={{
+          ...baseData,
+          attributes: [saved('attribute-old-might', 'Might'), saved('attribute-custom', 'Custom Grit')],
+          skills: [savedSkill],
+        }}
+      />
+    );
+
+    expect(await screen.findByText(/attributes selected: 3 \/ 6/i)).toBeInTheDocument();
+    expect(screen.getAllByTestId(/^custom-attribute-card-/)).toHaveLength(1);
+    expect(screen.getByTestId('custom-attribute-card-attribute-custom')).toBeInTheDocument();
+
+    await next();
+    expect(await screen.findByText(/skills selected: 2 \/ 12/i)).toBeInTheDocument();
+    expect(screen.queryAllByTestId(/^custom-skill-card-/)).toHaveLength(0);
+    await next();
+    await userEvent.click(screen.getByTestId('step-complete-button'));
+
+    const created = mockCreateWorld.mock.calls[0][0];
+    expect(created.attributes.map((a: { id: string }) => a.id)).toContain('attribute-old-might');
+    expect(created.attributes).toHaveLength(3);
+    expect(created.skills.find((s: { name: string }) => s.name === 'Brawling')).toMatchObject({
+      id: 'skill-old',
+      attributeIds: ['attribute-old-might'],
+    });
+  });
+
   it('caps selections at the world attribute limit', async () => {
     const many = Array.from({ length: 8 }, (_, i) => attr(`Attr ${i}`));
     render(
@@ -164,5 +202,18 @@ describe('WorldCreationWizard review steps', () => {
     expect(await screen.findByText(/couldn't create this world/i)).toBeInTheDocument();
     expect(onComplete).not.toHaveBeenCalled();
     expect(mockPush).not.toHaveBeenCalled();
+  });
+});
+
+describe('withoutSuggestedEntries', () => {
+  it('also drops entries from id-less legacy suggestions, by name', () => {
+    const entry = (id: string, name: string) => ({
+      id, worldId: '', name, description: '', baseValue: 5, minValue: 1, maxValue: 10,
+    });
+    const result = withoutSuggestedEntries({
+      aiSuggestions: { attributes: [attr('Might')], skills: [] },
+      attributes: [entry('a1', 'Might'), entry('a2', 'Custom Grit')],
+    });
+    expect(result.attributes?.map((a) => a.name)).toEqual(['Custom Grit']);
   });
 });
