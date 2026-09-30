@@ -8,7 +8,7 @@ jest.mock('@/lib/featureFlags', () => ({ isFeatureEnabled: jest.fn(() => false) 
 
 describe('parseNarrativeResponse debris guard', () => {
   it('keeps scene movement out of flag-off parsed metadata', () => {
-    const response = { content: '{"content":"Guard enters.","metadata":{"characterIds":["npc-guard"],"sceneEntries":["npc-guard"],"sceneExits":[]}}' };
+    const response = { content: '{"content":"Guard enters.","metadata":{"characterIds":["npc-guard"],"sceneEntries":["npc-guard"],"sceneExits":[],"sceneTransition":{"to":"Old Mill"}}}' };
     const withoutMovement = { content: '{"content":"Guard enters.","metadata":{"characterIds":["npc-guard"]}}' };
     expect(parseNarrativeResponse(response, 'scene')).toEqual(parseNarrativeResponse(withoutMovement, 'scene'));
   });
@@ -33,6 +33,22 @@ describe('parseNarrativeResponse debris guard', () => {
         content: '{"content":"Guard steps outside.","metadata":{"characterIds":[],"sceneExits":["npc-guard","npc-unknown"]}}',
       }, 'scene', ['npc-guard']);
       expect(parsed.extractedMetadata.sceneExits).toEqual(['npc-guard']);
+    } finally {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+    }
+  });
+
+  it('parses a named scene transition and ignores invalid targets', () => {
+    (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+    try {
+      const valid = parseNarrativeResponse({
+        content: '{"content":"You enter the mill.","metadata":{"sceneTransition":{"to":" Old Mill "}}}',
+      }, 'scene');
+      const invalid = parseNarrativeResponse({
+        content: '{"content":"You wait.","metadata":{"sceneTransition":{"to":17}}}',
+      }, 'scene');
+      expect(valid.extractedMetadata.sceneTransition).toEqual({ to: 'Old Mill' });
+      expect(invalid.extractedMetadata.sceneTransition).toBeUndefined();
     } finally {
       (isFeatureEnabled as jest.Mock).mockReturnValue(false);
     }

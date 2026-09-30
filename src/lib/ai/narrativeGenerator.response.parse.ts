@@ -182,6 +182,10 @@ export const parseNarrativeResponse = (
               sceneExits: Array.isArray(parsed.metadata.sceneExits)
                 ? parsed.metadata.sceneExits.filter((id: unknown): id is string => typeof id === 'string' && knownSceneNpcIds.has(id))
                 : [],
+              ...(typeof parsed.metadata.sceneTransition?.to === 'string' &&
+              safeTrim(parsed.metadata.sceneTransition.to)
+                ? { sceneTransition: { to: safeTrim(parsed.metadata.sceneTransition.to) } }
+                : {}),
             } : {}),
             speakerId:
               typeof parsed?.metadata?.speakerId === 'string'

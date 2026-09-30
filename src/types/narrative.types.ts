@@ -281,6 +281,7 @@ export interface NarrativeMetadata {
   characterIds?: EntityID[];
   sceneEntries?: EntityID[];
   sceneExits?: EntityID[];
+  sceneTransition?: { to: string };
   characters?: GeneratedCharacterMetadata[];
   // Dialogue-specific metadata
   speakerId?: EntityID;
@@ -386,6 +387,7 @@ export interface NarrativeGenerationResult {
     characterIds: EntityID[];
     sceneEntries?: EntityID[];
     sceneExits?: EntityID[];
+    sceneTransition?: { to: string };
     speakerId?: EntityID;
     location?: string;
     mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';

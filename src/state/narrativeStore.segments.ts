@@ -11,6 +11,8 @@ import { formatDecisionText } from '../lib/narrative/formatDecisionText';
 import { useSessionStore } from './sessionStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 import { isResolverManaged } from '@/lib/narrative/resolverGuard';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { useSceneStore } from './sceneStore';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
 
 const normalizeLocationKey = (value: string): string =>
@@ -59,8 +61,20 @@ export const createNarrativeSegmentActions = (
     let metadata = segmentData.metadata
       ? { ...segmentData.metadata }
       : undefined;
+    const isSceneStateEnabled = isFeatureEnabled('SCENE_STATE');
 
-    if (metadata?.location) {
+    if (isSceneStateEnabled) {
+      const currentPlace = useSceneStore.getState().scenes[sessionId]?.location;
+      const rawTransitionTo = metadata?.sceneTransition?.to;
+      const transitionTo = typeof rawTransitionTo === 'string'
+        ? safeTrim(rawTransitionTo).replace(/\s+/g, ' ')
+        : '';
+      const label = typeof metadata?.location === 'string'
+        ? safeTrim(metadata.location).replace(/\s+/g, ' ')
+        : '';
+      const location = transitionTo || currentPlace || previousSegment?.metadata?.location || label;
+      if (location) metadata = { ...(metadata ?? { tags: [] }), location };
+    } else if (metadata?.location) {
       const cleanedLocation = safeTrim(metadata.location).replace(/\s+/g, ' ');
 
       if (!cleanedLocation) {
@@ -115,6 +129,9 @@ export const createNarrativeSegmentActions = (
       characterIds: metadata?.characterIds,
       ...(metadata?.sceneEntries ? { sceneEntries: metadata.sceneEntries } : {}),
       ...(metadata?.sceneExits ? { sceneExits: metadata.sceneExits } : {}),
+      ...(isSceneStateEnabled && metadata?.sceneTransition
+        ? { sceneTransition: metadata.sceneTransition }
+        : {}),
       characters: metadata?.characters,
       speakerId: metadata?.speakerId,
       itemsAcquired: metadata?.itemsAcquired,

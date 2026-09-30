@@ -12,6 +12,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useWorldStore } from '@/state/worldStore';
+import { useNPCStore } from '@/state/npcStore';
 import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
 import type {
   NarrativeGenerationResult,
@@ -305,6 +306,74 @@ describe('TurnResolver', () => {
   });
 
   describe('resolveTurn', () => {
+    it('keeps the recorded place when a model location label drifts', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().setLocation(sessionId, 'Muddy Lake');
+      useSceneStore.getState().setPresentNpcIds(sessionId, ['npc-guard']);
+      useNPCStore.getState().createNPC({
+        id: 'npc-guard', name: 'Guard', description: 'A guard', worldId,
+      });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const generator = makeMockGenerator(makeGenerationResult({
+        content: 'The water laps at the shore.',
+        metadata: { characterIds: [], tags: [], location: "Muddy Lake's" },
+      }));
+      const result = await resolveTurn(
+        makeCommand({ sessionId, worldId, characterId }),
+        generator
+      );
+
+      expect(result.segment.metadata.location).toBe('Muddy Lake');
+      expect(result.snapshot.sceneState?.location).toBe('Muddy Lake');
+      expect(result.snapshot.sceneState?.presentNpcIds).toContain('npc-guard');
+      const promptContext = (generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext.currentSituation;
+      expect(promptContext).toContain('CURRENT PLACE: Muddy Lake');
+      expect(promptContext).toContain('PRESENT NPCS: Guard');
+      expect(promptContext).toContain('metadata.sceneTransition');
+    });
+
+    it('moves the recorded place only for a structured transition', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().setLocation(sessionId, 'Muddy Lake');
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const generator = makeMockGenerator(makeGenerationResult({
+        content: 'You step into the mill.',
+        metadata: {
+          characterIds: [], tags: [], location: 'A damp building',
+          sceneTransition: { to: 'Old Mill' },
+        },
+      }));
+
+      const result = await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
+      expect(result.segment.metadata.location).toBe('Old Mill');
+      expect(result.snapshot.sceneState?.location).toBe('Old Mill');
+    });
+
+    it('keeps the existing location label behavior with SCENE_STATE off', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().setLocation(sessionId, 'Muddy Lake');
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+      const generator = makeMockGenerator(makeGenerationResult({
+        metadata: { characterIds: [], tags: [], location: "Muddy Lake's", sceneTransition: { to: 'Old Mill' } },
+      }));
+      const result = await resolveTurn(
+        makeCommand({ sessionId, worldId, characterId }),
+        generator
+      );
+
+      expect(result.segment.metadata.location).toBe("Muddy Lake's");
+      expect(result.segment.metadata.sceneTransition).toBeUndefined();
+      expect(result.snapshot.sceneState).toBeUndefined();
+      expect(useSceneStore.getState().scenes[sessionId]?.location).toBe('Muddy Lake');
+      expect((generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext.currentSituation).toBe('Player chose: "Head north"');
+    });
+
     it('keeps an NPC present when prose says they leave an object', async () => {
       const { sessionId, worldId, characterId } = seedItemUseStores();
       useSceneStore.setState({ scenes: {} });
@@ -1506,6 +1575,17 @@ describe('TurnResolver', () => {
   });
 
   describe('resolveInitialTurn', () => {
+    it('records the opening location with SCENE_STATE enabled', async () => {
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const result = await resolveInitialTurn(
+        { sessionId: 'session-1', worldId: 'world-1', characterId: 'char-1', generateChoices: false },
+        makeMockGenerator()
+      );
+      expect(result.snapshot.sceneState?.location).toBe('The road');
+    });
+
     it('commits the first segment and returns a settled result', async () => {
       const generator = makeMockGenerator();
 
@@ -1618,6 +1698,24 @@ describe('sessionSnapshotAssembler', () => {
     expect(Object.isFrozen(snapshot.sceneState?.presentNpcIds)).toBe(true);
     expect(Object.isFrozen(snapshot.sceneState?.completedBeats[0])).toBe(true);
     expect(assembleSessionSnapshot('session-3').sceneState).toBeUndefined();
+  });
+
+  it('projects the last recorded location before a scene-store record exists', () => {
+    useNarrativeStore.getState().addSegment('session-1', {
+      content: 'You stand beside the lake.',
+      type: 'scene',
+      characterIds: [],
+      metadata: { characterIds: [], tags: [], location: 'Muddy Lake' },
+      worldId: 'world-1',
+      timestamp: new Date(),
+      updatedAt: new Date().toISOString(),
+    });
+    const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+    (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+
+    expect(assembleSessionSnapshot('session-1').sceneState).toEqual({
+      location: 'Muddy Lake', presentNpcIds: [], completedBeats: [],
+    });
   });
 
   it('assembles a frozen snapshot from current store state', () => {

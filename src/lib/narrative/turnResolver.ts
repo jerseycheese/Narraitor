@@ -216,6 +216,17 @@ async function resolveTurnInner(
   // Pre-turn snapshot for prompt context
   const preTurnSnapshot = assembleSessionSnapshot(sessionId, ids);
   const recentSegments = recentSceneSegments(preTurnSnapshot.segments);
+  const sceneState = preTurnSnapshot.sceneState;
+  const presentNpcNames = sceneState?.presentNpcIds.map(
+    (id) => preTurnSnapshot.npcs.find((npc) => npc.id === id)?.name ?? id
+  ) ?? [];
+  const scenePromptContext = sceneState
+    ? [
+        `CURRENT PLACE: ${sceneState.location ?? 'not yet established'}`,
+        `PRESENT NPCS: ${presentNpcNames.join(', ') || 'none'}`,
+        'When the action moves to a new place, report metadata.sceneTransition as {"to":"new place"}; otherwise omit it. metadata.location is only a label.',
+      ].join('\n')
+    : '';
   const turnsSinceComplication = computeTurnsSinceComplication(
     [...preTurnSnapshot.segments]
   );
@@ -267,7 +278,7 @@ async function resolveTurnInner(
           recentSegments: [...recentSegments],
           turnsSinceComplication,
           worldClock,
-          currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}`,
+          currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}${scenePromptContext ? `\n${scenePromptContext}` : ''}`,
         },
         generationParameters: {
           includedTopics: command.generationParams?.includedTopics ?? [command.choiceText],
@@ -615,6 +626,14 @@ async function commitAndSettleGeneratedTurn({
   const storedSegment =
     useNarrativeStore.getState().segments[storedSegmentId] ?? newSegment;
   if (isFeatureEnabled('SCENE_STATE')) {
+    const currentPlace = useSceneStore.getState().scenes[sessionId]?.location;
+    const transitionTo = storedSegment.metadata.sceneTransition?.to;
+    if (
+      (!currentPlace || (typeof transitionTo === 'string' && transitionTo.trim())) &&
+      storedSegment.metadata.location
+    ) {
+      useSceneStore.getState().setLocation(sessionId, storedSegment.metadata.location);
+    }
     reconcileScenePresence(sessionId, characterId, storedSegment);
   }
   const { notes, errors, acquiredItems } = await reconcileCoreSideEffects({

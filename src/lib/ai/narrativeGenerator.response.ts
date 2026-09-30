@@ -71,6 +71,9 @@ export const formatNarrativeResponse = async (
       ...(isFeatureEnabled('SCENE_STATE') ? {
         sceneEntries: extractedMetadata.sceneEntries ?? [],
         sceneExits: extractedMetadata.sceneExits ?? [],
+        ...(extractedMetadata.sceneTransition
+          ? { sceneTransition: extractedMetadata.sceneTransition }
+          : {}),
       } : {}),
       speakerId,
       location: extractedMetadata.location || fallbackLocation,

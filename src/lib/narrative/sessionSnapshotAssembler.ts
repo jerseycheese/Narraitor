@@ -87,7 +87,15 @@ export function assembleSessionSnapshot(
       : [];
 
   const sceneState = isFeatureEnabled('SCENE_STATE')
-    ? useSceneStore.getState().scenes[sessionId]
+    ? useSceneStore.getState().scenes[sessionId] ?? (
+        allSegments.length > 0
+          ? {
+              location: allSegments[allSegments.length - 1].metadata.location ?? null,
+              presentNpcIds: [],
+              completedBeats: [],
+            }
+          : undefined
+      )
     : undefined;
 
   const snapshot: SessionSnapshot = {
