@@ -113,6 +113,8 @@ export const createNarrativeSegmentActions = (
       tags: metadata?.tags ?? [],
       location: metadata?.location,
       characterIds: metadata?.characterIds,
+      ...(metadata?.sceneEntries ? { sceneEntries: metadata.sceneEntries } : {}),
+      ...(metadata?.sceneExits ? { sceneExits: metadata.sceneExits } : {}),
       characters: metadata?.characters,
       speakerId: metadata?.speakerId,
       itemsAcquired: metadata?.itemsAcquired,

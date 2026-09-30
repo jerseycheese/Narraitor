@@ -12,6 +12,8 @@ export interface NarrativeExtractedMetadata {
     | 'neutral';
   tags?: string[];
   characterIds?: string[];
+  sceneEntries?: string[];
+  sceneExits?: string[];
   speakerId?: string;
   itemsAcquired?: Array<{
     name: string;

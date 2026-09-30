@@ -679,30 +679,20 @@ function reconcileScenePresence(
   const previouslySeen = new Set(
     earlierSegments.flatMap((earlier) => earlier.metadata?.characterIds ?? [])
   );
-  const names = new Map<EntityID, string>();
-  for (const entry of segments) {
-    for (const character of entry.metadata?.characters ?? []) {
-      names.set(character.id, character.name);
-    }
-  }
   const current = new Set(useSceneStore.getState().scenes[sessionId]?.presentNpcIds ?? []);
-  const candidates = new Set([
+  const knownNpcIds = new Set([
     ...current,
     ...(segment.metadata?.characterIds ?? []),
-    ...previouslySeen,
+    ...(segment.metadata?.characters ?? []).map((character) => character.id),
   ]);
-  const prose = segment.content ?? '';
-  for (const npcId of candidates) {
-    if (npcId === playerId) continue;
-    const name = names.get(npcId) ?? npcId;
-    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const subject = `\\b${escapedName}\\b`;
-    const hasExit = new RegExp(`${subject}\\s+(?:leaves?|left|departs?|departed|exits?|exited|walks? away)\\b`, 'i').test(prose);
-    const hasReturn = new RegExp(`${subject}\\s+(?:returns?|returned|re-enters?|re-entered|enters?|entered|arrives?|arrived|comes? back|came back)\\b`, 'i').test(prose);
-    if (hasExit) current.delete(npcId);
-    else if (hasReturn || (!previouslySeen.has(npcId) && segment.metadata?.characterIds?.includes(npcId))) {
-      current.add(npcId);
-    }
+  for (const npcId of segment.metadata?.characterIds ?? []) {
+    if (npcId !== playerId && !previouslySeen.has(npcId)) current.add(npcId);
+  }
+  for (const npcId of segment.metadata?.sceneEntries ?? []) {
+    if (npcId !== playerId && knownNpcIds.has(npcId)) current.add(npcId);
+  }
+  for (const npcId of segment.metadata?.sceneExits ?? []) {
+    if (npcId !== playerId && knownNpcIds.has(npcId)) current.delete(npcId);
   }
   useSceneStore.getState().setPresentNpcIds(sessionId, [...current]);
 }

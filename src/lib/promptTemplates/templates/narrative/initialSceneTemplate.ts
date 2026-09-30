@@ -1,7 +1,9 @@
 import { majorEventGuidelines } from './majorEventGuidelines';
 import type { NarrativeTemplateContext } from './context';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 
 export const initialSceneTemplate = (context: NarrativeTemplateContext) => {
+  const scenePresenceEnabled = isFeatureEnabled('SCENE_STATE');
   const {
     worldName,
     worldDescription,
@@ -29,7 +31,7 @@ ${Array.isArray(npcRoster) && npcRoster.length > 0 ? `NPC ROSTER (Reference IDs 
 ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- ${npc.name} [${npc.id}]${npc.description ? ` — ${npc.description}` : ''}`).join('\n')}
 
 NPC METADATA RULES:
-- Use NPC names naturally in the narrative.
+${scenePresenceEnabled ? '- Report NPCs entering in metadata.sceneEntries and NPCs leaving in metadata.sceneExits, using IDs from metadata.characterIds or metadata.characters. Use [] when no one moves.\n' : ''}- Use NPC names naturally in the narrative.
 - For any NPC who appears or speaks in this opening scene, include their ID (from the roster above) in metadata.characterIds.
 - Do NOT include NPCs who are only spoken about or foreshadowed; keep metadata.characterIds limited to characters physically sharing the scene.
 - If you reference someone off-screen for later use, add them to metadata.characters but leave metadata.characterIds untouched.
@@ -94,7 +96,7 @@ Response Format (CRITICAL - must be valid JSON):
   "type": "dialogue" | "action" | "transition" | "scene",
   "metadata": {
     "characterIds": [],
-    "speakerId": "npc-id-if-someone-speaks",
+${scenePresenceEnabled ? '    "sceneEntries": [],\n    "sceneExits": [],\n' : ''}    "speakerId": "npc-id-if-someone-speaks",
     "characters": [
       {
         "id": "npc-id-if-someone-speaks",

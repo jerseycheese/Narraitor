@@ -1,8 +1,10 @@
 import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import type { NarrativeTemplateContext } from './context';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 
 export const transitionTemplate = (context: NarrativeTemplateContext) => {
+  const scenePresenceEnabled = isFeatureEnabled('SCENE_STATE');
   const {
     worldName,
     genre,
@@ -19,7 +21,7 @@ NPC ROSTER (Reference IDs for metadata.characterIds):
 ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- ${npc.name} [${npc.id}]${npc.description ? ` — ${npc.description}` : ''}`).join('\n')}
 
 NPC METADATA RULES:
-- If an NPC accompanies or addresses the player during the transition, add their ID to metadata.characterIds.
+${scenePresenceEnabled ? '- Report NPCs entering or returning in metadata.sceneEntries and NPCs leaving in metadata.sceneExits, using IDs from metadata.characterIds, metadata.characters, or the current scene. Use [] when no one moves; mentioning an NPC without movement does not change presence.\n' : ''}- If an NPC accompanies or addresses the player during the transition, add their ID to metadata.characterIds.
 - Do NOT list NPCs who are only mentioned as destinations or references; keep metadata.characterIds limited to characters physically with the player.
 - If an off-screen NPC must be foreshadowed, add them to metadata.characters for later continuity but leave them out of metadata.characterIds.
 - Set metadata.speakerId only when a single NPC speaks directly to the player; otherwise omit it.
@@ -61,7 +63,7 @@ Response Format:
   "type": "transition",
   "metadata": {
     "characterIds": [],
-    "speakerId": "npc-id-if-applicable",
+${scenePresenceEnabled ? '    "sceneEntries": [],\n    "sceneExits": [],\n' : ''}    "speakerId": "npc-id-if-applicable",
     "characters": [
       {
         "id": "npc-id-if-applicable",

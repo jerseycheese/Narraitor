@@ -305,6 +305,30 @@ describe('TurnResolver', () => {
   });
 
   describe('resolveTurn', () => {
+    it('keeps an NPC present when prose says they leave an object', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const npcId = 'npc-guard';
+      const generator = makeMockGenerator();
+      (generator.generateSegment as jest.Mock)
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard joins you at the gate.',
+          metadata: { characterIds: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }))
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard leaves the key on the table.',
+          metadata: { characterIds: [npcId], sceneExits: ['npc-unknown'], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }));
+
+      const command = makeCommand({ sessionId, worldId, characterId });
+      await resolveTurn(command, generator);
+      await resolveTurn(command, generator);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).toContain(npcId);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).not.toContain('npc-unknown');
+    });
+
     it('keeps a departed NPC absent until an explicit return, including the relationship gate', async () => {
       const { sessionId, worldId, characterId } = seedItemUseStores();
       useSceneStore.setState({ scenes: {} });
@@ -319,7 +343,7 @@ describe('TurnResolver', () => {
         }))
         .mockResolvedValueOnce(makeGenerationResult({
           content: 'Guard leaves the courtyard.',
-          metadata: { characterIds: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+          metadata: { characterIds: [], sceneExits: [npcId], tags: [] },
         }))
         .mockResolvedValueOnce(makeGenerationResult({ content: 'You wait alone.' }))
         .mockResolvedValueOnce(makeGenerationResult({
@@ -328,12 +352,13 @@ describe('TurnResolver', () => {
         }))
         .mockResolvedValueOnce(makeGenerationResult({
           content: 'Guard returns to the courtyard.',
-          metadata: { characterIds: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+          metadata: { characterIds: [npcId], sceneEntries: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
         }));
       const command = makeCommand({ sessionId, worldId, characterId });
       await resolveTurn(command, generator);
       expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).toContain(npcId);
       await resolveTurn(command, generator);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).not.toContain(npcId);
       await resolveTurn(command, generator);
       await resolveTurn(command, generator);
       expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).not.toContain(npcId);

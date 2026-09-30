@@ -279,6 +279,8 @@ export interface NarrativeMetadata {
   worldCost?: WorldCostSegmentNote;
   location?: string;
   characterIds?: EntityID[];
+  sceneEntries?: EntityID[];
+  sceneExits?: EntityID[];
   characters?: GeneratedCharacterMetadata[];
   // Dialogue-specific metadata
   speakerId?: EntityID;
@@ -382,6 +384,8 @@ export interface NarrativeGenerationResult {
   segmentType: 'scene' | 'dialogue' | 'action' | 'transition';
   metadata: {
     characterIds: EntityID[];
+    sceneEntries?: EntityID[];
+    sceneExits?: EntityID[];
     speakerId?: EntityID;
     location?: string;
     mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
