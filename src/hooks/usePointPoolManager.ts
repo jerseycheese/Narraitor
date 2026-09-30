@@ -205,8 +205,11 @@ export interface UseSkillPointPoolReturn
   maxSkills?: number;
 }
 
+// Spend is counted above each skill's minimum, matching the creation wizard.
 const sumSelectedSkillValues = (skills: SkillPointPoolItem[]): number =>
-  skills.filter((skill) => skill.isSelected).reduce((sum, skill) => sum + skill.value, 0);
+  skills
+    .filter((skill) => skill.isSelected)
+    .reduce((sum, skill) => sum + Math.max(0, skill.value - skill.minValue), 0);
 
 export function useSkillPointPool({
   totalPoints,

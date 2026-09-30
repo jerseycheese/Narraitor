@@ -11,7 +11,6 @@ export interface CharacterCreationDraft {
   worldId: EntityID;
   characterData: unknown;
   validation: unknown;
-  pointPools: unknown;
   lastSaved?: string;
 }
 

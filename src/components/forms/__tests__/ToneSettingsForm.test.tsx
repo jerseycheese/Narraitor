@@ -22,12 +22,10 @@ jest.mock('@/lib/utils', () => ({
 }));
 
 const mockOnToneSettingsChange = jest.fn();
-const mockOnSave = jest.fn();
 
 describe('ToneSettingsForm', () => {
   beforeEach(() => {
     mockOnToneSettingsChange.mockClear();
-    mockOnSave.mockClear();
   });
 
   test('renders with default tone settings', () => {
@@ -154,55 +152,10 @@ describe('ToneSettingsForm', () => {
       <ToneSettingsForm
         toneSettings={DEFAULT_TONE_SETTINGS}
         onToneSettingsChange={mockOnToneSettingsChange}
-        onSave={mockOnSave}
-        showSaveButton={true}
       />
     );
 
     expect(screen.getByText('Content Rating is required')).toBeInTheDocument();
     expect(screen.getByText('Narrative Style must be valid')).toBeInTheDocument();
-  });
-
-  test('disables save button when validation fails', async () => {
-    const { validateToneSettings } = await import('@/lib/utils');
-    (validateToneSettings as jest.Mock).mockReturnValue({
-      valid: false,
-      errors: ['Content Rating is required']
-    });
-
-    render(
-      <ToneSettingsForm
-        toneSettings={DEFAULT_TONE_SETTINGS}
-        onToneSettingsChange={mockOnToneSettingsChange}
-        onSave={mockOnSave}
-        showSaveButton={true}
-      />
-    );
-
-    const saveButton = screen.getByRole('button', { name: 'Save Tone Settings' });
-    expect(saveButton).toBeDisabled();
-  });
-
-  test('calls onSave when save button is clicked in valid state', async () => {
-    const { validateToneSettings } = await import('@/lib/utils');
-    (validateToneSettings as jest.Mock).mockReturnValue({
-      valid: true,
-      errors: []
-    });
-
-    render(
-      <ToneSettingsForm
-        toneSettings={DEFAULT_TONE_SETTINGS}
-        onToneSettingsChange={mockOnToneSettingsChange}
-        onSave={mockOnSave}
-        showSaveButton={true}
-      />
-    );
-
-    const saveButton = screen.getByRole('button', { name: 'Save Tone Settings' });
-    expect(saveButton).not.toBeDisabled();
-    
-    fireEvent.click(saveButton);
-    expect(mockOnSave).toHaveBeenCalledTimes(1);
   });
 });

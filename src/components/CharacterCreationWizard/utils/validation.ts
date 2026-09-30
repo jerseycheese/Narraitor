@@ -5,6 +5,12 @@ import {
   validateSelectionCount,
   ValidationResult
 } from '@/lib/utils/validationUtils';
+import {
+  calculateSkillPointPool,
+  getMaxSkillSelections,
+  getSkillBounds,
+  type SkillRulesWorld,
+} from './skillAllocation';
 
 export const isCharacterNameUnique = (name: string, worldId: EntityID): boolean => {
   // Check uniqueness within world
@@ -37,6 +43,11 @@ export const validateAttributes = (
   return { valid: true, errors: [] };
 };
 
+/**
+ * Validates the wizard's skill step: selection count against the world's limit,
+ * per-skill bounds, and point spend against the pool. Bounds and spend come
+ * from skillAllocation so every surface counts them the same way.
+ */
 export const validateSkills = (
   skills: Array<{
     skillId: EntityID;
@@ -47,42 +58,22 @@ export const validateSkills = (
     maxLevel?: number;
   }>,
   skillPointPool: number,
-  worldSkills: Array<{ id: EntityID; minValue: number; maxValue: number }> = []
+  world: SkillRulesWorld | undefined
 ): ValidationResult => {
   const selections = skills.map(skill => skill.isSelected);
   const result = validateSelectionCount(selections, {
     minSelections: 1,
-    maxSelections: 8,
+    maxSelections: getMaxSkillSelections(world),
     fieldName: 'skills'
   });
-  
-  // Update error messages to match existing test expectations
-  const updatedErrors = result.errors.map(error => {
-    if (error === 'Select at least 1 skills') {
-      return 'Select at least one skill';
-    }
-    if (error === 'Maximum 8 skills allowed') {
-      return 'Maximum 8 skills allowed';
-    }
-    return error;
-  });
-  
-  const errors = [...updatedErrors];
 
-  const getBounds = (skill: { minLevel?: number; maxLevel?: number; skillId: EntityID }) => {
-    const worldSkill = worldSkills.find(ws => ws.id === skill.skillId);
-    const minLevel = skill.minLevel ?? worldSkill?.minValue ?? 1;
-    const maxLevel = skill.maxLevel ?? worldSkill?.maxValue ?? minLevel;
-    return { minLevel, maxLevel };
-  };
+  const errors = result.errors.map(error =>
+    error === 'Select at least 1 skills' ? 'Select at least one skill' : error
+  );
 
   const selectedSkills = skills.filter(skill => skill.isSelected);
-  const totalAllocated = selectedSkills.reduce((sum, skill) => {
-    const { minLevel } = getBounds(skill);
-    return sum + Math.max(0, (skill.level ?? minLevel) - minLevel);
-  }, 0);
   selectedSkills.forEach(skill => {
-    const { minLevel, maxLevel } = getBounds(skill);
+    const { minLevel, maxLevel } = getSkillBounds(skill, world);
     const skillLabel = skill.name || skill.skillId;
     if (maxLevel === minLevel) {
       errors.push(`Skill ${skillLabel} cannot be leveled because its configuration has no available range.`);
@@ -95,7 +86,8 @@ export const validateSkills = (
     }
   });
 
-  if (skillPointPool >= 0 && totalAllocated > skillPointPool) {
+  const { spent } = calculateSkillPointPool(skills, world, skillPointPool);
+  if (skillPointPool >= 0 && spent > skillPointPool) {
     errors.push('You have allocated more skill points than available.');
   }
 

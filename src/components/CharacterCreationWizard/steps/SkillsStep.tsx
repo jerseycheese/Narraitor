@@ -7,14 +7,12 @@ import {
 import RangeSlider from '@/components/ui/RangeSlider';
 import { World } from '@/types/world.types';
 import { validateSkills } from '../utils/validation';
-import { getSkillBounds as resolveSkillBounds } from '../utils/skillAllocation';
+import { getMaxSkillSelections, getSkillBounds } from '../utils/skillAllocation';
 import {
   getUnmetPrerequisites,
   formatUnmetPrerequisites,
   type UnmetPrerequisite,
 } from '@/lib/utils/skillPrerequisites';
-
-const MAX_SKILL_SELECTION_LIMIT = 8;
 
 interface CharacterWizardSkill {
   skillId: string;
@@ -65,16 +63,6 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
   worldConfig,
 }) => {
   const totalSkillPoints = worldConfig?.settings?.skillPointPool ?? data.pointPools?.skills?.total ?? 0;
-  const worldSkillBounds = useMemo(
-    () =>
-      (worldConfig?.skills || []).map(skill => ({
-        id: skill.id,
-        minValue: skill.minValue,
-        maxValue: skill.maxValue,
-      })),
-    [worldConfig]
-  );
-
   const characterAttributes = useMemo(
     () => data.characterData.attributes ?? [],
     [data.characterData.attributes]
@@ -110,7 +98,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
     let capacity = 0;
 
     data.characterData.skills.forEach(skill => {
-      const { minLevel, maxLevel } = resolveSkillBounds(skill, worldConfig);
+      const { minLevel, maxLevel } = getSkillBounds(skill, worldConfig);
       bounds.set(skill.skillId, { minLevel, maxLevel });
 
       if (skill.isSelected) {
@@ -149,7 +137,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
     const validationResult = validateSkills(
       data.characterData.skills,
       totalSkillPoints,
-      worldSkillBounds
+      worldConfig
     );
 
     const currentValidation = data.validation[2];
@@ -170,7 +158,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
     data.validation,
     onValidation,
     totalSkillPoints,
-    worldSkillBounds
+    worldConfig
   ]);
 
   // Re-validate prerequisites when attributes change: a previously selected
@@ -187,7 +175,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
       const unmet = unmetPrerequisitesBySkillId.get(skill.skillId) ?? [];
       if (skill.isSelected && unmet.length > 0) {
         const bounds =
-          boundsBySkillId.get(skill.skillId) ?? resolveSkillBounds(skill, worldConfig);
+          boundsBySkillId.get(skill.skillId) ?? getSkillBounds(skill, worldConfig);
         return { ...skill, isSelected: false, level: bounds.minLevel };
       }
       return skill;
@@ -204,7 +192,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
 
   const hasUnallocatedPoints = remainingPoints > 0;
   const selectedSkills = data.characterData.skills.filter(skill => skill.isSelected);
-  const maxSelectable = Math.min(worldConfig?.settings?.maxSkills ?? MAX_SKILL_SELECTION_LIMIT, MAX_SKILL_SELECTION_LIMIT);
+  const maxSelectable = getMaxSkillSelections(worldConfig);
   const handleSkillToggle = (skillId: string) => {
     const target = data.characterData.skills.find(skill => skill.skillId === skillId);
     const isLocked = (unmetPrerequisitesBySkillId.get(skillId)?.length ?? 0) > 0;
@@ -212,10 +200,14 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
     if (target && !target.isSelected && isLocked) {
       return;
     }
+    // Enforce the world's selection limit.
+    if (target && !target.isSelected && selectedSkills.length >= maxSelectable) {
+      return;
+    }
 
     const updatedSkills = data.characterData.skills.map(skill => {
       if (skill.skillId !== skillId) return skill;
-      const bounds = boundsBySkillId.get(skillId) ?? resolveSkillBounds(skill, worldConfig);
+      const bounds = boundsBySkillId.get(skillId) ?? getSkillBounds(skill, worldConfig);
       if (skill.isSelected) {
         return {
           ...skill,
@@ -233,7 +225,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
     onUpdate({ skills: updatedSkills });
   };
   const handleLevelChange = (skillId: string, level: number) => {
-    const bounds = boundsBySkillId.get(skillId) ?? resolveSkillBounds(
+    const bounds = boundsBySkillId.get(skillId) ?? getSkillBounds(
       data.characterData.skills.find(skill => skill.skillId === skillId)!,
       worldConfig
     );
@@ -295,7 +287,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
 
       <div className="wizard-skill-allocation-list" data-tutorial="skill-selection">
         {data.characterData.skills.map((skill, index) => {
-          const bounds = boundsBySkillId.get(skill.skillId) ?? resolveSkillBounds(skill, worldConfig);
+          const bounds = boundsBySkillId.get(skill.skillId) ?? getSkillBounds(skill, worldConfig);
           const cost = costBySkillId.get(skill.skillId) ?? 0;
           const safeKey = skill.skillId || `${skill.name}-${index}`;
           const maxAllowedLevel = maxAllowedLevelBySkillId.get(skill.skillId) ?? bounds.maxLevel;

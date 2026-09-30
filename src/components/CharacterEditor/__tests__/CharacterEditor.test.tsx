@@ -181,6 +181,39 @@ describe('CharacterEditor MVP Tests', () => {
     expect(mockRouter.push).toHaveBeenCalledWith('/characters/test-char-1');
   });
 
+  test("counts skill spend above each skill's minimum, like the wizard", async () => {
+    // Level 5 on a skill with minimum 1 costs 4 points, which fits a pool of 4.
+    const mockUpdateCharacter = jest.fn();
+    const tightWorld = {
+      ...mockWorld,
+      skills: [{ ...mockWorld.skills[0], minValue: 1 }],
+      settings: { ...mockWorld.settings, skillPointPool: 4 },
+    };
+    mockZustandStore(
+      useCharacterStore as jest.MockedFunction<typeof useCharacterStore>,
+      createMockCharacterStore({
+        characters: { 'test-char-1': mockCharacter },
+        updateCharacter: mockUpdateCharacter,
+        deleteCharacter: jest.fn(),
+      })
+    );
+    mockZustandStore(
+      useWorldStore as jest.MockedFunction<typeof useWorldStore>,
+      createMockWorldStore({ worlds: { 'test-world-1': tightWorld } })
+    );
+
+    render(<CharacterEditor characterId="test-char-1" />);
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('Test Character')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText('Save Changes'));
+
+    await waitFor(() => {
+      expect(mockUpdateCharacter).toHaveBeenCalled();
+    });
+  });
+
   // Acceptance Criteria 5: Users can cancel edits without saving changes
   test('cancels edits without saving changes', async () => {
     const mockUpdateCharacter = jest.fn();

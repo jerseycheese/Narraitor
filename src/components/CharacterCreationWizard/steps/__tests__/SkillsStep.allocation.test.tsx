@@ -133,6 +133,29 @@ describe('SkillsStep - skill point allocation', () => {
     expect(updatedSkills[0].level).toBe(4);
   });
 
+  it("blocks selecting past the world's maxSkills limit", async () => {
+    const user = userEvent.setup();
+    const worldConfig = buildWorldConfig(3);
+    worldConfig.settings.maxSkills = 1;
+    renderSkillsStep({
+      worldConfig,
+      data: {
+        characterData: {
+          skills: [
+            { skillId: 'skill-1', name: 'Stealth', isSelected: true, level: 1, minLevel: 1, maxLevel: 5 },
+            { skillId: 'skill-2', name: 'Athletics', isSelected: false, level: 1, minLevel: 1, maxLevel: 5 },
+          ],
+        },
+        pointPools: { skills: { total: 3, spent: 0, remaining: 3 } },
+        validation: {},
+      },
+    });
+
+    await user.click(screen.getByTestId('skill-toggle-skill-2'));
+
+    expect(onUpdate).not.toHaveBeenCalled();
+  });
+
   it('resets levels to minimum when a skill is deselected', async () => {
     const user = userEvent.setup();
     renderSkillsStep();
