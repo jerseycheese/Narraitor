@@ -153,7 +153,7 @@ describe('POST /api/ai/validate-provider', () => {
   });
 
   test('rejects body-carried model aliases and malformed model IDs without calling upstream', async () => {
-    for (const badModel of ['~deepseek/deepseek-flash-latest', 'bad/model', 'bad:model', 'gemini flash', '']) {
+    for (const badModel of ['~deepseek/deepseek-flash-latest', 'bad/model', 'bad:model', 'gemini flash', '', 123, true, {}]) {
       const response = await POST(buildRequest({ key: KEY, body: { type: 'gemini', model: badModel } }));
       const data = await response.json();
 
@@ -241,7 +241,7 @@ describe('POST /api/ai/validate-provider — Claude', () => {
   });
 
   test('rejects malformed model IDs without calling upstream', async () => {
-    for (const badModel of ['claude sonnet', 'claude\nsonnet', '~', 'a'.repeat(129), '']) {
+    for (const badModel of ['claude sonnet', 'claude\nsonnet', '~', 'a'.repeat(129), '', 123, true, {}]) {
       const response = await POST(claudeRequest({ model: badModel }));
       const data = await response.json();
 
@@ -422,7 +422,7 @@ describe('POST /api/ai/validate-provider — OpenAI-compatible providers', () =>
   });
 
   test('rejects malformed model IDs without calling upstream', async () => {
-    for (const badModel of ['~', '~~deepseek', 'deepseek/chat~', 'deepseek chat', 'a'.repeat(129), '']) {
+    for (const badModel of ['~', '~~deepseek', 'deepseek/chat~', 'deepseek chat', 'a'.repeat(129), '', 123, true, {}]) {
       const response = await POST(openAIRequest({ endpoint: ENDPOINT, model: badModel }));
       const data = await response.json();
 

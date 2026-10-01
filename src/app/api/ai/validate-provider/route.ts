@@ -83,14 +83,14 @@ export const POST = withAIRoute(async (request: NextRequest) => {
     return fail('NO_KEY');
   }
 
-  let body: { type?: string; model?: string; endpoint?: string } = {};
+  let body: { type?: unknown; model?: unknown; endpoint?: unknown } = {};
   try {
     body = await request.json();
   } catch {
     // An empty body is fine — defaults apply.
   }
 
-  const type = (body.type ?? 'gemini') as ProviderType;
+  const type = ((typeof body.type === 'string' ? body.type : 'gemini')) as ProviderType;
   if (!getProviderAdapter(type)) {
     return fail('UNSUPPORTED_PROVIDER');
   }
@@ -105,8 +105,12 @@ export const POST = withAIRoute(async (request: NextRequest) => {
  * safety settings the app actually sends so a key that works here works for
  * generation too.
  */
-async function validateGemini(key: string, requestedModel?: string) {
-  const model = requestedModel?.trim();
+async function validateGemini(key: string, requestedModel?: unknown) {
+  if (requestedModel !== undefined && typeof requestedModel !== 'string') {
+    return fail('INVALID_MODEL');
+  }
+
+  const model = typeof requestedModel === 'string' ? requestedModel.trim() : undefined;
   if (requestedModel !== undefined && (!model || !isValidGeminiModel(model))) {
     return fail('INVALID_MODEL');
   }
@@ -147,8 +151,12 @@ async function validateGemini(key: string, requestedModel?: string) {
  * which keeps this ping's wire shape from drifting out of sync with the
  * generation path the way a hand-rolled OpenAI-shaped ping would.
  */
-async function validateClaude(key: string, requestedModel?: string) {
-  const trimmed = requestedModel?.trim();
+async function validateClaude(key: string, requestedModel?: unknown) {
+  if (requestedModel !== undefined && typeof requestedModel !== 'string') {
+    return fail('INVALID_MODEL');
+  }
+
+  const trimmed = typeof requestedModel === 'string' ? requestedModel.trim() : undefined;
   if (requestedModel !== undefined && (!trimmed || !isValidBodyModel(trimmed))) {
     return fail('INVALID_MODEL');
   }
@@ -184,13 +192,16 @@ async function validateClaude(key: string, requestedModel?: string) {
 async function validateOpenAICompatible(
   key: string,
   type: ProviderType,
-  endpoint: string | undefined,
-  requestedModel: string | undefined
+  endpoint: unknown,
+  requestedModel: unknown
 ) {
-  if (!endpoint || !isSafeProviderEndpoint(endpoint)) {
+  if (typeof endpoint !== 'string' || !isSafeProviderEndpoint(endpoint)) {
     return fail('INVALID_ENDPOINT');
   }
-  const model = requestedModel?.trim();
+  if (typeof requestedModel !== 'string') {
+    return fail('INVALID_MODEL');
+  }
+  const model = requestedModel.trim();
   if (!model || !isValidBodyModel(model)) {
     return fail('INVALID_MODEL');
   }
