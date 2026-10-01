@@ -452,8 +452,31 @@ async function resolveItemUseTurnInner(
     remainingQuantity: usage.remainingQuantity,
     previousQuantity: usage.previousQuantity,
   };
+  const preTurnSnapshot = assembleSessionSnapshot(sessionId, {
+    worldId,
+    characterId,
+  });
+  const sceneState = preTurnSnapshot.sceneState;
+  const presentNpcNames =
+    sceneState?.presentNpcIds.map(
+      (id) => preTurnSnapshot.npcs.find((npc) => npc.id === id)?.name ?? id
+    ) ?? [];
+  const projectedSceneState = sceneState
+    ? {
+        location: sceneState.location,
+        presentNpcNames,
+        completedBeats: sceneState.completedBeats,
+      }
+    : undefined;
   const generated = await generateItemUsageNarrative(
-    { item, characterId, worldId, sessionId, usageDetails },
+    {
+      item,
+      characterId,
+      worldId,
+      sessionId,
+      usageDetails,
+      ...(projectedSceneState ? { sceneState: projectedSceneState } : {}),
+    },
     generator
   );
   const content = generated.content?.trim()

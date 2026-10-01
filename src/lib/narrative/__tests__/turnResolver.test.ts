@@ -14,6 +14,7 @@ import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { sceneTemplate } from '@/lib/promptTemplates/templates/narrative/sceneTemplate';
+import { actionTemplate } from '@/lib/promptTemplates/templates/narrative/actionTemplate';
 import { FIRST_SEGMENT_LOCATION } from '@/types/narrative.types';
 import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
 import type {
@@ -1850,6 +1851,82 @@ describe('TurnResolver', () => {
       ).toEqual([
         expect.objectContaining({ prompt: 'Existing decision' }),
       ]);
+    });
+
+    it('projects recorded scene beats into the item-use prompt and keeps flag-off prompts identical', async () => {
+      const ids = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().recordBeat(ids.sessionId, {
+        id: 'gate-opened',
+        text: 'The rusted gate swung open.',
+        turnIndex: 1,
+      });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation(
+        (flag: string) => flag === 'SCENE_STATE'
+      );
+
+      try {
+        const flagOnGenerator = makeItemUseGenerator();
+        await resolveItemUseTurn(ids, flagOnGenerator);
+
+        const { narrativeContext: flagOnContext } = (
+          flagOnGenerator.generateSegment as jest.Mock
+        ).mock.calls[0][0];
+        expect(flagOnContext.sceneState?.completedBeats).toEqual([
+          { id: 'gate-opened', text: 'The rusted gate swung open.', turnIndex: 1 },
+        ]);
+        const flagOnPrompt = actionTemplate({
+          worldName: 'Test World',
+          genre: 'fantasy',
+          tone: 'tense',
+          narrativeContext: flagOnContext,
+        });
+        expect(flagOnPrompt).toContain(
+          '[gate-opened] (turn 1): The rusted gate swung open.'
+        );
+        expect(flagOnPrompt).not.toContain('None recorded yet.');
+      } finally {
+        (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+      }
+
+      const offIds = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().recordBeat(offIds.sessionId, {
+        id: 'gate-opened',
+        text: 'The rusted gate swung open.',
+        turnIndex: 1,
+      });
+      const flagOffGenerator = makeItemUseGenerator();
+      await resolveItemUseTurn(offIds, flagOffGenerator);
+
+      const { narrativeContext: flagOffContext } = (
+        flagOffGenerator.generateSegment as jest.Mock
+      ).mock.calls[0][0];
+      expect(flagOffContext.sceneState).toBeUndefined();
+      const flagOffPrompt = actionTemplate({
+        worldName: 'Test World',
+        genre: 'fantasy',
+        tone: 'tense',
+        narrativeContext: flagOffContext,
+      });
+      const baselinePrompt = actionTemplate({
+        worldName: 'Test World',
+        genre: 'fantasy',
+        tone: 'tense',
+        narrativeContext: {
+          ...flagOffContext,
+          sceneState: {
+            location: 'Muddy Lake',
+            presentNpcNames: ['Guard'],
+            completedBeats: [
+              { id: 'gate-opened', text: 'The rusted gate swung open.', turnIndex: 1 },
+            ],
+          },
+        },
+      });
+      expect(flagOffPrompt).toBe(baselinePrompt);
+      expect(flagOffPrompt).not.toContain('gate-opened');
     });
   });
 

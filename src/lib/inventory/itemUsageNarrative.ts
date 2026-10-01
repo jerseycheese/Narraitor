@@ -14,12 +14,19 @@ export interface ItemUsageNarrativeDetails {
   previousQuantity?: number;
 }
 
+export interface ItemUsageNarrativeSceneState {
+  location: string | null;
+  presentNpcNames: string[];
+  completedBeats?: readonly { id: string; text: string; turnIndex: number }[];
+}
+
 interface ItemUsageNarrativeRequest {
   item: InventoryItem;
   characterId: EntityID;
   worldId: EntityID;
   sessionId: EntityID;
   usageDetails: ItemUsageNarrativeDetails;
+  sceneState?: ItemUsageNarrativeSceneState;
 }
 
 /**
@@ -84,6 +91,7 @@ export async function generateItemUsageNarrative(
     worldId,
     sessionId,
     usageDetails,
+    sceneState,
   }: ItemUsageNarrativeRequest,
   generator: NarrativeGenerator
 ): Promise<NarrativeGenerationResult> {
@@ -170,6 +178,7 @@ export async function generateItemUsageNarrative(
               name: item.name,
             },
           ],
+          ...(sceneState ? { sceneState } : {}),
         },
         generationParameters: {
           segmentType: 'action',
