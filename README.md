@@ -109,13 +109,13 @@ src/
 
 ## Roadmap
 
-Version 1.0 shipped in August 2026: a single-player release you run in your browser with your own key, no account needed. The releases since have been refinements rather than big new features, and each one is written up in [RELEASES.md](RELEASES.md). The current version is 1.10.
+Version 1.0 shipped in August 2026: a single-player release you run in your browser with your own key, no account needed. The releases since have been refinements rather than big new features, and each one is written up in [RELEASES.md](RELEASES.md). The current version is 1.11.
 
 Recent work: a visual redesign, generated images for worlds and journal entries and endings, better keyboard support, work on keeping longer stories consistent from turn to turn, and the option to generate with OpenAI or OpenRouter instead of Gemini (or your own server, if you run one).
 
 Version [1.8](https://github.com/jerseycheese/Narraitor/milestone/9) set shared visual rules for buttons, type and borders. Version [1.9](https://github.com/jerseycheese/Narraitor/milestone/10) applied them page by page: wizards, lists, detail and edit pages, the dashboard, journal and ending screen, settings, and the public pages.
 
-Version [1.10](https://github.com/jerseycheese/Narraitor/milestone/11) fixed the play-loop bugs a September playtest round turned up: a session that locked on its first turn, a death that left the screen hanging, failures with no retry, and prompt text leaking into the story. Version [1.11](https://github.com/jerseycheese/Narraitor/milestone/12) takes on that round's bigger finding. After about turn 15, the story loses track of who's in the scene and what has already happened. The fix gives the game its own record of both, instead of relying on the model to remember.
+Version [1.10](https://github.com/jerseycheese/Narraitor/milestone/11) fixed the play-loop bugs a September playtest round turned up. Version [1.11](https://github.com/jerseycheese/Narraitor/milestone/12) built the game its own record of who's in the scene and what has already happened, but that didn't make long stories hold together, so it ships switched off. Version [1.12](https://github.com/jerseycheese/Narraitor/milestone/13) tries a different lever: making cheaper open-weight models work properly through OpenRouter, then testing whether shorter episodes keep the story strong.
 
 There are no plans for accounts or cloud saves: Narraitor stays on your device unless a clear reason to change that turns up, and [the reasoning is written down](public_docs/architecture/ADR-014-browser-local-until-named-trigger.md). Further out, the ideas worth exploring are shared worlds, voice narration, and mobile apps.
 
