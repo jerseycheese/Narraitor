@@ -216,6 +216,53 @@ describe('resolveProvider', () => {
     expect(resolution).toMatchObject({ ok: true, descriptor: { model: DEFAULT_TEXT_MODEL } });
   });
 
+  it('accepts valid leading-~ body-carried model aliases for OpenAI-compatible providers', () => {
+    const resolution = resolveProvider(
+      requestWith({
+        [PROVIDER_API_KEY_HEADER]: 'byo-key',
+        [PROVIDER_TYPE_HEADER]: 'openai-compatible',
+        [PROVIDER_ENDPOINT_HEADER]: OPENROUTER,
+        [PROVIDER_MODEL_HEADER]: '~deepseek/deepseek-flash-latest',
+      })
+    );
+
+    expect(resolution).toMatchObject({
+      ok: true,
+      descriptor: {
+        type: 'openai-compatible',
+        endpoint: OPENROUTER,
+        model: '~deepseek/deepseek-flash-latest',
+      },
+    });
+  });
+
+  it('rejects malformed model IDs for OpenAI-compatible providers', () => {
+    for (const badModel of ['~', '~~deepseek', 'deepseek/chat~', 'deepseek chat', 'a'.repeat(129)]) {
+      const resolution = resolveProvider(
+        requestWith({
+          [PROVIDER_API_KEY_HEADER]: 'byo-key',
+          [PROVIDER_TYPE_HEADER]: 'openai-compatible',
+          [PROVIDER_ENDPOINT_HEADER]: OPENROUTER,
+          [PROVIDER_MODEL_HEADER]: badModel,
+        })
+      );
+
+      expect(resolution).toEqual({ ok: false, reason: 'INVALID_MODEL' });
+    }
+  });
+
+  it('refuses body-carried model aliases on Gemini and falls back to default model', () => {
+    const resolution = resolveProvider(
+      requestWith({
+        [PROVIDER_API_KEY_HEADER]: 'byo-key',
+        [PROVIDER_TYPE_HEADER]: 'gemini',
+        [PROVIDER_MODEL_HEADER]: '~deepseek/deepseek-flash-latest',
+      })
+    );
+
+    expect(resolution).toMatchObject({ ok: true, descriptor: { model: DEFAULT_TEXT_MODEL } });
+  });
+
   /**
    * The env key belongs to the deployment, not to the caller. Honouring routing
    * headers without a caller-supplied key would let anyone name an endpoint and

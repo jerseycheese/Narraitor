@@ -151,6 +151,17 @@ describe('POST /api/ai/validate-provider', () => {
     expect(data.error).toBe('UNSUPPORTED_PROVIDER');
     expect(mockMakeGeminiRequest).not.toHaveBeenCalled();
   });
+
+  test('rejects body-carried model aliases and malformed model IDs without calling upstream', async () => {
+    for (const badModel of ['~deepseek/deepseek-flash-latest', 'bad/model', 'bad:model', 'gemini flash', '']) {
+      const response = await POST(buildRequest({ key: KEY, body: { type: 'gemini', model: badModel } }));
+      const data = await response.json();
+
+      expect(data.valid).toBe(false);
+      expect(data.error).toBe('INVALID_MODEL');
+      expect(mockMakeGeminiRequest).not.toHaveBeenCalled();
+    }
+  });
 });
 
 describe('POST /api/ai/validate-provider — Claude', () => {
@@ -227,6 +238,17 @@ describe('POST /api/ai/validate-provider — Claude', () => {
     const response = await POST(claudeRequest({ model: 'claude-sonnet-5' }));
 
     expect((await response.json()).error).toBe('RATE_LIMITED');
+  });
+
+  test('rejects malformed model IDs without calling upstream', async () => {
+    for (const badModel of ['claude sonnet', 'claude\nsonnet', '~', 'a'.repeat(129), '']) {
+      const response = await POST(claudeRequest({ model: badModel }));
+      const data = await response.json();
+
+      expect(data.valid).toBe(false);
+      expect(data.error).toBe('INVALID_MODEL');
+      expect(global.fetch).not.toHaveBeenCalled();
+    }
   });
 });
 
@@ -379,5 +401,34 @@ describe('POST /api/ai/validate-provider — OpenAI-compatible providers', () =>
     const response = await POST(openAIRequest({ endpoint: ENDPOINT, model: 'nope/nope-1' }));
 
     expect((await response.json()).error).toBe('INVALID_MODEL');
+  });
+
+  test('accepts valid leading-~ body-carried model aliases and pings upstream', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue(fakeResponse(200));
+
+    const response = await POST(
+      openAIRequest({ endpoint: ENDPOINT, model: '~deepseek/deepseek-flash-latest' })
+    );
+    const data = await response.json();
+
+    expect(data.valid).toBe(true);
+    expect(data.model).toBe('~deepseek/deepseek-flash-latest');
+    expect(global.fetch).toHaveBeenCalledWith(
+      ENDPOINT,
+      expect.objectContaining({
+        body: expect.stringContaining('"model":"~deepseek/deepseek-flash-latest"'),
+      })
+    );
+  });
+
+  test('rejects malformed model IDs without calling upstream', async () => {
+    for (const badModel of ['~', '~~deepseek', 'deepseek/chat~', 'deepseek chat', 'a'.repeat(129), '']) {
+      const response = await POST(openAIRequest({ endpoint: ENDPOINT, model: badModel }));
+      const data = await response.json();
+
+      expect(data.valid).toBe(false);
+      expect(data.error).toBe('INVALID_MODEL');
+      expect(global.fetch).not.toHaveBeenCalled();
+    }
   });
 });
