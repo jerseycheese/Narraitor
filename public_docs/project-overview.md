@@ -13,7 +13,7 @@ I built this AI storytelling app that lets you play RPG narratives in any fictio
 Middle Earth, the beaches of Normandy, something you invented last week: all fair game. It's designed for solo play when you want a narrative RPG experience but don't have a group or game master available.
 
 ## Current Status
-As of v1.10.0 (2026-09-27), the app is past MVP: all the main systems (world creation, character building, AI narrative generation, session persistence, multi-provider AI) are operational and have shipped through ten releases. Current work (v1.11) targets long-session story coherence — a September playtest round found the story falling apart between turns 15-25 in 4 of 5 runs, so a turn resolver and stall-breaker are going in to fix that mechanically rather than by tweaking prompt wording. See [MVP Roadmap](./development/mvp-roadmap.md) and [RELEASES.md](../RELEASES.md) for the running detail.
+As of v1.11.0 (2026-10-01), the app is past MVP: all the main systems (world creation, character building, AI narrative generation, session persistence, multi-provider AI) are operational and have shipped through eleven releases. v1.11 built scene state and a stall-breaker for long-session coherence, but the re-measure showed no gain, so it ships switched off. Current work (v1.12) changes lever: making cheaper open-weight models work properly through OpenRouter, then testing whether 10-turn episodes keep the story strong. See [MVP Roadmap](./development/mvp-roadmap.md) and [RELEASES.md](../RELEASES.md) for the running detail.
 
 ## Technical Foundation
 
@@ -49,7 +49,7 @@ Built primarily for personal use: solo narrative RPG experiences when you want t
 **KISS approach**: Simple, maintainable code over clever solutions. **TDD workflow**: Tests before implementation to catch issues early. **Component-first**: Build in Storybook isolation before integration. **Domain boundaries**: Keep related functionality together.
 
 ## Current Focus
-Long-session story coherence for v1.11: a turn resolver to track scene/location/beat state and break stalls mechanically, plus an ending detector that reads a thread ledger instead of per-turn event labels. See [MVP Roadmap](./development/mvp-roadmap.md) for the active queue.
+v1.12: OpenRouter models without workarounds (#2252, #2251, #2249), the fatal-cooldown fix (#2250), then a re-measure at n=3 plus 10-turn episodes (#2257). See [MVP Roadmap](./development/mvp-roadmap.md) for the active queue.
 
 ## Technical Architecture
 Domain-driven structure with Zustand stores for each area (World, Character, Narrative, etc.). Shared component patterns for wizards and forms. AI service abstractions handle prompt management and context building. Everything's type-safe with validation.
