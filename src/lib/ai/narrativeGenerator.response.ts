@@ -8,17 +8,19 @@ import {
   normalizeCharacterIds,
   getWorldGenre,
   getMoodForGenre,
-  FIRST_SEGMENT_LOCATION,
 } from './narrativeGenerator.response.helpers';
+import { FIRST_SEGMENT_LOCATION } from '@/types/narrative.types';
 import { safeTrim } from '@/lib/utils';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 
 export const formatNarrativeResponse = async (
   response: { content?: string; tokenUsage?: number },
   segmentType: string,
   geminiClient: AIClient,
-  previousLocation?: string
+  previousLocation?: string,
+  currentSceneNpcIds: readonly string[] = []
 ): Promise<NarrativeGenerationResult> => {
-  const parsed = parseNarrativeResponse(response, segmentType);
+  const parsed = parseNarrativeResponse(response, segmentType, currentSceneNpcIds);
   const actualContent = parsed.actualContent;
   const extractedMetadata = parsed.extractedMetadata;
   const resolvedSegmentType = parsed.segmentType;
@@ -66,6 +68,13 @@ export const formatNarrativeResponse = async (
       | 'transition',
     metadata: {
       characterIds: confirmedCharacterIds,
+      ...(isFeatureEnabled('SCENE_STATE') ? {
+        sceneEntries: extractedMetadata.sceneEntries ?? [],
+        sceneExits: extractedMetadata.sceneExits ?? [],
+        ...(extractedMetadata.sceneTransition
+          ? { sceneTransition: extractedMetadata.sceneTransition }
+          : {}),
+      } : {}),
       speakerId,
       location: extractedMetadata.location || fallbackLocation,
       mood: extractedMetadata.mood || fallbackMood,

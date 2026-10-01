@@ -1,8 +1,10 @@
 // Action template focused on immediate item usage beats
 import { majorEventGuidelines } from './majorEventGuidelines';
 import type { NarrativeTemplateContext } from './context';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 
 export const actionTemplate = (context: NarrativeTemplateContext) => {
+  const scenePresenceEnabled = isFeatureEnabled('SCENE_STATE');
   const {
     worldName,
     genre,
@@ -54,7 +56,7 @@ CRITICAL REQUIREMENTS:
 ${formattedRoster}
 
 NPC METADATA RULES:
-- Use NPC names in prose, but list their IDs in metadata.characterIds if they appear or speak during this beat.
+${scenePresenceEnabled ? '- Report NPCs entering or returning in metadata.sceneEntries and NPCs leaving in metadata.sceneExits, using IDs from metadata.characterIds, metadata.characters, or the current scene. Use [] when no one moves; mentioning an NPC without movement does not change presence.\n' : ''}- Use NPC names in prose, but list their IDs in metadata.characterIds if they appear or speak during this beat.
 - Do NOT include NPCs who are only mentioned or remembered—only characters sharing the scene belong in metadata.characterIds.
 - If you reference an off-screen NPC for future context, add them to metadata.characters but leave metadata.characterIds unchanged.
 - If a single NPC addresses the player directly, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
@@ -71,7 +73,7 @@ Response Format:
   "type": "action",
   "metadata": {
     "characterIds": [],
-    "speakerId": "npc-id-if-applicable",
+${scenePresenceEnabled ? '    "sceneEntries": [],\n    "sceneExits": [],\n' : ''}    "speakerId": "npc-id-if-applicable",
     "characters": [
       {
         "id": "npc-id-if-applicable",

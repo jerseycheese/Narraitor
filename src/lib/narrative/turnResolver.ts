@@ -1,6 +1,7 @@
 // src/lib/narrative/turnResolver.ts
 
 import type { EntityID } from '@/types/common.types';
+import { FIRST_SEGMENT_LOCATION } from '@/types/narrative.types';
 import type {
   LostItemMetadata,
   NarrativeGenerationResult,
@@ -36,7 +37,7 @@ import {
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { computeTurnsSinceComplication } from '@/lib/narrative/turnsSinceComplication';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
-import { assembleSessionSnapshot } from '@/lib/narrative/sessionSnapshotAssembler';
+import { assembleSessionSnapshot, latestSegmentNpcIds } from '@/lib/narrative/sessionSnapshotAssembler';
 import { extractStructuredLore } from '@/lib/ai/structuredLoreExtractor';
 import {
   getLoreContextForPrompt,
@@ -51,6 +52,7 @@ import {
 } from '@/lib/narrative/turnTags';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldStore } from '@/state/worldStore';
+import { useSceneStore, waitForSceneStoreHydration } from '@/state/sceneStore';
 import {
   buildUsageNarrative,
   generateItemUsageNarrative,
@@ -210,10 +212,15 @@ async function resolveTurnInner(
 ): Promise<TurnResult> {
   const { sessionId, worldId, characterId } = command;
   const ids = { worldId, characterId };
+  if (isFeatureEnabled('SCENE_STATE')) await waitForSceneStoreHydration();
 
   // Pre-turn snapshot for prompt context
   const preTurnSnapshot = assembleSessionSnapshot(sessionId, ids);
   const recentSegments = recentSceneSegments(preTurnSnapshot.segments);
+  const sceneState = preTurnSnapshot.sceneState;
+  const presentNpcNames = sceneState?.presentNpcIds.map(
+    (id) => preTurnSnapshot.npcs.find((npc) => npc.id === id)?.name ?? id
+  ) ?? [];
   const turnsSinceComplication = computeTurnsSinceComplication(
     [...preTurnSnapshot.segments]
   );
@@ -266,6 +273,7 @@ async function resolveTurnInner(
           turnsSinceComplication,
           worldClock,
           currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}`,
+          ...(sceneState ? { sceneState: { location: sceneState.location, presentNpcNames } } : {}),
         },
         generationParameters: {
           includedTopics: command.generationParams?.includedTopics ?? [command.choiceText],
@@ -313,6 +321,7 @@ async function resolveInitialTurnInner(
 ): Promise<TurnResult> {
   const { sessionId, worldId, characterId } = command;
   const ids = { worldId, characterId };
+  if (isFeatureEnabled('SCENE_STATE')) await waitForSceneStoreHydration();
 
   // Recheck inside the lock: if another instance already committed an
   // opening segment while this request was queued, skip generation.
@@ -358,6 +367,7 @@ async function resolveItemUseTurnInner(
   generator: NarrativeGenerator
 ): Promise<ItemUseTurnOutcome> {
   const { sessionId, worldId, characterId, itemId } = command;
+  if (isFeatureEnabled('SCENE_STATE')) await waitForSceneStoreHydration();
   const generationError = useNarrativeStore.getState().generationError;
   const activeSessionId = useSessionStore.getState().id;
 
@@ -610,6 +620,21 @@ async function commitAndSettleGeneratedTurn({
   );
   const storedSegment =
     useNarrativeStore.getState().segments[storedSegmentId] ?? newSegment;
+  if (isFeatureEnabled('SCENE_STATE')) {
+    const hadSceneRecord = Boolean(useSceneStore.getState().scenes[sessionId]);
+    const currentPlace = useSceneStore.getState().scenes[sessionId]?.location;
+    const transitionTo = storedSegment.metadata.sceneTransition?.to;
+    const transitionTarget = typeof transitionTo === 'string' ? transitionTo.trim() : '';
+    const nextPlace = transitionTarget && transitionTarget !== FIRST_SEGMENT_LOCATION
+      ? transitionTarget
+      : !currentPlace || currentPlace === FIRST_SEGMENT_LOCATION
+        ? storedSegment.metadata.location
+        : undefined;
+    if (nextPlace && nextPlace !== FIRST_SEGMENT_LOCATION) {
+      useSceneStore.getState().setLocation(sessionId, nextPlace);
+    }
+    reconcileScenePresence(sessionId, characterId, storedSegment, hadSceneRecord);
+  }
   const { notes, errors, acquiredItems } = await reconcileCoreSideEffects({
     segment: storedSegment,
     segmentId: storedSegmentId,
@@ -660,6 +685,37 @@ async function commitAndSettleGeneratedTurn({
     reconciledNotes: notes ?? undefined,
     reconciliationErrors: errors,
   };
+}
+
+function reconcileScenePresence(
+  sessionId: EntityID,
+  playerId: EntityID,
+  segment: NarrativeSegment,
+  hadSceneRecord: boolean
+): void {
+  const segments = useNarrativeStore.getState().getSessionSegments(sessionId);
+  const earlierSegments = segments.slice(0, -1);
+  const previouslySeen = new Set(
+    earlierSegments.flatMap((earlier) => earlier.metadata?.characterIds ?? [])
+  );
+  const current = new Set(hadSceneRecord
+    ? useSceneStore.getState().scenes[sessionId]?.presentNpcIds ?? []
+    : latestSegmentNpcIds(earlierSegments, playerId));
+  const knownNpcIds = new Set([
+    ...current,
+    ...(segment.metadata?.characterIds ?? []),
+    ...(segment.metadata?.characters ?? []).map((character) => character.id),
+  ]);
+  for (const npcId of segment.metadata?.characterIds ?? []) {
+    if (npcId !== playerId && !previouslySeen.has(npcId)) current.add(npcId);
+  }
+  for (const npcId of segment.metadata?.sceneEntries ?? []) {
+    if (npcId !== playerId && knownNpcIds.has(npcId)) current.add(npcId);
+  }
+  for (const npcId of segment.metadata?.sceneExits ?? []) {
+    if (npcId !== playerId && knownNpcIds.has(npcId)) current.delete(npcId);
+  }
+  useSceneStore.getState().setPresentNpcIds(sessionId, [...current]);
 }
 
 /**

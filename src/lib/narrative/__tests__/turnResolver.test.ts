@@ -12,6 +12,9 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useWorldStore } from '@/state/worldStore';
+import { useNPCStore } from '@/state/npcStore';
+import { sceneTemplate } from '@/lib/promptTemplates/templates/narrative/sceneTemplate';
+import { FIRST_SEGMENT_LOCATION } from '@/types/narrative.types';
 import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
 import type {
   NarrativeGenerationResult,
@@ -56,6 +59,7 @@ jest.mock('../worldClock', () => ({
 
 jest.mock('../turnsSinceComplication', () => ({
   computeTurnsSinceComplication: jest.fn(() => 0),
+  isPacingStale: jest.fn(() => false),
 }));
 
 jest.mock('../itemLossInference', () => ({
@@ -305,6 +309,289 @@ describe('TurnResolver', () => {
   });
 
   describe('resolveTurn', () => {
+    it('keeps sceneTransition in instructions and out of the stationary response example', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().setLocation(sessionId, 'Muddy Lake');
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const generator = makeMockGenerator();
+
+      await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
+
+      const { narrativeContext } = (generator.generateSegment as jest.Mock).mock.calls[0][0];
+      const prompt = sceneTemplate({ worldName: 'Test World', genre: 'fantasy', tone: 'tense', narrativeContext });
+      expect(prompt).toContain('report metadata.sceneTransition');
+      expect(prompt).not.toContain('"sceneTransition":');
+    });
+
+    it('restores legacy on-screen NPCs when no scene record exists', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useNPCStore.getState().createNPC({
+        id: 'npc-guard', name: 'Guard', description: 'A guard', worldId,
+      });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+      useNarrativeStore.getState().addSegment(sessionId, {
+        content: 'Guard stands beside you at the lake.',
+        type: 'scene',
+        characterIds: [characterId, 'npc-guard'],
+        metadata: { characterIds: [characterId, 'npc-guard'], tags: [], location: 'Muddy Lake' },
+        worldId,
+        timestamp: new Date(),
+        updatedAt: new Date().toISOString(),
+      });
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const generator = makeMockGenerator(makeGenerationResult({
+        content: 'You inspect the shoreline.',
+        metadata: { characterIds: [], tags: [], location: 'Muddy Lake' },
+      }));
+
+      const result = await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
+
+      expect((generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext.sceneState)
+        .toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'] });
+      expect(result.snapshot.sceneState?.presentNpcIds).toEqual(['npc-guard']);
+    });
+
+    it('keeps the recorded place when a model location label drifts', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().setLocation(sessionId, 'Muddy Lake');
+      useSceneStore.getState().setPresentNpcIds(sessionId, ['npc-guard']);
+      useNPCStore.getState().createNPC({
+        id: 'npc-guard', name: 'Guard', description: 'A guard', worldId,
+      });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const generator = makeMockGenerator(makeGenerationResult({
+        content: 'The water laps at the shore.',
+        metadata: { characterIds: [], tags: [], location: "Muddy Lake's" },
+      }));
+      const result = await resolveTurn(
+        makeCommand({ sessionId, worldId, characterId }),
+        generator
+      );
+
+      expect(result.segment.metadata.location).toBe('Muddy Lake');
+      expect(result.snapshot.sceneState?.location).toBe('Muddy Lake');
+      expect(result.snapshot.sceneState?.presentNpcIds).toContain('npc-guard');
+      const promptContext = (generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext;
+      expect(promptContext.currentSituation).toBe('Player chose: "Head north"');
+      expect(promptContext.sceneState).toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'] });
+    });
+
+    it('moves the recorded place only for a structured transition', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().setLocation(sessionId, 'Muddy Lake');
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const generator = makeMockGenerator(makeGenerationResult({
+        content: 'You step into the mill.',
+        metadata: {
+          characterIds: [], tags: [], location: 'A damp building',
+          sceneTransition: { to: 'Old Mill' },
+        },
+      }));
+
+      const result = await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
+      expect(result.segment.metadata.location).toBe('Old Mill');
+      expect(result.snapshot.sceneState?.location).toBe('Old Mill');
+    });
+
+    it('uses the transition target when the stored location label conflicts', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().setLocation(sessionId, 'Muddy Lake');
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const generator = makeMockGenerator(makeGenerationResult({
+        metadata: {
+          characterIds: [], tags: [], location: "the kitchen's",
+          sceneTransition: { to: 'Council room' },
+        },
+      }));
+      const addSegment = useNarrativeStore.getState().addSegment;
+      const addSegmentSpy = jest.spyOn(useNarrativeStore.getState(), 'addSegment').mockImplementation(
+        (...args) => {
+          const id = addSegment(...args);
+          const segment = useNarrativeStore.getState().segments[id];
+          useNarrativeStore.setState((state) => ({
+            segments: {
+              ...state.segments,
+              [id]: { ...segment, metadata: { ...segment.metadata, location: "the kitchen's" } },
+            },
+          }));
+          return id;
+        }
+      );
+      try {
+        const result = await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
+        expect(result.snapshot.sceneState?.location).toBe('Council room');
+      } finally {
+        addSegmentSpy.mockRestore();
+        useNarrativeStore.setState({ addSegment });
+      }
+    });
+
+    it('keeps the existing location label behavior with SCENE_STATE off', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().setLocation(sessionId, 'Muddy Lake');
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+      const generator = makeMockGenerator(makeGenerationResult({
+        metadata: { characterIds: [], tags: [], location: "Muddy Lake's", sceneTransition: { to: 'Old Mill' } },
+      }));
+      const result = await resolveTurn(
+        makeCommand({ sessionId, worldId, characterId }),
+        generator
+      );
+
+      expect(result.segment.metadata.location).toBe("Muddy Lake's");
+      expect(result.segment.metadata.sceneTransition).toBeUndefined();
+      expect(result.snapshot.sceneState).toBeUndefined();
+      expect(useSceneStore.getState().scenes[sessionId]?.location).toBe('Muddy Lake');
+      expect((generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext.currentSituation).toBe('Player chose: "Head north"');
+    });
+
+    it('keeps an NPC present when prose says they leave an object', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const npcId = 'npc-guard';
+      const generator = makeMockGenerator();
+      (generator.generateSegment as jest.Mock)
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard joins you at the gate.',
+          metadata: { characterIds: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }))
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard leaves the key on the table.',
+          metadata: { characterIds: [npcId], sceneExits: ['npc-unknown'], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }));
+
+      const command = makeCommand({ sessionId, worldId, characterId });
+      await resolveTurn(command, generator);
+      await resolveTurn(command, generator);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).toContain(npcId);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).not.toContain('npc-unknown');
+    });
+
+    it('keeps a departed NPC absent until an explicit return, including the relationship gate', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const npcId = 'npc-guard';
+      const generator = makeMockGenerator();
+      (generator.generateSegment as jest.Mock)
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard joins you at the gate.',
+          metadata: { characterIds: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }))
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard leaves the courtyard.',
+          metadata: { characterIds: [], sceneExits: [npcId], tags: [] },
+        }))
+        .mockResolvedValueOnce(makeGenerationResult({ content: 'You wait alone.' }))
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard calls out and acts from beyond the gate.',
+          metadata: { characterIds: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }))
+        .mockResolvedValueOnce(makeGenerationResult({
+          content: 'Guard returns to the courtyard.',
+          metadata: { characterIds: [npcId], sceneEntries: [npcId], characters: [{ id: npcId, name: 'Guard', description: 'A guard' }], tags: [] },
+        }));
+      const command = makeCommand({ sessionId, worldId, characterId });
+      await resolveTurn(command, generator);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).toContain(npcId);
+      await resolveTurn(command, generator);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).not.toContain(npcId);
+      await resolveTurn(command, generator);
+      await resolveTurn(command, generator);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).not.toContain(npcId);
+
+      const selectRelationshipChoice = async (optionId: string) => {
+        const decisionId = useNarrativeStore.getState().addDecision(sessionId, {
+          prompt: 'What do you do?',
+          options: [{ id: optionId, text: 'Help Guard', alignment: 'neutral', consequences: [
+            { type: 'relationship', action: 'add', targetId: npcId, value: 10 },
+          ] }],
+        });
+        await useNarrativeStore.getState().selectDecisionOption(decisionId, optionId, characterId);
+      };
+      await selectRelationshipChoice('choice-absent');
+      expect(useWorldStore.getState().getWorldState(worldId).npcRelationships[npcId]).toBeUndefined();
+
+      await resolveTurn(command, generator);
+      expect(useSceneStore.getState().scenes[sessionId]?.presentNpcIds).toContain(npcId);
+      await selectRelationshipChoice('choice-returned');
+      expect(useWorldStore.getState().getWorldState(worldId).npcRelationships[npcId].trust).toBe(60);
+    });
+
+    it('waits for scene hydration before assembling the first prompt snapshot', async () => {
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const hydration = deferred<void>();
+      const hydratedSpy = jest.spyOn(useSceneStore.persist, 'hasHydrated').mockReturnValue(false);
+      const rehydrateSpy = jest.spyOn(useSceneStore.persist, 'rehydrate').mockImplementation(async () => {
+        await hydration.promise;
+        useSceneStore.setState({ scenes: {
+          'session-1': { location: null, presentNpcIds: ['npc-guard'], completedBeats: [] },
+        } });
+      });
+      try {
+        const generator = makeMockGenerator();
+        const turn = resolveTurn(makeCommand(), generator);
+        await Promise.resolve();
+        expect(generator.generateSegment).not.toHaveBeenCalled();
+        hydration.resolve();
+        const result = await turn;
+        expect(result.status).toBe('settled');
+        expect(rehydrateSpy).toHaveBeenCalledTimes(1);
+        expect(result.snapshot.sceneState?.presentNpcIds).toContain('npc-guard');
+      } finally {
+        hydratedSpy.mockRestore();
+        rehydrateSpy.mockRestore();
+      }
+    });
+
+    it('waits for scene hydration before applying a relationship choice', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const npcId = 'npc-guard';
+      await resolveTurn(makeCommand({ sessionId, worldId, characterId }), makeMockGenerator());
+      useSceneStore.setState({ scenes: {} });
+      const decisionId = useNarrativeStore.getState().addDecision(sessionId, {
+        prompt: 'Help the guard?',
+        options: [{ id: 'help', text: 'Help', alignment: 'neutral', consequences: [
+          { type: 'relationship', action: 'add', targetId: npcId, value: 10 },
+        ] }],
+      });
+      const hydration = deferred<void>();
+      const hydratedSpy = jest.spyOn(useSceneStore.persist, 'hasHydrated')
+        .mockReturnValueOnce(false).mockReturnValueOnce(false).mockReturnValue(true);
+      const rehydrateSpy = jest.spyOn(useSceneStore.persist, 'rehydrate').mockImplementation(async () => {
+        await hydration.promise;
+        useSceneStore.getState().setPresentNpcIds(sessionId, [npcId]);
+      });
+      try {
+        const selection = useNarrativeStore.getState().selectDecisionOption(decisionId, 'help', characterId);
+        expect(useWorldStore.getState().getWorldState(worldId).npcRelationships[npcId]).toBeUndefined();
+        hydration.resolve();
+        await selection;
+        expect(rehydrateSpy).toHaveBeenCalledTimes(1);
+        expect(useWorldStore.getState().getWorldState(worldId).npcRelationships[npcId].trust).toBe(60);
+      } finally {
+        hydratedSpy.mockRestore();
+        rehydrateSpy.mockRestore();
+      }
+    });
     it('commits a segment and returns a settled result', async () => {
       const generator = makeMockGenerator();
       const command = makeCommand();
@@ -1371,6 +1658,38 @@ describe('TurnResolver', () => {
   });
 
   describe('resolveInitialTurn', () => {
+    it('leaves the fallback location unset until the model names a place', async () => {
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const generator = makeMockGenerator(makeGenerationResult({
+        metadata: { characterIds: [], tags: [], location: FIRST_SEGMENT_LOCATION },
+      }));
+      (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult({
+        metadata: { characterIds: [], tags: [], location: 'Council room' },
+      }));
+
+      const opening = await resolveInitialTurn(
+        { sessionId: 'session-1', worldId: 'world-1', characterId: 'char-1', generateChoices: false },
+        generator
+      );
+      expect(opening.snapshot.sceneState?.location).toBeNull();
+
+      const next = await resolveTurn(makeCommand(), generator);
+      expect(next.snapshot.sceneState?.location).toBe('Council room');
+    });
+
+    it('records the opening location with SCENE_STATE enabled', async () => {
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const result = await resolveInitialTurn(
+        { sessionId: 'session-1', worldId: 'world-1', characterId: 'char-1', generateChoices: false },
+        makeMockGenerator()
+      );
+      expect(result.snapshot.sceneState?.location).toBe('The road');
+    });
+
     it('commits the first segment and returns a settled result', async () => {
       const generator = makeMockGenerator();
 
@@ -1483,6 +1802,24 @@ describe('sessionSnapshotAssembler', () => {
     expect(Object.isFrozen(snapshot.sceneState?.presentNpcIds)).toBe(true);
     expect(Object.isFrozen(snapshot.sceneState?.completedBeats[0])).toBe(true);
     expect(assembleSessionSnapshot('session-3').sceneState).toBeUndefined();
+  });
+
+  it('projects the last recorded location before a scene-store record exists', () => {
+    useNarrativeStore.getState().addSegment('session-1', {
+      content: 'You stand beside the lake.',
+      type: 'scene',
+      characterIds: [],
+      metadata: { characterIds: [], tags: [], location: 'Muddy Lake' },
+      worldId: 'world-1',
+      timestamp: new Date(),
+      updatedAt: new Date().toISOString(),
+    });
+    const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+    (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+
+    expect(assembleSessionSnapshot('session-1').sceneState).toEqual({
+      location: 'Muddy Lake', presentNpcIds: [], completedBeats: [],
+    });
   });
 
   it('assembles a frozen snapshot from current store state', () => {

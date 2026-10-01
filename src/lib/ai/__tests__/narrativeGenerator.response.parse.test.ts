@@ -2,8 +2,58 @@ import {
   parseNarrativeResponse,
   unescapeJsonString,
 } from '../narrativeGenerator.response.parse';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+
+jest.mock('@/lib/featureFlags', () => ({ isFeatureEnabled: jest.fn(() => false) }));
 
 describe('parseNarrativeResponse debris guard', () => {
+  it('keeps scene movement out of flag-off parsed metadata', () => {
+    const response = { content: '{"content":"Guard enters.","metadata":{"characterIds":["npc-guard"],"sceneEntries":["npc-guard"],"sceneExits":[],"sceneTransition":{"to":"Old Mill"}}}' };
+    const withoutMovement = { content: '{"content":"Guard enters.","metadata":{"characterIds":["npc-guard"]}}' };
+    expect(parseNarrativeResponse(response, 'scene')).toEqual(parseNarrativeResponse(withoutMovement, 'scene'));
+  });
+
+  it('keeps only string scene movement IDs when the flag is on', () => {
+    (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+    try {
+      const parsed = parseNarrativeResponse({
+        content: '{"content":"Guard enters.","metadata":{"characterIds":["npc-guard"],"sceneEntries":["npc-guard","npc-unknown",5,null,{}],"sceneExits":"npc-guard"}}',
+      }, 'scene');
+      expect(parsed.extractedMetadata.sceneEntries).toEqual(['npc-guard']);
+      expect(parsed.extractedMetadata.sceneExits).toEqual([]);
+    } finally {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+    }
+  });
+
+  it('accepts an exit for an NPC already in the current scene', () => {
+    (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+    try {
+      const parsed = parseNarrativeResponse({
+        content: '{"content":"Guard steps outside.","metadata":{"characterIds":[],"sceneExits":["npc-guard","npc-unknown"]}}',
+      }, 'scene', ['npc-guard']);
+      expect(parsed.extractedMetadata.sceneExits).toEqual(['npc-guard']);
+    } finally {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+    }
+  });
+
+  it('parses a named scene transition and ignores invalid targets', () => {
+    (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+    try {
+      const valid = parseNarrativeResponse({
+        content: '{"content":"You enter the mill.","metadata":{"sceneTransition":{"to":" Old Mill "}}}',
+      }, 'scene');
+      const invalid = parseNarrativeResponse({
+        content: '{"content":"You wait.","metadata":{"sceneTransition":{"to":17}}}',
+      }, 'scene');
+      expect(valid.extractedMetadata.sceneTransition).toEqual({ to: 'Old Mill' });
+      expect(invalid.extractedMetadata.sceneTransition).toBeUndefined();
+    } finally {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+    }
+  });
+
   it('throws when the response is a bare opening brace', () => {
     expect(() => parseNarrativeResponse({ content: '{' }, 'scene')).toThrow(
       'Service error: malformed API response'

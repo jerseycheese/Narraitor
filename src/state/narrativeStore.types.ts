@@ -42,7 +42,7 @@ export interface NarrativeStore {
   addDecision: (sessionId: EntityID, decision: Omit<Decision, 'id'>) => EntityID;
   updateDecision: (decisionId: EntityID, updates: Partial<Decision>) => void;
   /** Records a player's choice selection with timestamp and character association */
-  selectDecisionOption: (decisionId: EntityID, optionId: EntityID, characterId?: EntityID) => void;
+  selectDecisionOption: (decisionId: EntityID, optionId: EntityID, characterId?: EntityID) => void | Promise<void>;
   getSessionDecisions: (sessionId: EntityID) => Decision[];
   getLatestDecision: (sessionId: EntityID) => Decision | null;
 

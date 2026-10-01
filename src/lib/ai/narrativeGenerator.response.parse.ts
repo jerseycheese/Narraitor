@@ -1,4 +1,5 @@
 import { safeTrim } from '@/lib/utils';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 import { isValidCategory } from '@/lib/inventory/categories';
 import type { InventoryAcquisitionMethod } from '@/types/inventory.types';
 import type { GeneratedCharacterMetadata, LostItemMetadata } from '@/types/narrative.types';
@@ -112,7 +113,8 @@ const extractFlattenedFields = (
 
 export const parseNarrativeResponse = (
   response: { content?: string },
-  segmentType: string
+  segmentType: string,
+  currentSceneNpcIds: readonly string[] = []
 ): ParsedNarrativeResponse => {
   let actualContent = response.content || '';
   let extractedMetadata: NarrativeExtractedMetadata = {};
@@ -149,6 +151,13 @@ export const parseNarrativeResponse = (
         }
       } else {
         const parsed = JSON.parse(jsonStr);
+        const knownSceneNpcIds = new Set<string>(currentSceneNpcIds);
+        for (const id of Array.isArray(parsed?.metadata?.characterIds) ? parsed.metadata.characterIds : []) {
+          if (typeof id === 'string') knownSceneNpcIds.add(id);
+        }
+        for (const character of Array.isArray(parsed?.metadata?.characters) ? parsed.metadata.characters : []) {
+          if (typeof character?.id === 'string') knownSceneNpcIds.add(character.id);
+        }
         if (parsed.content) {
           actualContent = parsed.content;
           contentFromClosedField = true;
@@ -166,6 +175,18 @@ export const parseNarrativeResponse = (
             characterIds: Array.isArray(parsed?.metadata?.characterIds)
               ? parsed?.metadata?.characterIds
               : [],
+            ...(isFeatureEnabled('SCENE_STATE') ? {
+              sceneEntries: Array.isArray(parsed.metadata.sceneEntries)
+                ? parsed.metadata.sceneEntries.filter((id: unknown): id is string => typeof id === 'string' && knownSceneNpcIds.has(id))
+                : [],
+              sceneExits: Array.isArray(parsed.metadata.sceneExits)
+                ? parsed.metadata.sceneExits.filter((id: unknown): id is string => typeof id === 'string' && knownSceneNpcIds.has(id))
+                : [],
+              ...(typeof parsed.metadata.sceneTransition?.to === 'string' &&
+              safeTrim(parsed.metadata.sceneTransition.to)
+                ? { sceneTransition: { to: safeTrim(parsed.metadata.sceneTransition.to) } }
+                : {}),
+            } : {}),
             speakerId:
               typeof parsed?.metadata?.speakerId === 'string'
                 ? parsed?.metadata?.speakerId

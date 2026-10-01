@@ -8,6 +8,9 @@ import type { ContinuitySegmentNote } from './continuity.types';
 import type { WorldClockPromptContext, WorldClockSegmentNote } from './worldThread.types';
 import type { WorldCostSegmentNote } from './worldCost.types';
 
+/** Placeholder used by legacy response formatting before a place is established. */
+export const FIRST_SEGMENT_LOCATION = 'Starting Location';
+
 /**
  * Represents a segment of narrative in the game
  */
@@ -279,6 +282,9 @@ export interface NarrativeMetadata {
   worldCost?: WorldCostSegmentNote;
   location?: string;
   characterIds?: EntityID[];
+  sceneEntries?: EntityID[];
+  sceneExits?: EntityID[];
+  sceneTransition?: { to: string };
   characters?: GeneratedCharacterMetadata[];
   // Dialogue-specific metadata
   speakerId?: EntityID;
@@ -349,6 +355,7 @@ export interface NarrativeContext {
   turnsSinceComplication?: number;
   currentLocation?: string;
   currentSituation?: string;
+  sceneState?: { location: string | null; presentNpcNames: string[] };
   importantEntities?: Array<{
     id: EntityID;
     type: string;
@@ -382,6 +389,9 @@ export interface NarrativeGenerationResult {
   segmentType: 'scene' | 'dialogue' | 'action' | 'transition';
   metadata: {
     characterIds: EntityID[];
+    sceneEntries?: EntityID[];
+    sceneExits?: EntityID[];
+    sceneTransition?: { to: string };
     speakerId?: EntityID;
     location?: string;
     mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';

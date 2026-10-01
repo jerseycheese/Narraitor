@@ -121,6 +121,7 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
   const worldDescriptionSection = isFeatureEnabled('WORLD_DESCRIPTION_IN_SCENE')
     ? worldDescriptionBlock(worldDescription)
     : '';
+  const scenePresenceEnabled = isFeatureEnabled('SCENE_STATE');
 
   const baseContent = `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
 
@@ -130,7 +131,10 @@ ${worldDescriptionSection}${backgroundSection}
 STORY SO FAR:
 ${recentContent}
 
-${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
+${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}${scenePresenceEnabled && narrativeContext?.sceneState ? `
+CURRENT PLACE: ${narrativeContext.sceneState.location ?? 'not yet established'}
+PRESENT NPCS: ${narrativeContext.sceneState.presentNpcNames.join(', ') || 'none'}
+When the action moves to a new place, report metadata.sceneTransition as {"to":"new place"}; otherwise omit it. metadata.location is only a label.` : ''}
 
 ${skillResult ? `
 SKILL CHECK RESULT GUIDANCE:
@@ -190,7 +194,7 @@ ${segmentType === 'transition'
 ${formattedRoster}
 
 NPC METADATA RULES:
-- Use NPC names in the prose, but capture their IDs (from the roster above) in metadata.characterIds ONLY for characters who appear or speak in this segment.
+${scenePresenceEnabled ? '- Report NPCs entering or returning in metadata.sceneEntries and NPCs leaving in metadata.sceneExits, using IDs from metadata.characterIds, metadata.characters, or the current scene. Use [] when no one moves; mentioning an NPC without movement does not change presence.\n' : ''}- Use NPC names in the prose, but capture their IDs (from the roster above) in metadata.characterIds ONLY for characters who appear or speak in this segment.
 - Do NOT include characters who are merely mentioned, remembered, or located elsewhere—only on-screen participants belong in metadata.characterIds.
 - If you foreshadow or reference an off-screen NPC, you may add them to metadata.characters for future use, but keep them out of metadata.characterIds.
 - If a single NPC is the primary speaker addressing the player, set metadata.speakerId to that NPC's ID. Otherwise omit speakerId.
@@ -255,7 +259,7 @@ Response Format:
   "type": "dialogue" | "action" | "transition" | "scene",
   "metadata": {
     "characterIds": ["npc-id-1", "npc-id-2"],
-    "speakerId": "npc-id-1",
+${scenePresenceEnabled ? '    "sceneEntries": [],\n    "sceneExits": [],\n' : ''}    "speakerId": "npc-id-1",
     "characters": [
       {
         "id": "npc-id-1",

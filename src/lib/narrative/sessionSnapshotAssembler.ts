@@ -1,6 +1,8 @@
 // src/lib/narrative/sessionSnapshotAssembler.ts
 
 import type { EntityID } from '@/types/common.types';
+import { FIRST_SEGMENT_LOCATION } from '@/types/narrative.types';
+import type { NarrativeSegment } from '@/types/narrative.types';
 import type { SessionSnapshot } from '@/types/turnResolver.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -13,6 +15,16 @@ import { useSceneStore } from '@/state/sceneStore';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 import { getLoreContextForPrompt } from '@/lib/ai/loreContextHelper';
 import { countWorldClockTurns } from '@/lib/narrative/worldClock';
+
+/** Recovers the on-screen NPCs from a saved session before scene state existed. */
+export function latestSegmentNpcIds(
+  segments: readonly NarrativeSegment[],
+  playerId: EntityID
+): EntityID[] {
+  const latest = segments[segments.length - 1];
+  return [...new Set(latest?.metadata?.characterIds ?? latest?.characterIds ?? [])]
+    .filter((id) => id !== playerId);
+}
 
 /**
  * Reads every session-relevant store once at call time and returns a frozen,
@@ -86,8 +98,22 @@ export function assembleSessionSnapshot(
       ? narrativeState.getSessionDecisions(sessionId)
       : [];
 
+  const recordedScene = useSceneStore.getState().scenes[sessionId];
   const sceneState = isFeatureEnabled('SCENE_STATE')
-    ? useSceneStore.getState().scenes[sessionId]
+    ? recordedScene
+      ? {
+          ...recordedScene,
+          location: recordedScene.location === FIRST_SEGMENT_LOCATION ? null : recordedScene.location,
+        }
+      : allSegments.length > 0
+        ? {
+            location: allSegments[allSegments.length - 1].metadata.location === FIRST_SEGMENT_LOCATION
+              ? null
+              : allSegments[allSegments.length - 1].metadata.location ?? null,
+            presentNpcIds: latestSegmentNpcIds(allSegments, characterId),
+            completedBeats: [],
+          }
+        : undefined
     : undefined;
 
   const snapshot: SessionSnapshot = {

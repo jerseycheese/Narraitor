@@ -17,6 +17,7 @@ interface NarrativeTemplateNarrativeContext {
   recentSegments?: Array<{ content?: string }>;
   currentLocation?: string;
   currentSituation?: string;
+  sceneState?: { location: string | null; presentNpcNames: string[] };
   currentTags?: string[];
   /** Consecutive segments since the last complication — see computeTurnsSinceComplication */
   turnsSinceComplication?: number;

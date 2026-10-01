@@ -29,6 +29,7 @@ import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
 import { logger } from '@/lib/utils/logger';
 import { useInventoryStore } from '@/state/inventoryStore';
+import { useSceneStore } from '@/state/sceneStore';
 import {
   recordRequestCalibration,
 } from './narrativeGenerator.calibration';
@@ -181,7 +182,8 @@ export class NarrativeGenerator {
         response,
         inferSegmentType(response.content || ''),
         this.geminiClient,
-        getCarryForwardLocation(request.narrativeContext)
+        getCarryForwardLocation(request.narrativeContext),
+        useSceneStore.getState().scenes[request.sessionId]?.presentNpcIds ?? []
       );
 
       result = await enforceLanguageComplexity(result, toneSettings, this.geminiClient);

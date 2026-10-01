@@ -5,6 +5,9 @@ import { getCarryForwardLocation } from '../narrativeGenerator.response.helpers'
 import { useWorldStore } from '@/state/worldStore';
 import type { NarrativeExtractedMetadata } from '../narrativeGenerator.response.types';
 import type { NarrativeSegment } from '@/types/narrative.types';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+
+jest.mock('@/lib/featureFlags', () => ({ isFeatureEnabled: jest.fn(() => false) }));
 
 jest.mock('@/state/worldStore', () => ({
   useWorldStore: {
@@ -13,6 +16,25 @@ jest.mock('@/state/worldStore', () => ({
 }));
 
 describe('narrative response helpers', () => {
+  it('carries structured scene movement only with SCENE_STATE enabled', async () => {
+    const response = {
+      content: '{"content":"Guard steps outside.","metadata":{"characterIds":["npc-guard"],"sceneEntries":[],"sceneExits":["npc-guard"],"sceneTransition":{"to":"Old Mill"}}}',
+    };
+    const client = { generateContent: jest.fn() };
+    const flagOff = await formatNarrativeResponse(response, 'scene', client);
+    (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+    try {
+      const flagOn = await formatNarrativeResponse(response, 'scene', client);
+      const { sceneEntries, sceneExits, sceneTransition, ...withoutMovement } = flagOn.metadata;
+      expect(sceneEntries).toEqual([]);
+      expect(sceneExits).toEqual(['npc-guard']);
+      expect(sceneTransition).toEqual({ to: 'Old Mill' });
+      expect(flagOff.metadata).toEqual(withoutMovement);
+    } finally {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+    }
+  });
+
   it('parses JSON responses with metadata', () => {
     const response = {
       content: `\n\n\`\`\`json\n{"content":"Hello","type":"dialogue","metadata":{"location":"Town","mood":"tense","tags":["tag"],"characterIds":["npc-1"],"speakerId":"npc-1","itemsAcquired":[{"name":"Key","description":"Rusty","quantity":1,"acquisitionMethod":"loot"}],"characters":[{"id":"npc-1","name":"Bob"}],"majorEvent":"Big moment"}}\n\`\`\``,
