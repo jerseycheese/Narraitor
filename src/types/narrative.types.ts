@@ -354,6 +354,7 @@ export interface NarrativeContext {
   recentSegments?: NarrativeSegment[];
   /** Consecutive segments since the last complication — see computeTurnsSinceComplication */
   turnsSinceComplication?: number;
+  stalledSceneTurns?: number;
   currentLocation?: string;
   currentSituation?: string;
   sceneState?: {

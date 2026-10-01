@@ -1,3 +1,4 @@
+import { stallBreakerBlock } from './stallBreakerBlock';
 import { sceneBeatBlock } from './sceneBeatBlock';
 import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
@@ -245,7 +246,7 @@ Focus on varied sensory details and the character's reactions to bring the scene
 
   return `${baseContent}${examplesSection}
 
-${majorEventGuidelines}${sceneBeatBlock(context)}
+${majorEventGuidelines}${sceneBeatBlock(context)}${stallBreakerBlock(context)}
 
 SEGMENT TYPE SELECTION:
 Choose the most appropriate segment type based on your narrative content:

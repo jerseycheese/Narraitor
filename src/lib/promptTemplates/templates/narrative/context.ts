@@ -25,6 +25,7 @@ interface NarrativeTemplateNarrativeContext {
   currentTags?: string[];
   /** Consecutive segments since the last complication — see computeTurnsSinceComplication */
   turnsSinceComplication?: number;
+  stalledSceneTurns?: number;
   importantEntities?: Array<{
     id?: string;
     type?: string;

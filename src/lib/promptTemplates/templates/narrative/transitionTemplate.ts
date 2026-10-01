@@ -1,3 +1,4 @@
+import { stallBreakerBlock } from './stallBreakerBlock';
 import { sceneBeatBlock } from './sceneBeatBlock';
 import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
@@ -56,7 +57,7 @@ IMPORTANT: Write in SECOND PERSON perspective (using "you").`;
 
 ${formattedRoster}
 
-${majorEventGuidelines}${sceneBeatBlock(context)}
+${majorEventGuidelines}${sceneBeatBlock(context)}${stallBreakerBlock(context)}
 
 Response Format:
 {

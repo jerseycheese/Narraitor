@@ -53,6 +53,7 @@ import {
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSceneStore, waitForSceneStoreHydration } from '@/state/sceneStore';
+import { countQuietSceneTurns, SCENE_STALL_QUIET_TURNS } from './stallBreaker';
 import {
   buildUsageNarrative,
   generateItemUsageNarrative,
@@ -237,9 +238,14 @@ async function resolveTurnInner(
         world?.toneSettings?.customInstructions
       )
     : undefined;
-  const shouldRequestSceneTransition =
+  const quietSceneTurns = isFeatureEnabled('SCENE_STATE')
+    ? countQuietSceneTurns(preTurnSnapshot.segments, sceneState?.completedBeats)
+    : 0;
+  const shouldBreakSceneStall = quietSceneTurns >= SCENE_STALL_QUIET_TURNS;
+  const shouldRequestSceneTransition = shouldBreakSceneStall || (
     needsSceneTransition(worldClock) &&
-    !didWorldClockTransitionLastClockTurn(preTurnSnapshot.segments);
+    !didWorldClockTransitionLastClockTurn(preTurnSnapshot.segments)
+  );
 
   // Build skill check context string for the AI prompt
   let skillCheckContext = '';
@@ -272,6 +278,7 @@ async function resolveTurnInner(
           recentSegments: [...recentSegments],
           turnsSinceComplication,
           worldClock,
+          ...(shouldBreakSceneStall ? { stalledSceneTurns: quietSceneTurns } : {}),
           currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}`,
           ...(sceneState ? { sceneState: { location: sceneState.location, presentNpcNames, completedBeats: sceneState.completedBeats } } : {}),
         },
@@ -289,6 +296,12 @@ async function resolveTurnInner(
     command.signal
   );
 
+  if (shouldBreakSceneStall) {
+    const target = result.metadata.sceneTransition?.to?.trim();
+    if (!target || target === FIRST_SEGMENT_LOCATION) {
+      throw new Error('A stalled scene requires a recorded scene exit or time skip. Retry with metadata.sceneTransition.');
+    }
+  }
   const resultWithInferredLosses = inferMissingItemLosses(result, characterId);
 
   return commitAndSettleGeneratedTurn({
