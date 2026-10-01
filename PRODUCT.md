@@ -26,7 +26,8 @@ with tracked consequences, inventory, and a journal. The story adapts to your wo
 rather than defaulting to generic fantasy. Success is an immersive, coherent, replayable story
 loop that stays out of its own way. v1.8 shipped on 2026-09-14 and set shared design rules for
 buttons, type, and borders. v1.9 shipped on 2026-09-24 and applied them page by page. v1.10
-shipped on 2026-09-27 and fixed the play-loop bugs from the September playtest round.
+shipped on 2026-09-27 and fixed the play-loop bugs from the September playtest round. v1.11
+shipped on 2026-10-01 with scene state built but switched off after it measured no gain.
 
 ## Positioning
 

@@ -4,6 +4,48 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.11.0 - 2026-10-01
+
+v1.11 built the scene-state mechanism meant to keep long stories coherent: the turn resolver now records who's in the scene, where it is, and which beats have happened, and a stall-breaker forces the story forward. The re-measure didn't clear the bar, so all of it ships switched off. What's live is one game-session controller instead of two, and a set of wizard and play-screen fixes. The release covers 16 commits since [v1.10.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.10.0).
+
+**What's in this release**
+
+Play and game session:
+
+- The game session runs one NarrativeController, with turn state held in the store instead of seven component-level copies ([#2239](https://github.com/jerseycheese/Narraitor/pull/2239), for [#2232](https://github.com/jerseycheese/Narraitor/issues/2232)).
+- The loading skeleton's header stays inside its loading shell ([#2231](https://github.com/jerseycheese/Narraitor/pull/2231)).
+- Fixes from the browser-QA walkthrough: wizard, loading state, a modal, and the recovery notification ([#2226](https://github.com/jerseycheese/Narraitor/pull/2226)).
+
+Wizards:
+
+- The world wizard keeps its review state when you go Back, the clear-draft dialog says what it does, it enforces one limit instead of two, and creation failures now show up ([#2246](https://github.com/jerseycheese/Narraitor/pull/2246)).
+- The character wizard and the character editor follow the same skill rules ([#2245](https://github.com/jerseycheese/Narraitor/pull/2245)).
+- Edits to an AI suggestion are checked against the point pool ([#2229](https://github.com/jerseycheese/Narraitor/pull/2229), for [#2216](https://github.com/jerseycheese/Narraitor/issues/2216)).
+
+Shipped but off:
+
+- Scene state: the model, store and prompt snapshot ([#2241](https://github.com/jerseycheese/Narraitor/pull/2241)), presence and recorded location ([#2242](https://github.com/jerseycheese/Narraitor/pull/2242)), and the beat ledger plus stall-breaker ([#2248](https://github.com/jerseycheese/Narraitor/pull/2248)). Behind `SCENE_STATE`, off.
+- The ending offer reads the thread ledger instead of the last six major-event labels ([#2230](https://github.com/jerseycheese/Narraitor/pull/2230), for [#2204](https://github.com/jerseycheese/Narraitor/issues/2204)). Behind `ENDING_GATE_THREAD_LEDGER`, off.
+
+Other:
+
+- The landing page's showcase exchange and dividers are modernised ([#2209](https://github.com/jerseycheese/Narraitor/pull/2209)).
+- A standalone seed script for visual QA on dynamic routes ([#2219](https://github.com/jerseycheese/Narraitor/pull/2219)), the backlog-routing adapter and playtest-finding template ([#2207](https://github.com/jerseycheese/Narraitor/pull/2207), [#2208](https://github.com/jerseycheese/Narraitor/pull/2208)), a docs catch-up to v1.10 ([#2212](https://github.com/jerseycheese/Narraitor/pull/2212)), and an unused tone-settings prop removed ([#2247](https://github.com/jerseycheese/Narraitor/pull/2247)).
+
+**Known incomplete**
+
+The scene-state re-measure ([#2205](https://github.com/jerseycheese/Narraitor/issues/2205)) came back HOLD. Blocks 2 and 3 averaged 2.32 against a 3.0 bar, and a flag-off control on the same commit scored 2.43, so the flags added nothing. The model reported scene exits and entries zero times in 58 turns, and the stall-breaker never fired. The epic ([#2203](https://github.com/jerseycheese/Narraitor/issues/2203)) is parked with its code behind the off flag.
+
+The single-controller change ([#2239](https://github.com/jerseycheese/Narraitor/pull/2239)) hasn't had its own playtest. The 2026-10-01 model-test runs ran on `develop` with it in place and didn't show anything that pointed at it, which is indirect evidence only.
+
+Known bugs from those runs, still open: the ending request returns 413 ([#2253](https://github.com/jerseycheese/Narraitor/issues/2253)), starting fresh after an ended session hangs ([#2254](https://github.com/jerseycheese/Narraitor/issues/2254)), and narrator-written deaths skip the fatal cooldown ([#2250](https://github.com/jerseycheese/Narraitor/issues/2250)).
+
+**What's next**
+
+Four arcs of prompt and metadata work have now failed the same way, so [v1.12](https://github.com/jerseycheese/Narraitor/milestone/13) changes lever. A model test on 2026-10-01 found DeepSeek flash scored 4.14 in turns 1-10 against the default's 2.86 ([#1818](https://github.com/jerseycheese/Narraitor/issues/1818)). v1.12 makes OpenRouter models work without workarounds ([#2252](https://github.com/jerseycheese/Narraitor/issues/2252), [#2251](https://github.com/jerseycheese/Narraitor/issues/2251), [#2249](https://github.com/jerseycheese/Narraitor/issues/2249)), fixes the death cooldown ([#2250](https://github.com/jerseycheese/Narraitor/issues/2250)), then re-measures at n=3 and tests 10-turn episodes ([#2257](https://github.com/jerseycheese/Narraitor/issues/2257)).
+
+---
+
 ## v1.10.0 - 2026-09-27
 
 v1.10 fixes what the September playtest round ([#1818](https://github.com/jerseycheese/Narraitor/issues/1818)) broke in the play loop: a session that locked on turn 1, a death that hung on "Writing your story...", failures with no retry, and prompt text leaking into the story. It also clears a set of wizard bugs. The milestone closes 11 issues, plus [#2172](https://github.com/jerseycheese/Narraitor/issues/2172) closed as a duplicate, across 21 commits since [v1.9.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.9.0).
