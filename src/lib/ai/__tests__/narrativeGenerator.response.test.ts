@@ -18,17 +18,18 @@ jest.mock('@/state/worldStore', () => ({
 describe('narrative response helpers', () => {
   it('carries structured scene movement only with SCENE_STATE enabled', async () => {
     const response = {
-      content: '{"content":"Guard steps outside.","metadata":{"characterIds":["npc-guard"],"sceneEntries":[],"sceneExits":["npc-guard"],"sceneTransition":{"to":"Old Mill"}}}',
+      content: '{"content":"Guard steps outside.","metadata":{"characterIds":["npc-guard"],"sceneEntries":[],"sceneExits":["npc-guard"],"sceneTransition":{"to":"Old Mill"},"sceneBeat":{"id":"guard-departure","text":"The guard left."}}}',
     };
     const client = { generateContent: jest.fn() };
     const flagOff = await formatNarrativeResponse(response, 'scene', client);
     (isFeatureEnabled as jest.Mock).mockReturnValue(true);
     try {
       const flagOn = await formatNarrativeResponse(response, 'scene', client);
-      const { sceneEntries, sceneExits, sceneTransition, ...withoutMovement } = flagOn.metadata;
+      const { sceneEntries, sceneExits, sceneTransition, sceneBeat, ...withoutMovement } = flagOn.metadata;
       expect(sceneEntries).toEqual([]);
       expect(sceneExits).toEqual(['npc-guard']);
       expect(sceneTransition).toEqual({ to: 'Old Mill' });
+      expect(sceneBeat).toEqual({ id: 'guard-departure', text: 'The guard left.' });
       expect(flagOff.metadata).toEqual(withoutMovement);
     } finally {
       (isFeatureEnabled as jest.Mock).mockReturnValue(false);

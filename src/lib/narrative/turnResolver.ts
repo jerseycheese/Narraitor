@@ -53,6 +53,7 @@ import {
 import { useInventoryStore } from '@/state/inventoryStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSceneStore, waitForSceneStoreHydration } from '@/state/sceneStore';
+import { countQuietSceneTurns, SCENE_STALL_QUIET_TURNS } from './stallBreaker';
 import {
   buildUsageNarrative,
   generateItemUsageNarrative,
@@ -237,9 +238,14 @@ async function resolveTurnInner(
         world?.toneSettings?.customInstructions
       )
     : undefined;
-  const shouldRequestSceneTransition =
+  const quietSceneTurns = isFeatureEnabled('SCENE_STATE')
+    ? countQuietSceneTurns(preTurnSnapshot.segments, sceneState?.completedBeats)
+    : 0;
+  const shouldBreakSceneStall = quietSceneTurns >= SCENE_STALL_QUIET_TURNS;
+  const shouldRequestSceneTransition = shouldBreakSceneStall || (
     needsSceneTransition(worldClock) &&
-    !didWorldClockTransitionLastClockTurn(preTurnSnapshot.segments);
+    !didWorldClockTransitionLastClockTurn(preTurnSnapshot.segments)
+  );
 
   // Build skill check context string for the AI prompt
   let skillCheckContext = '';
@@ -253,7 +259,7 @@ async function resolveTurnInner(
     skillCheckContext = ` [Skill checks: ${descriptions.join(', ')}]`;
   }
 
-  const result = await awaitGeneration(
+  const generateSegment = (isStallRetry = false) => awaitGeneration(
     () => generator.generateSegment(
       {
         worldId,
@@ -272,8 +278,10 @@ async function resolveTurnInner(
           recentSegments: [...recentSegments],
           turnsSinceComplication,
           worldClock,
+          ...(shouldBreakSceneStall ? { stalledSceneTurns: quietSceneTurns } : {}),
+          ...(isStallRetry ? { isStallRetry: true } : {}),
           currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}`,
-          ...(sceneState ? { sceneState: { location: sceneState.location, presentNpcNames } } : {}),
+          ...(sceneState ? { sceneState: { location: sceneState.location, presentNpcNames, completedBeats: sceneState.completedBeats } } : {}),
         },
         generationParameters: {
           includedTopics: command.generationParams?.includedTopics ?? [command.choiceText],
@@ -289,6 +297,28 @@ async function resolveTurnInner(
     command.signal
   );
 
+  let result = await generateSegment();
+  if (shouldBreakSceneStall) {
+    const target = result.metadata.sceneTransition?.to?.trim();
+    if (!target || target === FIRST_SEGMENT_LOCATION) {
+      result = await generateSegment(true);
+      const retryTarget = result.metadata.sceneTransition?.to?.trim();
+      if (!retryTarget || retryTarget === FIRST_SEGMENT_LOCATION) {
+        const currentPlace = [
+          sceneState?.location,
+          recentSegments[recentSegments.length - 1]?.metadata.location,
+          result.metadata.location,
+        ].find((place) => place?.trim() && place.trim() !== FIRST_SEGMENT_LOCATION)?.trim() ?? 'Current scene';
+        result = {
+          ...result,
+          metadata: { ...result.metadata, sceneTransition: { to: currentPlace } },
+        };
+        logger.warn('[TurnResolver] Forced scene time skip after ignored stall retry', {
+          sessionId, quietSceneTurns, location: currentPlace,
+        });
+      }
+    }
+  }
   const resultWithInferredLosses = inferMissingItemLosses(result, characterId);
 
   return commitAndSettleGeneratedTurn({
@@ -422,8 +452,31 @@ async function resolveItemUseTurnInner(
     remainingQuantity: usage.remainingQuantity,
     previousQuantity: usage.previousQuantity,
   };
+  const preTurnSnapshot = assembleSessionSnapshot(sessionId, {
+    worldId,
+    characterId,
+  });
+  const sceneState = preTurnSnapshot.sceneState;
+  const presentNpcNames =
+    sceneState?.presentNpcIds.map(
+      (id) => preTurnSnapshot.npcs.find((npc) => npc.id === id)?.name ?? id
+    ) ?? [];
+  const projectedSceneState = sceneState
+    ? {
+        location: sceneState.location,
+        presentNpcNames,
+        completedBeats: sceneState.completedBeats,
+      }
+    : undefined;
   const generated = await generateItemUsageNarrative(
-    { item, characterId, worldId, sessionId, usageDetails },
+    {
+      item,
+      characterId,
+      worldId,
+      sessionId,
+      usageDetails,
+      ...(projectedSceneState ? { sceneState: projectedSceneState } : {}),
+    },
     generator
   );
   const content = generated.content?.trim()
@@ -592,6 +645,16 @@ async function commitAndSettleGeneratedTurn({
   playerCharacterName,
   reconciliationPolicy,
 }: CommitAndSettleParams): Promise<TurnResult> {
+  if (isFeatureEnabled('SCENE_STATE')) {
+    const beat = result.metadata.sceneBeat;
+    if (beat && useSceneStore.getState().scenes[sessionId]?.completedBeats.some(
+      (recorded) => recorded.id === beat.id
+    )) {
+      result = { ...result, metadata: { ...result.metadata } };
+      delete result.metadata.sceneBeat;
+      logger.warn('[TurnResolver] Dropped duplicate scene beat', { sessionId, beatId: beat.id });
+    }
+  }
   const now = new Date();
   const newSegment: NarrativeSegment = {
     id: segmentId,
@@ -634,6 +697,13 @@ async function commitAndSettleGeneratedTurn({
       useSceneStore.getState().setLocation(sessionId, nextPlace);
     }
     reconcileScenePresence(sessionId, characterId, storedSegment, hadSceneRecord);
+    const beat = storedSegment.metadata.sceneBeat;
+    if (beat) {
+      useSceneStore.getState().recordBeat(sessionId, {
+        ...beat,
+        turnIndex: countWorldClockTurns(useNarrativeStore.getState().getSessionSegments(sessionId)),
+      });
+    }
   }
   const { notes, errors, acquiredItems } = await reconcileCoreSideEffects({
     segment: storedSegment,

@@ -176,6 +176,14 @@ export const parseNarrativeResponse = (
               ? parsed?.metadata?.characterIds
               : [],
             ...(isFeatureEnabled('SCENE_STATE') ? {
+              ...(typeof parsed.metadata.sceneBeat?.id === 'string' &&
+              typeof parsed.metadata.sceneBeat?.text === 'string' &&
+              safeTrim(parsed.metadata.sceneBeat.id) && safeTrim(parsed.metadata.sceneBeat.text)
+                ? { sceneBeat: {
+                    id: safeTrim(parsed.metadata.sceneBeat.id),
+                    text: safeTrim(parsed.metadata.sceneBeat.text),
+                  } }
+                : {}),
               sceneEntries: Array.isArray(parsed.metadata.sceneEntries)
                 ? parsed.metadata.sceneEntries.filter((id: unknown): id is string => typeof id === 'string' && knownSceneNpcIds.has(id))
                 : [],

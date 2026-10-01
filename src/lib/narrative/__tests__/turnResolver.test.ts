@@ -14,6 +14,7 @@ import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNPCStore } from '@/state/npcStore';
 import { sceneTemplate } from '@/lib/promptTemplates/templates/narrative/sceneTemplate';
+import { actionTemplate } from '@/lib/promptTemplates/templates/narrative/actionTemplate';
 import { FIRST_SEGMENT_LOCATION } from '@/types/narrative.types';
 import { PARTIAL_RECONCILIATION_ERROR } from '@/lib/narrative/narrativeErrors';
 import type {
@@ -309,6 +310,222 @@ describe('TurnResolver', () => {
   });
 
   describe('resolveTurn', () => {
+    describe('scene stall breaker', () => {
+      const quietTurnLimit = 5;
+
+      beforeEach(() => {
+        useSceneStore.setState({ scenes: {} });
+        const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+        (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+        (needsSceneTransition as jest.Mock).mockReturnValue(false);
+      });
+
+      it('forces a cut after five quiet turns without a due clock thread', async () => {
+        const generator = makeMockGenerator();
+        for (let turn = 0; turn < quietTurnLimit; turn += 1) {
+          await resolveTurn(makeCommand(), generator);
+          expect((generator.generateSegment as jest.Mock).mock.calls[turn][0].generationParameters)
+            .not.toHaveProperty('segmentType');
+        }
+        (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult({
+          segmentType: 'transition',
+          metadata: { characterIds: [], tags: [], sceneTransition: { to: 'The road' } },
+        }));
+        await resolveTurn(makeCommand(), generator);
+        const request = (generator.generateSegment as jest.Mock).mock.calls[quietTurnLimit][0];
+        expect(request.generationParameters.segmentType).toBe('transition');
+        const prompt = sceneTemplate({ narrativeContext: request.narrativeContext, generationParameters: request.generationParameters });
+        expect(prompt).toContain('FORCED SCENE EXIT OR TIME SKIP');
+        expect(prompt).toContain('5 quiet turns');
+        expect(prompt).toContain('metadata.sceneTransition');
+        expect(prompt).not.toContain('"sceneTransition":');
+        (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult());
+        await resolveTurn(makeCommand(), generator);
+        expect((generator.generateSegment as jest.Mock).mock.calls[quietTurnLimit + 1][0].generationParameters)
+          .not.toHaveProperty('segmentType');
+      });
+
+      it.each(['transition', 'beat'])(
+        'resets the quiet count on a recorded %s', async (progress) => {
+          const generator = makeMockGenerator();
+          for (let turn = 0; turn < quietTurnLimit - 1; turn += 1) {
+            await resolveTurn(makeCommand(), generator);
+          }
+          (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult({
+            metadata: { characterIds: [], tags: [], ...(progress === 'transition'
+              ? { sceneTransition: { to: 'Old Mill' } }
+              : { sceneBeat: { id: 'reveal', text: 'The guard revealed the culprit.' } }) },
+          }));
+          await resolveTurn(makeCommand(), generator);
+          (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult());
+          for (let turn = 0; turn < quietTurnLimit; turn += 1) {
+            await resolveTurn(makeCommand(), generator);
+            const request = (generator.generateSegment as jest.Mock).mock.calls[quietTurnLimit + turn][0];
+            expect(request.generationParameters).not.toHaveProperty('segmentType');
+          }
+          (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult({
+            metadata: { characterIds: [], tags: [], sceneTransition: { to: 'The road' } },
+          }));
+          await resolveTurn(makeCommand(), generator);
+          expect((generator.generateSegment as jest.Mock).mock.lastCall[0].generationParameters.segmentType)
+            .toBe('transition');
+        }
+      );
+
+      it.each([undefined, FIRST_SEGMENT_LOCATION])(
+        'retries a forced cut without a usable transition target (%s)', async (target) => {
+          const generator = makeMockGenerator();
+          for (let turn = 0; turn < quietTurnLimit; turn += 1) await resolveTurn(makeCommand(), generator);
+          (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult({
+            metadata: { characterIds: [], tags: [], ...(target ? { sceneTransition: { to: target } } : {}) },
+          }));
+          (generator.generateSegment as jest.Mock).mockResolvedValueOnce(makeGenerationResult({
+            metadata: { characterIds: [], tags: [], ...(target ? { sceneTransition: { to: target } } : {}) },
+          })).mockResolvedValueOnce(makeGenerationResult({
+            metadata: { characterIds: [], tags: [], sceneTransition: { to: 'Old Mill' } },
+          }));
+          const result = await resolveTurn(makeCommand(), generator);
+          expect(result.status).toBe('settled');
+          expect(result.segment.metadata.sceneTransition).toEqual({ to: 'Old Mill' });
+          expect(useNarrativeStore.getState().getSessionSegments('session-1')).toHaveLength(quietTurnLimit + 1);
+          const retry = (generator.generateSegment as jest.Mock).mock.lastCall[0];
+          expect(sceneTemplate({ narrativeContext: retry.narrativeContext })).toContain('RETRY:');
+        }
+      );
+
+
+      it('commits a recorded time skip and resets the counter when the model ignores the stall instruction twice', async () => {
+        const generator = makeMockGenerator();
+        for (let turn = 0; turn < quietTurnLimit; turn += 1) await resolveTurn(makeCommand(), generator);
+        const { logger } = jest.requireActual('@/lib/utils/logger');
+        const warning = jest.spyOn(logger, 'warn').mockImplementation(() => {});
+        try {
+          const result = await resolveTurn(makeCommand(), generator);
+          expect(generator.generateSegment).toHaveBeenCalledTimes(quietTurnLimit + 2);
+          expect(result.status).toBe('settled');
+          expect(result.segment.content).toBe(makeGenerationResult().content);
+          expect(result.segment.metadata.sceneTransition).toEqual({ to: 'The road' });
+          expect(useNarrativeStore.getState().getSessionSegments('session-1')).toHaveLength(quietTurnLimit + 1);
+          expect(warning).toHaveBeenCalledWith(expect.stringContaining('Forced scene time skip'), expect.objectContaining({ sessionId: 'session-1' }));
+          await resolveTurn(makeCommand(), generator);
+          const request = (generator.generateSegment as jest.Mock).mock.lastCall[0];
+          expect(request.generationParameters).not.toHaveProperty('segmentType');
+          expect(request.narrativeContext).not.toHaveProperty('stalledSceneTurns');
+        } finally {
+          warning.mockRestore();
+        }
+      });
+
+      it('recovers a stalled legacy session without treating a placeholder as progress', async () => {
+        const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+        (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+        const generator = makeMockGenerator(makeGenerationResult({
+          metadata: { characterIds: [], tags: [], location: FIRST_SEGMENT_LOCATION, sceneTransition: { to: FIRST_SEGMENT_LOCATION } },
+        }));
+        for (let turn = 0; turn < quietTurnLimit; turn += 1) await resolveTurn(makeCommand(), generator);
+        expect(useSceneStore.getState().scenes).toEqual({});
+        (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+        (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult({
+          metadata: { characterIds: [], tags: [], sceneTransition: { to: 'Old Mill' } },
+        }));
+        await resolveTurn(makeCommand(), generator);
+        const request = (generator.generateSegment as jest.Mock).mock.lastCall[0];
+        expect(request.generationParameters.segmentType).toBe('transition');
+        expect(request.narrativeContext.sceneState.location).toBeNull();
+        expect(useSceneStore.getState().scenes['session-1'].location).toBe('Old Mill');
+      });
+
+      it('keeps clock-driven prompts identical to develop when the scene flag is off', async () => {
+        const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+        (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'WORLD_CLOCK');
+        (needsSceneTransition as jest.Mock).mockReturnValue(true);
+        const generator = makeMockGenerator();
+        await resolveTurn(makeCommand(), generator);
+        const request = (generator.generateSegment as jest.Mock).mock.lastCall[0];
+        expect(request.generationParameters.segmentType).toBe('transition');
+        const context = { narrativeContext: request.narrativeContext, generationParameters: request.generationParameters };
+        expect(sceneTemplate({ ...context, narrativeContext: { ...context.narrativeContext, stalledSceneTurns: 20, isStallRetry: true } }))
+          .toBe(sceneTemplate(context));
+      });
+
+      it('preserves a due clock transition with scene state enabled before the stall threshold', async () => {
+        (needsSceneTransition as jest.Mock).mockReturnValue(true);
+        const generator = makeMockGenerator();
+        await resolveTurn(makeCommand(), generator);
+        const request = (generator.generateSegment as jest.Mock).mock.lastCall[0];
+        expect(request.generationParameters.segmentType).toBe('transition');
+        expect(sceneTemplate({ narrativeContext: request.narrativeContext, generationParameters: request.generationParameters }))
+          .not.toContain('FORCED SCENE EXIT OR TIME SKIP');
+      });
+    });
+
+    it('records a structured beat and carries it into the next prompt', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const beat = { id: 'bus-arrival', text: 'The bus arrived at the cabin.' };
+      const generator = makeMockGenerator(makeGenerationResult({
+        metadata: { characterIds: [], tags: [], sceneBeat: beat },
+      }));
+      const command = makeCommand({ sessionId, worldId, characterId });
+      const result = await resolveTurn(command, generator);
+      expect(result.snapshot.sceneState?.completedBeats).toEqual([{ ...beat, turnIndex: 1 }]);
+      (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult());
+      const next = await resolveTurn(command, generator);
+      expect(next.snapshot.sceneState?.completedBeats).toEqual([{ ...beat, turnIndex: 1 }]);
+      const { narrativeContext } = (generator.generateSegment as jest.Mock).mock.calls[1][0];
+      const prompt = sceneTemplate({ narrativeContext });
+      expect(prompt).toContain('SETTLED SCENE BEATS');
+      expect(prompt).toContain('bus-arrival');
+      expect(prompt).toContain(beat.text);
+      expect(prompt).not.toContain('"sceneBeat":');
+    });
+
+    it('commits a segment with a duplicate beat id without recording the beat twice', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const originalBeat = { id: 'bus-arrival', text: 'The bus arrived.', turnIndex: 1 };
+      useSceneStore.getState().recordBeat(sessionId, originalBeat);
+      const generator = makeMockGenerator(makeGenerationResult({
+        content: 'The bus passengers inspect the cabin.',
+        metadata: { characterIds: [], tags: [], sceneBeat: { id: 'bus-arrival', text: 'A bus arrives.' } },
+      }));
+      const { logger } = jest.requireActual('@/lib/utils/logger');
+      const warning = jest.spyOn(logger, 'warn').mockImplementation(() => {});
+      try {
+        const result = await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
+        expect(result.status).toBe('settled');
+        expect(result.segment.content).toBe('The bus passengers inspect the cabin.');
+        expect(result.segment.metadata).not.toHaveProperty('sceneBeat');
+        expect(useNarrativeStore.getState().getSessionSegments(sessionId)).toHaveLength(1);
+        expect(result.snapshot.sceneState?.completedBeats).toEqual([originalBeat]);
+        expect(warning).toHaveBeenCalledWith(expect.stringContaining('Dropped duplicate scene beat'), expect.objectContaining({ sessionId, beatId: 'bus-arrival' }));
+      } finally {
+        warning.mockRestore();
+      }
+    });
+
+    it('keeps prompts identical and ignores beat recording with SCENE_STATE off', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+      const generator = makeMockGenerator(makeGenerationResult({
+        metadata: { characterIds: [], tags: [], sceneBeat: { id: 'arrival', text: 'The bus arrived.' } },
+      }));
+      await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
+      const { narrativeContext } = (generator.generateSegment as jest.Mock).mock.calls[0][0];
+      const baseline = sceneTemplate({ narrativeContext });
+      expect(sceneTemplate({ narrativeContext: {
+        ...narrativeContext,
+        sceneState: { location: 'Cabin', presentNpcNames: [], completedBeats: [{ id: 'arrival', text: 'The bus arrived.', turnIndex: 1 }] },
+      } })).toBe(baseline);
+      expect(useSceneStore.getState().scenes).toEqual({});
+    });
+
     it('keeps sceneTransition in instructions and out of the stationary response example', async () => {
       const { sessionId, worldId, characterId } = seedItemUseStores();
       useSceneStore.setState({ scenes: {} });
@@ -351,7 +568,7 @@ describe('TurnResolver', () => {
       const result = await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
 
       expect((generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext.sceneState)
-        .toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'] });
+        .toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'], completedBeats: [] });
       expect(result.snapshot.sceneState?.presentNpcIds).toEqual(['npc-guard']);
     });
 
@@ -379,7 +596,7 @@ describe('TurnResolver', () => {
       expect(result.snapshot.sceneState?.presentNpcIds).toContain('npc-guard');
       const promptContext = (generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext;
       expect(promptContext.currentSituation).toBe('Player chose: "Head north"');
-      expect(promptContext.sceneState).toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'] });
+      expect(promptContext.sceneState).toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'], completedBeats: [] });
     });
 
     it('moves the recorded place only for a structured transition', async () => {
@@ -1634,6 +1851,82 @@ describe('TurnResolver', () => {
       ).toEqual([
         expect.objectContaining({ prompt: 'Existing decision' }),
       ]);
+    });
+
+    it('projects recorded scene beats into the item-use prompt and keeps flag-off prompts identical', async () => {
+      const ids = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().recordBeat(ids.sessionId, {
+        id: 'gate-opened',
+        text: 'The rusted gate swung open.',
+        turnIndex: 1,
+      });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation(
+        (flag: string) => flag === 'SCENE_STATE'
+      );
+
+      try {
+        const flagOnGenerator = makeItemUseGenerator();
+        await resolveItemUseTurn(ids, flagOnGenerator);
+
+        const { narrativeContext: flagOnContext } = (
+          flagOnGenerator.generateSegment as jest.Mock
+        ).mock.calls[0][0];
+        expect(flagOnContext.sceneState?.completedBeats).toEqual([
+          { id: 'gate-opened', text: 'The rusted gate swung open.', turnIndex: 1 },
+        ]);
+        const flagOnPrompt = actionTemplate({
+          worldName: 'Test World',
+          genre: 'fantasy',
+          tone: 'tense',
+          narrativeContext: flagOnContext,
+        });
+        expect(flagOnPrompt).toContain(
+          '[gate-opened] (turn 1): The rusted gate swung open.'
+        );
+        expect(flagOnPrompt).not.toContain('None recorded yet.');
+      } finally {
+        (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+      }
+
+      const offIds = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().recordBeat(offIds.sessionId, {
+        id: 'gate-opened',
+        text: 'The rusted gate swung open.',
+        turnIndex: 1,
+      });
+      const flagOffGenerator = makeItemUseGenerator();
+      await resolveItemUseTurn(offIds, flagOffGenerator);
+
+      const { narrativeContext: flagOffContext } = (
+        flagOffGenerator.generateSegment as jest.Mock
+      ).mock.calls[0][0];
+      expect(flagOffContext.sceneState).toBeUndefined();
+      const flagOffPrompt = actionTemplate({
+        worldName: 'Test World',
+        genre: 'fantasy',
+        tone: 'tense',
+        narrativeContext: flagOffContext,
+      });
+      const baselinePrompt = actionTemplate({
+        worldName: 'Test World',
+        genre: 'fantasy',
+        tone: 'tense',
+        narrativeContext: {
+          ...flagOffContext,
+          sceneState: {
+            location: 'Muddy Lake',
+            presentNpcNames: ['Guard'],
+            completedBeats: [
+              { id: 'gate-opened', text: 'The rusted gate swung open.', turnIndex: 1 },
+            ],
+          },
+        },
+      });
+      expect(flagOffPrompt).toBe(baselinePrompt);
+      expect(flagOffPrompt).not.toContain('gate-opened');
     });
   });
 

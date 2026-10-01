@@ -59,3 +59,25 @@ it('renders recorded scene facts and transition guidance in the scene template o
     (isFeatureEnabled as jest.Mock).mockReturnValue(false);
   }
 });
+
+it.each([sceneTemplate, actionTemplate, initialSceneTemplate, transitionTemplate])(
+  'keeps beat instructions out of response examples and flag-off prompts identical',
+  (template) => {
+    const ledgerContext = { ...context, narrativeContext: { sceneState: {
+      location: null, presentNpcNames: [], completedBeats: [
+        { id: 'bus-arrival', text: 'The bus arrived.', turnIndex: 11 },
+      ],
+    } } };
+    expect(template(ledgerContext)).toBe(template(context));
+    (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+    try {
+      const prompt = template(ledgerContext);
+      expect(prompt).toContain('[bus-arrival] (turn 11): The bus arrived.');
+      expect(prompt).toContain('metadata.sceneBeat');
+      expect(prompt).not.toContain('"sceneBeat":');
+      expect(template(context)).toContain('None recorded yet.');
+    } finally {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+    }
+  }
+);

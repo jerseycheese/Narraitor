@@ -1,3 +1,4 @@
+import { sceneBeatBlock } from './sceneBeatBlock';
 import {
   PERSPECTIVE_AND_EMPHASIS_EXAMPLES,
   shouldIncludeExamples,
@@ -83,7 +84,7 @@ NPC METADATA RULES:
 - When inventing a new NPC, add them to metadata.characters with a slug-style id (lowercase with hyphens), a short description, and an avatar prompt so future segments can reuse the same identity.
 - Do not print character IDs or bracketed tokens (e.g., [npc-id]) in the narrative text.
 
-${majorEventGuidelines}
+${majorEventGuidelines}${sceneBeatBlock(context)}
 
 Response Format:
 {

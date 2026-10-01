@@ -15,6 +15,7 @@ export interface NarrativeExtractedMetadata {
   sceneEntries?: string[];
   sceneExits?: string[];
   sceneTransition?: { to: string };
+  sceneBeat?: { id: string; text: string };
   speakerId?: string;
   itemsAcquired?: Array<{
     name: string;
