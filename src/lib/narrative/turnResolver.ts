@@ -259,7 +259,7 @@ async function resolveTurnInner(
     skillCheckContext = ` [Skill checks: ${descriptions.join(', ')}]`;
   }
 
-  const result = await awaitGeneration(
+  const generateSegment = (isStallRetry = false) => awaitGeneration(
     () => generator.generateSegment(
       {
         worldId,
@@ -279,6 +279,7 @@ async function resolveTurnInner(
           turnsSinceComplication,
           worldClock,
           ...(shouldBreakSceneStall ? { stalledSceneTurns: quietSceneTurns } : {}),
+          ...(isStallRetry ? { isStallRetry: true } : {}),
           currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}`,
           ...(sceneState ? { sceneState: { location: sceneState.location, presentNpcNames, completedBeats: sceneState.completedBeats } } : {}),
         },
@@ -296,10 +297,26 @@ async function resolveTurnInner(
     command.signal
   );
 
+  let result = await generateSegment();
   if (shouldBreakSceneStall) {
     const target = result.metadata.sceneTransition?.to?.trim();
     if (!target || target === FIRST_SEGMENT_LOCATION) {
-      throw new Error('A stalled scene requires a recorded scene exit or time skip. Retry with metadata.sceneTransition.');
+      result = await generateSegment(true);
+      const retryTarget = result.metadata.sceneTransition?.to?.trim();
+      if (!retryTarget || retryTarget === FIRST_SEGMENT_LOCATION) {
+        const currentPlace = [
+          sceneState?.location,
+          recentSegments[recentSegments.length - 1]?.metadata.location,
+          result.metadata.location,
+        ].find((place) => place?.trim() && place.trim() !== FIRST_SEGMENT_LOCATION)?.trim() ?? 'Current scene';
+        result = {
+          ...result,
+          metadata: { ...result.metadata, sceneTransition: { to: currentPlace } },
+        };
+        logger.warn('[TurnResolver] Forced scene time skip after ignored stall retry', {
+          sessionId, quietSceneTurns, location: currentPlace,
+        });
+      }
     }
   }
   const resultWithInferredLosses = inferMissingItemLosses(result, characterId);
@@ -610,7 +627,9 @@ async function commitAndSettleGeneratedTurn({
     if (beat && useSceneStore.getState().scenes[sessionId]?.completedBeats.some(
       (recorded) => recorded.id === beat.id
     )) {
-      throw new Error(`Scene beat "${beat.id}" is already recorded. Retry with a new event.`);
+      result = { ...result, metadata: { ...result.metadata } };
+      delete result.metadata.sceneBeat;
+      logger.warn('[TurnResolver] Dropped duplicate scene beat', { sessionId, beatId: beat.id });
     }
   }
   const now = new Date();

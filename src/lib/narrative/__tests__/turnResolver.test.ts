@@ -372,17 +372,48 @@ describe('TurnResolver', () => {
       );
 
       it.each([undefined, FIRST_SEGMENT_LOCATION])(
-        'rejects a forced cut without a usable transition target (%s)', async (target) => {
+        'retries a forced cut without a usable transition target (%s)', async (target) => {
           const generator = makeMockGenerator();
           for (let turn = 0; turn < quietTurnLimit; turn += 1) await resolveTurn(makeCommand(), generator);
           (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult({
             metadata: { characterIds: [], tags: [], ...(target ? { sceneTransition: { to: target } } : {}) },
           }));
-          await expect(resolveTurn(makeCommand(), generator)).rejects.toThrow('scene exit or time skip');
-          expect(useNarrativeStore.getState().getSessionSegments('session-1')).toHaveLength(quietTurnLimit);
+          (generator.generateSegment as jest.Mock).mockResolvedValueOnce(makeGenerationResult({
+            metadata: { characterIds: [], tags: [], ...(target ? { sceneTransition: { to: target } } : {}) },
+          })).mockResolvedValueOnce(makeGenerationResult({
+            metadata: { characterIds: [], tags: [], sceneTransition: { to: 'Old Mill' } },
+          }));
+          const result = await resolveTurn(makeCommand(), generator);
+          expect(result.status).toBe('settled');
+          expect(result.segment.metadata.sceneTransition).toEqual({ to: 'Old Mill' });
+          expect(useNarrativeStore.getState().getSessionSegments('session-1')).toHaveLength(quietTurnLimit + 1);
+          const retry = (generator.generateSegment as jest.Mock).mock.lastCall[0];
+          expect(sceneTemplate({ narrativeContext: retry.narrativeContext })).toContain('RETRY:');
         }
       );
 
+
+      it('commits a recorded time skip and resets the counter when the model ignores the stall instruction twice', async () => {
+        const generator = makeMockGenerator();
+        for (let turn = 0; turn < quietTurnLimit; turn += 1) await resolveTurn(makeCommand(), generator);
+        const { logger } = jest.requireActual('@/lib/utils/logger');
+        const warning = jest.spyOn(logger, 'warn').mockImplementation(() => {});
+        try {
+          const result = await resolveTurn(makeCommand(), generator);
+          expect(generator.generateSegment).toHaveBeenCalledTimes(quietTurnLimit + 2);
+          expect(result.status).toBe('settled');
+          expect(result.segment.content).toBe(makeGenerationResult().content);
+          expect(result.segment.metadata.sceneTransition).toEqual({ to: 'The road' });
+          expect(useNarrativeStore.getState().getSessionSegments('session-1')).toHaveLength(quietTurnLimit + 1);
+          expect(warning).toHaveBeenCalledWith(expect.stringContaining('Forced scene time skip'), expect.objectContaining({ sessionId: 'session-1' }));
+          await resolveTurn(makeCommand(), generator);
+          const request = (generator.generateSegment as jest.Mock).mock.lastCall[0];
+          expect(request.generationParameters).not.toHaveProperty('segmentType');
+          expect(request.narrativeContext).not.toHaveProperty('stalledSceneTurns');
+        } finally {
+          warning.mockRestore();
+        }
+      });
 
       it('recovers a stalled legacy session without treating a placeholder as progress', async () => {
         const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
@@ -412,7 +443,7 @@ describe('TurnResolver', () => {
         const request = (generator.generateSegment as jest.Mock).mock.lastCall[0];
         expect(request.generationParameters.segmentType).toBe('transition');
         const context = { narrativeContext: request.narrativeContext, generationParameters: request.generationParameters };
-        expect(sceneTemplate({ ...context, narrativeContext: { ...context.narrativeContext, stalledSceneTurns: 20 } }))
+        expect(sceneTemplate({ ...context, narrativeContext: { ...context.narrativeContext, stalledSceneTurns: 20, isStallRetry: true } }))
           .toBe(sceneTemplate(context));
       });
 
@@ -450,27 +481,30 @@ describe('TurnResolver', () => {
       expect(prompt).not.toContain('"sceneBeat":');
     });
 
-    it('rejects a replayed beat before committing or changing scene state', async () => {
+    it('commits a segment with a duplicate beat id without recording the beat twice', async () => {
       const { sessionId, worldId, characterId } = seedItemUseStores();
       useSceneStore.setState({ scenes: {} });
       const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
       (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
-      useSceneStore.getState().recordBeat(sessionId, {
-        id: 'bus-arrival', text: 'The bus arrived.', turnIndex: 1,
-      });
-      const sceneBefore = useSceneStore.getState().scenes[sessionId];
+      const originalBeat = { id: 'bus-arrival', text: 'The bus arrived.', turnIndex: 1 };
+      useSceneStore.getState().recordBeat(sessionId, originalBeat);
       const generator = makeMockGenerator(makeGenerationResult({
-        content: 'The bus arrives for the first time.',
+        content: 'The bus passengers inspect the cabin.',
         metadata: { characterIds: [], tags: [], sceneBeat: { id: 'bus-arrival', text: 'A bus arrives.' } },
       }));
-      await expect(resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator))
-        .rejects.toThrow('already recorded');
-      expect(useNarrativeStore.getState().getSessionSegments(sessionId)).toEqual([]);
-      expect(useSceneStore.getState().scenes[sessionId]).toEqual(sceneBefore);
-      expect(applyWorldClockUpdates).not.toHaveBeenCalled();
-      (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult());
-      await expect(resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator))
-        .resolves.toMatchObject({ status: 'settled' });
+      const { logger } = jest.requireActual('@/lib/utils/logger');
+      const warning = jest.spyOn(logger, 'warn').mockImplementation(() => {});
+      try {
+        const result = await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
+        expect(result.status).toBe('settled');
+        expect(result.segment.content).toBe('The bus passengers inspect the cabin.');
+        expect(result.segment.metadata).not.toHaveProperty('sceneBeat');
+        expect(useNarrativeStore.getState().getSessionSegments(sessionId)).toHaveLength(1);
+        expect(result.snapshot.sceneState?.completedBeats).toEqual([originalBeat]);
+        expect(warning).toHaveBeenCalledWith(expect.stringContaining('Dropped duplicate scene beat'), expect.objectContaining({ sessionId, beatId: 'bus-arrival' }));
+      } finally {
+        warning.mockRestore();
+      }
     });
 
     it('keeps prompts identical and ignores beat recording with SCENE_STATE off', async () => {

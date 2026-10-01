@@ -355,6 +355,7 @@ export interface NarrativeContext {
   /** Consecutive segments since the last complication — see computeTurnsSinceComplication */
   turnsSinceComplication?: number;
   stalledSceneTurns?: number;
+  isStallRetry?: boolean;
   currentLocation?: string;
   currentSituation?: string;
   sceneState?: {
