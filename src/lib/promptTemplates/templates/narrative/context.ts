@@ -17,7 +17,11 @@ interface NarrativeTemplateNarrativeContext {
   recentSegments?: Array<{ content?: string }>;
   currentLocation?: string;
   currentSituation?: string;
-  sceneState?: { location: string | null; presentNpcNames: string[] };
+  sceneState?: {
+    location: string | null;
+    presentNpcNames: string[];
+    completedBeats?: readonly { id: string; text: string; turnIndex: number }[];
+  };
   currentTags?: string[];
   /** Consecutive segments since the last complication — see computeTurnsSinceComplication */
   turnsSinceComplication?: number;

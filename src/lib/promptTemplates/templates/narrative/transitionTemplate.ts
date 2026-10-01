@@ -1,3 +1,4 @@
+import { sceneBeatBlock } from './sceneBeatBlock';
 import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import type { NarrativeTemplateContext } from './context';
@@ -55,7 +56,7 @@ IMPORTANT: Write in SECOND PERSON perspective (using "you").`;
 
 ${formattedRoster}
 
-${majorEventGuidelines}
+${majorEventGuidelines}${sceneBeatBlock(context)}
 
 Response Format:
 {

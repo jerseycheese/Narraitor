@@ -309,6 +309,70 @@ describe('TurnResolver', () => {
   });
 
   describe('resolveTurn', () => {
+    it('records a structured beat and carries it into the next prompt', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      const beat = { id: 'bus-arrival', text: 'The bus arrived at the cabin.' };
+      const generator = makeMockGenerator(makeGenerationResult({
+        metadata: { characterIds: [], tags: [], sceneBeat: beat },
+      }));
+      const command = makeCommand({ sessionId, worldId, characterId });
+      const result = await resolveTurn(command, generator);
+      expect(result.snapshot.sceneState?.completedBeats).toEqual([{ ...beat, turnIndex: 1 }]);
+      (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult());
+      const next = await resolveTurn(command, generator);
+      expect(next.snapshot.sceneState?.completedBeats).toEqual([{ ...beat, turnIndex: 1 }]);
+      const { narrativeContext } = (generator.generateSegment as jest.Mock).mock.calls[1][0];
+      const prompt = sceneTemplate({ narrativeContext });
+      expect(prompt).toContain('SETTLED SCENE BEATS');
+      expect(prompt).toContain('bus-arrival');
+      expect(prompt).toContain(beat.text);
+      expect(prompt).not.toContain('"sceneBeat":');
+    });
+
+    it('rejects a replayed beat before committing or changing scene state', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'SCENE_STATE');
+      useSceneStore.getState().recordBeat(sessionId, {
+        id: 'bus-arrival', text: 'The bus arrived.', turnIndex: 1,
+      });
+      const sceneBefore = useSceneStore.getState().scenes[sessionId];
+      const generator = makeMockGenerator(makeGenerationResult({
+        content: 'The bus arrives for the first time.',
+        metadata: { characterIds: [], tags: [], sceneBeat: { id: 'bus-arrival', text: 'A bus arrives.' } },
+      }));
+      await expect(resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator))
+        .rejects.toThrow('already recorded');
+      expect(useNarrativeStore.getState().getSessionSegments(sessionId)).toEqual([]);
+      expect(useSceneStore.getState().scenes[sessionId]).toEqual(sceneBefore);
+      expect(applyWorldClockUpdates).not.toHaveBeenCalled();
+      (generator.generateSegment as jest.Mock).mockResolvedValue(makeGenerationResult());
+      await expect(resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator))
+        .resolves.toMatchObject({ status: 'settled' });
+    });
+
+    it('keeps prompts identical and ignores beat recording with SCENE_STATE off', async () => {
+      const { sessionId, worldId, characterId } = seedItemUseStores();
+      useSceneStore.setState({ scenes: {} });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+      const generator = makeMockGenerator(makeGenerationResult({
+        metadata: { characterIds: [], tags: [], sceneBeat: { id: 'arrival', text: 'The bus arrived.' } },
+      }));
+      await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
+      const { narrativeContext } = (generator.generateSegment as jest.Mock).mock.calls[0][0];
+      const baseline = sceneTemplate({ narrativeContext });
+      expect(sceneTemplate({ narrativeContext: {
+        ...narrativeContext,
+        sceneState: { location: 'Cabin', presentNpcNames: [], completedBeats: [{ id: 'arrival', text: 'The bus arrived.', turnIndex: 1 }] },
+      } })).toBe(baseline);
+      expect(useSceneStore.getState().scenes).toEqual({});
+    });
+
     it('keeps sceneTransition in instructions and out of the stationary response example', async () => {
       const { sessionId, worldId, characterId } = seedItemUseStores();
       useSceneStore.setState({ scenes: {} });
@@ -351,7 +415,7 @@ describe('TurnResolver', () => {
       const result = await resolveTurn(makeCommand({ sessionId, worldId, characterId }), generator);
 
       expect((generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext.sceneState)
-        .toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'] });
+        .toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'], completedBeats: [] });
       expect(result.snapshot.sceneState?.presentNpcIds).toEqual(['npc-guard']);
     });
 
@@ -379,7 +443,7 @@ describe('TurnResolver', () => {
       expect(result.snapshot.sceneState?.presentNpcIds).toContain('npc-guard');
       const promptContext = (generator.generateSegment as jest.Mock).mock.calls[0][0].narrativeContext;
       expect(promptContext.currentSituation).toBe('Player chose: "Head north"');
-      expect(promptContext.sceneState).toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'] });
+      expect(promptContext.sceneState).toEqual({ location: 'Muddy Lake', presentNpcNames: ['Guard'], completedBeats: [] });
     });
 
     it('moves the recorded place only for a structured transition', async () => {

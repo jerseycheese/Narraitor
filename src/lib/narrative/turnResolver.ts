@@ -273,7 +273,7 @@ async function resolveTurnInner(
           turnsSinceComplication,
           worldClock,
           currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}`,
-          ...(sceneState ? { sceneState: { location: sceneState.location, presentNpcNames } } : {}),
+          ...(sceneState ? { sceneState: { location: sceneState.location, presentNpcNames, completedBeats: sceneState.completedBeats } } : {}),
         },
         generationParameters: {
           includedTopics: command.generationParams?.includedTopics ?? [command.choiceText],
@@ -592,6 +592,14 @@ async function commitAndSettleGeneratedTurn({
   playerCharacterName,
   reconciliationPolicy,
 }: CommitAndSettleParams): Promise<TurnResult> {
+  if (isFeatureEnabled('SCENE_STATE')) {
+    const beat = result.metadata.sceneBeat;
+    if (beat && useSceneStore.getState().scenes[sessionId]?.completedBeats.some(
+      (recorded) => recorded.id === beat.id
+    )) {
+      throw new Error(`Scene beat "${beat.id}" is already recorded. Retry with a new event.`);
+    }
+  }
   const now = new Date();
   const newSegment: NarrativeSegment = {
     id: segmentId,
@@ -634,6 +642,13 @@ async function commitAndSettleGeneratedTurn({
       useSceneStore.getState().setLocation(sessionId, nextPlace);
     }
     reconcileScenePresence(sessionId, characterId, storedSegment, hadSceneRecord);
+    const beat = storedSegment.metadata.sceneBeat;
+    if (beat) {
+      useSceneStore.getState().recordBeat(sessionId, {
+        ...beat,
+        turnIndex: countWorldClockTurns(useNarrativeStore.getState().getSessionSegments(sessionId)),
+      });
+    }
   }
   const { notes, errors, acquiredItems } = await reconcileCoreSideEffects({
     segment: storedSegment,

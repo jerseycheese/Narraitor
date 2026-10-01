@@ -1,3 +1,4 @@
+import { sceneBeatBlock } from './sceneBeatBlock';
 // Action template focused on immediate item usage beats
 import { majorEventGuidelines } from './majorEventGuidelines';
 import type { NarrativeTemplateContext } from './context';
@@ -65,7 +66,7 @@ ${scenePresenceEnabled ? '- Report NPCs entering or returning in metadata.sceneE
 - Prefer pulling speaking characters from the roster when possible; avoid inventing new NPC identities unless there is no roster member who fits.
 - Do not include bracket tokens like [npc-id] in the narrative – keep IDs strictly in metadata.
 
-${majorEventGuidelines}
+${majorEventGuidelines}${sceneBeatBlock(context)}
 
 Response Format:
 {

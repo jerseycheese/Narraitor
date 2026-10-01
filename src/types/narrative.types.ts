@@ -285,6 +285,7 @@ export interface NarrativeMetadata {
   sceneEntries?: EntityID[];
   sceneExits?: EntityID[];
   sceneTransition?: { to: string };
+  sceneBeat?: { id: string; text: string };
   characters?: GeneratedCharacterMetadata[];
   // Dialogue-specific metadata
   speakerId?: EntityID;
@@ -355,7 +356,11 @@ export interface NarrativeContext {
   turnsSinceComplication?: number;
   currentLocation?: string;
   currentSituation?: string;
-  sceneState?: { location: string | null; presentNpcNames: string[] };
+  sceneState?: {
+    location: string | null;
+    presentNpcNames: string[];
+    completedBeats?: readonly { id: string; text: string; turnIndex: number }[];
+  };
   importantEntities?: Array<{
     id: EntityID;
     type: string;
@@ -392,6 +397,7 @@ export interface NarrativeGenerationResult {
     sceneEntries?: EntityID[];
     sceneExits?: EntityID[];
     sceneTransition?: { to: string };
+    sceneBeat?: { id: string; text: string };
     speakerId?: EntityID;
     location?: string;
     mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';

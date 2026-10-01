@@ -137,6 +137,7 @@ export const createNarrativeSegmentActions = (
       characterIds: metadata?.characterIds,
       ...(metadata?.sceneEntries ? { sceneEntries: metadata.sceneEntries } : {}),
       ...(metadata?.sceneExits ? { sceneExits: metadata.sceneExits } : {}),
+      ...(isSceneStateEnabled && metadata?.sceneBeat ? { sceneBeat: metadata.sceneBeat } : {}),
       ...(isSceneStateEnabled && metadata?.sceneTransition
         ? { sceneTransition: metadata.sceneTransition }
         : {}),

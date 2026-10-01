@@ -69,6 +69,7 @@ export const formatNarrativeResponse = async (
     metadata: {
       characterIds: confirmedCharacterIds,
       ...(isFeatureEnabled('SCENE_STATE') ? {
+        ...(extractedMetadata.sceneBeat ? { sceneBeat: extractedMetadata.sceneBeat } : {}),
         sceneEntries: extractedMetadata.sceneEntries ?? [],
         sceneExits: extractedMetadata.sceneExits ?? [],
         ...(extractedMetadata.sceneTransition

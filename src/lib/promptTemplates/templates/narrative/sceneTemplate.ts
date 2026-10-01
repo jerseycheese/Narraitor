@@ -1,3 +1,4 @@
+import { sceneBeatBlock } from './sceneBeatBlock';
 import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import { worldClockBlock } from './worldClockBlock';
@@ -244,7 +245,7 @@ Focus on varied sensory details and the character's reactions to bring the scene
 
   return `${baseContent}${examplesSection}
 
-${majorEventGuidelines}
+${majorEventGuidelines}${sceneBeatBlock(context)}
 
 SEGMENT TYPE SELECTION:
 Choose the most appropriate segment type based on your narrative content:

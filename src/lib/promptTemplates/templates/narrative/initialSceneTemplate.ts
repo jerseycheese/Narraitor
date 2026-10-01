@@ -1,3 +1,4 @@
+import { sceneBeatBlock } from './sceneBeatBlock';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import type { NarrativeTemplateContext } from './context';
 import { isFeatureEnabled } from '@/lib/featureFlags';
@@ -81,7 +82,7 @@ SENSORY WRITING GUIDELINES:
 - Avoid repetitive olfactory descriptions (smells/scents/odors) unless essential to the scene
 - Use fresh, varied sensory language to avoid clichéd phrases
 
-${majorEventGuidelines}
+${majorEventGuidelines}${sceneBeatBlock(context)}
 
 SEGMENT TYPE SELECTION:
 Choose the most appropriate segment type for your opening narrative:

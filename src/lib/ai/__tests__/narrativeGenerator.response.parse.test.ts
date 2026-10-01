@@ -7,6 +7,25 @@ import { isFeatureEnabled } from '@/lib/featureFlags';
 jest.mock('@/lib/featureFlags', () => ({ isFeatureEnabled: jest.fn(() => false) }));
 
 describe('parseNarrativeResponse debris guard', () => {
+  it('parses only complete structured beats and ignores them with the flag off', () => {
+    const response = (sceneBeat: unknown) => ({ content: JSON.stringify({
+      content: 'The bus arrives.', metadata: { sceneBeat },
+    }) });
+    const beat = { id: ' bus-arrival ', text: ' The bus arrived. ' };
+    expect(parseNarrativeResponse(response(beat), 'scene'))
+      .toEqual(parseNarrativeResponse(response(undefined), 'scene'));
+    (isFeatureEnabled as jest.Mock).mockReturnValue(true);
+    try {
+      expect(parseNarrativeResponse(response(beat), 'scene').extractedMetadata.sceneBeat)
+        .toEqual({ id: 'bus-arrival', text: 'The bus arrived.' });
+      for (const invalid of [null, [], 'arrival', { id: 7, text: 'Arrival' }, { id: 'arrival', text: ' ' }, { text: 'Arrival' }]) {
+        expect(parseNarrativeResponse(response(invalid), 'scene').extractedMetadata.sceneBeat).toBeUndefined();
+      }
+    } finally {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+    }
+  });
+
   it('keeps scene movement out of flag-off parsed metadata', () => {
     const response = { content: '{"content":"Guard enters.","metadata":{"characterIds":["npc-guard"],"sceneEntries":["npc-guard"],"sceneExits":[],"sceneTransition":{"to":"Old Mill"}}}' };
     const withoutMovement = { content: '{"content":"Guard enters.","metadata":{"characterIds":["npc-guard"]}}' };
