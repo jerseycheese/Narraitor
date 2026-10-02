@@ -88,6 +88,55 @@ describe('isLethalNarrativeDraft', () => {
     }
   });
 
+  it('returns false for NPC deaths where the player survives', () => {
+    const npcDeathExamples = [
+      'The guard falls dead. You escape safely.',
+      'The bandit dropped lifeless to the dirt as you step past.',
+      'The beast collapses and dies before reaching you.',
+    ];
+
+    for (const prose of npcDeathExamples) {
+      expect(isLethalNarrativeDraft(makeDraft({ content: prose }))).toBe(false);
+    }
+  });
+
+  it('returns false for conditional or hypothetical death references', () => {
+    const conditionalExamples = [
+      'If you die, the camp will mourn you.',
+      'Unless you die in the cave, we will meet at dawn.',
+      'Lest you die of thirst, take this flask.',
+      'The elder warns that you could die if you cross the river alone.',
+    ];
+
+    for (const prose of conditionalExamples) {
+      expect(isLethalNarrativeDraft(makeDraft({ content: prose }))).toBe(false);
+    }
+  });
+
+  it('returns false for temporary unconsciousness without session-ending incapacitation', () => {
+    const unconsciousExamples = [
+      'You fall unconscious from the blow, but awaken hours later.',
+      'You are knocked unconscious for a moment, groggily rising to your feet.',
+    ];
+
+    for (const prose of unconsciousExamples) {
+      expect(isLethalNarrativeDraft(makeDraft({ content: prose }))).toBe(false);
+    }
+  });
+
+  it('returns true for cardiac cessation, respiratory cessation, corpse references, and permanent incapacitation', () => {
+    const lethalExamples = [
+      'Your heart stops. You never wake again.',
+      'You stop breathing and the killer leaves your corpse in the lake.',
+      'You are paralyzed and cannot continue.',
+      'Elena slips into eternal darkness.',
+    ];
+
+    for (const prose of lethalExamples) {
+      expect(isLethalNarrativeDraft(makeDraft({ content: prose }), 'Elena')).toBe(true);
+    }
+  });
+
   it('returns false for empty or whitespace content', () => {
     expect(isLethalNarrativeDraft(makeDraft({ content: '' }))).toBe(false);
     expect(isLethalNarrativeDraft(makeDraft({ content: '   ' }))).toBe(false);

@@ -392,7 +392,6 @@ export interface GenerationParameters {
   desiredTone?: EndingTone;
   fatalRiskAllowed?: boolean;
   isFatalRepair?: boolean;
-  repairInstruction?: string;
 }
 
 /**

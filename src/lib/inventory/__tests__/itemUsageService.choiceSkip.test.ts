@@ -153,25 +153,28 @@ describe('processItemUsage - skip choice regeneration on session end (#925)', ()
     expect(mockGeneratePlayerChoices).toHaveBeenCalledTimes(1);
   });
 
-  it('skips choice regeneration and keeps existing decisions when item usage is fatal', async () => {
+  it('rejects fatal item usage, skips choice regeneration, and keeps existing decisions', async () => {
     mockGenerateSegment.mockResolvedValue(
       buildGeneration(['item-usage', 'fatal-outcome'])
     );
 
-    // Seed an existing decision that must survive a fatal item usage.
+    // Seed an existing decision that must survive when fatal item usage is rejected.
     useNarrativeStore.getState().addDecision(sessionId, {
       prompt: 'Existing decision',
       options: [{ id: 'existing-1', text: 'Stay' }],
     });
 
-    const result = await processItemUsage({
-      characterId,
-      itemId,
-      sessionId,
-      worldId,
-    });
+    await expect(
+      processItemUsage({
+        characterId,
+        itemId,
+        sessionId,
+        worldId,
+      })
+    ).rejects.toThrow(
+      'Forbidden lethal narrative outcome generated on a protected turn.'
+    );
 
-    expect(result.success).toBe(true);
     expect(mockGeneratePlayerChoices).not.toHaveBeenCalled();
 
     const decisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
