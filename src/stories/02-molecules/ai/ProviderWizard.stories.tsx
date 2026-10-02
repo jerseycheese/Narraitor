@@ -8,6 +8,18 @@ const meta: Meta<typeof ProviderWizard> = {
   component: ProviderWizard,
   parameters: {
     layout: 'padded',
+    msw: {
+      handlers: [
+        http.post('/api/ai/models', () =>
+          HttpResponse.json({
+            models: [
+              { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+              { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
+            ],
+          })
+        ),
+      ],
+    },
   },
   tags: ['autodocs'],
   args: {
@@ -94,5 +106,35 @@ export const VerifyError: Story = {
     await userEvent.click(nextBtn2);
     const testBtn = await canvas.findByRole('button', { name: /test connection/i });
     await userEvent.click(testBtn);
+  },
+};
+
+export const ModelsLoaded: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const geminiBtn = await canvas.findByRole('button', { name: /google gemini/i });
+    await userEvent.click(geminiBtn);
+    const nextBtn = await canvas.findByRole('button', { name: /^next$/i });
+    await userEvent.click(nextBtn);
+    const keyInput = await canvas.findByLabelText(/api key/i);
+    await userEvent.type(keyInput, 'AIzaSyExampleSecretKey');
+    const loadBtn = await canvas.findByRole('button', { name: /load models/i });
+    await userEvent.click(loadBtn);
+  },
+};
+
+export const ManualModelEntry: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const geminiBtn = await canvas.findByRole('button', { name: /google gemini/i });
+    await userEvent.click(geminiBtn);
+    const nextBtn = await canvas.findByRole('button', { name: /^next$/i });
+    await userEvent.click(nextBtn);
+    const keyInput = await canvas.findByLabelText(/api key/i);
+    await userEvent.type(keyInput, 'AIzaSyExampleSecretKey');
+    const loadBtn = await canvas.findByRole('button', { name: /load models/i });
+    await userEvent.click(loadBtn);
+    const manualToggle = await canvas.findByRole('button', { name: /enter model id manually/i });
+    await userEvent.click(manualToggle);
   },
 };

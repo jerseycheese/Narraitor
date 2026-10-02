@@ -227,6 +227,31 @@
   font-size: var(--font-size-sm);
 }
 
+.provider-model-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.provider-load-models-btn {
+  font-size: var(--font-size-xs);
+  padding: var(--space-1) var(--space-3);
+  min-height: auto;
+}
+
+.provider-model-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.provider-discovery-error {
+  color: var(--color-danger);
+}
+
 /* Mobile wizard fit (#1539): at phone widths the auto-fill preset grid
    collapses to a single 12rem column, so seven stacked presets (six of them
    "Coming soon") push the custom-endpoint toggle and the Cancel/Next row

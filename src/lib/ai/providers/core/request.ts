@@ -35,6 +35,7 @@ export class ProviderUpstreamError extends Error {
 }
 
 export interface SendProviderRequestOptions {
+  method?: 'GET' | 'POST';
   timeoutMs?: number;
   /**
    * True when `url` came from the player rather than from a pinned constant.
@@ -44,6 +45,61 @@ export interface SendProviderRequestOptions {
   /** Extra headers the destination service asks for, from its preset. */
   customHeaders?: Record<string, string>;
   signal?: AbortSignal;
+}
+
+/** Default response body limit (5MB) to prevent memory exhaustion from rogue endpoints. */
+export const MAX_RESPONSE_BODY_BYTES = 5 * 1024 * 1024;
+
+/**
+ * Reads and parses a JSON response body ensuring it does not exceed maxBytes.
+ * Protects against unbounded responses from player-supplied endpoints.
+ */
+export async function readBoundedJson<T>(
+  response: Response,
+  maxBytes: number = MAX_RESPONSE_BODY_BYTES
+): Promise<T> {
+  const contentLength = response.headers.get('content-length');
+  if (contentLength) {
+    const bytes = parseInt(contentLength, 10);
+    if (!Number.isNaN(bytes) && bytes > maxBytes) {
+      throw new Error('Service error: response exceeded maximum size');
+    }
+  }
+
+  if (!response.body) {
+    return {} as T;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) {
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        try {
+          await reader.cancel();
+        } catch {
+          // Ignore cancel error
+        }
+        throw new Error('Service error: response exceeded maximum size');
+      }
+      chunks.push(value);
+    }
+  }
+
+  const merged = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    merged.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  const text = new TextDecoder().decode(merged);
+  return JSON.parse(text) as T;
 }
 
 /**
@@ -85,7 +141,7 @@ function applyCustomHeaders(
 }
 
 /**
- * POST to a provider with a hard timeout.
+ * Make an HTTP request to a provider with a hard timeout, redirect refusal, and optional endpoint guarding.
  *
  * The thrown messages are load-bearing: `getUserFriendlyError` classifies on
  * "timeout" and "network" substrings, so a rewording here changes what the
@@ -94,10 +150,16 @@ function applyCustomHeaders(
 export async function sendProviderRequest(
   url: string,
   headers: Record<string, string>,
-  body: object,
+  body?: object | null,
   options: SendProviderRequestOptions = {}
 ): Promise<Response> {
-  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, playerSuppliedEndpoint = false, customHeaders, signal } = options;
+  const {
+    method = 'POST',
+    timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS,
+    playerSuppliedEndpoint = false,
+    customHeaders,
+    signal,
+  } = options;
 
   if (signal?.aborted) {
     throw new Error('Request aborted');
@@ -141,10 +203,11 @@ export async function sendProviderRequest(
     // The acceptance is recorded as a dismissal on the alert itself. Inline
     // `codeql[...]` comments do nothing on GitHub code scanning, so one here
     // would look like a control while being decoration.
+    const isGet = method === 'GET';
     const response = await fetch(url, {
-      method: 'POST',
+      method,
       headers: requestHeaders,
-      body: JSON.stringify(body),
+      body: isGet || body === undefined || body === null ? undefined : JSON.stringify(body),
       redirect: 'error',
       signal: controller.signal,
     });
