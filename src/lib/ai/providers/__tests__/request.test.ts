@@ -12,7 +12,7 @@ jest.mock('../endpointGuard', () => ({
   isSafeProviderEndpoint: jest.fn().mockReturnValue(true),
 }));
 
-import { generateProviderText, sendProviderRequest } from '../core/request';
+import { generateProviderText, readBoundedJson, sendProviderRequest } from '../core/request';
 import { assertPublicProviderEndpoint } from '../endpointGuard';
 import { openAICompatibleAdapter } from '../openai-compatible/adapter';
 import type { ProviderDescriptor, TextGenerationSpec } from '../types';
@@ -193,3 +193,95 @@ describe('token limit failure on empty content', () => {
   });
 });
 
+describe('bounded JSON response reading', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('times out a stalled body and cancels/releases its reader', async () => {
+    jest.useFakeTimers();
+    const cancel = jest.fn();
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode('{'));
+      },
+      cancel,
+    });
+    const response = new Response(body);
+
+    const reading = readBoundedJson(response, 1024, { timeoutMs: 100 });
+    const rejection = expect(reading).rejects.toThrow('Request timeout - please try again');
+    await Promise.resolve();
+    await jest.advanceTimersByTimeAsync(100);
+
+    await rejection;
+    expect(cancel).toHaveBeenCalled();
+    expect(() => response.body?.getReader()).not.toThrow();
+  });
+
+  it('cancels a pending body read when the caller aborts', async () => {
+    const cancel = jest.fn();
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode('{'));
+      },
+      cancel,
+    });
+    const response = new Response(body);
+    const controller = new AbortController();
+    const removeListener = jest.spyOn(controller.signal, 'removeEventListener');
+    const reading = readBoundedJson(response, 1024, { signal: controller.signal });
+    const rejection = expect(reading).rejects.toThrow('Request aborted');
+
+    controller.abort();
+
+    await rejection;
+    expect(cancel).toHaveBeenCalled();
+    expect(removeListener).toHaveBeenCalledWith('abort', expect.any(Function));
+    expect(() => response.body?.getReader()).not.toThrow();
+  });
+
+  it('uses one deadline for a body that keeps trickling chunks', async () => {
+    jest.useFakeTimers();
+    const cancel = jest.fn();
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode('{'));
+      },
+      pull(controller) {
+        return new Promise<void>((resolve) => {
+          setTimeout(() => {
+            controller.enqueue(new TextEncoder().encode(' '));
+            resolve();
+          }, 40);
+        });
+      },
+      cancel,
+    });
+    const response = new Response(body);
+    const reading = readBoundedJson(response, 1024, { timeoutMs: 100 });
+    const rejection = expect(reading).rejects.toThrow('Request timeout - please try again');
+
+    await jest.advanceTimersByTimeAsync(100);
+
+    await rejection;
+    expect(cancel).toHaveBeenCalled();
+    expect(() => response.body?.getReader()).not.toThrow();
+  });
+
+  it('cancels and releases the reader when the size limit is exceeded', async () => {
+    const cancel = jest.fn();
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode('too large'));
+      },
+      cancel,
+    });
+    const response = new Response(body);
+    await expect(readBoundedJson(response, 2)).rejects.toThrow(
+      'Service error: response exceeded maximum size'
+    );
+    expect(cancel).toHaveBeenCalled();
+    expect(() => response.body?.getReader()).not.toThrow();
+  });
+});

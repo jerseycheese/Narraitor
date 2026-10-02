@@ -9,16 +9,18 @@ import {
   filterOpenAICompatibleModels,
   filterOllamaModels,
 } from '../modelDiscovery';
-import { sendProviderRequest } from '../providers/core/request';
+import { readBoundedJson, sendProviderRequest } from '../providers/core/request';
 
 jest.mock('../providers/core/request', () => {
   const actual = jest.requireActual('../providers/core/request');
   return {
     ...actual,
+    readBoundedJson: jest.fn(actual.readBoundedJson),
     sendProviderRequest: jest.fn(),
   };
 });
 
+const mockReadBoundedJson = readBoundedJson as jest.MockedFunction<typeof readBoundedJson>;
 const mockSendProviderRequest = sendProviderRequest as jest.MockedFunction<typeof sendProviderRequest>;
 
 describe('modelDiscovery', () => {
@@ -165,13 +167,18 @@ describe('modelDiscovery', () => {
       expect(result[0].name).toBe('Llama 3 8B');
     });
 
-    it('captures reasoning policy metadata', () => {
+    it('preserves supported parameters and normalized reasoning policy', () => {
       const raw = [
         {
           id: 'deepseek/deepseek-r1',
           name: 'DeepSeek R1',
-          supported_parameters: ['reasoning'],
-          reasoning: { mandatory: true },
+          supported_parameters: ['reasoning', 'temperature'],
+          reasoning: {
+            mandatory: true,
+            default_enabled: false,
+            supported_efforts: ['low', 'high'],
+            default_effort: 'high',
+          },
         },
         {
           id: 'openai/gpt-4o',
@@ -180,8 +187,67 @@ describe('modelDiscovery', () => {
         },
       ];
       const result = filterOpenRouterModels(raw);
-      expect(result[0].reasoning).toBe(true);
-      expect(result[1].reasoning).toBe(false);
+      expect(result[0]).toMatchObject({
+        reasoning: true,
+        supportedParameters: ['reasoning', 'temperature'],
+        reasoningPolicy: {
+          mandatory: true,
+          defaultEnabled: false,
+          supportedEfforts: ['low', 'high'],
+          defaultEffort: 'high',
+        },
+      });
+      expect(result[1]).toMatchObject({
+        reasoning: false,
+        supportedParameters: ['temperature'],
+      });
+      expect(result[1].reasoningPolicy).toBeUndefined();
+    });
+
+    it('uses explicit output modalities while retaining text-plus-image models', () => {
+      const raw = [
+        {
+          id: 'vision/text-and-image',
+          architecture: {
+            modality: 'text->text+image',
+            output_modalities: ['text', 'image'],
+          },
+        },
+        {
+          id: 'image/image-only',
+          architecture: { output_modalities: ['image'] },
+        },
+        {
+          id: 'text/text-only',
+          architecture: { output_modalities: ['text'] },
+        },
+      ];
+      expect(filterOpenRouterModels(raw).map((model) => model.id)).toEqual([
+        'vision/text-and-image',
+        'text/text-only',
+      ]);
+    });
+
+    it('skips malformed optional metadata without dropping the catalogue', () => {
+      const raw = [
+        {
+          id: 'provider/model',
+          architecture: { modality: 12, output_modalities: 'image' },
+          supported_parameters: 12,
+          reasoning: {
+            mandatory: 'yes',
+            default_enabled: false,
+            supported_efforts: ['low', 3],
+            default_effort: 5,
+          },
+        },
+        { id: 'provider/next-model' },
+      ];
+      expect(filterOpenRouterModels(raw)).toMatchObject([
+        { id: 'provider/model', reasoning: true, reasoningPolicy: { defaultEnabled: false } },
+        { id: 'provider/next-model', reasoning: false },
+      ]);
+      expect(filterOpenRouterModels(raw)[0].supportedParameters).toBeUndefined();
     });
   });
 
@@ -227,6 +293,39 @@ describe('modelDiscovery', () => {
       const result = filterGeminiModels(raw);
       expect(result[0].name).toBe('gemini-custom');
     });
+
+    it('filters audio-only IDs while preserving multimodal text and thinking metadata', () => {
+      const raw = [
+        {
+          name: 'models/gemini-3.8-flash-tts',
+          supportedGenerationMethods: ['generateContent'],
+        },
+        {
+          name: 'models/gemini-3.8-live-audio',
+          supportedGenerationMethods: ['generateContent'],
+        },
+        {
+          name: 'models/gemini-3.1-flash-lite-image',
+          supportedGenerationMethods: ['generateContent'],
+        },
+        {
+          name: 'models/gemini-2.5-flash-vision',
+          supportedGenerationMethods: ['generateContent'],
+          thinking: true,
+        },
+        {
+          name: 'models/gemini-2.5-flash-image',
+          supportedGenerationMethods: ['generateContent'],
+        },
+      ];
+      const result = filterGeminiModels(raw);
+      expect(result.map((model) => model.id)).toEqual([
+        'gemini-3.1-flash-lite-image',
+        'gemini-2.5-flash-vision',
+        'gemini-2.5-flash-image',
+      ]);
+      expect(result[1].reasoning).toBe(true);
+    });
   });
 
   describe('filterOpenAICompatibleModels', () => {
@@ -262,6 +361,46 @@ describe('modelDiscovery', () => {
   });
 
   describe('discoverModels end-to-end', () => {
+    it.each([
+      {
+        type: 'gemini' as const,
+        body: { models: [] },
+      },
+      {
+        type: 'openai-compatible' as const,
+        endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+        body: { data: [] },
+      },
+      {
+        type: 'openai-compatible' as const,
+        endpoint: 'https://api.example.com/v1/chat/completions',
+        body: { data: [] },
+      },
+      {
+        type: 'ollama' as const,
+        endpoint: 'https://ollama.example.com/v1/chat/completions',
+        body: { models: [] },
+      },
+    ])('passes the deadline and abort signal to $type body reads', async (config) => {
+      const signal = new AbortController().signal;
+      mockSendProviderRequest.mockResolvedValueOnce(
+        new Response(JSON.stringify(config.body), { status: 200 })
+      );
+
+      await discoverModels({
+        type: config.type,
+        endpoint: config.endpoint,
+        key: 'test-key',
+        signal,
+      });
+
+      expect(mockReadBoundedJson).toHaveBeenCalledWith(
+        expect.any(Response),
+        undefined,
+        { timeoutMs: 10000, signal }
+      );
+    });
+
     it('discovers Gemini models and handles pagination', async () => {
       mockSendProviderRequest
         .mockResolvedValueOnce(
@@ -311,6 +450,25 @@ describe('modelDiscovery', () => {
         null,
         expect.objectContaining({ method: 'GET' })
       );
+    });
+
+    it('does not log malformed upstream bodies or request credentials', async () => {
+      const apiKey = 'sentinel-provider-key';
+      const upstreamBody = `malformed response echoing ${apiKey}`;
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      mockSendProviderRequest.mockResolvedValueOnce(new Response(upstreamBody, { status: 200 }));
+
+      try {
+        const result = await discoverModels({ type: 'gemini', key: apiKey });
+        expect(result.error).toBe('NETWORK');
+        const loggedArguments = warnSpy.mock.calls.flat();
+        expect(loggedArguments.some((argument) => argument instanceof Error)).toBe(false);
+        const logText = loggedArguments.map(String).join(' ');
+        expect(logText).not.toContain(apiKey);
+        expect(logText).not.toContain(upstreamBody);
+      } finally {
+        warnSpy.mockRestore();
+      }
     });
 
     it('returns UNSUPPORTED_PROVIDER for claude', async () => {

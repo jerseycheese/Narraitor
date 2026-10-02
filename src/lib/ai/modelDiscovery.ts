@@ -86,17 +86,13 @@ export interface OpenRouterRawModel {
   description?: string;
   context_length?: number;
   architecture?: {
-    modality?: string;
+    modality?: unknown;
+    output_modalities?: unknown;
     instruct_type?: string | null;
   };
-  endpoints?: Array<{ name?: string }>;
-  supported_parameters?: string[];
-  reasoning?: {
-    mandatory?: boolean;
-    default_enabled?: boolean;
-    supported_efforts?: string[];
-    default_effort?: string;
-  };
+  endpoints?: unknown;
+  supported_parameters?: unknown;
+  reasoning?: unknown;
 }
 
 /**
@@ -118,14 +114,15 @@ export function filterOpenRouterModels(raw: OpenRouterRawModel[]): DiscoveredMod
       continue;
     }
 
-    // Filter explicit non-text modalities
-    const modality = item.architecture?.modality?.toLowerCase();
-    if (modality) {
-      // Modality examples: "text->text", "text+image->text", "image->image", "text->image"
-      // If modality does not end with 'text', it is not a text generation model
-      if (!modality.endsWith('text')) {
-        continue;
-      }
+    const architecture = item.architecture;
+    const outputModalities = architecture?.output_modalities;
+    const hasOutputModalities =
+      Array.isArray(outputModalities) && outputModalities.every((value) => typeof value === 'string');
+    if (hasOutputModalities) {
+      if (!outputModalities.some((value: string) => value.toLowerCase() === 'text')) continue;
+    } else if (typeof architecture?.modality === 'string') {
+      const output = architecture.modality.toLowerCase().split('->').at(-1) ?? '';
+      if (!output.split('+').includes('text')) continue;
     }
 
     // Filter embedding IDs
@@ -133,8 +130,35 @@ export function filterOpenRouterModels(raw: OpenRouterRawModel[]): DiscoveredMod
       continue;
     }
 
-    const supportsReasoningParam =
-      (item.supported_parameters ?? []).includes('reasoning') || Boolean(item.reasoning);
+    const supportedParameters = item.supported_parameters;
+    const normalizedSupportedParameters =
+      Array.isArray(supportedParameters) &&
+      supportedParameters.every((value) => typeof value === 'string')
+        ? supportedParameters
+        : undefined;
+
+    const rawReasoning = item.reasoning;
+    const reasoningObject =
+      rawReasoning && typeof rawReasoning === 'object' && !Array.isArray(rawReasoning)
+        ? (rawReasoning as Record<string, unknown>)
+        : undefined;
+    const reasoningPolicy: NonNullable<DiscoveredModel['reasoningPolicy']> = {};
+    if (typeof reasoningObject?.mandatory === 'boolean') {
+      reasoningPolicy.mandatory = reasoningObject.mandatory;
+    }
+    if (typeof reasoningObject?.default_enabled === 'boolean') {
+      reasoningPolicy.defaultEnabled = reasoningObject.default_enabled;
+    }
+    if (
+      Array.isArray(reasoningObject?.supported_efforts) &&
+      reasoningObject.supported_efforts.every((value) => typeof value === 'string')
+    ) {
+      reasoningPolicy.supportedEfforts = reasoningObject.supported_efforts;
+    }
+    if (typeof reasoningObject?.default_effort === 'string') {
+      reasoningPolicy.defaultEffort = reasoningObject.default_effort;
+    }
+    const hasReasoningPolicy = Object.keys(reasoningPolicy).length > 0;
 
     seen.add(id);
     models.push({
@@ -142,7 +166,12 @@ export function filterOpenRouterModels(raw: OpenRouterRawModel[]): DiscoveredMod
       name: item.name?.trim() || id,
       description: item.description?.trim(),
       contextLength: item.context_length,
-      reasoning: supportsReasoningParam,
+      reasoning:
+        normalizedSupportedParameters?.includes('reasoning') === true ||
+        rawReasoning === true ||
+        hasReasoningPolicy,
+      supportedParameters: normalizedSupportedParameters,
+      reasoningPolicy: hasReasoningPolicy ? reasoningPolicy : undefined,
     });
   }
 
@@ -155,6 +184,7 @@ export interface GeminiRawModel {
   description?: string;
   inputTokenLimit?: number;
   supportedGenerationMethods?: string[];
+  thinking?: unknown;
 }
 
 /**
@@ -175,6 +205,7 @@ export function filterGeminiModels(raw: GeminiRawModel[]): DiscoveredModel[] {
 
     const normalizedId = item.name.replace(/^models\//, '').trim();
     if (!normalizedId || seen.has(normalizedId)) continue;
+    if (/(?:^|[-_])(?:tts|audio)(?:[-_.]|$)/i.test(normalizedId)) continue;
 
     seen.add(normalizedId);
     models.push({
@@ -182,7 +213,7 @@ export function filterGeminiModels(raw: GeminiRawModel[]): DiscoveredModel[] {
       name: item.displayName?.trim() || normalizedId,
       description: item.description?.trim(),
       contextLength: item.inputTokenLimit,
-      reasoning: false,
+      reasoning: item.thinking === true,
     });
   }
 
@@ -347,7 +378,7 @@ async function discoverGemini(
       const body = await readBoundedJson<{
         models?: GeminiRawModel[];
         nextPageToken?: string;
-      }>(response);
+      }>(response, undefined, { timeoutMs: DISCOVERY_TIMEOUT_MS, signal });
 
       if (Array.isArray(body.models)) {
         allRawModels.push(...body.models);
@@ -357,9 +388,9 @@ async function discoverGemini(
     } while (pageToken && pageCount < MAX_PAGES);
 
     return { models: filterGeminiModels(allRawModels) };
-  } catch (err) {
+  } catch {
     if (signal?.aborted) return { models: [], error: 'NETWORK' };
-    logger.warn('Gemini discovery failed', err);
+    logger.warn('Gemini discovery failed');
     return { models: [], error: 'NETWORK' };
   }
 }
@@ -392,15 +423,15 @@ async function discoverOpenRouter(
       return { models: [], error: classifyStatus(response.status) };
     }
 
-    const body = await readBoundedJson<{ data?: OpenRouterRawModel[] }>(response);
+    const body = await readBoundedJson<{ data?: OpenRouterRawModel[] }>(response, undefined, { timeoutMs: DISCOVERY_TIMEOUT_MS, signal });
     if (!Array.isArray(body.data)) {
       return { models: [], error: 'DISCOVERY_FAILED' };
     }
 
     return { models: filterOpenRouterModels(body.data) };
-  } catch (err) {
+  } catch {
     if (signal?.aborted) return { models: [], error: 'NETWORK' };
-    logger.warn('OpenRouter discovery failed', err);
+    logger.warn('OpenRouter discovery failed');
     return { models: [], error: 'NETWORK' };
   }
 }
@@ -438,7 +469,7 @@ async function discoverOpenAICompatible(
     const body = await readBoundedJson<{
       data?: OpenAICompatibleRawModel[];
       models?: OpenAICompatibleRawModel[];
-    }>(response);
+    }>(response, undefined, { timeoutMs: DISCOVERY_TIMEOUT_MS, signal });
 
     const rawList = Array.isArray(body.data)
       ? body.data
@@ -449,9 +480,9 @@ async function discoverOpenAICompatible(
           : [];
 
     return { models: filterOpenAICompatibleModels(rawList) };
-  } catch (err) {
+  } catch {
     if (signal?.aborted) return { models: [], error: 'NETWORK' };
-    logger.warn('OpenAI-compatible discovery failed', err);
+    logger.warn('OpenAI-compatible discovery failed');
     return { models: [], error: 'NETWORK' };
   }
 }
@@ -487,13 +518,13 @@ async function discoverOllama(
       return { models: [], error: classifyStatus(response.status) };
     }
 
-    const body = await readBoundedJson<{ models?: OllamaRawModel[] }>(response);
+    const body = await readBoundedJson<{ models?: OllamaRawModel[] }>(response, undefined, { timeoutMs: DISCOVERY_TIMEOUT_MS, signal });
     const rawList = Array.isArray(body.models) ? body.models : [];
 
     return { models: filterOllamaModels(rawList) };
-  } catch (err) {
+  } catch {
     if (signal?.aborted) return { models: [], error: 'NETWORK' };
-    logger.warn('Ollama discovery failed', err);
+    logger.warn('Ollama discovery failed');
     return { models: [], error: 'NETWORK' };
   }
 }

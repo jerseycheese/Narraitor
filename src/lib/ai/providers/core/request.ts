@@ -50,18 +50,30 @@ export interface SendProviderRequestOptions {
 /** Default response body limit (5MB) to prevent memory exhaustion from rogue endpoints. */
 export const MAX_RESPONSE_BODY_BYTES = 5 * 1024 * 1024;
 
+export interface ReadBoundedJsonOptions {
+  timeoutMs?: number;
+  signal?: AbortSignal;
+}
+
 /**
- * Reads and parses a JSON response body ensuring it does not exceed maxBytes.
- * Protects against unbounded responses from player-supplied endpoints.
+ * Reads and parses a JSON response body ensuring it does not exceed maxBytes
+ * or outlive the body-read deadline.
  */
 export async function readBoundedJson<T>(
   response: Response,
-  maxBytes: number = MAX_RESPONSE_BODY_BYTES
+  maxBytes: number = MAX_RESPONSE_BODY_BYTES,
+  options: ReadBoundedJsonOptions = {}
 ): Promise<T> {
+  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, signal } = options;
+  if (signal?.aborted) {
+    throw new Error('Request aborted');
+  }
+
   const contentLength = response.headers.get('content-length');
   if (contentLength) {
     const bytes = parseInt(contentLength, 10);
     if (!Number.isNaN(bytes) && bytes > maxBytes) {
+      void response.body?.cancel().catch(() => undefined);
       throw new Error('Service error: response exceeded maximum size');
     }
   }
@@ -73,21 +85,61 @@ export async function readBoundedJson<T>(
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
   let totalBytes = 0;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  let pendingRead: Promise<ReadableStreamReadResult<Uint8Array>> | undefined;
+  let shouldCancel = false;
+  let abortListener: (() => void) | undefined;
+  const interruptionPromise = new Promise<never>((_resolve, reject) => {
+    timeoutId = setTimeout(
+      () => reject(new Error('Request timeout - please try again')),
+      timeoutMs
+    );
+    abortListener = () => reject(new Error('Request aborted'));
+    signal?.addEventListener('abort', abortListener, { once: true });
+    if (signal?.aborted) abortListener();
+  });
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (value) {
-      totalBytes += value.byteLength;
-      if (totalBytes > maxBytes) {
-        try {
-          await reader.cancel();
-        } catch {
-          // Ignore cancel error
+  const releaseReader = () => {
+    try {
+      reader.releaseLock();
+    } catch {
+      // A pending read releases the lock once cancellation settles it.
+    }
+  };
+
+  try {
+    while (true) {
+      pendingRead = reader.read();
+      const { done, value } = await Promise.race([pendingRead, interruptionPromise]);
+      pendingRead = undefined;
+      if (done) break;
+      if (value) {
+        totalBytes += value.byteLength;
+        if (totalBytes > maxBytes) {
+          shouldCancel = true;
+          throw new Error('Service error: response exceeded maximum size');
         }
-        throw new Error('Service error: response exceeded maximum size');
+        chunks.push(value);
       }
-      chunks.push(value);
+    }
+  } catch (error) {
+    shouldCancel = true;
+    throw error;
+  } finally {
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
+    if (abortListener) signal?.removeEventListener('abort', abortListener);
+
+    if (shouldCancel) {
+      try {
+        void reader.cancel().catch(() => undefined);
+      } catch {
+        // Ignore cancellation failure; preserve the read error.
+      }
+    }
+    if (pendingRead) {
+      void pendingRead.then(releaseReader, releaseReader);
+    } else {
+      releaseReader();
     }
   }
 

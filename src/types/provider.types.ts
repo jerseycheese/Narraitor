@@ -171,4 +171,11 @@ export interface DiscoveredModel {
   description?: string;
   contextLength?: number;
   reasoning?: boolean;
+  supportedParameters?: string[];
+  reasoningPolicy?: {
+    mandatory?: boolean;
+    defaultEnabled?: boolean;
+    supportedEfforts?: string[];
+    defaultEffort?: string;
+  };
 }

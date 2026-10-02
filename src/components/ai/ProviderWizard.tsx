@@ -198,15 +198,25 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
     validationReqIdRef.current = null;
   }, [data.apiKey, data.model, data.endpoint, data.type]);
 
-  // Abort stale discovery if provider, key, or endpoint changes
+  // A catalogue belongs to the provider configuration it was loaded for.
   useEffect(() => {
-    if (discoveryAbortRef.current) {
-      discoveryAbortRef.current.abort();
-      discoveryAbortRef.current = null;
-    }
+    discoveryAbortRef.current?.abort();
+    discoveryAbortRef.current = null;
+    discoveryReqIdRef.current = null;
+    setDiscoveredModels([]);
+    setSearchQuery('');
     setDiscoveryStatus('idle');
     setDiscoveryError(null);
-  }, [data.presetId, data.apiKey, data.endpoint, data.type]);
+  }, [data.mode, data.presetId, data.apiKey, data.endpoint, data.type]);
+
+  useEffect(
+    () => () => {
+      discoveryAbortRef.current?.abort();
+      discoveryAbortRef.current = null;
+      discoveryReqIdRef.current = null;
+    },
+    []
+  );
 
   // Reveal is a glance, not a mode: leaving the step re-masks
   useEffect(() => {

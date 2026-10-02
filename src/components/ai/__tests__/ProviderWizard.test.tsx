@@ -322,6 +322,70 @@ describe('ProviderWizard', () => {
     expect(screen.queryByRole('option', { name: /custom model/i })).not.toBeInTheDocument();
   });
 
+  test('clears discovered models when credentials or endpoint change', async () => {
+    mockDiscover.mockReset();
+    mockDiscover
+      .mockResolvedValueOnce({ models: [{ id: 'model-from-config-a', name: 'Config A model' }] })
+      .mockResolvedValueOnce({ models: [{ id: 'model-from-config-b', name: 'Config B model' }] });
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /ollama/i }));
+    await user.type(screen.getByLabelText(/endpoint url/i), 'https://ollama-a.example.com');
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+    expect(await screen.findByRole('option', { name: /config a model/i })).toBeInTheDocument();
+
+    const keyField = screen.getByLabelText(/api key/i);
+    await user.type(keyField, 'key-for-config-a');
+    await waitFor(() => {
+      expect(screen.queryByRole('option', { name: /config a model/i })).not.toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+    expect(await screen.findByRole('option', { name: /config b model/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /^back$/i }));
+    const endpointField = screen.getByLabelText(/endpoint url/i);
+    await user.clear(endpointField);
+    await user.type(endpointField, 'https://ollama-b.example.com');
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('option', { name: /config b model/i })).not.toBeInTheDocument();
+      expect(screen.getByLabelText(/^model$/i).tagName).toBe('INPUT');
+    });
+  });
+
+  test('ignores a discovery response that resolves after the key changes', async () => {
+    mockDiscover.mockReset();
+    let resolveDiscovery: (result: { models: { id: string; name: string }[] }) => void = () => {};
+    mockDiscover.mockImplementationOnce(
+      () => new Promise((resolve) => {
+        resolveDiscovery = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.type(screen.getByLabelText(/api key/i), 'AIza-original-key');
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+
+    const keyField = screen.getByLabelText(/api key/i);
+    await user.clear(keyField);
+    await user.type(keyField, 'AIza-changed-key');
+    resolveDiscovery({ models: [{ id: 'stale-model', name: 'Stale model' }] });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('option', { name: /stale model/i })).not.toBeInTheDocument();
+      expect(screen.getByLabelText(/^model$/i).tagName).toBe('INPUT');
+    });
+  });
+
   test('when discovery omits the suggestion, requires explicit selection rather than choosing first result', async () => {
     mockDiscover.mockResolvedValueOnce({
       models: [
