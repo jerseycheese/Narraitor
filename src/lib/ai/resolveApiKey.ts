@@ -20,6 +20,7 @@ import {
 } from './presets';
 import { isProviderSupported } from './providers/adapterRegistry';
 import { isSafeProviderEndpoint } from './providers/endpointGuard';
+import { isValidBodyModel, isValidGeminiModel } from './modelSyntax';
 import type { ProviderDescriptor } from './providers/types';
 import type { ProviderType } from '@/types/provider.types';
 
@@ -36,20 +37,6 @@ import type { ProviderType } from '@/types/provider.types';
 
 const PROVIDER_TYPES: ProviderType[] = ['gemini', 'openai-compatible', 'claude', 'ollama'];
 
-/**
- * Gemini model ids are interpolated into a REST URL, so an arbitrary value
- * could steer a request at some other path. Only Google's own model-id shape
- * gets through.
- */
-const GEMINI_MODEL_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9.\-_]{0,63}$/;
-
-/**
- * Other providers carry the model in the request body, not the URL, so the
- * vendor-prefixed ids they actually use (`meta-llama/Llama-3.3-70B-Instruct-Turbo`,
- * `google/gemini-2.5-flash:free`) are fine. Whitespace and control characters
- * are not, and the length is capped so a header can't carry a payload.
- */
-const BODY_MODEL_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9.\-_/:]{0,127}$/;
 const MAX_PROMPT_OVERRIDE_CHARS = 4000;
 
 export type ProviderResolutionFailure =
@@ -182,10 +169,10 @@ function readModel(request: NextRequest | undefined, type: ProviderType): string
   const raw = request?.headers.get(PROVIDER_MODEL_HEADER)?.trim();
 
   if (type === 'gemini') {
-    return raw && GEMINI_MODEL_PATTERN.test(raw) ? raw : DEFAULT_TEXT_MODEL;
+    return raw && isValidGeminiModel(raw) ? raw : DEFAULT_TEXT_MODEL;
   }
 
-  return raw && BODY_MODEL_PATTERN.test(raw) ? raw : null;
+  return raw && isValidBodyModel(raw) ? raw : null;
 }
 
 /**

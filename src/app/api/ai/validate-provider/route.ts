@@ -7,6 +7,7 @@ import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
 import { getProviderAdapter } from '@/lib/ai/providers/adapterRegistry';
 import { claudeAdapter } from '@/lib/ai/providers/claude/adapter';
 import { isSafeProviderEndpoint } from '@/lib/ai/providers/endpointGuard';
+import { isValidBodyModel, isValidGeminiModel } from '@/lib/ai/modelSyntax';
 import {
   getPresetById,
   presetHeadersForEndpoint,
@@ -82,11 +83,15 @@ export const POST = withAIRoute(async (request: NextRequest) => {
     return fail('NO_KEY');
   }
 
-  let body: { type?: string; model?: string; endpoint?: string } = {};
+  let body: { type?: unknown; model?: unknown; endpoint?: unknown } = {};
   try {
     body = await request.json();
   } catch {
     // An empty body is fine — defaults apply.
+  }
+
+  if (body.type !== undefined && typeof body.type !== 'string') {
+    return fail('UNSUPPORTED_PROVIDER');
   }
 
   const type = (body.type ?? 'gemini') as ProviderType;
@@ -104,9 +109,18 @@ export const POST = withAIRoute(async (request: NextRequest) => {
  * safety settings the app actually sends so a key that works here works for
  * generation too.
  */
-async function validateGemini(key: string, requestedModel?: string) {
-  const model = requestedModel || DEFAULT_TEXT_MODEL;
-  const endpoint = `${GEMINI_MODELS_BASE}/${encodeURIComponent(model)}:generateContent`;
+async function validateGemini(key: string, requestedModel?: unknown) {
+  if (requestedModel !== undefined && typeof requestedModel !== 'string') {
+    return fail('INVALID_MODEL');
+  }
+
+  const model = typeof requestedModel === 'string' ? requestedModel.trim() : undefined;
+  if (requestedModel !== undefined && (!model || !isValidGeminiModel(model))) {
+    return fail('INVALID_MODEL');
+  }
+
+  const effectiveModel = model || DEFAULT_TEXT_MODEL;
+  const endpoint = `${GEMINI_MODELS_BASE}/${encodeURIComponent(effectiveModel)}:generateContent`;
 
   try {
     const response = await makeGeminiRequest(
@@ -124,7 +138,7 @@ async function validateGemini(key: string, requestedModel?: string) {
       return NextResponse.json({
         valid: true,
         capabilities: toWireCapabilities('gemini'),
-        model,
+        model: effectiveModel,
       });
     }
 
@@ -141,9 +155,18 @@ async function validateGemini(key: string, requestedModel?: string) {
  * which keeps this ping's wire shape from drifting out of sync with the
  * generation path the way a hand-rolled OpenAI-shaped ping would.
  */
-async function validateClaude(key: string, requestedModel?: string) {
-  const model = requestedModel || getPresetById('claude')?.defaultModel;
-  if (!model) return fail('INVALID_MODEL');
+async function validateClaude(key: string, requestedModel?: unknown) {
+  if (requestedModel !== undefined && typeof requestedModel !== 'string') {
+    return fail('INVALID_MODEL');
+  }
+
+  const trimmed = typeof requestedModel === 'string' ? requestedModel.trim() : undefined;
+  if (requestedModel !== undefined && (!trimmed || !isValidBodyModel(trimmed))) {
+    return fail('INVALID_MODEL');
+  }
+
+  const model = trimmed || getPresetById('claude')?.defaultModel;
+  if (!model || !isValidBodyModel(model)) return fail('INVALID_MODEL');
 
   const descriptor: ProviderDescriptor = { type: 'claude', endpoint: '', model, apiKey: key };
 
@@ -173,13 +196,17 @@ async function validateClaude(key: string, requestedModel?: string) {
 async function validateOpenAICompatible(
   key: string,
   type: ProviderType,
-  endpoint: string | undefined,
-  requestedModel: string | undefined
+  endpoint: unknown,
+  requestedModel: unknown
 ) {
-  if (!endpoint || !isSafeProviderEndpoint(endpoint)) {
+  if (typeof endpoint !== 'string' || !isSafeProviderEndpoint(endpoint)) {
     return fail('INVALID_ENDPOINT');
   }
-  if (!requestedModel) {
+  if (typeof requestedModel !== 'string') {
+    return fail('INVALID_MODEL');
+  }
+  const model = requestedModel.trim();
+  if (!model || !isValidBodyModel(model)) {
     return fail('INVALID_MODEL');
   }
 
@@ -188,7 +215,7 @@ async function validateOpenAICompatible(
       endpoint,
       { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
       {
-        model: requestedModel,
+        model,
         messages: [{ role: 'user', content: 'ping' }],
         // Same name the generation path uses. Hardcoding max_tokens here made
         // the wizard refuse a key that generates fine, which is the third time
@@ -209,7 +236,7 @@ async function validateOpenAICompatible(
       return NextResponse.json({
         valid: true,
         capabilities: toWireCapabilities(type),
-        model: requestedModel,
+        model,
       });
     }
 
