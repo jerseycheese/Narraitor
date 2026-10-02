@@ -5,7 +5,9 @@ import { useWizardFlow } from '@/components/shared/wizard/hooks/useWizardFlow';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardStep } from '@/components/shared/wizard/WizardStep';
 import { WizardNavigation } from '@/components/shared/wizard/WizardNavigation';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { ProviderPresets } from './ProviderPresets';
 import { CustomProviderForm } from './CustomProviderForm';
@@ -386,7 +388,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
     <WizardContainer title="Set up a provider" className="component-provider-wizard">
       <WizardStep error={wizard.currentError}>
         {currentStep === 0 && (
-          <div>
+          <div className="provider-form-fields">
             <p className="form-help-text">
               Pick a provider. Stories are generated with your own key, kept in this browser.
             </p>
@@ -427,11 +429,11 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
         )}
 
         {currentStep === 1 && (
-          <div>
+          <div className="provider-form-fields">
             <div className="form-group">
-              <label className="form-label" htmlFor="provider-name">
+              <Label htmlFor="provider-name">
                 Name
-              </label>
+              </Label>
               <Input
                 id="provider-name"
                 value={data.name}
@@ -441,9 +443,9 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="provider-key">
+              <Label htmlFor="provider-key">
                 API key{data.requiresApiKey ? '' : ' (optional)'}
-              </label>
+              </Label>
               <div className="provider-key-field">
                 <Input
                   id="provider-key"
@@ -480,23 +482,25 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
 
             <div className="form-group">
               <div className="provider-model-header">
-                <label className="form-label" htmlFor="provider-model">
+                <Label htmlFor="provider-model">
                   Model
-                </label>
+                </Label>
                 {showLoadModels && (
-                  <button
+                  <Button
                     type="button"
-                    className="wizard-nav-secondary provider-load-models-btn"
+                    variant="secondary"
+                    size="sm"
+                    className="provider-load-models-btn"
                     onClick={handleDiscoverModels}
                     disabled={discoveryStatus === 'loading' || (data.requiresApiKey && !data.apiKey.trim())}
                   >
                     {discoveryStatus === 'loading' ? 'Loading models...' : 'Load models'}
-                  </button>
+                  </Button>
                 )}
               </div>
 
               {discoveryStatus === 'error' && (
-                <p className="form-help-text provider-discovery-error">
+                <p className="form-error">
                   {describeDiscoveryError(discoveryError)}
                 </p>
               )}
@@ -504,9 +508,9 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
               {discoveredModels.length > 0 && !isManualEntry ? (
                 <div className="provider-model-picker">
                   <div className="form-group">
-                    <label className="form-label" htmlFor={searchId}>
+                    <Label htmlFor={searchId}>
                       Search models
-                    </label>
+                    </Label>
                     <Input
                       id={searchId}
                       type="search"
@@ -563,14 +567,14 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
             <p className="form-help-text">
               Run a quick check to confirm your key works before saving.
             </p>
-            <button
+            <Button
               type="button"
-              className="wizard-nav-secondary"
+              variant="secondary"
               onClick={runVerify}
               disabled={verifyState === 'loading'}
             >
               {verifyState === 'loading' ? 'Checking...' : 'Test connection'}
-            </button>
+            </Button>
             {verifyState === 'success' && (
               <div className="provider-verify-status" data-state="success">
                 Connected. Text {verifyResult?.capabilities?.text ? 'yes' : 'no'}, images{' '}

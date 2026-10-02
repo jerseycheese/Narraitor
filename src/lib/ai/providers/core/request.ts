@@ -116,7 +116,6 @@ export async function readBoundedJson<T>(
       if (value) {
         totalBytes += value.byteLength;
         if (totalBytes > maxBytes) {
-          shouldCancel = true;
           throw new Error('Service error: response exceeded maximum size');
         }
         chunks.push(value);
