@@ -82,14 +82,30 @@ export function determineOpenRouterReasoning(
   return { effort: 'low' };
 }
 
+export const OPENROUTER_METADATA_TIMEOUT_MS = 5000;
+
 export async function getOpenRouterModelMetadata(
   modelId: string,
-  apiKey?: string | null
+  apiKey?: string | null,
+  options?: { timeoutMs?: number; signal?: AbortSignal }
 ): Promise<OpenRouterModelMetadata | undefined> {
   const now = Date.now();
   if (modelMetadataCache.has(modelId) && now - cacheTimestamp < CACHE_TTL_MS) {
     return modelMetadataCache.get(modelId);
   }
+
+  if (options?.signal?.aborted) {
+    return undefined;
+  }
+
+  const effectiveTimeoutMs = options?.timeoutMs
+    ? Math.min(options.timeoutMs, OPENROUTER_METADATA_TIMEOUT_MS)
+    : OPENROUTER_METADATA_TIMEOUT_MS;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), effectiveTimeoutMs);
+  const onAbort = () => controller.abort();
+  options?.signal?.addEventListener('abort', onAbort, { once: true });
 
   try {
     const headers: Record<string, string> = {};
@@ -99,6 +115,7 @@ export async function getOpenRouterModelMetadata(
 
     const response = await fetch(OPENROUTER_MODELS_ENDPOINT, {
       headers: Object.keys(headers).length > 0 ? headers : undefined,
+      signal: controller.signal,
     });
 
     if (!response.ok) {
@@ -117,7 +134,14 @@ export async function getOpenRouterModelMetadata(
       return modelMetadataCache.get(modelId);
     }
   } catch (error) {
-    logger.warn('Error fetching OpenRouter model metadata', error);
+    if (options?.signal?.aborted) {
+      logger.info('OpenRouter model metadata fetch aborted');
+    } else {
+      logger.warn('Error fetching OpenRouter model metadata', error);
+    }
+  } finally {
+    clearTimeout(timeoutId);
+    options?.signal?.removeEventListener('abort', onAbort);
   }
 
   return undefined;

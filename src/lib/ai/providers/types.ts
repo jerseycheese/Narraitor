@@ -181,5 +181,8 @@ export interface ProviderAdapter {
    * Optional hook allowing an adapter to resolve dynamic provider metadata
    * (such as model reasoning capabilities) before request dispatch.
    */
-  prepareDescriptor?(descriptor: ProviderDescriptor): Promise<ProviderDescriptor>;
+  prepareDescriptor?(
+    descriptor: ProviderDescriptor,
+    options?: { timeoutMs?: number; signal?: AbortSignal }
+  ): Promise<ProviderDescriptor>;
 }

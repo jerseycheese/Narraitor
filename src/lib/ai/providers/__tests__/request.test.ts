@@ -13,6 +13,7 @@ jest.mock('../endpointGuard', () => ({
 }));
 
 import { generateProviderText, sendProviderRequest } from '../core/request';
+import { assertPublicProviderEndpoint } from '../endpointGuard';
 import { openAICompatibleAdapter } from '../openai-compatible/adapter';
 import type { ProviderDescriptor, TextGenerationSpec } from '../types';
 
@@ -155,6 +156,24 @@ describe('request cancellation and timeout', () => {
     await expect(sendProviderRequest(ENDPOINT, AUTH_HEADERS, { model: 'x' })).rejects.toThrow(
       'Request timeout - please try again'
     );
+  });
+
+  it('aborts when signal aborts during asynchronous endpoint guard', async () => {
+    const controller = new AbortController();
+    (assertPublicProviderEndpoint as jest.Mock).mockImplementationOnce(async () => {
+      controller.abort();
+    });
+
+    await expect(
+      sendProviderRequest(
+        'https://custom.endpoint.com/v1/chat/completions',
+        AUTH_HEADERS,
+        { model: 'x' },
+        { playerSuppliedEndpoint: true, signal: controller.signal }
+      )
+    ).rejects.toThrow('Request aborted');
+
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 });
 

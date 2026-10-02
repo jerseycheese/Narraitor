@@ -137,11 +137,18 @@ export const openAICompatibleAdapter: ProviderAdapter = {
     };
   },
 
-  async prepareDescriptor(descriptor: ProviderDescriptor): Promise<ProviderDescriptor> {
+  async prepareDescriptor(
+    descriptor: ProviderDescriptor,
+    options?: { timeoutMs?: number; signal?: AbortSignal }
+  ): Promise<ProviderDescriptor> {
     if (!isOpenRouterChatEndpoint(descriptor.endpoint)) {
       return descriptor;
     }
-    const metadata = await getOpenRouterModelMetadata(descriptor.model, descriptor.apiKey);
+    const metadata = await getOpenRouterModelMetadata(
+      descriptor.model,
+      descriptor.apiKey,
+      options
+    );
     const reasoning = determineOpenRouterReasoning(metadata);
     if (!reasoning) {
       return descriptor;

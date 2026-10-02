@@ -158,5 +158,49 @@ describe('openrouterPolicy', () => {
       const result = await getOpenRouterModelMetadata('test/model');
       expect(result).toBeUndefined();
     });
+
+    it('returns undefined without calling fetch when signal is already aborted', async () => {
+      const fetchMock = jest.fn();
+      global.fetch = fetchMock as typeof fetch;
+
+      const controller = new AbortController();
+      controller.abort();
+
+      const result = await getOpenRouterModelMetadata('test/model', null, { signal: controller.signal });
+      expect(result).toBeUndefined();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('bounds metadata fetch with caller signal and aborts pending fetch', async () => {
+      const controller = new AbortController();
+      const fetchMock = jest.fn().mockImplementation((_, init?: RequestInit) => {
+        return new Promise((_, reject) => {
+          init?.signal?.addEventListener('abort', () => {
+            reject(new DOMException('The operation was aborted.', 'AbortError'));
+          });
+        });
+      });
+      global.fetch = fetchMock as typeof fetch;
+
+      const promise = getOpenRouterModelMetadata('test/model', null, { signal: controller.signal });
+      controller.abort();
+
+      const result = await promise;
+      expect(result).toBeUndefined();
+    });
+
+    it('bounds metadata fetch with timeout and falls back to undefined on timeout', async () => {
+      const fetchMock = jest.fn().mockImplementation((_, init?: RequestInit) => {
+        return new Promise((_, reject) => {
+          init?.signal?.addEventListener('abort', () => {
+            reject(new DOMException('The operation was aborted.', 'AbortError'));
+          });
+        });
+      });
+      global.fetch = fetchMock as typeof fetch;
+
+      const result = await getOpenRouterModelMetadata('test/model', null, { timeoutMs: 10 });
+      expect(result).toBeUndefined();
+    });
   });
 });

@@ -28,10 +28,7 @@ const logger = new Logger('ProviderRequest');
  * flattening everything to 500.
  */
 export class ProviderUpstreamError extends Error {
-  constructor(
-    message: string,
-    readonly status: number
-  ) {
+  constructor(message: string, readonly status: number) {
     super(message);
     this.name = 'ProviderUpstreamError';
   }
@@ -41,14 +38,10 @@ export interface SendProviderRequestOptions {
   timeoutMs?: number;
   /**
    * True when `url` came from the player rather than from a pinned constant.
-   * Runs the endpoint guard immediately before the request — at the sink, so no
-   * call path can reach `fetch` having skipped it.
+   * Runs the endpoint guard immediately before the request at the sink.
    */
   playerSuppliedEndpoint?: boolean;
-  /**
-   * Extra headers the destination service asks for, from its preset. Merged
-   * beneath `headers`; see applyCustomHeaders for what they cannot set.
-   */
+  /** Extra headers the destination service asks for, from its preset. */
   customHeaders?: Record<string, string>;
   signal?: AbortSignal;
 }
@@ -84,12 +77,10 @@ function applyCustomHeaders(
   customHeaders?: Record<string, string>
 ): Record<string, string> {
   if (!customHeaders) return headers;
-
   const allowed = Object.entries(customHeaders).filter(
     ([name]) => !RESERVED_HEADERS.has(name.trim().toLowerCase())
   );
   if (allowed.length === 0) return headers;
-
   return { ...Object.fromEntries(allowed), ...headers };
 }
 
@@ -116,13 +107,21 @@ export async function sendProviderRequest(
     await assertPublicProviderEndpoint(url);
   }
 
+  if (signal?.aborted) {
+    throw new Error('Request aborted');
+  }
+
   const requestHeaders = applyCustomHeaders(headers, customHeaders);
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   const onAbort = () => controller.abort();
-  signal?.addEventListener('abort', onAbort, { once: true });
+  if (signal?.aborted) {
+    controller.abort();
+  } else {
+    signal?.addEventListener('abort', onAbort, { once: true });
+  }
 
   try {
     // SECURITY: `redirect: 'error'` is doing real work here, not tidiness.
@@ -217,9 +216,11 @@ export async function openProviderTextStream(
   timeoutMs?: number,
   signal?: AbortSignal
 ): Promise<Response> {
+  if (signal?.aborted) throw new Error('Request aborted');
   const effectiveDescriptor = adapter.prepareDescriptor
-    ? await adapter.prepareDescriptor(descriptor)
+    ? await adapter.prepareDescriptor(descriptor, { timeoutMs, signal })
     : descriptor;
+  if (signal?.aborted) throw new Error('Request aborted');
 
   const response = await sendProviderRequest(
     adapter.buildUrl(effectiveDescriptor, spec),
@@ -250,9 +251,11 @@ export async function generateProviderText(
   timeoutMs?: number,
   signal?: AbortSignal
 ): Promise<ProviderTextResult> {
+  if (signal?.aborted) throw new Error('Request aborted');
   const effectiveDescriptor = adapter.prepareDescriptor
-    ? await adapter.prepareDescriptor(descriptor)
+    ? await adapter.prepareDescriptor(descriptor, { timeoutMs, signal })
     : descriptor;
+  if (signal?.aborted) throw new Error('Request aborted');
 
   const response = await sendProviderRequest(
     adapter.buildUrl(effectiveDescriptor, spec),
@@ -279,21 +282,17 @@ export async function generateProviderText(
   throw new ProviderUpstreamError(message, 500);
 }
 
-/** Read the upstream error status and turn it into a typed error without retaining the raw body. */
 async function toUpstreamError(
   adapter: ProviderAdapter,
   response: Response
 ): Promise<ProviderUpstreamError> {
   const errorText = await response.text().catch(() => '');
-
-  // Deliberately logs the shape of the failure, not its content.
   logger.error('Provider API error', {
     provider: adapter.type,
     status: response.status,
     statusText: response.statusText,
     detailLength: errorText.length,
   });
-
   const classified = classifyUpstreamStatus(response.status, response.statusText);
   return new ProviderUpstreamError(classified.message, response.status);
 }
