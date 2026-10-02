@@ -11,6 +11,11 @@ import type {
 } from '../types';
 import { hasSystemRole } from '../capabilities';
 import { buildProviderSystemPrompt } from '../promptOverrides';
+import {
+  determineOpenRouterReasoning,
+  getOpenRouterModelMetadata,
+  isOpenRouterChatEndpoint,
+} from './openrouterPolicy';
 
 interface ChatMessage {
   role: 'system' | 'user';
@@ -120,6 +125,7 @@ export const openAICompatibleAdapter: ProviderAdapter = {
             temperature: descriptor.temperatureOverride ?? spec.temperature,
             top_p: descriptor.topPOverride ?? 1.0,
           }),
+      ...(descriptor.reasoning ? { reasoning: descriptor.reasoning } : {}),
       ...(spec.stream
         ? {
             stream: true,
@@ -128,6 +134,28 @@ export const openAICompatibleAdapter: ProviderAdapter = {
             stream_options: { include_usage: true },
           }
         : {}),
+    };
+  },
+
+  async prepareDescriptor(
+    descriptor: ProviderDescriptor,
+    options?: { timeoutMs?: number; signal?: AbortSignal }
+  ): Promise<ProviderDescriptor> {
+    if (!isOpenRouterChatEndpoint(descriptor.endpoint)) {
+      return descriptor;
+    }
+    const metadata = await getOpenRouterModelMetadata(
+      descriptor.model,
+      descriptor.apiKey,
+      options
+    );
+    const reasoning = determineOpenRouterReasoning(metadata);
+    if (!reasoning) {
+      return descriptor;
+    }
+    return {
+      ...descriptor,
+      reasoning,
     };
   },
 
@@ -146,6 +174,12 @@ export const openAICompatibleAdapter: ProviderAdapter = {
     // difference between "the provider blocked this" and a blank story beat.
     if (!content && REFUSAL_FINISH_REASONS.has(finishReason)) {
       return { ok: false, failure: 'moderation' };
+    }
+
+    // When the output token limit is reached before any content is produced,
+    // report it as an exhausted budget failure rather than returning an empty string.
+    if (!content.trim() && finishReason === 'MAX_TOKENS') {
+      return { ok: false, failure: 'token_limit' };
     }
 
     return {

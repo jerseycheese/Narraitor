@@ -28,10 +28,7 @@ const logger = new Logger('ProviderRequest');
  * flattening everything to 500.
  */
 export class ProviderUpstreamError extends Error {
-  constructor(
-    message: string,
-    readonly status: number
-  ) {
+  constructor(message: string, readonly status: number) {
     super(message);
     this.name = 'ProviderUpstreamError';
   }
@@ -41,15 +38,12 @@ export interface SendProviderRequestOptions {
   timeoutMs?: number;
   /**
    * True when `url` came from the player rather than from a pinned constant.
-   * Runs the endpoint guard immediately before the request — at the sink, so no
-   * call path can reach `fetch` having skipped it.
+   * Runs the endpoint guard immediately before the request at the sink.
    */
   playerSuppliedEndpoint?: boolean;
-  /**
-   * Extra headers the destination service asks for, from its preset. Merged
-   * beneath `headers`; see applyCustomHeaders for what they cannot set.
-   */
+  /** Extra headers the destination service asks for, from its preset. */
   customHeaders?: Record<string, string>;
+  signal?: AbortSignal;
 }
 
 /**
@@ -83,12 +77,10 @@ function applyCustomHeaders(
   customHeaders?: Record<string, string>
 ): Record<string, string> {
   if (!customHeaders) return headers;
-
   const allowed = Object.entries(customHeaders).filter(
     ([name]) => !RESERVED_HEADERS.has(name.trim().toLowerCase())
   );
   if (allowed.length === 0) return headers;
-
   return { ...Object.fromEntries(allowed), ...headers };
 }
 
@@ -105,16 +97,31 @@ export async function sendProviderRequest(
   body: object,
   options: SendProviderRequestOptions = {}
 ): Promise<Response> {
-  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, playerSuppliedEndpoint = false, customHeaders } = options;
+  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, playerSuppliedEndpoint = false, customHeaders, signal } = options;
+
+  if (signal?.aborted) {
+    throw new Error('Request aborted');
+  }
 
   if (playerSuppliedEndpoint) {
     await assertPublicProviderEndpoint(url);
+  }
+
+  if (signal?.aborted) {
+    throw new Error('Request aborted');
   }
 
   const requestHeaders = applyCustomHeaders(headers, customHeaders);
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  const onAbort = () => controller.abort();
+  if (signal?.aborted) {
+    controller.abort();
+  } else {
+    signal?.addEventListener('abort', onAbort, { once: true });
+  }
 
   try {
     // SECURITY: `redirect: 'error'` is doing real work here, not tidiness.
@@ -143,17 +150,24 @@ export async function sendProviderRequest(
     });
 
     clearTimeout(timeoutId);
+    signal?.removeEventListener('abort', onAbort);
     return response;
   } catch (err) {
     clearTimeout(timeoutId);
+    signal?.removeEventListener('abort', onAbort);
 
-    if (err instanceof Error) {
-      if (err.name === 'AbortError') {
-        throw new Error('Request timeout - please try again');
-      }
-      if (err.message.includes('network') || err.message.includes('fetch')) {
-        throw new Error('Network error - please check your connection');
-      }
+    if (signal?.aborted) {
+      throw new Error('Request aborted');
+    }
+
+    const errName = (err as { name?: string })?.name;
+    const errMsg = (err as { message?: string })?.message ?? '';
+
+    if (errName === 'AbortError') {
+      throw new Error('Request timeout - please try again');
+    }
+    if (errMsg.includes('network') || errMsg.includes('fetch')) {
+      throw new Error('Network error - please check your connection');
     }
 
     throw err;
@@ -184,6 +198,10 @@ const PARSE_FAILURES = {
     message: 'Service error: the provider blocked this content',
     detail: 'The provider returned an empty response and reported a content block',
   },
+  token_limit: {
+    message: 'Service error: output token limit reached before generation completed',
+    detail: 'The provider exhausted the output token budget before returning content',
+  },
 } as const;
 
 /**
@@ -195,16 +213,24 @@ export async function openProviderTextStream(
   adapter: ProviderAdapter,
   descriptor: ProviderDescriptor,
   spec: TextGenerationSpec,
-  timeoutMs?: number
+  timeoutMs?: number,
+  signal?: AbortSignal
 ): Promise<Response> {
+  if (signal?.aborted) throw new Error('Request aborted');
+  const effectiveDescriptor = adapter.prepareDescriptor
+    ? await adapter.prepareDescriptor(descriptor, { timeoutMs, signal })
+    : descriptor;
+  if (signal?.aborted) throw new Error('Request aborted');
+
   const response = await sendProviderRequest(
-    adapter.buildUrl(descriptor, spec),
-    adapter.buildHeaders(descriptor),
-    adapter.buildBody(descriptor, spec),
+    adapter.buildUrl(effectiveDescriptor, spec),
+    adapter.buildHeaders(effectiveDescriptor),
+    adapter.buildBody(effectiveDescriptor, spec),
     {
       timeoutMs,
       playerSuppliedEndpoint: adapter.playerSuppliedEndpoint,
-      customHeaders: descriptor.customHeaders,
+      customHeaders: effectiveDescriptor.customHeaders,
+      signal,
     }
   );
 
@@ -222,16 +248,24 @@ export async function generateProviderText(
   adapter: ProviderAdapter,
   descriptor: ProviderDescriptor,
   spec: TextGenerationSpec,
-  timeoutMs?: number
+  timeoutMs?: number,
+  signal?: AbortSignal
 ): Promise<ProviderTextResult> {
+  if (signal?.aborted) throw new Error('Request aborted');
+  const effectiveDescriptor = adapter.prepareDescriptor
+    ? await adapter.prepareDescriptor(descriptor, { timeoutMs, signal })
+    : descriptor;
+  if (signal?.aborted) throw new Error('Request aborted');
+
   const response = await sendProviderRequest(
-    adapter.buildUrl(descriptor, spec),
-    adapter.buildHeaders(descriptor),
-    adapter.buildBody(descriptor, spec),
+    adapter.buildUrl(effectiveDescriptor, spec),
+    adapter.buildHeaders(effectiveDescriptor),
+    adapter.buildBody(effectiveDescriptor, spec),
     {
       timeoutMs,
       playerSuppliedEndpoint: adapter.playerSuppliedEndpoint,
-      customHeaders: descriptor.customHeaders,
+      customHeaders: effectiveDescriptor.customHeaders,
+      signal,
     }
   );
 
@@ -248,21 +282,17 @@ export async function generateProviderText(
   throw new ProviderUpstreamError(message, 500);
 }
 
-/** Read the upstream error status and turn it into a typed error without retaining the raw body. */
 async function toUpstreamError(
   adapter: ProviderAdapter,
   response: Response
 ): Promise<ProviderUpstreamError> {
   const errorText = await response.text().catch(() => '');
-
-  // Deliberately logs the shape of the failure, not its content.
   logger.error('Provider API error', {
     provider: adapter.type,
     status: response.status,
     statusText: response.statusText,
     detailLength: errorText.length,
   });
-
   const classified = classifyUpstreamStatus(response.status, response.statusText);
   return new ProviderUpstreamError(classified.message, response.status);
 }

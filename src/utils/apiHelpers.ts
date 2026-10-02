@@ -337,7 +337,13 @@ export async function processAITextRequest(
   if (!prepared.ok) return prepared.response;
 
   try {
-    const result = await generateProviderText(prepared.adapter, prepared.descriptor, prepared.spec);
+    const result = await generateProviderText(
+      prepared.adapter,
+      prepared.descriptor,
+      prepared.spec,
+      undefined,
+      request.signal
+    );
 
     return NextResponse.json(result);
   } catch (error) {
@@ -363,7 +369,13 @@ export async function processAIStreamingTextRequest(
 
   let upstream: Response;
   try {
-    upstream = await openProviderTextStream(prepared.adapter, prepared.descriptor, prepared.spec);
+    upstream = await openProviderTextStream(
+      prepared.adapter,
+      prepared.descriptor,
+      prepared.spec,
+      undefined,
+      request.signal
+    );
   } catch (error) {
     return toErrorResponse(error, errorContext);
   }

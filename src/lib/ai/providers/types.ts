@@ -58,6 +58,10 @@ export interface ProviderDescriptor {
   maxTokensOverride?: number;
   customSafetyPromptOverride?: string;
   customSystemPromptOverride?: string;
+  reasoning?: {
+    enabled?: boolean;
+    effort?: string;
+  };
 }
 
 /**
@@ -120,7 +124,7 @@ export interface ProviderTextResult {
  * "the model returned nothing" unless the adapter names it. OpenRouter reports
  * one as `finish_reason: "error"`.
  */
-export type ProviderParseFailure = 'malformed' | 'moderation';
+export type ProviderParseFailure = 'malformed' | 'moderation' | 'token_limit';
 
 export type ProviderParseResult =
   | { ok: true; result: ProviderTextResult }
@@ -172,4 +176,13 @@ export interface ProviderAdapter {
    * frame — an unrecognized payload shape is not worth aborting a turn over.
    */
   parseStreamFrame(payload: unknown): ProviderStreamFrame | null;
+
+  /**
+   * Optional hook allowing an adapter to resolve dynamic provider metadata
+   * (such as model reasoning capabilities) before request dispatch.
+   */
+  prepareDescriptor?(
+    descriptor: ProviderDescriptor,
+    options?: { timeoutMs?: number; signal?: AbortSignal }
+  ): Promise<ProviderDescriptor>;
 }
