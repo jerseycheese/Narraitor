@@ -45,9 +45,9 @@ function buildPlayerDeathPatterns(playerName?: string): RegExp[] {
       'i'
     ),
 
-    // Drowning / suffocation / asphyxiation
+    // Drowning / suffocation / asphyxiation terminal outcomes
     new RegExp(
-      `\\b${subject}\\s+(?:have\\s+|has\\s+|had\\s+|were\\s+|are\\s+)?(?:drown|drowns|drowned|drowning|suffocate|suffocates|suffocated|asphyxiate|asphyxiated)\\b`,
+      `\\b${subject}\\s+(?:(?:have\\s+|has\\s+|had\\s+|were\\s+)?(?:drowned|suffocated|asphyxiated)|(?:drown|drowns|suffocate|suffocates|asphyxiate|asphyxiates)(?:\\s+to\\s+death)?)\\b`,
       'i'
     ),
 
@@ -74,7 +74,7 @@ function buildPlayerDeathPatterns(playerName?: string): RegExp[] {
       'i'
     ),
     new RegExp(
-      `\\b(?:strikes?|struck|deals?|dealt|delivers?|delivered)\\s+(?:to\\s+${subject}\\s+)?(?:a|the)\\s+(?:fatal|mortal|killing|death)\\s+blow(?:\\s+to\\s+${subject})?\\b`,
+      `\\b(?:strikes?|struck|deals?|dealt|delivers?|delivered)\\s+(?:(?:to|against)\\s+${subject}\\s+(?:a|the)\\s+(?:fatal|mortal|killing|death)\\s+blow|(?:a|the)\\s+(?:fatal|mortal|killing|death)\\s+blow\\s+(?:to|against)\\s+${subject}|${subject}\\s+(?:with\\s+)?(?:a|the)\\s+(?:fatal|mortal|killing|death)\\s+blow)\\b`,
       'i'
     ),
 

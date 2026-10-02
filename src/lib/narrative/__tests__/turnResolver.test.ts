@@ -1359,6 +1359,102 @@ describe('TurnResolver', () => {
       expect(segments[0].id).toBe(priorId);
     });
 
+    it('accepts NPC fatal blow like "You deliver a fatal blow to the guard and escape unharmed." on protected turns without repair', async () => {
+      const npcKillResult = makeGenerationResult({
+        content: 'You deliver a fatal blow to the guard and escape unharmed.',
+        metadata: { characterIds: [], tags: [] },
+      });
+
+      const generator = {
+        generateSegment: jest.fn().mockResolvedValueOnce(npcKillResult),
+        generateInitialScene: jest.fn(),
+      } as unknown as NarrativeGenerator;
+
+      const command = makeCommand({ fatalRiskAllowed: false });
+      const turnResult = await resolveTurn(command, generator);
+
+      expect(turnResult.status).toBe('settled');
+      expect(turnResult.isFatal).toBe(false);
+      expect(turnResult.segment.content).toBe(
+        'You deliver a fatal blow to the guard and escape unharmed.'
+      );
+      expect(generator.generateSegment).toHaveBeenCalledTimes(1);
+    });
+
+    it('accepts third-party NPC fatal blow like "The knight delivers a killing blow to the wolf while you watch from safety." on protected turns without repair', async () => {
+      const npcKillResult = makeGenerationResult({
+        content: 'The knight delivers a killing blow to the wolf while you watch from safety.',
+        metadata: { characterIds: [], tags: [] },
+      });
+
+      const generator = {
+        generateSegment: jest.fn().mockResolvedValueOnce(npcKillResult),
+        generateInitialScene: jest.fn(),
+      } as unknown as NarrativeGenerator;
+
+      const command = makeCommand({ fatalRiskAllowed: false });
+      const turnResult = await resolveTurn(command, generator);
+
+      expect(turnResult.status).toBe('settled');
+      expect(turnResult.isFatal).toBe(false);
+      expect(turnResult.segment.content).toBe(
+        'The knight delivers a killing blow to the wolf while you watch from safety.'
+      );
+      expect(generator.generateSegment).toHaveBeenCalledTimes(1);
+    });
+
+    it('accepts ongoing danger and rescue like "You are drowning, but a rescuer pulls you out and you recover." on protected turns without repair', async () => {
+      const rescueResult = makeGenerationResult({
+        content: 'You are drowning, but a rescuer pulls you out and you recover.',
+        metadata: { characterIds: [], tags: [] },
+      });
+
+      const generator = {
+        generateSegment: jest.fn().mockResolvedValueOnce(rescueResult),
+        generateInitialScene: jest.fn(),
+      } as unknown as NarrativeGenerator;
+
+      const command = makeCommand({ fatalRiskAllowed: false });
+      const turnResult = await resolveTurn(command, generator);
+
+      expect(turnResult.status).toBe('settled');
+      expect(turnResult.isFatal).toBe(false);
+      expect(turnResult.segment.content).toBe(
+        'You are drowning, but a rescuer pulls you out and you recover.'
+      );
+      expect(generator.generateSegment).toHaveBeenCalledTimes(1);
+    });
+
+    it('repairs terminal drowning like "You drowned in the deep water." on protected turns', async () => {
+      const lethalResult = makeGenerationResult({
+        content: 'You drowned in the deep water.',
+        metadata: { characterIds: [], tags: [] },
+      });
+      const repairedResult = makeGenerationResult({
+        content: 'You kick hard toward the light, breaking the surface and coughing up water.',
+        metadata: { characterIds: [], tags: [] },
+      });
+
+      const generator = {
+        generateSegment: jest
+          .fn()
+          .mockResolvedValueOnce(lethalResult)
+          .mockResolvedValueOnce(repairedResult),
+        generateInitialScene: jest.fn(),
+      } as unknown as NarrativeGenerator;
+
+      const command = makeCommand({ fatalRiskAllowed: false });
+      const turnResult = await resolveTurn(command, generator);
+
+      expect(turnResult.status).toBe('settled');
+      expect(turnResult.isFatal).toBe(false);
+      expect(turnResult.segment.content).toBe(
+        'You kick hard toward the light, breaking the surface and coughing up water.'
+      );
+      expect(generator.generateSegment).toHaveBeenCalledTimes(2);
+      expect((generator.generateSegment as jest.Mock).mock.calls[1][0].isFatalRepair).toBe(true);
+    });
+
     it('rejects turn when repair call throws an error and preserves prior turn', async () => {
       const initialSegment = {
         sessionId: 'session-1',

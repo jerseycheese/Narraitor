@@ -52,6 +52,8 @@ describe('isLethalNarrativeDraft', () => {
       'Until you died, the camp feared you.',
       'You fall to your knees before you die from blood loss.',
       'You have drowned. Your life ends beneath the lake.',
+      'The killer delivers a fatal blow to you.',
+      'You drowned in the deep water.',
     ];
 
     for (const prose of lethalExamples) {
@@ -83,6 +85,7 @@ describe('isLethalNarrativeDraft', () => {
       'The wound burns fiercely, but you grit your teeth and press onward.',
       'Elena reels from the heavy impact, staggering back against the stone wall.',
       'You barely dodge the lethal swipe, your heart hammering against your ribs.',
+      'You are drowning, but a rescuer pulls you out and you recover.',
     ];
 
     for (const prose of nonLethalExamples) {
@@ -97,6 +100,8 @@ describe('isLethalNarrativeDraft', () => {
       'The guard falls dead. You escape safely.',
       'The bandit dropped lifeless to the dirt as you step past.',
       'The beast collapses and dies before reaching you.',
+      'You deliver a fatal blow to the guard and escape unharmed.',
+      'The knight delivers a killing blow to the wolf while you watch from safety.',
     ];
 
     for (const prose of npcDeathExamples) {
