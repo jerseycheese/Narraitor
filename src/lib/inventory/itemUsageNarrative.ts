@@ -161,6 +161,7 @@ export async function generateItemUsageNarrative(
         worldId,
         sessionId,
         characterIds: [characterId],
+        fatalRiskAllowed: false,
         narrativeContext: {
           worldId,
           sessionId,
@@ -178,12 +179,14 @@ export async function generateItemUsageNarrative(
               name: item.name,
             },
           ],
+          fatalRiskAllowed: false,
           ...(sceneState ? { sceneState } : {}),
         },
         generationParameters: {
           segmentType: 'action',
           desiredLength: 'short',
           includedTopics,
+          fatalRiskAllowed: false,
         },
       }
     );

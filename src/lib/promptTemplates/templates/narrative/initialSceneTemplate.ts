@@ -18,6 +18,15 @@ export const initialSceneTemplate = (context: NarrativeTemplateContext) => {
     npcRoster = []
   } = context;
 
+  const fatalRiskAllowed =
+    context.generationParameters?.fatalRiskAllowed ??
+    context.fatalRiskAllowed ??
+    false;
+  const isFatalRepair =
+    context.generationParameters?.isFatalRepair ??
+    context.isFatalRepair ??
+    false;
+
   return `You are creating the opening scene for a ${genre} story world called "${worldName}".
 
 World Description: ${worldDescription}
@@ -76,6 +85,17 @@ Examples:
 ✗ WRONG: "You see ${playerCharacterName || 'yourself'} in the mirror..."
 
 The opening should immerse the reader in the world while leaving room for the story to develop.
+${!fatalRiskAllowed ? `
+SURVIVAL CONSTRAINT (DEATH COOLDOWN ACTIVE):
+- The player character MUST survive this turn. Do NOT kill, fatally wound, or incapacitate the player character.
+- Any failure, damage, or setback must leave the character alive and able to continue.
+` : ''}
+${isFatalRepair ? `
+REPAIR INSTRUCTION — PREVIOUS DRAFT CONTAINED FORBIDDEN DEATH:
+- The previous draft killed, incapacitated, or ended the player character on a protected turn.
+- You MUST rewrite the outcome so the player character SURVIVES this encounter.
+- Inflict high-stakes setbacks, severe damage, loss of resources, or lasting complications, but keep the player character alive and able to act.
+` : ''}
 
 SENSORY WRITING GUIDELINES:
 - Focus on visual, auditory, and tactile descriptions primarily

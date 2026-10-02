@@ -115,6 +115,7 @@ async function reconcileSegment({
         characterId: playerCharacterId,
         result: result.worldCost,
         decisionId: segment.metadata?.causedByDecisionId,
+        fatalRiskAllowed: segment.metadata?.fatalRiskAllowed,
       });
     }
 

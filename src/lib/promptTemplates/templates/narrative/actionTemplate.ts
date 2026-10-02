@@ -16,6 +16,17 @@ export const actionTemplate = (context: NarrativeTemplateContext) => {
     npcRoster = [],
   } = context;
 
+  const fatalRiskAllowed =
+    context.generationParameters?.fatalRiskAllowed ??
+    context.narrativeContext?.fatalRiskAllowed ??
+    context.fatalRiskAllowed ??
+    true;
+  const isFatalRepair =
+    context.generationParameters?.isFatalRepair ??
+    context.narrativeContext?.isFatalRepair ??
+    context.isFatalRepair ??
+    false;
+
   const recentSegments = narrativeContext?.recentSegments || [];
   const recentContent = recentSegments
     .map((segment, index) => `[Scene ${index + 1}]: ${segment.content}`)
@@ -53,6 +64,17 @@ CRITICAL REQUIREMENTS:
 - Keep the perspective in SECOND PERSON ("you") and stay in present tense.
 - Avoid game mechanics, inventory jargon, or UI references.
 - 2 to 4 sentences max; keep the beat tight and focused on the moment.
+${!fatalRiskAllowed ? `
+SURVIVAL CONSTRAINT (DEATH COOLDOWN ACTIVE):
+- The player character MUST survive this turn. Do NOT kill, fatally wound, or incapacitate the player character.
+- Any failure, damage, or setback must leave the character alive and able to continue.
+` : ''}
+${isFatalRepair ? `
+REPAIR INSTRUCTION — PREVIOUS DRAFT CONTAINED FORBIDDEN DEATH:
+- The previous draft killed, incapacitated, or ended the player character on a protected turn.
+- You MUST rewrite the outcome so the player character SURVIVES this encounter.
+- Inflict high-stakes setbacks, severe damage, loss of resources, or lasting complications, but keep the player character alive and able to act.
+` : ''}
 
 ${formattedRoster}
 

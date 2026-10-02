@@ -280,6 +280,60 @@ describe('Item Usage Service', () => {
       expect(narrative.content.length).toBeGreaterThan(0);
     });
 
+    it('passes fatalRiskAllowed: false into initial item-use generator request and context', async () => {
+      const mockGenerator = {
+        generateSegment: jest.fn().mockResolvedValue({
+          content: 'You feel a soothing warmth as you drink the potion.',
+          segmentType: 'action',
+          metadata: { characterIds: [characterId], tags: ['item-usage'] },
+        }),
+      } as unknown as NarrativeGenerator;
+
+      const item: InventoryItem = {
+        id: 'item-protect',
+        name: 'Protection Elixir',
+        description: 'Wards off harm',
+        quantity: 1,
+        stackable: false,
+        categoryId: 'consumables',
+        categorization: {
+          categoryId: 'consumables',
+          source: 'manual',
+          classifiedAt: new Date().toISOString(),
+        },
+        acquisitionHistory: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      await generateItemUsageNarrative(
+        {
+          item,
+          characterId,
+          worldId,
+          sessionId,
+          usageDetails: {
+            wasConsumed: false,
+            remainingQuantity: 1,
+            previousQuantity: 1,
+          },
+        },
+        mockGenerator
+      );
+
+      expect(mockGenerator.generateSegment).toHaveBeenCalledWith(
+        expect.objectContaining({
+          fatalRiskAllowed: false,
+          narrativeContext: expect.objectContaining({
+            fatalRiskAllowed: false,
+          }),
+          generationParameters: expect.objectContaining({
+            fatalRiskAllowed: false,
+          }),
+        })
+      );
+    });
+
     it('should handle AI generation failures gracefully', async () => {
       // Mock failure
       (createDefaultGeminiClient as jest.Mock).mockReturnValueOnce({

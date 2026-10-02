@@ -10,6 +10,7 @@ export interface ApplyWorldCostParams {
   characterId: EntityID;
   result: WorldCostExtractionResult;
   decisionId?: EntityID;
+  fatalRiskAllowed?: boolean;
 }
 
 /**
@@ -18,7 +19,7 @@ export interface ApplyWorldCostParams {
  * out of the inventory. Either kind is recorded on the thread that imposed
  * it when the extractor named one of this session's open threads.
  */
-export function applyWorldCost({ sessionId, characterId, result, decisionId }: ApplyWorldCostParams): WorldCostSegmentNote {
+export function applyWorldCost({ sessionId, characterId, result, decisionId, fatalRiskAllowed }: ApplyWorldCostParams): WorldCostSegmentNote {
   const characterStore = useCharacterStore.getState();
   const threadStore = useWorldThreadStore.getState();
   const note: WorldCostSegmentNote = { imposed: [], cleared: [] };
@@ -67,7 +68,7 @@ export function applyWorldCost({ sessionId, characterId, result, decisionId }: A
     });
   }
 
-  if (result.fatal) note.fatal = true;
+  if (result.fatal && fatalRiskAllowed !== false) note.fatal = true;
 
   return note;
 }

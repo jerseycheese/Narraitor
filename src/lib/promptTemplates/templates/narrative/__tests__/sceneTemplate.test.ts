@@ -54,6 +54,70 @@ describe('sceneTemplate failed-attempt guidance', () => {
     expect(prompt).toContain('FATAL/INCAPACITATING OUTCOME:');
   });
 
+  it('suppresses fatal outcome instructions on a critical-weight failure when fatalRiskAllowed is false', () => {
+    const prompt = sceneTemplate({
+      ...makeContext(undefined, ['skill-failure:skill-1'], 'critical'),
+      generationParameters: {
+        decisionWeight: 'critical',
+        fatalRiskAllowed: false,
+      },
+    });
+    expect(prompt).toContain(HEADER);
+    expect(prompt).not.toContain('FATAL/INCAPACITATING OUTCOME:');
+    expect(prompt).not.toContain('this is game over');
+    expect(prompt).not.toContain('dead, unconscious, or otherwise unable to continue');
+  });
+
+  it('suppresses lethal severity on a critical failure roll when fatalRiskAllowed is false', () => {
+    const prompt = sceneTemplate({
+      ...makeContext(undefined, ['skill-critical-failure:skill-1']),
+      generationParameters: {
+        fatalRiskAllowed: false,
+      },
+    });
+    expect(prompt).not.toContain('or lethal if the stakes justify it');
+  });
+
+  it('renders general survival constraint on non-critical turns when fatalRiskAllowed is false', () => {
+    const prompt = sceneTemplate({
+      ...makeContext(undefined, []),
+      generationParameters: {
+        decisionWeight: 'standard',
+        fatalRiskAllowed: false,
+      },
+    });
+    expect(prompt).toContain('SURVIVAL CONSTRAINT (DEATH COOLDOWN ACTIVE):');
+    expect(prompt).toContain('The player character MUST survive this turn.');
+  });
+
+  it('renders corrective repair instructions when isFatalRepair is true', () => {
+    const prompt = sceneTemplate({
+      ...makeContext(undefined, []),
+      generationParameters: {
+        fatalRiskAllowed: false,
+        isFatalRepair: true,
+      },
+    });
+    expect(prompt).toContain(
+      'REPAIR INSTRUCTION — PREVIOUS DRAFT CONTAINED FORBIDDEN DEATH:'
+    );
+    expect(prompt).toContain(
+      'You MUST rewrite the outcome so the player character SURVIVES this encounter.'
+    );
+  });
+
+  it('omits repair instructions when isFatalRepair is not set', () => {
+    const prompt = sceneTemplate({
+      ...makeContext(undefined, []),
+      generationParameters: {
+        fatalRiskAllowed: false,
+      },
+    });
+    expect(prompt).not.toContain(
+      'REPAIR INSTRUCTION — PREVIOUS DRAFT CONTAINED FORBIDDEN DEATH:'
+    );
+  });
+
   it('replaces the old consequences-and-setbacks bullet so it cannot compete', () => {
     const prompt = sceneTemplate(makeContext(undefined, ['skill-failure:skill-1']));
     expect(prompt).toContain('see FAILED ATTEMPT rules below');

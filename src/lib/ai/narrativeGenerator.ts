@@ -278,6 +278,11 @@ export class NarrativeGenerator {
 
       const npcRoster = buildNpcRoster(world.id);
 
+      const fatalRiskAllowed =
+        options?.generationParameters?.fatalRiskAllowed ?? false;
+      const isFatalRepair =
+        options?.generationParameters?.isFatalRepair ?? false;
+
       const context = {
         worldName: world.name,
         worldDescription: world.description,
@@ -289,6 +294,9 @@ export class NarrativeGenerator {
         playerCharacterBackground: playerCharacter?.background,
         toneSettings: toneSettings,
         npcRoster,
+        generationParameters: options?.generationParameters,
+        fatalRiskAllowed,
+        isFatalRepair,
       };
 
       const prompt = template(context);

@@ -11,7 +11,12 @@ import type { NarrativeSegment } from '@/types/narrative.types';
  */
 export const isSessionEndingSegment = (segment: NarrativeSegment): boolean => {
   if (segment.type === 'ending') return true;
-  if (segment.metadata?.tags?.includes('fatal-outcome')) return true;
+  if (
+    segment.metadata?.fatalRiskAllowed !== false &&
+    segment.metadata?.tags?.includes('fatal-outcome')
+  ) {
+    return true;
+  }
   if (segment.metadata?.endingId != null || segment.metadata?.endingData != null) {
     return true;
   }

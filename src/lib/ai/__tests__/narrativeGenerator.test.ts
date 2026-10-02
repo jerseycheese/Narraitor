@@ -372,5 +372,39 @@ describe('NarrativeGenerator', () => {
       expect(result.metadata.debugInfo?.fullPrompt).toBeDefined();
       expect(result.metadata.debugInfo?.rawResponse).toBe(mockAIResponse.content);
     });
+
+    it('forwards fatalRiskAllowed and isFatalRepair to the initial scene template context', async () => {
+      const mockAIResponse = {
+        content: 'You awaken in the heart of the Mystical Forest...',
+        finishReason: 'stop',
+      };
+      mockGeminiClient.generateContent.mockResolvedValue(mockAIResponse);
+
+      const mockTemplate = jest.fn().mockReturnValue('Generated initial prompt');
+      (getNarrativeTemplate as jest.Mock).mockReturnValue(mockTemplate);
+
+      await narrativeGenerator.generateInitialScene(
+        'world-123',
+        ['char-1'],
+        'session-123',
+        {
+          generationParameters: {
+            fatalRiskAllowed: false,
+            isFatalRepair: true,
+          },
+        }
+      );
+
+      expect(mockTemplate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          fatalRiskAllowed: false,
+          isFatalRepair: true,
+          generationParameters: expect.objectContaining({
+            fatalRiskAllowed: false,
+            isFatalRepair: true,
+          }),
+        })
+      );
+    });
   });
 });
