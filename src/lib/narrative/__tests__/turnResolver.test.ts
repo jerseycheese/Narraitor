@@ -1140,12 +1140,12 @@ describe('TurnResolver', () => {
       ]);
     });
 
-    it('stamps fatal-outcome tag from world cost reconciliation', async () => {
+    it('stamps fatal-outcome tag from world cost reconciliation when fatalRiskAllowed is true', async () => {
       (applyWorldClockUpdates as jest.Mock).mockResolvedValueOnce({
         worldCost: { applied: true, fatal: true, message: 'Fatigue claims you' },
       });
       const generator = makeMockGenerator();
-      const command = makeCommand();
+      const command = makeCommand({ fatalRiskAllowed: true });
 
       const turnResult = await resolveTurn(command, generator);
 
@@ -1153,13 +1153,223 @@ describe('TurnResolver', () => {
       expect(turnResult.isFatal).toBe(true);
     });
 
-    it('marks isFatal from a critical failure command without setting isEnding', async () => {
+    it('rejects lethal generator draft on protected turn and preserves prior accepted turn', async () => {
+      const initialSegment = {
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        content: 'You stand cautiously at the tree line.',
+        type: 'scene' as const,
+        metadata: { characterIds: [], tags: [], location: 'Tree line' },
+        timestamp: new Date(),
+        updatedAt: new Date().toISOString(),
+        characterIds: [],
+      };
+      const priorId = useNarrativeStore.getState().addSegment('session-1', initialSegment, {
+        resolverManaged: true,
+      });
+      (applyWorldClockUpdates as jest.Mock).mockClear();
+      (applyWorldStateThreadUpdates as jest.Mock).mockClear();
+
+      const lethalResult = makeGenerationResult({
+        content: 'The monster strikes you down. You breathe your last breath and die.',
+        metadata: { characterIds: [], tags: ['fatal-outcome'] },
+      });
+      // Mock generator returning lethal draft on all attempts (initial + repair)
+      const generator = makeMockGenerator(lethalResult);
+      const onChunk = jest.fn();
+      const command = makeCommand({ fatalRiskAllowed: false, onChunk });
+
+      await expect(resolveTurn(command, generator)).rejects.toThrow(
+        'Forbidden lethal narrative outcome generated on a protected turn.'
+      );
+
+      // Prior accepted turn must remain intact
+      const segments = useNarrativeStore.getState().getSessionSegments('session-1');
+      expect(segments).toHaveLength(1);
+      expect(segments[0].id).toBe(priorId);
+      expect(segments[0].content).toBe('You stand cautiously at the tree line.');
+
+      // No lethal chunks streamed to player
+      expect(onChunk).not.toHaveBeenCalled();
+
+      // No reconciliation side effects run on rejected draft
+      expect(applyWorldClockUpdates).not.toHaveBeenCalled();
+      expect(applyWorldStateThreadUpdates).not.toHaveBeenCalled();
+    });
+
+    it('successfully repairs a forbidden lethal draft and emits buffered repaired chunks', async () => {
+      const initialSegment = {
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        content: 'You stand cautiously at the tree line.',
+        type: 'scene' as const,
+        metadata: { characterIds: [], tags: [], location: 'Tree line' },
+        timestamp: new Date(),
+        updatedAt: new Date().toISOString(),
+        characterIds: [],
+      };
+      const priorId = useNarrativeStore.getState().addSegment('session-1', initialSegment, {
+        resolverManaged: true,
+      });
+      (applyWorldClockUpdates as jest.Mock).mockClear();
+      (applyWorldStateThreadUpdates as jest.Mock).mockClear();
+
+      const lethalResult = makeGenerationResult({
+        content: 'The monster strikes you down. You breathe your last breath and die.',
+        metadata: { characterIds: [], tags: ['fatal-outcome'] },
+      });
+      const repairedResult = makeGenerationResult({
+        content: 'You roll aside at the last second, bruised but alive.',
+        metadata: { characterIds: [], tags: ['close-call'] },
+      });
+
+      const onChunk = jest.fn();
+      const generator = {
+        generateSegment: jest
+          .fn()
+          .mockImplementationOnce(async (_req, options) => {
+            options?.onChunk?.('Lethal chunk that must not be emitted to player');
+            return lethalResult;
+          })
+          .mockImplementationOnce(async (_req, options) => {
+            options?.onChunk?.('Repaired chunk 1; ');
+            options?.onChunk?.('repaired chunk 2.');
+            return repairedResult;
+          }),
+        generateInitialScene: jest.fn(),
+      } as unknown as NarrativeGenerator;
+
+      const command = makeCommand({ fatalRiskAllowed: false, onChunk });
+
+      const turnResult = await resolveTurn(command, generator);
+
+      // Successfully resolved
+      expect(turnResult.status).toBe('settled');
+      expect(turnResult.isFatal).toBe(false);
+      expect(turnResult.segment.metadata?.tags).not.toContain('fatal-outcome');
+      expect(turnResult.segment.content).toBe(
+        'You roll aside at the last second, bruised but alive.'
+      );
+
+      // Verify repair flag was passed on the second attempt
+      expect(generator.generateSegment).toHaveBeenCalledTimes(2);
+      const repairCall = (generator.generateSegment as jest.Mock).mock.calls[1][0];
+      expect(repairCall.isFatalRepair).toBe(true);
+      expect(repairCall.fatalRiskAllowed).toBe(false);
+
+      // Verify onChunk only received the repaired chunks, never the initial lethal chunk
+      expect(onChunk).toHaveBeenCalledTimes(2);
+      expect(onChunk).toHaveBeenNthCalledWith(1, 'Repaired chunk 1; ');
+      expect(onChunk).toHaveBeenNthCalledWith(2, 'repaired chunk 2.');
+
+      // Both prior turn and repaired turn are in the store
+      const segments = useNarrativeStore.getState().getSessionSegments('session-1');
+      expect(segments).toHaveLength(2);
+      expect(segments[0].id).toBe(priorId);
+      expect(segments[1].content).toBe(
+        'You roll aside at the last second, bruised but alive.'
+      );
+
+      // Reconciliation side effects ran for the settled turn
+      expect(applyWorldClockUpdates).toHaveBeenCalledTimes(1);
+    });
+
+    it('rejects turn when repair call throws an error and preserves prior turn', async () => {
+      const initialSegment = {
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        content: 'Prior narrative.',
+        type: 'scene' as const,
+        metadata: { characterIds: [], tags: [] },
+        timestamp: new Date(),
+        updatedAt: new Date().toISOString(),
+        characterIds: [],
+      };
+      const priorId = useNarrativeStore.getState().addSegment('session-1', initialSegment, {
+        resolverManaged: true,
+      });
+      (applyWorldClockUpdates as jest.Mock).mockClear();
+      (applyWorldStateThreadUpdates as jest.Mock).mockClear();
+
+      const lethalResult = makeGenerationResult({
+        content: 'You die instantly.',
+        metadata: { characterIds: [], tags: ['fatal-outcome'] },
+      });
+
+      const onChunk = jest.fn();
+      const generator = {
+        generateSegment: jest
+          .fn()
+          .mockImplementationOnce(async (_req, options) => {
+            options?.onChunk?.('Lethal chunk');
+            return lethalResult;
+          })
+          .mockRejectedValueOnce(new Error('AI generation repair failed')),
+        generateInitialScene: jest.fn(),
+      } as unknown as NarrativeGenerator;
+
+      const command = makeCommand({ fatalRiskAllowed: false, onChunk });
+
+      await expect(resolveTurn(command, generator)).rejects.toThrow(
+        'AI generation repair failed'
+      );
+
+      // Store remains intact
+      const segments = useNarrativeStore.getState().getSessionSegments('session-1');
+      expect(segments).toHaveLength(1);
+      expect(segments[0].id).toBe(priorId);
+      expect(onChunk).not.toHaveBeenCalled();
+      expect(applyWorldClockUpdates).not.toHaveBeenCalled();
+    });
+
+    it('accepts lethal draft when fatalRiskAllowed is true', async () => {
+      const lethalResult = makeGenerationResult({
+        content: 'You succumb to the deadly poison and breathe your last.',
+        metadata: { characterIds: [], tags: ['fatal-outcome'] },
+      });
+      const generator = makeMockGenerator(lethalResult);
+      const onChunk = jest.fn();
+      const command = makeCommand({ fatalRiskAllowed: true, onChunk });
+
+      const turnResult = await resolveTurn(command, generator);
+
+      expect(turnResult.status).toBe('settled');
+      expect(turnResult.isFatal).toBe(true);
+      expect(turnResult.segment.metadata?.tags).toContain('fatal-outcome');
+      expect(generator.generateSegment).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not stamp fatal-outcome or mark isFatal from late worldCost when fatalRiskAllowed is false', async () => {
+      (applyWorldClockUpdates as jest.Mock).mockResolvedValueOnce({
+        worldCost: { applied: true, fatal: true, message: 'Fatigue claims you' },
+      });
       const generator = makeMockGenerator();
-      const command = makeCommand({ isFatalCriticalFailure: true });
+      const command = makeCommand({ fatalRiskAllowed: false });
+
+      const turnResult = await resolveTurn(command, generator);
+
+      expect(turnResult.segment.metadata?.tags).not.toContain('fatal-outcome');
+      expect(turnResult.isFatal).toBe(false);
+      expect(turnResult.reconciledNotes?.worldCost?.fatal).toBeFalsy();
+    });
+
+    it('marks isFatal from a critical failure command when fatalRiskAllowed is true', async () => {
+      const generator = makeMockGenerator();
+      const command = makeCommand({ isFatalCriticalFailure: true, fatalRiskAllowed: true });
 
       const turnResult = await resolveTurn(command, generator);
 
       expect(turnResult.isFatal).toBe(true);
+      expect(turnResult.isEnding).toBe(false);
+    });
+
+    it('does not mark isFatal from a critical failure command when fatalRiskAllowed is false', async () => {
+      const generator = makeMockGenerator();
+      const command = makeCommand({ isFatalCriticalFailure: true, fatalRiskAllowed: false });
+
+      const turnResult = await resolveTurn(command, generator);
+
+      expect(turnResult.isFatal).toBe(false);
       expect(turnResult.isEnding).toBe(false);
     });
 

@@ -175,7 +175,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const sessionHasFatalSegment = useNarrativeStore((state) =>
     !state.endedSessions[sessionId] &&
     (state.sessionSegments[sessionId] ?? []).some((segmentId) =>
-      state.segments[segmentId]?.metadata?.tags?.includes('fatal-outcome')
+      state.segments[segmentId]?.metadata?.tags?.includes('fatal-outcome') &&
+      state.segments[segmentId]?.metadata?.fatalRiskAllowed !== false
     )
   );
   const narrativeGenerator = useNarrativeGenerator();
@@ -800,6 +801,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         generationParams: {
           includedTopics: [choiceText],
           desiredTone:
+            fatalRiskAllowed &&
             decisionWeight === 'critical' &&
             rollResults.some((r) => r.isCriticalFailure)
               ? 'tragic'

@@ -64,6 +64,12 @@ export const sceneTemplate = (context: NarrativeTemplateContext) => {
     npcRoster = []
   } = context;
 
+  const fatalRiskAllowed =
+    context.fatalRiskAllowed ??
+    generationParameters?.fatalRiskAllowed ??
+    narrativeContext?.fatalRiskAllowed ??
+    true;
+
   const segmentType = generationParameters?.segmentType || 'scene';
   const lengthDescription = describeNarrativeLength(generationParameters);
   const recentSegments = narrativeContext?.recentSegments || [];
@@ -143,7 +149,7 @@ SKILL CHECK RESULT GUIDANCE:
 ${showSuccessGuidance ? '- The player SUCCEEDED at their action - show the positive outcome naturally' : ''}
 ${hasCriticalSuccess ? '- CRITICAL SUCCESS: make it count - something extra goes right, beyond what the player was reaching for' : ''}
 ${showFailureGuidance ? '- The player FAILED at their action - the attempt still happens, goes wrong, and costs them (see FAILED ATTEMPT rules below)' : ''}
-${hasCriticalFailure ? '- CRITICAL FAILURE: consequences may be severe, irreversible, or lethal if the stakes justify it' : ''}
+${hasCriticalFailure ? (fatalRiskAllowed ? '- CRITICAL FAILURE: consequences may be severe, irreversible, or lethal if the stakes justify it' : '- CRITICAL FAILURE: consequences may be severe or irreversible, but not lethal (the character must survive)') : ''}
 ${skillResult === 'mixed' ? '- MIXED OUTCOME: part of this worked and part did not - show both in the same passage, and the failed part still costs' : ''}
 - DO NOT explicitly mention skill names, skill levels, or game mechanics
 - Show the outcome through what actually happens in the story
@@ -168,19 +174,29 @@ PACING GUIDANCE — RISING TENSION:
 ` : ''}
 ${worldClockBlock(worldClock)}
 
-${generationParameters?.decisionWeight === 'critical' && failed ? `
+${generationParameters?.decisionWeight === 'critical' && failed ? (fatalRiskAllowed ? `
 FATAL/INCAPACITATING OUTCOME:
 - This was a pivotal, life-or-death decision and it FAILED${hasCriticalFailure ? ' critically' : ''}.
 - The player character should be dead, unconscious, or otherwise unable to continue.
 - Describe the fatal consequence explicitly and dramatically - this is game over.
 - Keep it grounded in established world rules (no sudden miracles or lucky escapes).
 - The narrative tone should be tragic and final.
-` : generationParameters?.decisionWeight === 'critical' ? `
+` : `
+HIGH-STAKES SETBACK (SURVIVABLE):
+- This was a pivotal decision and it FAILED${hasCriticalFailure ? ' critically' : ''}.
+- Consequences must be severe and lasting, but the character MUST survive and remain able to act in the story.
+- Do NOT kill, incapacitate, or end the character's journey.
+`) : generationParameters?.decisionWeight === 'critical' ? (fatalRiskAllowed ? `
 PIVOTAL DECISION (LIFE OR DEATH):
 - This is a critical decision with extreme stakes.
 - Success should feel earned and impactful.
 - Failure will end the game, so make successes meaningful.
-` : ''}
+` : `
+PIVOTAL DECISION (HIGH STAKES):
+- This is a critical decision with severe stakes.
+- Success should feel earned and impactful.
+- Failure carries heavy consequences, so make successes meaningful.
+`) : ''}
 
 CRITICAL CONTINUITY RULES:
 ${segmentType === 'transition'

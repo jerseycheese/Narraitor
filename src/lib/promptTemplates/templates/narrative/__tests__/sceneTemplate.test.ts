@@ -54,6 +54,30 @@ describe('sceneTemplate failed-attempt guidance', () => {
     expect(prompt).toContain('FATAL/INCAPACITATING OUTCOME:');
   });
 
+  it('suppresses fatal outcome instructions on a critical-weight failure when fatalRiskAllowed is false', () => {
+    const prompt = sceneTemplate({
+      ...makeContext(undefined, ['skill-failure:skill-1'], 'critical'),
+      generationParameters: {
+        decisionWeight: 'critical',
+        fatalRiskAllowed: false,
+      },
+    });
+    expect(prompt).toContain(HEADER);
+    expect(prompt).not.toContain('FATAL/INCAPACITATING OUTCOME:');
+    expect(prompt).not.toContain('this is game over');
+    expect(prompt).not.toContain('dead, unconscious, or otherwise unable to continue');
+  });
+
+  it('suppresses lethal severity on a critical failure roll when fatalRiskAllowed is false', () => {
+    const prompt = sceneTemplate({
+      ...makeContext(undefined, ['skill-critical-failure:skill-1']),
+      generationParameters: {
+        fatalRiskAllowed: false,
+      },
+    });
+    expect(prompt).not.toContain('or lethal if the stakes justify it');
+  });
+
   it('replaces the old consequences-and-setbacks bullet so it cannot compete', () => {
     const prompt = sceneTemplate(makeContext(undefined, ['skill-failure:skill-1']));
     expect(prompt).toContain('see FAILED ATTEMPT rules below');

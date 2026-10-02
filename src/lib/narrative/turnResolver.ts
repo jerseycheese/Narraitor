@@ -58,6 +58,7 @@ import {
   buildUsageNarrative,
   generateItemUsageNarrative,
 } from '@/lib/inventory/itemUsageNarrative';
+import { isLethalNarrativeDraft } from './fatalDraftValidation';
 
 /**
  * Per-session lock so concurrent resolveTurn calls execute sequentially.
@@ -259,49 +260,91 @@ async function resolveTurnInner(
     skillCheckContext = ` [Skill checks: ${descriptions.join(', ')}]`;
   }
 
-  const generateSegment = (isStallRetry = false) => awaitGeneration(
-    () => generator.generateSegment(
-      {
-        worldId,
-        sessionId,
-        characterIds: characterId ? [characterId] : [],
-        narrativeContext: {
+  const isProtectedTurn = !command.fatalRiskAllowed;
+  let bufferedChunks: string[] = [];
+  const chunkHandler = isProtectedTurn
+    ? (command.onChunk
+        ? (chunk: string) => {
+            bufferedChunks.push(chunk);
+          }
+        : undefined)
+    : command.onChunk;
+
+  const generateSegment = (isStallRetry = false, isFatalRepair = false) => {
+    if (isProtectedTurn) {
+      bufferedChunks = [];
+    }
+    return awaitGeneration(
+      () => generator.generateSegment(
+        {
           worldId,
-          currentSceneId: `scene-${Date.now()}`,
-          characterIds: characterId ? [characterId] : [],
-          previousSegments: [...recentSegments],
-          currentTags: mergeTurnTags(
-            recentSegments[recentSegments.length - 1]?.metadata?.tags ?? [],
-            command.skillCheckTags
-          ),
           sessionId,
-          recentSegments: [...recentSegments],
-          turnsSinceComplication,
-          worldClock,
-          ...(shouldBreakSceneStall ? { stalledSceneTurns: quietSceneTurns } : {}),
-          ...(isStallRetry ? { isStallRetry: true } : {}),
-          currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}`,
-          ...(sceneState ? { sceneState: { location: sceneState.location, presentNpcNames, completedBeats: sceneState.completedBeats } } : {}),
+          characterIds: characterId ? [characterId] : [],
+          fatalRiskAllowed: command.fatalRiskAllowed,
+          isFatalRepair,
+          narrativeContext: {
+            worldId,
+            currentSceneId: `scene-${Date.now()}`,
+            characterIds: characterId ? [characterId] : [],
+            previousSegments: [...recentSegments],
+            currentTags: mergeTurnTags(
+              recentSegments[recentSegments.length - 1]?.metadata?.tags ?? [],
+              command.skillCheckTags
+            ),
+            sessionId,
+            recentSegments: [...recentSegments],
+            turnsSinceComplication,
+            worldClock,
+            ...(shouldBreakSceneStall ? { stalledSceneTurns: quietSceneTurns } : {}),
+            ...(isStallRetry ? { isStallRetry: true } : {}),
+            currentSituation: `Player chose: "${command.choiceText}"${skillCheckContext}`,
+            ...(sceneState ? { sceneState: { location: sceneState.location, presentNpcNames, completedBeats: sceneState.completedBeats } } : {}),
+            fatalRiskAllowed: command.fatalRiskAllowed,
+            isFatalRepair,
+          },
+          generationParameters: {
+            includedTopics: command.generationParams?.includedTopics ?? [command.choiceText],
+            decisionWeight: command.decisionWeight,
+            desiredTone: command.generationParams?.desiredTone,
+            fatalRiskAllowed: command.fatalRiskAllowed,
+            isFatalRepair,
+            ...(shouldRequestSceneTransition
+              ? { segmentType: 'transition' as const }
+              : {}),
+          },
         },
-        generationParameters: {
-          includedTopics: command.generationParams?.includedTopics ?? [command.choiceText],
-          decisionWeight: command.decisionWeight,
-          desiredTone: command.generationParams?.desiredTone,
-          ...(shouldRequestSceneTransition
-            ? { segmentType: 'transition' as const }
-            : {}),
-        },
-      },
-      { signal: command.signal, onChunk: command.onChunk }
-    ),
-    command.signal
-  );
+        { signal: command.signal, onChunk: chunkHandler }
+      ),
+      command.signal
+    );
+  };
 
   let result = await generateSegment();
+  if (isProtectedTurn && isLethalNarrativeDraft(result, preTurnSnapshot.character?.name)) {
+    logger.warn('[TurnResolver] Forbidden lethal draft generated on protected turn; attempting repair', {
+      sessionId,
+      turnIndex: currentTurn,
+    });
+    result = await generateSegment(false, true);
+    if (isLethalNarrativeDraft(result, preTurnSnapshot.character?.name)) {
+      logger.error('[TurnResolver] Forbidden lethal draft persisted after repair on protected turn; rejecting turn', {
+        sessionId,
+        turnIndex: currentTurn,
+      });
+      throw new Error('Forbidden lethal narrative outcome generated on a protected turn.');
+    }
+  }
+
   if (shouldBreakSceneStall) {
     const target = result.metadata.sceneTransition?.to?.trim();
     if (!target || target === FIRST_SEGMENT_LOCATION) {
       result = await generateSegment(true);
+      if (isProtectedTurn && isLethalNarrativeDraft(result, preTurnSnapshot.character?.name)) {
+        result = await generateSegment(true, true);
+        if (isLethalNarrativeDraft(result, preTurnSnapshot.character?.name)) {
+          throw new Error('Forbidden lethal narrative outcome generated on a protected turn.');
+        }
+      }
       const retryTarget = result.metadata.sceneTransition?.to?.trim();
       if (!retryTarget || retryTarget === FIRST_SEGMENT_LOCATION) {
         const currentPlace = [
@@ -319,6 +362,13 @@ async function resolveTurnInner(
       }
     }
   }
+
+  if (isProtectedTurn && command.onChunk && bufferedChunks.length > 0) {
+    for (const chunk of bufferedChunks) {
+      command.onChunk(chunk);
+    }
+  }
+
   const resultWithInferredLosses = inferMissingItemLosses(result, characterId);
 
   return commitAndSettleGeneratedTurn({
@@ -342,6 +392,7 @@ async function resolveTurnInner(
     isFirstSegment: false,
     isFatalCriticalFailure: command.isFatalCriticalFailure,
     playerCharacterName: preTurnSnapshot.character?.name,
+    fatalRiskAllowed: command.fatalRiskAllowed,
   });
 }
 
@@ -632,6 +683,7 @@ interface CommitAndSettleParams {
   isFatalCriticalFailure: boolean;
   playerCharacterName?: string;
   reconciliationPolicy?: ReconciliationPolicy;
+  fatalRiskAllowed?: boolean;
 }
 
 async function commitAndSettleGeneratedTurn({
@@ -644,7 +696,25 @@ async function commitAndSettleGeneratedTurn({
   isFatalCriticalFailure,
   playerCharacterName,
   reconciliationPolicy,
+  fatalRiskAllowed,
 }: CommitAndSettleParams): Promise<TurnResult> {
+  const resolvedFatalRiskAllowed =
+    result.metadata?.fatalRiskAllowed ?? fatalRiskAllowed;
+
+  const sanitizedMetadataTags = (result.metadata?.tags || []).filter(
+    (tag) => resolvedFatalRiskAllowed !== false || tag !== 'fatal-outcome'
+  );
+  result = {
+    ...result,
+    metadata: {
+      ...result.metadata,
+      tags: sanitizedMetadataTags,
+      ...(resolvedFatalRiskAllowed !== undefined
+        ? { fatalRiskAllowed: resolvedFatalRiskAllowed }
+        : {}),
+    },
+  };
+
   if (isFeatureEnabled('SCENE_STATE')) {
     const beat = result.metadata.sceneBeat;
     if (beat && useSceneStore.getState().scenes[sessionId]?.completedBeats.some(
@@ -713,6 +783,7 @@ async function commitAndSettleGeneratedTurn({
     metadata: result.metadata,
     isFirstSegment,
     policy: reconciliationPolicy,
+    fatalRiskAllowed: resolvedFatalRiskAllowed,
   });
 
   syncNpcMetadata(worldId, result.metadata.characters);
@@ -744,13 +815,16 @@ async function commitAndSettleGeneratedTurn({
   const settledSegment =
     useNarrativeStore.getState().segments[storedSegmentId] ?? storedSegment;
 
+  const isTurnFatal =
+    resolvedFatalRiskAllowed !== false &&
+    (isFatalCriticalFailure ||
+      settledSegment.metadata?.tags?.includes('fatal-outcome') === true);
+
   return {
     segment: settledSegment,
     status: errors.length === 0 ? 'settled' : 'partial',
     snapshot: assembleSessionSnapshot(sessionId, { worldId, characterId }),
-    isFatal:
-      isFatalCriticalFailure ||
-      settledSegment.metadata?.tags?.includes('fatal-outcome') === true,
+    isFatal: isTurnFatal,
     isEnding: isSessionEndingSegment(settledSegment),
     reconciledNotes: notes ?? undefined,
     reconciliationErrors: errors,
@@ -801,6 +875,7 @@ interface ReconcileParams {
   metadata: NarrativeSegment['metadata'];
   isFirstSegment: boolean;
   policy?: ReconciliationPolicy;
+  fatalRiskAllowed?: boolean;
 }
 
 interface ReconcileResult {
@@ -817,6 +892,7 @@ async function reconcileCoreSideEffects({
   metadata,
   isFirstSegment,
   policy,
+  fatalRiskAllowed,
 }: ReconcileParams): Promise<ReconcileResult> {
   const errors: ReconciliationError[] = [];
   const recordError = (
@@ -850,15 +926,27 @@ async function reconcileCoreSideEffects({
 
     if (result) {
       notes = result;
+      if (fatalRiskAllowed === false && notes.worldCost?.fatal) {
+        notes = {
+          ...notes,
+          worldCost: {
+            ...notes.worldCost,
+            fatal: false,
+          },
+        };
+      }
       const current = useNarrativeStore.getState().segments[segmentId];
       if (current) {
         const currentTags = current.metadata?.tags ?? [];
-        const tags =
-          result.worldCost?.fatal && !currentTags.includes('fatal-outcome')
-            ? [...currentTags, 'fatal-outcome']
-            : currentTags;
+        const shouldStampFatal =
+          fatalRiskAllowed !== false &&
+          Boolean(notes.worldCost?.fatal) &&
+          !currentTags.includes('fatal-outcome');
+        const tags = shouldStampFatal
+          ? [...currentTags, 'fatal-outcome']
+          : currentTags.filter((tag) => fatalRiskAllowed !== false || tag !== 'fatal-outcome');
         useNarrativeStore.getState().updateSegment(segmentId, {
-          metadata: { ...current.metadata, ...result, tags },
+          metadata: { ...current.metadata, ...notes, tags },
         });
       }
     }

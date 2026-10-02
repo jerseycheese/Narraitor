@@ -23,6 +23,16 @@ describe('isSessionEndingSegment', () => {
     ).toBe(true);
   });
 
+  it('returns false for a fatal-outcome tag when fatalRiskAllowed is false', () => {
+    expect(
+      isSessionEndingSegment(
+        buildSegment({
+          metadata: { tags: ['fatal-outcome'], fatalRiskAllowed: false },
+        })
+      )
+    ).toBe(false);
+  });
+
   it('returns true when the segment carries committed ending data', () => {
     expect(
       isSessionEndingSegment(buildSegment({ metadata: { tags: [], endingId: 'ending-1' } }))

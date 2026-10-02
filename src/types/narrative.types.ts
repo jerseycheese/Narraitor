@@ -337,6 +337,8 @@ export interface NarrativeGenerationRequest {
   characterIds: EntityID[];
   narrativeContext?: NarrativeContext;
   generationParameters?: GenerationParameters;
+  fatalRiskAllowed?: boolean;
+  isFatalRepair?: boolean;
 }
 
 /**
@@ -373,6 +375,8 @@ export interface NarrativeContext {
   }>;
   /** The world clock's open ledger for this turn; absent when the clock is off */
   worldClock?: WorldClockPromptContext;
+  fatalRiskAllowed?: boolean;
+  isFatalRepair?: boolean;
 }
 
 /**
@@ -386,6 +390,9 @@ export interface GenerationParameters {
   excludedTopics?: string[];
   decisionWeight?: DecisionWeight;
   desiredTone?: EndingTone;
+  fatalRiskAllowed?: boolean;
+  isFatalRepair?: boolean;
+  repairInstruction?: string;
 }
 
 /**

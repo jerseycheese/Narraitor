@@ -82,6 +82,10 @@ export const buildNarrativeContext = (
     toneSettings,
     npcRoster,
     characterSkillContext: '',
+    fatalRiskAllowed:
+      request.fatalRiskAllowed ??
+      request.generationParameters?.fatalRiskAllowed ??
+      request.narrativeContext?.fatalRiskAllowed,
     worldSkills:
       world.skills?.map((skill) => ({
         id: skill.id,
