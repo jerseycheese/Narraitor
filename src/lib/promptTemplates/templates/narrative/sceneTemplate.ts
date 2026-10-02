@@ -70,6 +70,12 @@ export const sceneTemplate = (context: NarrativeTemplateContext) => {
     narrativeContext?.fatalRiskAllowed ??
     true;
 
+  const isFatalRepair =
+    context.isFatalRepair ??
+    generationParameters?.isFatalRepair ??
+    narrativeContext?.isFatalRepair ??
+    false;
+
   const segmentType = generationParameters?.segmentType || 'scene';
   const lengthDescription = describeNarrativeLength(generationParameters);
   const recentSegments = narrativeContext?.recentSegments || [];
@@ -173,6 +179,17 @@ PACING GUIDANCE — RISING TENSION:
 - Judge the majorEvent field on its own rules below — this guidance stands down on its own and does not need one.
 ` : ''}
 ${worldClockBlock(worldClock)}
+${!fatalRiskAllowed ? `
+SURVIVAL CONSTRAINT (DEATH COOLDOWN ACTIVE):
+- The player character MUST survive this turn. Do NOT kill, fatally wound, or incapacitate the player character.
+- Any failure, damage, or setback must leave the character alive and able to continue.
+` : ''}
+${isFatalRepair ? `
+REPAIR INSTRUCTION — PREVIOUS DRAFT CONTAINED FORBIDDEN DEATH:
+- The previous draft killed, incapacitated, or ended the player character on a protected turn.
+- You MUST rewrite the outcome so the player character SURVIVES this encounter.
+- Inflict high-stakes setbacks, severe damage, loss of resources, or lasting complications, but keep the player character alive and able to act.
+` : ''}
 
 ${generationParameters?.decisionWeight === 'critical' && failed ? (fatalRiskAllowed ? `
 FATAL/INCAPACITATING OUTCOME:

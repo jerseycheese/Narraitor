@@ -36,6 +36,7 @@ interface NarrativeTemplateNarrativeContext {
   /** The world clock's open ledger for this turn — see worldClockBlock */
   worldClock?: WorldClockPromptContext;
   fatalRiskAllowed?: boolean;
+  isFatalRepair?: boolean;
 }
 
 /** Subset of generation parameters the templates read. */
@@ -44,6 +45,7 @@ interface NarrativeTemplateGenerationParameters {
   segmentType?: string;
   decisionWeight?: string;
   fatalRiskAllowed?: boolean;
+  isFatalRepair?: boolean;
 }
 
 /** Minimal settled commitment shape for prompt context. */
@@ -78,4 +80,5 @@ export interface NarrativeTemplateContext {
   newLocation?: string;
   settledCommitments?: SettledCommitmentDTO[];
   fatalRiskAllowed?: boolean;
+  isFatalRepair?: boolean;
 }
