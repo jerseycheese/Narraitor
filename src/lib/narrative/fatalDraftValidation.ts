@@ -10,12 +10,12 @@ function maskHypotheticals(text: string, playerName?: string): string {
       : `(?:you|thou)`;
 
   const conditionalPattern = new RegExp(
-    `\\b(?:if|unless|lest|whether|before|until|in\\s+case|should)\\s+${playerRef}\\s+[^.!?\\n,;:]*?(?:die|dies|died|perish|perishes|perished|bleed\\s+out|succumb|stop\\s+breathing)[^.!?\\n,;:]*`,
+    `\\b(?:if|unless|lest|in\\s+case)\\s+${playerRef}\\s+[^.!?\\n,;:]*?(?:die|dies|died|perish|perishes|perished|bleed\\s+out|succumb|drown)[^.!?\\n,;:]*`,
     'gi'
   );
 
   const warningPattern = new RegExp(
-    `\\b(?:warns?|warned|warning|fears?|feared|afraid|worried|threatens?|threatened)\\s+(?:that\\s+)?(?:to\\s+)?${playerRef}\\s+(?:could|might|would|will|may)\\s+(?:die|perish|succumb|fall)[^.!?\\n,;:]*`,
+    `\\b(?:warns?|warned|warning|fears?|feared|afraid|worried|threatens?|threatened)\\s+(?:that\\s+)?(?:to\\s+)?${playerRef}\\s+(?:could|might|would|will|may)\\s+(?:die|perish|succumb|fall|drown)[^.!?\\n,;:]*`,
     'gi'
   );
 
@@ -45,9 +45,25 @@ function buildPlayerDeathPatterns(playerName?: string): RegExp[] {
       'i'
     ),
 
+    // Drowning / suffocation / asphyxiation
+    new RegExp(
+      `\\b${subject}\\s+(?:have\\s+|has\\s+|had\\s+|were\\s+|are\\s+)?(?:drown|drowns|drowned|drowning|suffocate|suffocates|suffocated|asphyxiate|asphyxiated)\\b`,
+      'i'
+    ),
+
+    // Player life ending
+    new RegExp(
+      `\\b${possessive}\\s+life\\s+(?:ends?|ended|is\\s+over|is\\s+extinguished|is\\s+cut\\s+short|fades?\\s+away|ebbs?\\s+away)\\b`,
+      'i'
+    ),
+    new RegExp(
+      `\\b(?:ends?|ended|extinguished|took|taken|claims?|claimed|snuffs?|snuffed)\\s+${possessive}\\s+life\\b`,
+      'i'
+    ),
+
     // State of death or fatal trauma
     new RegExp(
-      `\\b${beVerb}\\s+(?:dead|killed|slain|lifeless|deceased|fatally\\s+(?:wounded|struck|pierced|poisoned|injured))\\b`,
+      `\\b${beVerb}\\s+(?:dead|killed|slain|lifeless|deceased|fatally\\s+(?:wounded|struck|pierced|poisoned|injured)|mortally\\s+(?:wounded|struck|pierced|poisoned|injured)|no\\s+longer\\s+(?:alive|among\\s+the\\s+living))\\b`,
       'i'
     ),
 
@@ -55,6 +71,10 @@ function buildPlayerDeathPatterns(playerName?: string): RegExp[] {
     new RegExp(`\\b(?:killed|slain|murdered)\\s+${subject}\\b`, 'i'),
     new RegExp(
       `\\b(?:death|fatality)\\s+(?:claims?|claimed|takes?|took)\\s+${subject}\\b`,
+      'i'
+    ),
+    new RegExp(
+      `\\b(?:strikes?|struck|deals?|dealt|delivers?|delivered)\\s+(?:to\\s+${subject}\\s+)?(?:a|the)\\s+(?:fatal|mortal|killing|death)\\s+blow(?:\\s+to\\s+${subject})?\\b`,
       'i'
     ),
 
@@ -70,7 +90,7 @@ function buildPlayerDeathPatterns(playerName?: string): RegExp[] {
 
     // Cardiac and respiratory vital cessation
     new RegExp(
-      `\\b${possessive}\\s+heart\\s+(?:stops?|stopped|ceases?\\s+to\\s+beat|ceased\\s+to\\s+beat)\\b`,
+      `\\b${possessive}\\s+heart\\s+(?:stops?|stopped|ceases?\\s+to\\s+beat|ceased\\s+to\\s+beat|beats?\\s+its\\s+last|gives?\\s+out|gave\\s+out)\\b`,
       'i'
     ),
     new RegExp(
@@ -78,11 +98,11 @@ function buildPlayerDeathPatterns(playerName?: string): RegExp[] {
       'i'
     ),
     new RegExp(
-      `\\b(?:draws?|drew|breathes?|breathed)\\s+${possessive}\\s+last\\s+breath\\b`,
+      `\\b(?:draws?|drew|breathes?|breathed|takes?|took)\\s+${possessive}\\s+last\\s+breath\\b`,
       'i'
     ),
     new RegExp(
-      `\\b${subject}\\s+(?:draws?|drew|breathes?|breathed)\\s+(?:his|her|their|your|thy)\\s+last\\s+breath\\b`,
+      `\\b${subject}\\s+(?:draws?|drew|breathes?|breathed|takes?|took)\\s+(?:his|her|their|your|thy)\\s+last\\s+breath\\b`,
       'i'
     ),
     new RegExp(`\\b${possessive}\\s+(?:final|last)\\s+breath\\b`, 'i'),
@@ -92,7 +112,7 @@ function buildPlayerDeathPatterns(playerName?: string): RegExp[] {
       `\\b${possessive}\\s+(?:lifeless\\s+body|corpse|remains)\\b`,
       'i'
     ),
-    new RegExp(`\\b(?:leaves?|left)\\s+${possessive}\\s+corpse\\b`, 'i'),
+    new RegExp(`\\b(?:leaves?|left|buries|buried)\\s+${possessive}\\s+corpse\\b`, 'i'),
 
     // Terminal session-ending incapacitation / non-awakening
     new RegExp(
@@ -108,8 +128,12 @@ function buildPlayerDeathPatterns(playerName?: string): RegExp[] {
       'i'
     ),
 
-    // Explicit game over assertion
+    // Explicit game over assertion / journey ending in death
     /\bthis\s+is\s+game\s+over\b/i,
+    new RegExp(
+      `\\b(?:this\\s+is\\s+the\\s+end\\s+for\\s+${subject}|${possessive}\\s+journey\\s+(?:ends|ended|has\\s+ended)\\s+(?:here|in\\s+death))\\b`,
+      'i'
+    ),
   ];
 }
 

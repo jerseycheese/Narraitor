@@ -158,6 +158,32 @@ function awaitGeneration<T>(
   });
 }
 
+function flushProtectedChunks(
+  onChunk: ((chunk: string) => void) | undefined,
+  bufferedChunks: string[],
+  finalResult: NarrativeGenerationResult,
+  playerCharacterName?: string
+): void {
+  if (!onChunk) return;
+  const combinedBuffered = bufferedChunks.join('');
+  const isBufferedUnsafe =
+    bufferedChunks.length === 0 ||
+    isLethalNarrativeDraft({ content: combinedBuffered }, playerCharacterName) ||
+    bufferedChunks.some((chunk) =>
+      isLethalNarrativeDraft({ content: chunk }, playerCharacterName)
+    );
+
+  if (isBufferedUnsafe) {
+    if (finalResult.content && !isLethalNarrativeDraft(finalResult, playerCharacterName)) {
+      onChunk(finalResult.content);
+    }
+  } else {
+    for (const chunk of bufferedChunks) {
+      onChunk(chunk);
+    }
+  }
+}
+
 /**
  * Advance the story by one Turn. Handles everything between "the player
  * picked a choice" and "the next Decision can safely read state":
@@ -380,24 +406,13 @@ async function resolveTurnInner(
     }
   }
 
-  if (isProtectedTurn && command.onChunk) {
-    const combinedBuffered = bufferedChunks.join('');
-    const isBufferedUnsafe =
-      bufferedChunks.length === 0 ||
-      isLethalNarrativeDraft({ content: combinedBuffered }, preTurnSnapshot.character?.name) ||
-      bufferedChunks.some((chunk) =>
-        isLethalNarrativeDraft({ content: chunk }, preTurnSnapshot.character?.name)
-      );
-
-    if (isBufferedUnsafe) {
-      if (result.content && !isLethalNarrativeDraft(result, preTurnSnapshot.character?.name)) {
-        command.onChunk(result.content);
-      }
-    } else {
-      for (const chunk of bufferedChunks) {
-        command.onChunk(chunk);
-      }
-    }
+  if (isProtectedTurn) {
+    flushProtectedChunks(
+      command.onChunk,
+      bufferedChunks,
+      result,
+      preTurnSnapshot.character?.name
+    );
   }
 
   const resultWithInferredLosses = inferMissingItemLosses(result, characterId);
@@ -505,25 +520,12 @@ async function resolveInitialTurnInner(
     }
   }
 
-  if (command.onChunk) {
-    const combinedBuffered = bufferedChunks.join('');
-    const isBufferedUnsafe =
-      bufferedChunks.length === 0 ||
-      isLethalNarrativeDraft({ content: combinedBuffered }, playerCharacterName) ||
-      bufferedChunks.some((chunk) =>
-        isLethalNarrativeDraft({ content: chunk }, playerCharacterName)
-      );
-
-    if (isBufferedUnsafe) {
-      if (result.content && !isLethalNarrativeDraft(result, playerCharacterName)) {
-        command.onChunk(result.content);
-      }
-    } else {
-      for (const chunk of bufferedChunks) {
-        command.onChunk(chunk);
-      }
-    }
-  }
+  flushProtectedChunks(
+    command.onChunk,
+    bufferedChunks,
+    result,
+    playerCharacterName
+  );
 
   return commitAndSettleGeneratedTurn({
     result,
@@ -681,15 +683,9 @@ async function resolveItemUseTurnInner(
           isFatalRepair: true,
         },
       });
-    } catch {
-      generated = {
-        content: buildUsageNarrative(item, usageDetails, 'detailed'),
-        segmentType: 'action',
-        metadata: {
-          characterIds: [characterId],
-          tags: ['item-usage', item.categoryId],
-        },
-      };
+    } catch (error) {
+      rollbackItemUsage();
+      throw error;
     }
     if (isLethalNarrativeDraft(generated, character.name)) {
       logger.error('[TurnResolver] Forbidden lethal item-use draft persisted after repair; rejecting turn', {

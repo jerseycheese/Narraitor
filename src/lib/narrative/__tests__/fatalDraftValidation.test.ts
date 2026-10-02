@@ -48,6 +48,10 @@ describe('isLethalNarrativeDraft', () => {
       'You drop lifeless to the stone floor.',
       'You collapse and die from the poison.',
       'You succumb to the wounds and your vision fades to black.',
+      'Before you died, you saw the killer smile.',
+      'Until you died, the camp feared you.',
+      'You fall to your knees before you die from blood loss.',
+      'You have drowned. Your life ends beneath the lake.',
     ];
 
     for (const prose of lethalExamples) {

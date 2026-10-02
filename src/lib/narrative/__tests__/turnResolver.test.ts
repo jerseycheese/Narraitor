@@ -1263,6 +1263,102 @@ describe('TurnResolver', () => {
       expect(applyWorldClockUpdates).toHaveBeenCalledTimes(1);
     });
 
+    it('repairs asserted death prose like "Before you died, you saw the killer smile." on protected turns', async () => {
+      const priorId = useNarrativeStore.getState().addSegment(
+        'session-1',
+        {
+          worldId: 'world-1',
+          content: 'Prior narrative.',
+          type: 'scene' as const,
+          metadata: { characterIds: [], tags: [] },
+          timestamp: new Date(),
+          updatedAt: new Date().toISOString(),
+          characterIds: [],
+        },
+        { resolverManaged: true }
+      );
+
+      const lethalResult = makeGenerationResult({
+        content: 'Before you died, you saw the killer smile.',
+        metadata: { characterIds: [], tags: [] },
+      });
+      const repairedResult = makeGenerationResult({
+        content: 'You break the killer’s grip and stumble backward, gasping for air.',
+        metadata: { characterIds: [], tags: [] },
+      });
+
+      const generator = {
+        generateSegment: jest
+          .fn()
+          .mockResolvedValueOnce(lethalResult)
+          .mockResolvedValueOnce(repairedResult),
+        generateInitialScene: jest.fn(),
+      } as unknown as NarrativeGenerator;
+
+      const command = makeCommand({ fatalRiskAllowed: false });
+      const turnResult = await resolveTurn(command, generator);
+
+      expect(turnResult.status).toBe('settled');
+      expect(turnResult.isFatal).toBe(false);
+      expect(turnResult.segment.content).toBe(
+        "You break the killer's grip and stumble backward, gasping for air."
+      );
+      expect(generator.generateSegment).toHaveBeenCalledTimes(2);
+      expect((generator.generateSegment as jest.Mock).mock.calls[1][0].isFatalRepair).toBe(true);
+
+      const segments = useNarrativeStore.getState().getSessionSegments('session-1');
+      expect(segments).toHaveLength(2);
+      expect(segments[0].id).toBe(priorId);
+    });
+
+    it('repairs drowning and life ending prose like "You have drowned. Your life ends beneath the lake." on protected turns', async () => {
+      const priorId = useNarrativeStore.getState().addSegment(
+        'session-1',
+        {
+          worldId: 'world-1',
+          content: 'Prior narrative.',
+          type: 'scene' as const,
+          metadata: { characterIds: [], tags: [] },
+          timestamp: new Date(),
+          updatedAt: new Date().toISOString(),
+          characterIds: [],
+        },
+        { resolverManaged: true }
+      );
+
+      const lethalResult = makeGenerationResult({
+        content: 'You have drowned. Your life ends beneath the lake.',
+        metadata: { characterIds: [], tags: [] },
+      });
+      const repairedResult = makeGenerationResult({
+        content: 'You thrash violently, kick toward the surface, and break into the cold night air.',
+        metadata: { characterIds: [], tags: [] },
+      });
+
+      const generator = {
+        generateSegment: jest
+          .fn()
+          .mockResolvedValueOnce(lethalResult)
+          .mockResolvedValueOnce(repairedResult),
+        generateInitialScene: jest.fn(),
+      } as unknown as NarrativeGenerator;
+
+      const command = makeCommand({ fatalRiskAllowed: false });
+      const turnResult = await resolveTurn(command, generator);
+
+      expect(turnResult.status).toBe('settled');
+      expect(turnResult.isFatal).toBe(false);
+      expect(turnResult.segment.content).toBe(
+        'You thrash violently, kick toward the surface, and break into the cold night air.'
+      );
+      expect(generator.generateSegment).toHaveBeenCalledTimes(2);
+      expect((generator.generateSegment as jest.Mock).mock.calls[1][0].isFatalRepair).toBe(true);
+
+      const segments = useNarrativeStore.getState().getSessionSegments('session-1');
+      expect(segments).toHaveLength(2);
+      expect(segments[0].id).toBe(priorId);
+    });
+
     it('rejects turn when repair call throws an error and preserves prior turn', async () => {
       const initialSegment = {
         sessionId: 'session-1',
@@ -2394,6 +2490,32 @@ describe('TurnResolver', () => {
       expect(outcome.turn.segment.metadata?.fatalRiskAllowed).toBe(false);
       expect(outcome.turn.segment.metadata?.tags).not.toContain('fatal-outcome');
       expect(useInventoryStore.getState().items[ids.itemId]).toBeUndefined();
+    });
+
+    it('rolls back inventory and surfaces error when item-use fatal repair fails', async () => {
+      const ids = seedItemUseStores(1);
+      const lethalResult = makeGenerationResult({
+        content: 'You drink the draught and fall to your knees before you die from blood loss.',
+        segmentType: 'action',
+        metadata: { characterIds: [], tags: ['item-usage'] },
+      });
+      const generator = {
+        generateSegment: jest
+          .fn()
+          .mockResolvedValueOnce(lethalResult)
+          .mockRejectedValueOnce(new Error('AI item repair service unavailable')),
+      } as unknown as NarrativeGenerator;
+
+      await expect(resolveItemUseTurn(ids, generator)).rejects.toThrow(
+        'AI item repair service unavailable'
+      );
+
+      const itemAfter = useInventoryStore.getState().items[ids.itemId];
+      expect(itemAfter).toBeDefined();
+      expect(itemAfter.quantity).toBe(1);
+
+      const segments = useNarrativeStore.getState().getSessionSegments(ids.sessionId);
+      expect(segments).toHaveLength(0);
     });
   });
 
