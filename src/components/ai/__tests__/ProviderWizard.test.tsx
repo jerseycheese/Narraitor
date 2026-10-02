@@ -14,8 +14,14 @@ jest.mock('@/lib/storage/encryption', () => ({
   clearEncryptionKey: jest.fn(async () => {}),
 }));
 
+import type { ValidationResult } from '@/lib/ai/validateProviderClient';
+
 jest.mock('@/lib/ai/validateProviderClient', () => ({
   validateProviderKey: jest.fn(),
+}));
+
+jest.mock('@/lib/api/discoverModelsClient', () => ({
+  discoverProviderModels: jest.fn(async () => ({ models: [] })),
 }));
 
 /**
@@ -39,9 +45,11 @@ jest.mock('@/lib/ai/presets', () => {
 import { ProviderWizard } from '../ProviderWizard';
 import { useProviderStore } from '@/state/providerStore';
 import { validateProviderKey } from '@/lib/ai/validateProviderClient';
+import { discoverProviderModels } from '@/lib/api/discoverModelsClient';
 import { KEYLESS_PROVIDER_KEY } from '@/lib/ai/providerKeyHeader';
 
 const mockValidate = validateProviderKey as jest.MockedFunction<typeof validateProviderKey>;
+const mockDiscover = discoverProviderModels as jest.MockedFunction<typeof discoverProviderModels>;
 
 beforeEach(() => {
   localStorage.clear();
@@ -277,4 +285,297 @@ describe('ProviderWizard', () => {
 
     expect(screen.getByRole('button', { name: /^next$/i })).toBeDisabled();
   });
+
+  test('loads models live on clicking Load models and filters with search', async () => {
+    mockDiscover.mockResolvedValueOnce({
+      models: [
+        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+        { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
+        { id: 'custom-model', name: 'Custom Model' },
+      ],
+    });
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    await user.type(screen.getByLabelText(/api key/i), 'AIza-test-key');
+    const loadBtn = screen.getByRole('button', { name: /load models/i });
+    await user.click(loadBtn);
+
+    expect(mockDiscover).toHaveBeenCalledWith(
+      expect.objectContaining({ apiKey: 'AIza-test-key', type: 'gemini' })
+    );
+
+    // Filtered Select and search should appear
+    const searchInput = await screen.findByLabelText(/search models/i);
+    expect(searchInput).toBeInTheDocument();
+
+    const modelSelect = screen.getByLabelText(/^model$/i);
+    expect(modelSelect.tagName).toBe('SELECT');
+
+    // Filter by search query
+    await user.type(searchInput, 'pro');
+    expect(screen.getByRole('option', { name: /gemini 2.5 pro/i })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: /custom model/i })).not.toBeInTheDocument();
+  });
+
+  test('clears discovered models when credentials or endpoint change', async () => {
+    mockDiscover.mockReset();
+    mockDiscover
+      .mockResolvedValueOnce({ models: [{ id: 'model-from-config-a', name: 'Config A model' }] })
+      .mockResolvedValueOnce({ models: [{ id: 'model-from-config-b', name: 'Config B model' }] });
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /ollama/i }));
+    await user.type(screen.getByLabelText(/endpoint url/i), 'https://ollama-a.example.com');
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+    expect(await screen.findByRole('option', { name: /config a model/i })).toBeInTheDocument();
+
+    const keyField = screen.getByLabelText(/api key/i);
+    await user.type(keyField, 'key-for-config-a');
+    await waitFor(() => {
+      expect(screen.queryByRole('option', { name: /config a model/i })).not.toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+    expect(await screen.findByRole('option', { name: /config b model/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /^back$/i }));
+    const endpointField = screen.getByLabelText(/endpoint url/i);
+    await user.clear(endpointField);
+    await user.type(endpointField, 'https://ollama-b.example.com');
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('option', { name: /config b model/i })).not.toBeInTheDocument();
+      expect(screen.getByLabelText(/^model$/i).tagName).toBe('INPUT');
+    });
+  });
+
+  test('ignores a discovery response that resolves after the key changes', async () => {
+    mockDiscover.mockReset();
+    let resolveDiscovery: (result: { models: { id: string; name: string }[] }) => void = () => {};
+    mockDiscover.mockImplementationOnce(
+      () => new Promise((resolve) => {
+        resolveDiscovery = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.type(screen.getByLabelText(/api key/i), 'AIza-original-key');
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+
+    const keyField = screen.getByLabelText(/api key/i);
+    await user.clear(keyField);
+    await user.type(keyField, 'AIza-changed-key');
+    resolveDiscovery({ models: [{ id: 'stale-model', name: 'Stale model' }] });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('option', { name: /stale model/i })).not.toBeInTheDocument();
+      expect(screen.getByLabelText(/^model$/i).tagName).toBe('INPUT');
+    });
+  });
+
+  test('when discovery omits the suggestion, requires explicit selection rather than choosing first result', async () => {
+    mockDiscover.mockResolvedValueOnce({
+      models: [
+        { id: 'gemini-other-1', name: 'Other Model 1' },
+        { id: 'gemini-other-2', name: 'Other Model 2' },
+      ],
+    });
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    await user.type(screen.getByLabelText(/api key/i), 'AIza-test-key');
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+
+    const modelSelect = await screen.findByLabelText(/^model$/i);
+    // Model should be cleared to empty string because gemini-2.5-flash was omitted
+    expect(modelSelect).toHaveValue('');
+
+    // Next must be disabled until user explicitly chooses
+    expect(screen.getByRole('button', { name: /^next$/i })).toBeDisabled();
+
+    // Explicitly choose an option
+    await user.selectOptions(modelSelect, 'gemini-other-1');
+    expect(modelSelect).toHaveValue('gemini-other-1');
+    expect(screen.getByRole('button', { name: /^next$/i })).not.toBeDisabled();
+  });
+
+  test('preserves a model the player deliberately entered before discovery', async () => {
+    mockDiscover.mockResolvedValueOnce({
+      models: [
+        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+        { id: 'my-deliberate-model', name: 'My Deliberate Model' },
+      ],
+    });
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    const modelInput = screen.getByLabelText(/^model$/i);
+    await user.clear(modelInput);
+    await user.type(modelInput, 'my-deliberate-model');
+
+    await user.type(screen.getByLabelText(/api key/i), 'AIza-test-key');
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+
+    const select = await screen.findByLabelText(/^model$/i);
+    expect(select).toHaveValue('my-deliberate-model');
+  });
+
+  test('allows manual recovery when discovery fails or returns empty results', async () => {
+    mockDiscover.mockResolvedValueOnce({
+      models: [],
+      error: 'NETWORK',
+    });
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    await user.type(screen.getByLabelText(/api key/i), 'AIza-test-key');
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+
+    // Error message appears
+    expect(await screen.findByText(/could not reach provider to load models/i)).toBeInTheDocument();
+
+    // Input remains available for manual typing
+    const modelInput = screen.getByLabelText(/^model$/i);
+    expect(modelInput.tagName).toBe('INPUT');
+    await user.clear(modelInput);
+    await user.type(modelInput, 'manual-fallback-model');
+
+    // Next is enabled and can proceed to verify step
+    expect(screen.getByRole('button', { name: /^next$/i })).not.toBeDisabled();
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    expect(screen.getByRole('button', { name: /test connection/i })).toBeInTheDocument();
+  });
+
+  test('allows toggling between discovered list and manual model entry', async () => {
+    mockDiscover.mockResolvedValueOnce({
+      models: [{ id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' }],
+    });
+    const user = userEvent.setup();
+
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.type(screen.getByLabelText(/api key/i), 'AIza-test-key');
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+
+    // Discovered models dropdown is visible
+    expect(await screen.findByLabelText(/search models/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^model$/i).tagName).toBe('SELECT');
+
+    // Toggle to manual entry
+    const toggleBtn = screen.getByRole('button', { name: /enter model id manually/i });
+    await user.click(toggleBtn);
+
+    expect(screen.queryByLabelText(/search models/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/^model$/i).tagName).toBe('INPUT');
+
+    // Toggle back to discovered models
+    await user.click(screen.getByRole('button', { name: /select from discovered models/i }));
+    expect(screen.getByLabelText(/search models/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^model$/i).tagName).toBe('SELECT');
+  });
+
+  test('ignores late validation response if credentials change while in flight', async () => {
+    let resolveValidation: (res: ValidationResult) => void = () => {};
+    mockValidate.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveValidation = resolve;
+        })
+    );
+
+    const user = userEvent.setup();
+    render(<ProviderWizard />);
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.type(screen.getByLabelText(/api key/i), 'AIza-original-key');
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    // Start verification in step 2
+    await user.click(screen.getByRole('button', { name: /test connection/i }));
+    expect(screen.getByRole('button', { name: /checking.../i })).toBeInTheDocument();
+
+    // Go back and change the API key
+    await user.click(screen.getByRole('button', { name: /^back$/i }));
+    const keyField = screen.getByLabelText(/api key/i);
+    await user.clear(keyField);
+    await user.type(keyField, 'AIza-changed-key');
+
+    // Navigate back to verify step
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    // Late resolution of the original validation
+    resolveValidation({
+      valid: true,
+      capabilities: { text: true, images: true, streaming: true },
+      model: 'gemini-2.5-flash',
+    });
+
+    // Save provider MUST remain disabled because configuration changed!
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /save provider/i })).toBeDisabled();
+    });
+  });
+
+  test('preserves model entered in CustomProviderForm on step 0 when loading models on step 1', async () => {
+    mockDiscover.mockResolvedValueOnce({
+      models: [
+        { id: 'llama3:8b', name: 'Llama 3 8B' },
+        { id: 'custom-model:v1', name: 'Custom Model v1' },
+      ],
+    });
+
+    const user = userEvent.setup();
+    render(<ProviderWizard />);
+
+    // Select Ollama preset on step 0 (which renders CustomProviderForm because requiresEndpoint: true)
+    await user.click(screen.getByRole('button', { name: /ollama/i }));
+    expect(screen.getByLabelText(/endpoint url/i)).toBeInTheDocument();
+
+    // Fill in endpoint and model on step 0
+    await user.type(screen.getByLabelText(/endpoint url/i), 'https://ollama.example.com');
+    const modelInputStep0 = screen.getByLabelText(/^model$/i);
+    await user.clear(modelInputStep0);
+    await user.type(modelInputStep0, 'custom-model:v1');
+
+    // Advance to step 1
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    // Click Load models
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+
+    // The deliberately entered model 'custom-model:v1' must be preserved and selected in the Select
+    await waitFor(() => {
+      expect(screen.getByLabelText(/search models/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/^model$/i)).toHaveValue('custom-model:v1');
+    });
+  });
 });
+

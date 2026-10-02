@@ -1,6 +1,7 @@
 import React from 'react';
 import { clsx } from 'clsx';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import './provider-config.css';
 
 interface CustomProviderValue {
@@ -51,9 +52,9 @@ export function CustomProviderForm({
       </p>
 
       <div className="form-group">
-        <label className="form-label" htmlFor="custom-provider-name">
+        <Label htmlFor="custom-provider-name">
           Name
-        </label>
+        </Label>
         <Input
           id="custom-provider-name"
           value={value.name}
@@ -63,23 +64,24 @@ export function CustomProviderForm({
       </div>
 
       <div className="form-group">
-        <label className="form-label" htmlFor="custom-provider-endpoint">
+        <Label htmlFor="custom-provider-endpoint">
           Endpoint URL
-        </label>
+        </Label>
         <Input
           id="custom-provider-endpoint"
           value={value.endpoint}
           placeholder={endpointPlaceholder || DEFAULT_ENDPOINT_PLACEHOLDER}
           aria-describedby="custom-provider-endpoint-help"
           aria-invalid={endpointLooksWrong || undefined}
+          className={clsx(endpointLooksWrong && 'form-input-error')}
           onChange={(e) => onChange({ endpoint: e.target.value })}
         />
       </div>
 
       <div className="form-group">
-        <label className="form-label" htmlFor="custom-provider-model">
+        <Label htmlFor="custom-provider-model">
           Model
-        </label>
+        </Label>
         <Input
           id="custom-provider-model"
           value={value.model}

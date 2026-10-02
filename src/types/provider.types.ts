@@ -105,7 +105,8 @@ export interface ProviderPreset {
   name: string;
   type: ProviderType;
   endpoint: string;
-  models: string[];
+  requiresEndpoint: boolean;
+  modelDiscovery: boolean;
   defaultModel: string;
   capabilities: ProviderCapabilities;
   helpUrl: string;
@@ -159,4 +160,22 @@ export interface ProviderPreset {
    * surfaced rather than left to the provider's own terms page.
    */
   privacyNote?: string;
+}
+
+/**
+ * Normalized model option returned by the model discovery route.
+ */
+export interface DiscoveredModel {
+  id: string;
+  name: string;
+  description?: string;
+  contextLength?: number;
+  reasoning?: boolean;
+  supportedParameters?: string[];
+  reasoningPolicy?: {
+    mandatory?: boolean;
+    defaultEnabled?: boolean;
+    supportedEfforts?: string[];
+    defaultEffort?: string;
+  };
 }

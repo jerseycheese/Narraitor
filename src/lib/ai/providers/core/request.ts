@@ -35,6 +35,7 @@ export class ProviderUpstreamError extends Error {
 }
 
 export interface SendProviderRequestOptions {
+  method?: 'GET' | 'POST';
   timeoutMs?: number;
   /**
    * True when `url` came from the player rather than from a pinned constant.
@@ -44,6 +45,112 @@ export interface SendProviderRequestOptions {
   /** Extra headers the destination service asks for, from its preset. */
   customHeaders?: Record<string, string>;
   signal?: AbortSignal;
+}
+
+/** Default response body limit (5MB) to prevent memory exhaustion from rogue endpoints. */
+export const MAX_RESPONSE_BODY_BYTES = 5 * 1024 * 1024;
+
+export interface ReadBoundedJsonOptions {
+  timeoutMs?: number;
+  signal?: AbortSignal;
+}
+
+/**
+ * Reads and parses a JSON response body ensuring it does not exceed maxBytes
+ * or outlive the body-read deadline.
+ */
+export async function readBoundedJson<T>(
+  response: Response,
+  maxBytes: number = MAX_RESPONSE_BODY_BYTES,
+  options: ReadBoundedJsonOptions = {}
+): Promise<T> {
+  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, signal } = options;
+  if (signal?.aborted) {
+    throw new Error('Request aborted');
+  }
+
+  const contentLength = response.headers.get('content-length');
+  if (contentLength) {
+    const bytes = parseInt(contentLength, 10);
+    if (!Number.isNaN(bytes) && bytes > maxBytes) {
+      void response.body?.cancel().catch(() => undefined);
+      throw new Error('Service error: response exceeded maximum size');
+    }
+  }
+
+  if (!response.body) {
+    return {} as T;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  let pendingRead: Promise<ReadableStreamReadResult<Uint8Array>> | undefined;
+  let shouldCancel = false;
+  let abortListener: (() => void) | undefined;
+  const interruptionPromise = new Promise<never>((_resolve, reject) => {
+    timeoutId = setTimeout(
+      () => reject(new Error('Request timeout - please try again')),
+      timeoutMs
+    );
+    abortListener = () => reject(new Error('Request aborted'));
+    signal?.addEventListener('abort', abortListener, { once: true });
+    if (signal?.aborted) abortListener();
+  });
+
+  const releaseReader = () => {
+    try {
+      reader.releaseLock();
+    } catch {
+      // A pending read releases the lock once cancellation settles it.
+    }
+  };
+
+  try {
+    while (true) {
+      pendingRead = reader.read();
+      const { done, value } = await Promise.race([pendingRead, interruptionPromise]);
+      pendingRead = undefined;
+      if (done) break;
+      if (value) {
+        totalBytes += value.byteLength;
+        if (totalBytes > maxBytes) {
+          throw new Error('Service error: response exceeded maximum size');
+        }
+        chunks.push(value);
+      }
+    }
+  } catch (error) {
+    shouldCancel = true;
+    throw error;
+  } finally {
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
+    if (abortListener) signal?.removeEventListener('abort', abortListener);
+
+    if (shouldCancel) {
+      try {
+        void reader.cancel().catch(() => undefined);
+      } catch {
+        // Ignore cancellation failure; preserve the read error.
+      }
+    }
+    if (pendingRead) {
+      void pendingRead.then(releaseReader, releaseReader);
+    } else {
+      releaseReader();
+    }
+  }
+
+  const merged = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    merged.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  const text = new TextDecoder().decode(merged);
+  return JSON.parse(text) as T;
 }
 
 /**
@@ -85,7 +192,7 @@ function applyCustomHeaders(
 }
 
 /**
- * POST to a provider with a hard timeout.
+ * Make an HTTP request to a provider with a hard timeout, redirect refusal, and optional endpoint guarding.
  *
  * The thrown messages are load-bearing: `getUserFriendlyError` classifies on
  * "timeout" and "network" substrings, so a rewording here changes what the
@@ -94,10 +201,16 @@ function applyCustomHeaders(
 export async function sendProviderRequest(
   url: string,
   headers: Record<string, string>,
-  body: object,
+  body?: object | null,
   options: SendProviderRequestOptions = {}
 ): Promise<Response> {
-  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, playerSuppliedEndpoint = false, customHeaders, signal } = options;
+  const {
+    method = 'POST',
+    timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS,
+    playerSuppliedEndpoint = false,
+    customHeaders,
+    signal,
+  } = options;
 
   if (signal?.aborted) {
     throw new Error('Request aborted');
@@ -141,10 +254,11 @@ export async function sendProviderRequest(
     // The acceptance is recorded as a dismissal on the alert itself. Inline
     // `codeql[...]` comments do nothing on GitHub code scanning, so one here
     // would look like a control while being decoration.
+    const isGet = method === 'GET';
     const response = await fetch(url, {
-      method: 'POST',
+      method,
       headers: requestHeaders,
-      body: JSON.stringify(body),
+      body: isGet || body === undefined || body === null ? undefined : JSON.stringify(body),
       redirect: 'error',
       signal: controller.signal,
     });

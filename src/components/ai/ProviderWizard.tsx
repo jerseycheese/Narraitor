@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useWizardFlow } from '@/components/shared/wizard/hooks/useWizardFlow';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardStep } from '@/components/shared/wizard/WizardStep';
 import { WizardNavigation } from '@/components/shared/wizard/WizardNavigation';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { ProviderPresets } from './ProviderPresets';
 import { CustomProviderForm } from './CustomProviderForm';
@@ -13,7 +15,8 @@ import { ProviderDisclosure } from './ProviderDisclosure';
 import { useProviderStore } from '@/state/providerStore';
 import { getPresetById, keyToSend } from '@/lib/ai/presets';
 import { validateProviderKey, type ValidationResult } from '@/lib/ai/validateProviderClient';
-import type { ProviderType } from '@/types/provider.types';
+import { discoverProviderModels } from '@/lib/api/discoverModelsClient';
+import type { DiscoveredModel, ProviderType } from '@/types/provider.types';
 import './provider-config.css';
 
 interface ProviderWizardData {
@@ -23,7 +26,6 @@ interface ProviderWizardData {
   type: ProviderType;
   endpoint: string;
   model: string;
-  models: string[];
   apiKey: string;
   images: boolean;
   streaming: boolean;
@@ -45,7 +47,6 @@ const INITIAL_DATA: ProviderWizardData = {
   type: 'gemini',
   endpoint: '',
   model: '',
-  models: [],
   apiKey: '',
   images: false,
   streaming: false,
@@ -80,6 +81,17 @@ function describeVerifyError(code: string | undefined, requiresApiKey: boolean):
   return ERROR_MESSAGES[key] ?? ERROR_MESSAGES.VALIDATION_FAILED;
 }
 
+function describeDiscoveryError(code: string | null | undefined): string {
+  if (code === 'NO_KEY') return 'Enter your API key first to load models.';
+  if (code === 'INVALID_KEY') return 'The API key was rejected while loading models.';
+  if (code === 'RATE_LIMITED') return 'Rate limited by the provider. Please try again in a moment.';
+  if (code === 'UNSUPPORTED_PROVIDER')
+    return 'Live model listing is not supported for this provider. Enter model ID manually below.';
+  if (code === 'INVALID_ENDPOINT') return 'Invalid endpoint address.';
+  if (code === 'NETWORK') return 'Could not reach provider to load models. Enter model ID manually below.';
+  return 'Could not load models list. Enter model ID manually below.';
+}
+
 const ERROR_MESSAGES: Record<string, string> = {
   INVALID_KEY: 'That key was rejected. Double-check it and try again.',
   INVALID_MODEL: 'That model name was not found for this provider.',
@@ -96,20 +108,11 @@ const ERROR_MESSAGES: Record<string, string> = {
 /**
  * The same failures, worded for a server the player runs themselves, where the
  * fix is on their machine rather than in somebody's dashboard.
- *
- * Only two states get their own copy, because only two are distinguishable from
- * here. "The software isn't installed" and "it's on a different port" both
- * arrive as nothing answering, so writing separate messages for them would mean
- * guessing at the player and being wrong most of the time.
  */
 const SELF_HOSTED_ERROR_MESSAGES: Record<string, string> = {
   NETWORK: 'Nothing answered at that address. Check the server is running and reachable from outside your machine.',
   INVALID_MODEL:
     'Your server does not have that model. Install it there, then run the check again.',
-  // A 403 maps to INVALID_KEY upstream, which is the right read for a hosted
-  // service and exactly wrong here: there is no key to reject. Ollama refuses
-  // any request whose Host header is not its own machine until it is told
-  // otherwise, so a self-hoster behind a tunnel meets this before anything else.
   INVALID_KEY:
     'Your server refused the request. Most local model servers only accept requests addressed to their own machine, so a server reached through a tunnel has to be told to allow that address.',
 };
@@ -118,19 +121,37 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   const addProvider = useProviderStore((s) => s.addProvider);
   const [verifyState, setVerifyState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [verifyResult, setVerifyResult] = useState<ValidationResult | null>(null);
+  const [validatedConfig, setValidatedConfig] = useState<{
+    apiKey?: string | null;
+    type: ProviderType;
+    endpoint: string;
+    model: string;
+  } | null>(null);
+  const validationReqIdRef = useRef<symbol | null>(null);
+
   const [isKeyRevealed, setIsKeyRevealed] = useState(false);
 
-  // Memoized so useWizardFlow's validation effect has a stable dependency —
-  // an inline function would change identity each render and loop the effect.
+  // Model discovery state
+  const searchId = useId();
+  const [discoveredModels, setDiscoveredModels] = useState<DiscoveredModel[]>([]);
+  const [discoveryStatus, setDiscoveryStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [discoveryError, setDiscoveryError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isManualEntry, setIsManualEntry] = useState(false);
+
+  // Track if user has deliberately entered or chosen a model
+  const hasUserDeliberatelySetModelRef = useRef(false);
+  const discoveryAbortRef = useRef<AbortController | null>(null);
+  const discoveryReqIdRef = useRef<symbol | null>(null);
+
+  // Memoized so useWizardFlow's validation effect has a stable dependency
   const validateStep = useCallback((step: number, data: ProviderWizardData) => {
     if (step === 0) {
-      // Picking the card is enough for a hosted service. A preset that lists no
-      // models has only told us the shape of its address, so the address itself
-      // is still outstanding.
+      const preset = data.mode === 'preset' ? getPresetById(data.presetId) : null;
       const ok =
         data.mode === 'custom'
           ? Boolean(data.endpoint.trim())
-          : Boolean(data.presetId) && (data.models.length > 0 || Boolean(data.endpoint.trim()));
+          : Boolean(data.presetId) && (!preset?.requiresEndpoint || Boolean(data.endpoint.trim()));
       return { valid: ok, errors: ok ? [] : ['Choose a provider'], touched: true };
     }
     if (step === 1) {
@@ -163,8 +184,6 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   const wizard = useWizardFlow<ProviderWizardData>({
     steps: STEPS,
     initialData: INITIAL_DATA,
-    // No persistKey: the wizard holds a plaintext key in memory only — it must
-    // never be written to localStorage.
     onComplete: handleSave,
     onCancel,
     validateStep,
@@ -173,14 +192,35 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   const { state, handlers, currentStep, isLastStep, stepValidation } = wizard;
   const { data } = state;
 
-  // Any change to the credentials invalidates a prior successful check.
+  // Any change to the credentials or model invalidates a prior successful check
   useEffect(() => {
     setVerifyState('idle');
     setVerifyResult(null);
+    setValidatedConfig(null);
+    validationReqIdRef.current = null;
   }, [data.apiKey, data.model, data.endpoint, data.type]);
 
-  // Reveal is a glance, not a mode: leaving the step re-masks, so a key can't
-  // sit in the clear behind a step the player has already walked past.
+  // A catalogue belongs to the provider configuration it was loaded for.
+  useEffect(() => {
+    discoveryAbortRef.current?.abort();
+    discoveryAbortRef.current = null;
+    discoveryReqIdRef.current = null;
+    setDiscoveredModels([]);
+    setSearchQuery('');
+    setDiscoveryStatus('idle');
+    setDiscoveryError(null);
+  }, [data.mode, data.presetId, data.apiKey, data.endpoint, data.type]);
+
+  useEffect(
+    () => () => {
+      discoveryAbortRef.current?.abort();
+      discoveryAbortRef.current = null;
+      discoveryReqIdRef.current = null;
+    },
+    []
+  );
+
+  // Reveal is a glance, not a mode: leaving the step re-masks
   useEffect(() => {
     setIsKeyRevealed(false);
   }, [currentStep]);
@@ -188,12 +228,14 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   const selectPreset = (presetId: string) => {
     const preset = getPresetById(presetId);
     if (!preset) return;
-    // An empty model list marks a service the player runs themselves: we know
-    // the shape of its address and nothing about the address itself, so the
-    // preset's endpoint becomes a hint to show rather than a value to keep.
-    // Pre-filling it would let a player walk to the verify step with our
-    // example still in the field.
-    const playerSuppliesEndpoint = preset.models.length === 0;
+    const playerSuppliesEndpoint = preset.requiresEndpoint;
+    hasUserDeliberatelySetModelRef.current = false;
+    setDiscoveredModels([]);
+    setSearchQuery('');
+    setIsManualEntry(false);
+    setDiscoveryStatus('idle');
+    setDiscoveryError(null);
+
     handlers.updateData({
       mode: 'preset',
       presetId: preset.id,
@@ -202,7 +244,6 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
       endpoint: playerSuppliesEndpoint ? '' : preset.endpoint,
       endpointHint: playerSuppliesEndpoint ? preset.endpoint : '',
       requiresApiKey: preset.requiresApiKey !== false,
-      models: preset.models,
       model: preset.defaultModel,
       images: preset.capabilities.images,
       streaming: preset.capabilities.streaming,
@@ -211,35 +252,143 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
     });
   };
 
-  const runVerify = async () => {
-    setVerifyState('loading');
+  const handleCustomFormChange = (
+    updates: Partial<{ name: string; endpoint: string; model: string }>
+  ) => {
+    if (updates.model !== undefined) {
+      hasUserDeliberatelySetModelRef.current = true;
+    }
+    handlers.updateData(updates);
+  };
+
+  const handleDiscoverModels = async () => {
+    if (discoveryAbortRef.current) {
+      discoveryAbortRef.current.abort();
+    }
+    const controller = new AbortController();
+    discoveryAbortRef.current = controller;
+    const reqId = Symbol();
+    discoveryReqIdRef.current = reqId;
+
+    setDiscoveryStatus('loading');
+    setDiscoveryError(null);
+
     try {
-      const result = await validateProviderKey({
+      const result = await discoverProviderModels({
         apiKey: keyToSend(data.apiKey, data.requiresApiKey),
         type: data.type,
-        endpoint: data.endpoint,
-        model: data.model,
+        endpoint: data.endpoint || undefined,
+        signal: controller.signal,
+      });
+
+      if (controller.signal.aborted || discoveryReqIdRef.current !== reqId) {
+        return;
+      }
+
+      if (result.error && result.models.length === 0) {
+        setDiscoveryStatus('error');
+        setDiscoveryError(result.error);
+        return;
+      }
+
+      setDiscoveredModels(result.models);
+      setDiscoveryStatus(result.models.length > 0 ? 'success' : 'idle');
+
+      // Requirement 6: when discovery omits the suggestion, require explicit selection/manual entry rather than choosing the first result. Preserve a model the player deliberately entered.
+      if (hasUserDeliberatelySetModelRef.current) {
+        if (data.model && !result.models.some((m) => m.id === data.model)) {
+          setIsManualEntry(true);
+        }
+      } else {
+        const preset = getPresetById(data.presetId);
+        const suggestion = preset?.defaultModel ?? '';
+        const hasSuggestion = result.models.some((m) => m.id === suggestion);
+        if (hasSuggestion) {
+          handlers.updateData({ model: suggestion });
+        } else {
+          handlers.updateData({ model: '' });
+        }
+      }
+    } catch {
+      if (!controller.signal.aborted && discoveryReqIdRef.current === reqId) {
+        setDiscoveryStatus('error');
+        setDiscoveryError('NETWORK');
+      }
+    }
+  };
+
+  const runVerify = async () => {
+    const targetConfig = {
+      apiKey: keyToSend(data.apiKey, data.requiresApiKey),
+      type: data.type,
+      endpoint: data.endpoint,
+      model: data.model,
+    };
+
+    const reqId = Symbol();
+    validationReqIdRef.current = reqId;
+    setVerifyState('loading');
+
+    try {
+      const result = await validateProviderKey({
+        apiKey: targetConfig.apiKey,
+        type: targetConfig.type,
+        endpoint: targetConfig.endpoint,
+        model: targetConfig.model,
         checkImage: data.images,
       });
+
+      if (validationReqIdRef.current !== reqId) {
+        // Drop late response if configuration changed while in flight
+        return;
+      }
+
       setVerifyResult(result);
       setVerifyState(result.valid ? 'success' : 'error');
+      if (result.valid) {
+        setValidatedConfig(targetConfig);
+      }
     } catch {
+      if (validationReqIdRef.current !== reqId) {
+        return;
+      }
       setVerifyResult({ valid: false, error: 'NETWORK' });
       setVerifyState('error');
     }
   };
 
   const hasChosenProvider = data.mode === 'preset' ? Boolean(data.presetId) : Boolean(data.endpoint.trim());
-  // A chosen preset that lists no models still needs its address typed in, so
-  // step 0 keeps going rather than handing straight over to step 1.
-  const playerSuppliesEndpoint = data.mode === 'preset' && Boolean(data.presetId) && data.models.length === 0;
-  const navDisabled = isLastStep ? verifyState !== 'success' : !(stepValidation?.valid ?? false);
+  const playerSuppliesEndpoint =
+    data.mode === 'preset'
+      ? Boolean(getPresetById(data.presetId)?.requiresEndpoint)
+      : false;
+
+  const isConfigValidated =
+    verifyState === 'success' &&
+    validatedConfig !== null &&
+    validatedConfig.apiKey === keyToSend(data.apiKey, data.requiresApiKey) &&
+    validatedConfig.type === data.type &&
+    validatedConfig.endpoint === data.endpoint &&
+    validatedConfig.model === data.model;
+
+  const navDisabled = isLastStep ? !isConfigValidated : !(stepValidation?.valid ?? false);
+
+  const filteredModels = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return discoveredModels;
+    return discoveredModels.filter(
+      (m) => m.id.toLowerCase().includes(q) || m.name.toLowerCase().includes(q)
+    );
+  }, [discoveredModels, searchQuery]);
+
+  const preset = getPresetById(data.presetId);
+  const showLoadModels = data.mode === 'custom' || preset?.modelDiscovery !== false;
 
   return (
     <WizardContainer title="Set up a provider" className="component-provider-wizard">
       <WizardStep error={wizard.currentError}>
         {currentStep === 0 && (
-          <div>
+          <div className="provider-form-fields">
             <p className="form-help-text">
               Pick a provider. Stories are generated with your own key, kept in this browser.
             </p>
@@ -247,32 +396,30 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
             {playerSuppliesEndpoint && (
               <CustomProviderForm
                 value={{ name: data.name, endpoint: data.endpoint, model: data.model }}
-                onChange={(updates) => handlers.updateData(updates)}
+                onChange={handleCustomFormChange}
                 endpointPlaceholder={data.endpointHint}
               />
             )}
             <button
               type="button"
               className="provider-advanced-toggle"
-              onClick={() =>
+              onClick={() => {
+                hasUserDeliberatelySetModelRef.current = false;
                 handlers.updateData({
                   mode: data.mode === 'custom' ? 'preset' : 'custom',
                   type: data.mode === 'custom' ? 'gemini' : 'openai-compatible',
                   privacyNote: data.mode === 'custom' ? '' : CUSTOM_PRIVACY_NOTE,
-                  // A hand-typed endpoint is somebody else's service until told
-                  // otherwise, so the keyless exemption does not follow it out
-                  // of the preset that granted it.
                   requiresApiKey: true,
                   endpointHint: '',
-                })
-              }
+                });
+              }}
             >
               {data.mode === 'custom' ? 'Use a preset instead' : 'Use a custom endpoint'}
             </button>
             {data.mode === 'custom' && (
               <CustomProviderForm
                 value={{ name: data.name, endpoint: data.endpoint, model: data.model }}
-                onChange={(updates) => handlers.updateData(updates)}
+                onChange={handleCustomFormChange}
               />
             )}
             {hasChosenProvider && (
@@ -282,11 +429,11 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
         )}
 
         {currentStep === 1 && (
-          <div>
+          <div className="provider-form-fields">
             <div className="form-group">
-              <label className="form-label" htmlFor="provider-name">
+              <Label htmlFor="provider-name">
                 Name
-              </label>
+              </Label>
               <Input
                 id="provider-name"
                 value={data.name}
@@ -296,35 +443,9 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="provider-model">
-                Model
-              </label>
-              {data.mode === 'preset' && data.models.length > 0 ? (
-                <Select
-                  id="provider-model"
-                  value={data.model}
-                  onChange={(e) => handlers.updateData({ model: e.target.value })}
-                >
-                  {data.models.map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
-                </Select>
-              ) : (
-                <Input
-                  id="provider-model"
-                  value={data.model}
-                  placeholder="model-name"
-                  onChange={(e) => handlers.updateData({ model: e.target.value })}
-                />
-              )}
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="provider-key">
+              <Label htmlFor="provider-key">
                 API key{data.requiresApiKey ? '' : ' (optional)'}
-              </label>
+              </Label>
               <div className="provider-key-field">
                 <Input
                   id="provider-key"
@@ -359,6 +480,84 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
               )}
             </div>
 
+            <div className="form-group">
+              <div className="provider-model-header">
+                <Label htmlFor="provider-model">
+                  Model
+                </Label>
+                {showLoadModels && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="provider-load-models-btn"
+                    onClick={handleDiscoverModels}
+                    disabled={discoveryStatus === 'loading' || (data.requiresApiKey && !data.apiKey.trim())}
+                  >
+                    {discoveryStatus === 'loading' ? 'Loading models...' : 'Load models'}
+                  </Button>
+                )}
+              </div>
+
+              {discoveryStatus === 'error' && (
+                <p className="form-error">
+                  {describeDiscoveryError(discoveryError)}
+                </p>
+              )}
+
+              {discoveredModels.length > 0 && !isManualEntry ? (
+                <div className="provider-model-picker">
+                  <div className="form-group">
+                    <Label htmlFor={searchId}>
+                      Search models
+                    </Label>
+                    <Input
+                      id={searchId}
+                      type="search"
+                      placeholder="Search models..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <Select
+                    id="provider-model"
+                    value={data.model}
+                    onChange={(e) => {
+                      hasUserDeliberatelySetModelRef.current = true;
+                      handlers.updateData({ model: e.target.value });
+                    }}
+                  >
+                    <option value="">Select a model...</option>
+                    {filteredModels.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name === m.id ? m.id : `${m.name} (${m.id})`}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              ) : (
+                <Input
+                  id="provider-model"
+                  value={data.model}
+                  placeholder="model-name"
+                  onChange={(e) => {
+                    hasUserDeliberatelySetModelRef.current = true;
+                    handlers.updateData({ model: e.target.value });
+                  }}
+                />
+              )}
+
+              {discoveredModels.length > 0 && (
+                <button
+                  type="button"
+                  className="provider-advanced-toggle"
+                  onClick={() => setIsManualEntry((prev) => !prev)}
+                >
+                  {isManualEntry ? 'Select from discovered models' : 'Enter model ID manually'}
+                </button>
+              )}
+            </div>
+
             <ProviderDisclosure type={data.type} privacyNote={data.privacyNote} />
           </div>
         )}
@@ -368,14 +567,14 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
             <p className="form-help-text">
               Run a quick check to confirm your key works before saving.
             </p>
-            <button
+            <Button
               type="button"
-              className="wizard-nav-secondary"
+              variant="secondary"
               onClick={runVerify}
               disabled={verifyState === 'loading'}
             >
               {verifyState === 'loading' ? 'Checking...' : 'Test connection'}
-            </button>
+            </Button>
             {verifyState === 'success' && (
               <div className="provider-verify-status" data-state="success">
                 Connected. Text {verifyResult?.capabilities?.text ? 'yes' : 'no'}, images{' '}

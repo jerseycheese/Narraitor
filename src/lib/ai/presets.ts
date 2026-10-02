@@ -27,7 +27,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     name: 'Google Gemini',
     type: 'gemini',
     endpoint: 'https://generativelanguage.googleapis.com',
-    models: ['gemini-2.5-flash', 'gemini-2.5-pro'],
+    requiresEndpoint: false,
+    modelDiscovery: true,
     defaultModel: 'gemini-2.5-flash',
     capabilities: { text: true, images: true, streaming: true },
     helpUrl: 'https://aistudio.google.com/apikey',
@@ -39,17 +40,10 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     id: 'openrouter',
     name: 'OpenRouter',
     type: 'openai-compatible',
-    // Each id below was checked against OpenRouter's live catalogue
-    // (https://openrouter.ai/api/v1/models), which is the only thing that knows
-    // what is actually servable. The catalogue keeps retired slugs resolvable
-    // with an empty `endpoints` array, so "the id still exists" and "something
-    // will answer it" are different questions.
-    //
-    // No zero-cost ":free" id is pinned here: OpenRouter documents that free
-    // availability changes frequently, so any one named here would rot.
-    models: ['openai/gpt-4o', 'anthropic/claude-sonnet-5', 'google/gemini-2.5-flash'],
     endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-    defaultModel: 'openai/gpt-4o',
+    requiresEndpoint: false,
+    modelDiscovery: true,
+    defaultModel: '~deepseek/deepseek-flash-latest',
     // Attribution only: OpenRouter uses these to list the app on its public
     // rankings, and a request without them succeeds exactly as it does with
     // them. `X-OpenRouter-Title` is the current name for the title header;
@@ -85,15 +79,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     // is the right answer here because this preset asks for no extra headers
     // and no renamed parameters.
     endpoint: 'https://ollama.example.com/v1/chat/completions',
-    // Empty on purpose. A hosted service has a catalogue we can list; a machine
-    // the player runs has only what they pulled onto it. Listing four popular
-    // names would be wrong for most players and would also hide the text field
-    // the wizard gives a preset with no models.
-    models: [],
-    // A suggestion to pre-fill that text field with, not a promise that it is
-    // installed. Deliberately not a gemma id: capabilities.hasSystemRole folds
-    // the system turn into the user turn for that family, so a gemma default
-    // would quietly put every new Ollama player on the fallback prompt path.
+    requiresEndpoint: true,
+    modelDiscovery: true,
     defaultModel: 'llama3.2',
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://ollama.ai/download',
@@ -118,18 +105,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     name: 'OpenAI',
     type: 'openai-compatible',
     endpoint: 'https://api.openai.com/v1/chat/completions',
-    // The list this replaced was three models OpenAI has since moved off:
-    // gpt-4-turbo and gpt-3.5-turbo both carry a published shutdown date on
-    // the deprecations page, and gpt-4o has quietly left the models index. A
-    // preset is a menu a player picks from, so a shutdown date on two of three
-    // entries is a bug with a fuse on it rather than a cosmetic one.
-    models: ['gpt-5.6-luna', 'gpt-5.6-terra', 'gpt-5.6-sol'],
-    // Luna leads for the same reason gemini-2.5-flash does above: it is the
-    // cheap fast tier, and a narrative turn is long output on a short prompt,
-    // which is exactly where the price gap bites. Luna runs $0.20/$1.20 per
-    // MTok against Terra's $2/$12 and Sol's $5/$30 - a tenfold difference on a
-    // default nobody changes. Sol is the one to reach for if prose quality
-    // disappoints.
+    requiresEndpoint: false,
+    modelDiscovery: true,
     defaultModel: 'gpt-5.6-luna',
     // Neither of these is cosmetic. OpenAI rejects max_tokens outright on these
     // models rather than ignoring it, and locks temperature and top_p because
@@ -150,7 +127,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     name: 'Anthropic Claude',
     type: 'claude',
     endpoint: 'https://api.anthropic.com/v1/messages',
-    models: ['claude-sonnet-5', 'claude-haiku-4-5'],
+    requiresEndpoint: false,
+    modelDiscovery: false,
     defaultModel: 'claude-sonnet-5',
     // No image generation on this API at all. ClaudeClient simply omits
     // generateImage (an optional AIClient method), the same way
@@ -169,7 +147,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     name: 'Deepseek',
     type: 'openai-compatible',
     endpoint: 'https://api.deepseek.com/v1/chat/completions',
-    models: ['deepseek-chat', 'deepseek-reasoner'],
+    requiresEndpoint: false,
+    modelDiscovery: true,
     defaultModel: 'deepseek-chat',
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://platform.deepseek.com/api_keys',
@@ -182,7 +161,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     name: 'Mistral',
     type: 'openai-compatible',
     endpoint: 'https://api.mistral.ai/v1/chat/completions',
-    models: ['mistral-large-latest', 'mistral-small-latest'],
+    requiresEndpoint: false,
+    modelDiscovery: true,
     defaultModel: 'mistral-large-latest',
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://console.mistral.ai/api-keys',
@@ -193,7 +173,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     name: 'Together AI',
     type: 'openai-compatible',
     endpoint: 'https://api.together.xyz/v1/chat/completions',
-    models: ['meta-llama/Llama-3.3-70B-Instruct-Turbo', 'mistralai/Mixtral-8x7B-Instruct-v0.1'],
+    requiresEndpoint: false,
+    modelDiscovery: true,
     defaultModel: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://api.together.xyz/settings/api-keys',
@@ -204,7 +185,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     name: 'Groq',
     type: 'openai-compatible',
     endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-    models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
+    requiresEndpoint: false,
+    modelDiscovery: true,
     defaultModel: 'llama-3.3-70b-versatile',
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://console.groq.com/keys',
@@ -223,7 +205,8 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     // honestly point at. Note the /router segment: there is no bare
     // /chat/completions on this host.
     endpoint: 'https://api.perplexity.ai/router/v1/chat/completions',
-    models: ['perplexity/kimi-k3', 'perplexity/glm-5.2', 'perplexity/deepseek-v4-flash-0731'],
+    requiresEndpoint: false,
+    modelDiscovery: true,
     defaultModel: 'perplexity/kimi-k3',
     // Perplexity takes images as input and can return them as search results;
     // it generates none. Generation stays on Gemini (see providers/capabilities).
