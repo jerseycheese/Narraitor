@@ -90,7 +90,11 @@ export const POST = withAIRoute(async (request: NextRequest) => {
     // An empty body is fine — defaults apply.
   }
 
-  const type = ((typeof body.type === 'string' ? body.type : 'gemini')) as ProviderType;
+  if (body.type !== undefined && typeof body.type !== 'string') {
+    return fail('UNSUPPORTED_PROVIDER');
+  }
+
+  const type = (body.type ?? 'gemini') as ProviderType;
   if (!getProviderAdapter(type)) {
     return fail('UNSUPPORTED_PROVIDER');
   }

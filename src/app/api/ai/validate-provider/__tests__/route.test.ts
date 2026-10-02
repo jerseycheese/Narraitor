@@ -144,12 +144,14 @@ describe('POST /api/ai/validate-provider', () => {
   });
 
   test('rejects a provider type outside the known set without calling upstream', async () => {
-    const response = await POST(buildRequest({ key: KEY, body: { type: 'not-a-real-provider' } }));
-    const data = await response.json();
+    for (const badType of ['not-a-real-provider', 123, true, {}]) {
+      const response = await POST(buildRequest({ key: KEY, body: { type: badType } }));
+      const data = await response.json();
 
-    expect(data.valid).toBe(false);
-    expect(data.error).toBe('UNSUPPORTED_PROVIDER');
-    expect(mockMakeGeminiRequest).not.toHaveBeenCalled();
+      expect(data.valid).toBe(false);
+      expect(data.error).toBe('UNSUPPORTED_PROVIDER');
+      expect(mockMakeGeminiRequest).not.toHaveBeenCalled();
+    }
   });
 
   test('rejects body-carried model aliases and malformed model IDs without calling upstream', async () => {
