@@ -50,6 +50,7 @@ export interface SendProviderRequestOptions {
    * beneath `headers`; see applyCustomHeaders for what they cannot set.
    */
   customHeaders?: Record<string, string>;
+  signal?: AbortSignal;
 }
 
 /**
@@ -105,7 +106,11 @@ export async function sendProviderRequest(
   body: object,
   options: SendProviderRequestOptions = {}
 ): Promise<Response> {
-  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, playerSuppliedEndpoint = false, customHeaders } = options;
+  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, playerSuppliedEndpoint = false, customHeaders, signal } = options;
+
+  if (signal?.aborted) {
+    throw new Error('Request aborted');
+  }
 
   if (playerSuppliedEndpoint) {
     await assertPublicProviderEndpoint(url);
@@ -115,6 +120,9 @@ export async function sendProviderRequest(
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  const onAbort = () => controller.abort();
+  signal?.addEventListener('abort', onAbort, { once: true });
 
   try {
     // SECURITY: `redirect: 'error'` is doing real work here, not tidiness.
@@ -143,17 +151,24 @@ export async function sendProviderRequest(
     });
 
     clearTimeout(timeoutId);
+    signal?.removeEventListener('abort', onAbort);
     return response;
   } catch (err) {
     clearTimeout(timeoutId);
+    signal?.removeEventListener('abort', onAbort);
 
-    if (err instanceof Error) {
-      if (err.name === 'AbortError') {
-        throw new Error('Request timeout - please try again');
-      }
-      if (err.message.includes('network') || err.message.includes('fetch')) {
-        throw new Error('Network error - please check your connection');
-      }
+    if (signal?.aborted) {
+      throw new Error('Request aborted');
+    }
+
+    const errName = (err as { name?: string })?.name;
+    const errMsg = (err as { message?: string })?.message ?? '';
+
+    if (errName === 'AbortError') {
+      throw new Error('Request timeout - please try again');
+    }
+    if (errMsg.includes('network') || errMsg.includes('fetch')) {
+      throw new Error('Network error - please check your connection');
     }
 
     throw err;
@@ -184,6 +199,10 @@ const PARSE_FAILURES = {
     message: 'Service error: the provider blocked this content',
     detail: 'The provider returned an empty response and reported a content block',
   },
+  token_limit: {
+    message: 'Service error: output token limit reached before generation completed',
+    detail: 'The provider exhausted the output token budget before returning content',
+  },
 } as const;
 
 /**
@@ -195,16 +214,22 @@ export async function openProviderTextStream(
   adapter: ProviderAdapter,
   descriptor: ProviderDescriptor,
   spec: TextGenerationSpec,
-  timeoutMs?: number
+  timeoutMs?: number,
+  signal?: AbortSignal
 ): Promise<Response> {
+  const effectiveDescriptor = adapter.prepareDescriptor
+    ? await adapter.prepareDescriptor(descriptor)
+    : descriptor;
+
   const response = await sendProviderRequest(
-    adapter.buildUrl(descriptor, spec),
-    adapter.buildHeaders(descriptor),
-    adapter.buildBody(descriptor, spec),
+    adapter.buildUrl(effectiveDescriptor, spec),
+    adapter.buildHeaders(effectiveDescriptor),
+    adapter.buildBody(effectiveDescriptor, spec),
     {
       timeoutMs,
       playerSuppliedEndpoint: adapter.playerSuppliedEndpoint,
-      customHeaders: descriptor.customHeaders,
+      customHeaders: effectiveDescriptor.customHeaders,
+      signal,
     }
   );
 
@@ -222,16 +247,22 @@ export async function generateProviderText(
   adapter: ProviderAdapter,
   descriptor: ProviderDescriptor,
   spec: TextGenerationSpec,
-  timeoutMs?: number
+  timeoutMs?: number,
+  signal?: AbortSignal
 ): Promise<ProviderTextResult> {
+  const effectiveDescriptor = adapter.prepareDescriptor
+    ? await adapter.prepareDescriptor(descriptor)
+    : descriptor;
+
   const response = await sendProviderRequest(
-    adapter.buildUrl(descriptor, spec),
-    adapter.buildHeaders(descriptor),
-    adapter.buildBody(descriptor, spec),
+    adapter.buildUrl(effectiveDescriptor, spec),
+    adapter.buildHeaders(effectiveDescriptor),
+    adapter.buildBody(effectiveDescriptor, spec),
     {
       timeoutMs,
       playerSuppliedEndpoint: adapter.playerSuppliedEndpoint,
-      customHeaders: descriptor.customHeaders,
+      customHeaders: effectiveDescriptor.customHeaders,
+      signal,
     }
   );
 

@@ -65,7 +65,8 @@ export class OpenAICompatibleClient implements AIClient {
           this.adapter,
           this.descriptor,
           this.buildSpec(prompt),
-          this.timeout
+          this.timeout,
+          options?.signal
         );
         return {
           content: result.content,

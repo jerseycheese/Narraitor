@@ -13,6 +13,7 @@ const logger = new Logger('ProviderStream');
  * hand it a plain object instead of constructing a real web ReadableStream. */
 export interface ByteStreamReader {
   read(): Promise<{ done: boolean; value?: Uint8Array }>;
+  cancel?(reason?: unknown): Promise<unknown>;
 }
 
 /**
@@ -55,11 +56,15 @@ export async function* consumeProviderStreamEvents(
   let finishReason: FinishReason = 'STOP';
   let promptTokens: number | undefined;
   let completionTokens: number | undefined;
+  let isDone = false;
 
   try {
     while (true) {
       const { done, value } = await reader.read();
-      if (done) break;
+      if (done) {
+        isDone = true;
+        break;
+      }
 
       sseBuffer += decoder.decode(value, { stream: true });
       const lines = sseBuffer.split('\n');
@@ -127,6 +132,11 @@ export async function* consumeProviderStreamEvents(
       return;
     }
 
+    if (!rawContent.trim() && finishReason === 'MAX_TOKENS') {
+      yield { error: 'Service error: output token limit reached before generation completed' };
+      return;
+    }
+
     yield {
       done: true,
       content: rawContent,
@@ -139,5 +149,9 @@ export async function* consumeProviderStreamEvents(
     yield {
       error: error instanceof Error ? error.message : 'Stream interrupted',
     };
+  } finally {
+    if (!isDone && typeof reader.cancel === 'function') {
+      await reader.cancel().catch(() => {});
+    }
   }
 }

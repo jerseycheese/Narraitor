@@ -49,7 +49,8 @@ beforeEach(() => {
 
 /** The headers the last fetch actually went out with. */
 function headersSent(): Record<string, string> {
-  return mockFetch.mock.calls[0][1].headers as Record<string, string>;
+  const lastCall = mockFetch.mock.calls.at(-1);
+  return (lastCall?.[1]?.headers ?? {}) as Record<string, string>;
 }
 
 const AUTH_HEADERS = { 'Content-Type': 'application/json', Authorization: 'Bearer player-key' };
@@ -120,3 +121,56 @@ describe('custom headers', () => {
     expect(headersSent()).toEqual(AUTH_HEADERS);
   });
 });
+
+describe('request cancellation and timeout', () => {
+  it('aborts immediately when signal is already aborted', async () => {
+    const controller = new AbortController();
+    controller.abort();
+
+    await expect(
+      sendProviderRequest(ENDPOINT, AUTH_HEADERS, { model: 'x' }, { signal: controller.signal })
+    ).rejects.toThrow('Request aborted');
+  });
+
+  it('aborts pending fetch when signal aborts during request', async () => {
+    const controller = new AbortController();
+    mockFetch.mockImplementation(
+      () =>
+        new Promise((_, reject) => {
+          controller.signal.addEventListener('abort', () => {
+            reject(new DOMException('The operation was aborted.', 'AbortError'));
+          });
+        })
+    );
+
+    const promise = sendProviderRequest(ENDPOINT, AUTH_HEADERS, { model: 'x' }, { signal: controller.signal });
+    controller.abort();
+
+    await expect(promise).rejects.toThrow('Request aborted');
+  });
+
+  it('translates fetch AbortError without signal into timeout message', async () => {
+    mockFetch.mockRejectedValue(new DOMException('The operation was aborted.', 'AbortError'));
+
+    await expect(sendProviderRequest(ENDPOINT, AUTH_HEADERS, { model: 'x' })).rejects.toThrow(
+      'Request timeout - please try again'
+    );
+  });
+});
+
+describe('token limit failure on empty content', () => {
+  it('throws ProviderUpstreamError when provider outputs empty content with length finish reason', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        choices: [{ message: { content: '' }, finish_reason: 'length' }],
+      }),
+    });
+
+    await expect(
+      generateProviderText(openAICompatibleAdapter, DESCRIPTOR, SPEC)
+    ).rejects.toThrow('Service error: output token limit reached before generation completed');
+  });
+});
+
