@@ -56,6 +56,18 @@ describe('modelDiscovery', () => {
         resolveCompatibleModelsEndpoint('https://api.example.com/v1/models')
       ).toBe('https://api.example.com/v1/models');
     });
+
+    it('normalizes trailing slashes on /chat/completions/ and /completions/', () => {
+      expect(
+        resolveCompatibleModelsEndpoint('https://api.example.com/v1/chat/completions/')
+      ).toBe('https://api.example.com/v1/models');
+      expect(
+        resolveCompatibleModelsEndpoint('https://api.example.com/v1/completions/')
+      ).toBe('https://api.example.com/v1/models');
+      expect(
+        resolveCompatibleModelsEndpoint('https://api.example.com/v1/models/')
+      ).toBe('https://api.example.com/v1/models');
+    });
   });
 
   describe('isOpenRouterEndpoint', () => {

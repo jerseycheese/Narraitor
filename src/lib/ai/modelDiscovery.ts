@@ -53,16 +53,16 @@ export function isOpenRouterEndpoint(endpoint: string | undefined): boolean {
  */
 export function resolveCompatibleModelsEndpoint(endpoint: string): string {
   const url = new URL(endpoint);
-  const pathname = url.pathname;
+  const pathname = url.pathname.replace(/\/+$/, '');
 
   if (pathname.endsWith('/chat/completions')) {
     url.pathname = pathname.slice(0, -'/chat/completions'.length) + '/models';
   } else if (pathname.endsWith('/completions')) {
     url.pathname = pathname.slice(0, -'/completions'.length) + '/models';
   } else if (pathname.endsWith('/models')) {
-    // Already ending in /models
+    url.pathname = pathname;
   } else {
-    url.pathname = pathname.replace(/\/+$/, '') + '/models';
+    url.pathname = pathname + '/models';
   }
 
   return url.toString();

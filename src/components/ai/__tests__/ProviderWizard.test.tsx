@@ -479,5 +479,39 @@ describe('ProviderWizard', () => {
       expect(screen.getByRole('button', { name: /save provider/i })).toBeDisabled();
     });
   });
+
+  test('preserves model entered in CustomProviderForm on step 0 when loading models on step 1', async () => {
+    mockDiscover.mockResolvedValueOnce({
+      models: [
+        { id: 'llama3:8b', name: 'Llama 3 8B' },
+        { id: 'custom-model:v1', name: 'Custom Model v1' },
+      ],
+    });
+
+    const user = userEvent.setup();
+    render(<ProviderWizard />);
+
+    // Select Ollama preset on step 0 (which renders CustomProviderForm because requiresEndpoint: true)
+    await user.click(screen.getByRole('button', { name: /ollama/i }));
+    expect(screen.getByLabelText(/endpoint url/i)).toBeInTheDocument();
+
+    // Fill in endpoint and model on step 0
+    await user.type(screen.getByLabelText(/endpoint url/i), 'https://ollama.example.com');
+    const modelInputStep0 = screen.getByLabelText(/^model$/i);
+    await user.clear(modelInputStep0);
+    await user.type(modelInputStep0, 'custom-model:v1');
+
+    // Advance to step 1
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+
+    // Click Load models
+    await user.click(screen.getByRole('button', { name: /load models/i }));
+
+    // The deliberately entered model 'custom-model:v1' must be preserved and selected in the Select
+    await waitFor(() => {
+      expect(screen.getByLabelText(/search models/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/^model$/i)).toHaveValue('custom-model:v1');
+    });
+  });
 });
 

@@ -240,6 +240,15 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
     });
   };
 
+  const handleCustomFormChange = (
+    updates: Partial<{ name: string; endpoint: string; model: string }>
+  ) => {
+    if (updates.model !== undefined) {
+      hasUserDeliberatelySetModelRef.current = true;
+    }
+    handlers.updateData(updates);
+  };
+
   const handleDiscoverModels = async () => {
     if (discoveryAbortRef.current) {
       discoveryAbortRef.current.abort();
@@ -274,7 +283,11 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
       setDiscoveryStatus(result.models.length > 0 ? 'success' : 'idle');
 
       // Requirement 6: when discovery omits the suggestion, require explicit selection/manual entry rather than choosing the first result. Preserve a model the player deliberately entered.
-      if (!hasUserDeliberatelySetModelRef.current) {
+      if (hasUserDeliberatelySetModelRef.current) {
+        if (data.model && !result.models.some((m) => m.id === data.model)) {
+          setIsManualEntry(true);
+        }
+      } else {
         const preset = getPresetById(data.presetId);
         const suggestion = preset?.defaultModel ?? '';
         const hasSuggestion = result.models.some((m) => m.id === suggestion);
@@ -371,29 +384,30 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
             {playerSuppliesEndpoint && (
               <CustomProviderForm
                 value={{ name: data.name, endpoint: data.endpoint, model: data.model }}
-                onChange={(updates) => handlers.updateData(updates)}
+                onChange={handleCustomFormChange}
                 endpointPlaceholder={data.endpointHint}
               />
             )}
             <button
               type="button"
               className="provider-advanced-toggle"
-              onClick={() =>
+              onClick={() => {
+                hasUserDeliberatelySetModelRef.current = false;
                 handlers.updateData({
                   mode: data.mode === 'custom' ? 'preset' : 'custom',
                   type: data.mode === 'custom' ? 'gemini' : 'openai-compatible',
                   privacyNote: data.mode === 'custom' ? '' : CUSTOM_PRIVACY_NOTE,
                   requiresApiKey: true,
                   endpointHint: '',
-                })
-              }
+                });
+              }}
             >
               {data.mode === 'custom' ? 'Use a preset instead' : 'Use a custom endpoint'}
             </button>
             {data.mode === 'custom' && (
               <CustomProviderForm
                 value={{ name: data.name, endpoint: data.endpoint, model: data.model }}
-                onChange={(updates) => handlers.updateData(updates)}
+                onChange={handleCustomFormChange}
               />
             )}
             {hasChosenProvider && (
