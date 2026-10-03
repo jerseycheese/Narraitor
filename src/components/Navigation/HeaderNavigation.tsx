@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { useMobileNavigation } from '@/hooks/useMobileNavigation';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
@@ -16,14 +15,6 @@ import { Button } from '@/components/ui/button';
 import { X, Menu, Plus, Play } from 'lucide-react';
 import { useNavigationData } from './useNavigationData';
 import { getSurfaceRegister } from '@/lib/routing/surfaceMode';
-
-const RecentPagesDropdown = dynamic(
-  () =>
-    import('./RecentPagesDropdown').then((m) => ({
-      default: m.RecentPagesDropdown,
-    })),
-  { ssr: false }
-);
 
 // Routes that own the play/create action inline, where a header CTA would just
 // duplicate it. Extends the suppression the retired workshop header applied to
@@ -181,9 +172,6 @@ export function HeaderNavigation() {
               <div className="header-nav-actions-group">
                 <ThemeMenu />
                 <TutorialMenu />
-                <SSRClientOnly>
-                  <RecentPagesDropdown />
-                </SSRClientOnly>
               </div>
 
               <SSRClientOnly className="header-nav-cta">

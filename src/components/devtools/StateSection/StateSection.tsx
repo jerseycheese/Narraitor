@@ -12,7 +12,6 @@ import { useJournalStore } from '@/state/journalStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import { useLoreStore } from '@/state/loreStore';
-import { useNavigationStore } from '@/state/navigationStore';
 import { useGoalStore } from '@/state/goalStore';
 import { useInventoryStore } from '@/state/inventoryStore';
 
@@ -42,7 +41,6 @@ export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) =>
     useSessionStore: useSessionStore(),
     useAiContextStore: useAiContextStore(),
     useLoreStore: useLoreStore(),
-    useNavigationStore: useNavigationStore(),
     useGoalStore: useGoalStore(),
     useInventoryStore: useInventoryStore(),
   };

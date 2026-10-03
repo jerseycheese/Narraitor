@@ -4,9 +4,6 @@ export const headerDropdownMenuClass =
 export const headerDropdownTriggerClass =
   'header-dropdown-trigger';
 
-export const headerDropdownHeaderClass =
-  'header-dropdown-header';
-
 export const headerDropdownItemClass =
   'header-dropdown-item';
 
