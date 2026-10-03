@@ -26,10 +26,10 @@ import {
   analyzeCharacterDraftRecovery,
   hasCharacterDraftData,
   CharacterCreationDraft,
+  CharacterDraftRecoveryPreview,
 } from './utils/characterDraft';
 import { useTutorial } from '@/components/TutorialProvider';
 import { tourStepToWizardStep } from '@/lib/tutorial/characterCreationWizardTour';
-import type { WizardValidation } from '@/hooks/useWizardState';
 import { getVisibleStepError } from '@/lib/utils/wizardValidation';
 
 /**
@@ -60,7 +60,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   // Auto-save integration
   const { data, setData, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } =
-    useDraftAutoSave<CharacterCreationDraft, ReturnType<typeof analyzeCharacterDraftRecovery>>({
+    useDraftAutoSave<CharacterCreationDraft, CharacterDraftRecoveryPreview>({
       storageKey: getCharacterDraftStorageKey(worldId),
       analyzeRecovery: analyzeCharacterDraftRecovery,
       hasCurrentData: hasCharacterDraftData,
@@ -217,16 +217,12 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   const handleRecoveryChoice = (choice: 'recover' | 'dismiss') => {
     if (choice === 'recover' && data?.characterData) {
-      const existingSkills = (
-        (data.characterData as Partial<CharacterCreationData>)?.skills ?? []
-      ) as CharacterCreationData['skills'];
+      const existingSkills = data.characterData.skills ?? [];
 
       const skillsWithBounds = normalizeSkillBounds(existingSkills, world);
 
-      const savedAttributes = Array.isArray(
-        (data.characterData as Partial<CharacterCreationData>)?.attributes
-      )
-        ? (data.characterData as CharacterCreationData).attributes
+      const savedAttributes = Array.isArray(data.characterData.attributes)
+        ? data.characterData.attributes
         : [];
       const mergedAttributes = world?.attributes?.length
         ? world.attributes.map(attr => {
@@ -252,12 +248,12 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
       const restoredBackground = {
         ...defaultCharacterData.background,
-        ...((data.characterData as Partial<CharacterCreationData>)?.background || {}),
+        ...(data.characterData.background || {}),
       };
 
       const restoredData: CharacterCreationData = {
         ...defaultCharacterData,
-        ...(data.characterData as CharacterCreationData),
+        ...data.characterData,
         attributes: mergedAttributes,
         skills: skillsWithBounds,
         background: restoredBackground,
@@ -266,8 +262,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
       const restoredStep =
         typeof data.currentStep === 'number' ? data.currentStep : initialStep;
-      const restoredValidation =
-        (data.validation as Record<number, WizardValidation>) || {};
+      const restoredValidation = data.validation || {};
 
       wizard.reset(restoredData, restoredStep, restoredValidation);
     } else if (choice === 'dismiss') {

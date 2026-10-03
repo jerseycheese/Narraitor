@@ -34,6 +34,7 @@ import {
   WIZARD_STEPS,
   WorldCreationData,
   WorldCreationDraft,
+  WorldDraftRecoveryPreview,
   WORLD_DRAFT_STORAGE_KEY,
   isValidWorldDraft,
   analyzeWorldDraftRecovery,
@@ -151,7 +152,7 @@ export default function WorldCreationWizard({
     recoveryPreview,
     hasCurrentData: autoSaveHasCurrentData,
     isLoaded: isAutoSaveLoaded,
-  } = useDraftAutoSave<WorldCreationDraft, ReturnType<typeof analyzeWorldDraftRecovery>>({
+  } = useDraftAutoSave<WorldCreationDraft, WorldDraftRecoveryPreview>({
     storageKey: WORLD_DRAFT_STORAGE_KEY,
     analyzeRecovery: analyzeWorldDraftRecovery,
     hasCurrentData: hasWorldDraftData,
