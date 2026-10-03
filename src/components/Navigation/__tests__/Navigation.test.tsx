@@ -76,9 +76,6 @@ jest.mock('../Breadcrumbs', () => ({
   Breadcrumbs: () => <div data-testid="breadcrumbs">Breadcrumbs</div>,
 }));
 
-jest.mock('../RecentPagesDropdown', () => ({
-  RecentPagesDropdown: () => <div data-testid="recent-pages">Recent Pages</div>,
-}));
 
 jest.mock('../MobileNavigationMenu', () => ({
   MobileNavigationMenu: () => <div data-testid="mobile-menu">Mobile Menu</div>,

@@ -47,10 +47,6 @@ jest.mock('@/state/loreStore', () => {
   return { useLoreStore: Object.assign(() => state, { getState: () => state }) };
 });
 
-jest.mock('@/state/navigationStore', () => {
-  const state = { currentPath: '/' };
-  return { useNavigationStore: Object.assign(() => state, { getState: () => state }) };
-});
 
 jest.mock('@/state/goalStore', () => {
   const state = { goals: [] };

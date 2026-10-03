@@ -17,9 +17,10 @@ Persist keys verified by `grep -rh "name: '" src/state/*.ts` on 2026-07-04. Note
 | loreStore.ts (+ 10 concern files) | useLoreStore | `lore-store` (v3 + migrate) | facts, factHistory, mergeAuditLog |
 | npcStore.ts | useNPCStore | `narraitor-npc-store` | NPCs per world (WORLD_DELETED cascade) |
 | goalStore.ts | useGoalStore | `narraitor-goal-store` | goals, activeGoalIds |
-| navigationStore.ts | useNavigationStore | `narraitor-navigation-store` | nav/loading state |
 | providerStore.ts | useProviderStore | `narraitor-provider-store` (encrypted keys) | providers, activeProviderId, validationStatus |
 | aiContextStore / calibrationStore / continuityStore | use\* | NOT persisted (calibration/continuity say so in their headers) | AI context override, calibration, continuity guardrail state |
+
+(There is no navigation store: navigationStore.ts was deleted in #2193; navigation loading lives in NavigationLoadingContext.)
 
 Event bus: `src/lib/state/storePubSub.ts` — `storeEvents.subscribe/subscribeOnce/emit`; events `world:deleted`, `character:deleted`, `session:fresh-start`, `session:started`, `session:ended`; wiring in `src/state/storeEventWiring.ts` (observed).
 

@@ -16,7 +16,6 @@ import { useInventoryStore } from '../../inventoryStore';
 import { useJournalStore } from '../../journalStore';
 import { useLoreStore } from '../../loreStore';
 import { useNarrativeStore } from '../../narrativeStore';
-import { useNavigationStore } from '../../navigationStore';
 import { useNPCStore } from '../../npcStore';
 import { useProviderStore } from '../../providerStore';
 
@@ -82,13 +81,7 @@ const stores: Array<{
     emptyKey: 'segments',
     empty: {},
   },
-  {
-    name: 'navigationStore',
-    store: useNavigationStore,
-    persisted: { history: [{ path: '/play', timestamp: '2026-01-01' }] },
-    emptyKey: 'history',
-    empty: [],
-  },
+
   {
     name: 'npcStore',
     store: useNPCStore,

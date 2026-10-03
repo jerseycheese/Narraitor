@@ -194,11 +194,11 @@
   gap: var(--space-3);
 }
 
-/* An `SSRClientOnly` wrapper renders even when its child renders nothing — it
+/* An `SSRClientOnly` wrapper renders even when its child renders nothing: it
    has to, or the hydration flicker comes back. As a zero-width flex item it
    still claims the gap beside it, leaving the last visible control short of the
    content's right edge: the CTA's wrapper did it to the whole cluster, and
-   RecentPagesDropdown's does it inside the icon group. Both wrappers are direct
+   the retired RecentPagesDropdown did it inside the icon group. Both wrappers are direct
    children of a flex row here, and a display:none flex item drops its gap with
    it. (#1655) */
 .header-nav-actions > div:empty,
@@ -313,14 +313,6 @@
   box-shadow: var(--shadow-overlay);
 }
 
-.header-dropdown-header {
-  padding: var(--space-2) var(--space-3);
-  font-family: var(--font-system);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
 
 .header-dropdown-item {
   display: flex;

@@ -48,7 +48,7 @@ export const ManuscriptFloatingHud: React.FC<ManuscriptFloatingHudProps> = ({
 
   // Close the character panel on an outside click, matching the click-outside
   // pattern the header's other popovers already use (ThemeMenu,
-  // RecentPagesDropdown). Escape and the toggle button itself stay the
+  // TutorialMenu). Escape and the toggle button itself stay the
   // caller's job (ActiveGameSession owns isCharacterSummaryExpanded).
   const headerLeftRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
