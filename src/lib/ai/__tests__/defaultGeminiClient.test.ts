@@ -16,7 +16,6 @@
 import { createDefaultGeminiClient, toDescriptor } from '../defaultGeminiClient';
 import { GeminiClient } from '../geminiClient';
 import { OpenAICompatibleClient } from '../providers/openai-compatible/client';
-import { DEFAULT_TEXT_MODEL } from '../config';
 import type { ProviderDescriptor } from '../providers/types';
 
 const geminiDescriptor: ProviderDescriptor = {
@@ -44,6 +43,21 @@ describe('createDefaultGeminiClient', () => {
   afterEach(() => {
     fetchSpy.mockRestore();
     process.env.GEMINI_API_KEY = originalEnvKey;
+  });
+
+  it.each([undefined, null])('requires a player key outside the test runner (%s)', (credential) => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    const originalWorkerId = process.env.JEST_WORKER_ID;
+    try {
+      Object.assign(process.env, { NODE_ENV: 'production' });
+      delete process.env.JEST_WORKER_ID;
+      process.env.GEMINI_API_KEY = 'server-key';
+      expect(() => createDefaultGeminiClient(credential)).toThrow('API key not configured');
+      expect(fetchSpy).not.toHaveBeenCalled();
+    } finally {
+      Object.assign(process.env, { NODE_ENV: originalNodeEnv });
+      process.env.JEST_WORKER_ID = originalWorkerId;
+    }
   });
 
   describe('an explicit descriptor with a key reaches the real factory', () => {
@@ -126,15 +140,9 @@ describe('toDescriptor', () => {
     expect(toDescriptor({ ...geminiDescriptor, apiKey: null })).toBeNull();
   });
 
-  it('falls back to the env key when the credential is omitted', () => {
+  it('requires a player credential even when the server has a key', () => {
     process.env.GEMINI_API_KEY = 'a-real-looking-env-key';
-
-    expect(toDescriptor()).toEqual({
-      type: 'gemini',
-      endpoint: '',
-      model: DEFAULT_TEXT_MODEL,
-      apiKey: 'a-real-looking-env-key',
-    });
+    expect(toDescriptor()).toBeNull();
   });
 
   it('does not fall back to the env key for an explicit null', () => {

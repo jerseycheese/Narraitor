@@ -7,6 +7,7 @@ import { logger } from '@/lib/utils/logger';
 import type { EndingGenerationRequest, EndingType, EndingTone } from '@/types/narrative.types';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
 import { withAIRoute } from '@/utils/apiHelpers';
+import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 
 export const POST = withAIRoute(async (request: NextRequest) => {
   try {
@@ -65,8 +66,12 @@ export const POST = withAIRoute(async (request: NextRequest) => {
       hasCustomPrompt: !!body.customPrompt 
     });
 
-    // Generate the ending
-    const result = await generateEnding(endingRequest, resolveProviderCredential(request));
+    const provider = resolveProviderCredential(request);
+    if (!provider) {
+      return createAPIErrorResponse(new Error('API key not configured'), 412);
+    }
+
+    const result = await generateEnding(endingRequest, provider);
 
     logger.info('Story ending generated successfully', { 
       sessionId,

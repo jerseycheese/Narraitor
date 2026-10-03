@@ -10,14 +10,23 @@ import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerato
 
 const mockGenerateStoryCheckpointSummary = generateStoryCheckpointSummary as jest.MockedFunction<typeof generateStoryCheckpointSummary>;
 
+const originalGeminiKey = process.env.GEMINI_API_KEY;
+afterEach(() => { process.env.GEMINI_API_KEY = originalGeminiKey; });
+
 describe('/api/narrative/story-checkpoint', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  const buildRequest = (body: Record<string, unknown>) =>
+  const buildRequest = (body: Record<string, unknown>, headers: Record<string, string> = {
+    'x-provider-api-key': 'openrouter-key',
+    'x-provider-type': 'openai-compatible',
+    'x-provider-endpoint': 'https://openrouter.ai/api/v1/chat/completions',
+    'x-provider-model': '~deepseek/deepseek-flash-latest',
+  }) =>
     new NextRequest('http://localhost:3000/api/narrative/story-checkpoint', {
       method: 'POST',
+      headers,
       body: JSON.stringify(body),
     });
 
@@ -73,12 +82,26 @@ describe('/api/narrative/story-checkpoint', () => {
     const data = await response.json();
     expect(response.status).toBe(200);
     expect(data.summary).toBe('Recap');
-    // The route forwards a resolved provider descriptor, not a key and a model.
-    // Null here because the test env pins GEMINI_API_KEY to the MOCK sentinel.
     expect(mockGenerateStoryCheckpointSummary).toHaveBeenCalledWith(
       expect.objectContaining({ worldId: 'world-1', sessionId: 'session-1' }),
-      null
+      expect.objectContaining({ type: 'openai-compatible', model: '~deepseek/deepseek-flash-latest' }),
+      '~deepseek/deepseek-flash-latest'
     );
+  });
+
+  it('asks for a player key even when the server has a Gemini key', async () => {
+    process.env.GEMINI_API_KEY = 'env-key';
+    const response = await POST(buildRequest({
+      worldId: 'world-1',
+      sessionId: 'session-1',
+      events: [{ id: 'event-1', description: 'Saved the village', timestamp: '2025-11-20T18:00:00Z' }],
+    }, {}));
+    expect(response.status).toBe(412);
+    expect(await response.json()).toMatchObject({
+      suggestion: 'Add your API key in Settings > Provider Setup to play.',
+      retryable: false,
+    });
+    expect(mockGenerateStoryCheckpointSummary).not.toHaveBeenCalled();
   });
 
   it('handles generator failures with 500', async () => {

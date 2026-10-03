@@ -11,10 +11,8 @@ import { KEYLESS_PROVIDER_KEY } from './providerKeyHeader';
  * the remaining multi-provider work — they're marked unavailable and the UI
  * keeps them out of reach until someone runs a live check against each.
  *
- * Order is deliberate. Gemini leads because it's the longest-proven. OpenRouter
- * comes next because one key covers dozens of models across providers through
- * a single OpenAI-compatible integration, whereas services below it need
- * prepaid billing with each provider.
+ * OpenRouter leads with the recommended DeepSeek flash model. Players still
+ * choose their provider and model explicitly in the wizard.
  *
  * TODO(#895): flip a preset to `available: true` only after
  * scripts/verify-openai-compatible-stream.mjs passes against it with a real
@@ -22,20 +20,6 @@ import { KEYLESS_PROVIDER_KEY } from './providerKeyHeader';
  * live check somebody ran, not about the code compiling.
  */
 export const PROVIDER_PRESETS: ProviderPreset[] = [
-  {
-    id: 'gemini',
-    name: 'Google Gemini',
-    type: 'gemini',
-    endpoint: 'https://generativelanguage.googleapis.com',
-    requiresEndpoint: false,
-    modelDiscovery: true,
-    defaultModel: 'gemini-2.5-flash',
-    capabilities: { text: true, images: true, streaming: true },
-    helpUrl: 'https://aistudio.google.com/apikey',
-    available: true,
-    privacyNote:
-      "Google's free tier allows your prompts and the model's output to be used to improve their models, and reviewed by human raters. Their paid tiers do not. If you are writing anything personal, use a paid-tier key.",
-  },
   {
     id: 'openrouter',
     name: 'OpenRouter',
@@ -61,9 +45,23 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     capabilities: { text: true, images: false, streaming: true },
     helpUrl: 'https://openrouter.ai/keys',
     available: true,
-    note: 'one key, dozens of models',
+    note: 'recommended: DeepSeek flash',
     privacyNote:
       'OpenRouter routes your prompts to whichever upstream model you pick, and each of those has its own data-retention terms. Their free models in particular may allow training on your prompts.',
+  },
+  {
+    id: 'gemini',
+    name: 'Google Gemini',
+    type: 'gemini',
+    endpoint: 'https://generativelanguage.googleapis.com',
+    requiresEndpoint: false,
+    modelDiscovery: true,
+    defaultModel: 'gemini-2.5-flash',
+    capabilities: { text: true, images: true, streaming: true },
+    helpUrl: 'https://aistudio.google.com/apikey',
+    available: true,
+    privacyNote:
+      "Google's free tier allows your prompts and the model's output to be used to improve their models, and reviewed by human raters. Their paid tiers do not. If you are writing anything personal, use a paid-tier key.",
   },
   {
     id: 'ollama',

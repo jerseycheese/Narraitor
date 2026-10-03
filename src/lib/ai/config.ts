@@ -4,8 +4,8 @@ import { AIConfig, GenerationConfig, SafetySetting } from './types';
 import { GEMINI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 
 /**
- * Text model used when the player has not configured one of their own. Every
- * fallback path resolves here, so the default lives in exactly one place.
+ * Default model for an explicitly selected Gemini provider. Other providers
+ * carry their own model in the resolved request descriptor.
  */
 export const DEFAULT_TEXT_MODEL = 'gemini-2.5-flash';
 
@@ -58,23 +58,15 @@ export const getSafetySettings = (): SafetySetting[] => {
 /**
  * The Gemini key a caller should actually use.
  *
- * The two absent values mean different things and must not be collapsed:
- *
- * - `undefined` — the caller never resolved a key. The server env key is the
- *   right answer, and the browser, dev and Storybook paths depend on it.
- * - `null` — a request resolved no *Gemini* key. That is what a player on
- *   another provider produces, and substituting the server's key there would
- *   spend the deployment's Gemini quota on a turn the player is already paying
- *   for elsewhere.
+ * Text requests require an explicit player key; absent credentials stay empty.
  */
 export const resolveEffectiveGeminiKey = (requestKey?: string | null): string =>
-  requestKey === undefined ? getAIConfig().geminiApiKey : requestKey ?? '';
+  requestKey ?? '';
 
 /**
  * Gets default configuration for AI service.
  * @param apiKeyOverride - the player's bring-your-own key for this request; when
- *   omitted, falls back to the server env key. An explicit null does not — see
- *   resolveEffectiveGeminiKey.
+ *   omitted, no key is configured.
  * @param modelOverride - the model the player picked (see resolveProvider); when
  *   omitted, falls back to the default text model.
  * @returns Complete AI service configuration
