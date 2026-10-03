@@ -9,6 +9,7 @@ import { useWorldStore } from '../../../state/worldStore';
 import { PortraitStep } from '../steps/PortraitStep';
 import { getTimestamp } from '@/lib/utils/timestamp';
 import type { World } from '@/types/world.types';
+import * as generatePortraitModule from '@/lib/api/generatePortrait';
 
 // Matches MAX_AI_BODY_BYTES in src/utils/apiHelpers.ts (64KB route limit)
 const MAX_AI_BODY_BYTES = 65_536;
@@ -111,19 +112,25 @@ describe('PortraitStep Component', () => {
     expect(screen.getByRole('button', { name: /generate portrait/i })).toBeInTheDocument();
   });
 
-  it('should handle portrait generation user interaction', async () => {
+  it('calls generatePortrait() and stores the returned portrait', async () => {
     const user = userEvent.setup();
-    
-    // Mock successful API response 
-    mockFetch.mockResolvedValue({
+    const generatePortraitSpy = jest.spyOn(
+      generatePortraitModule,
+      'generatePortrait'
+    );
+
+    const mockPortrait = {
+      type: 'ai-generated' as const,
+      url: 'data:image/png;base64,mockimage',
+      generatedAt: getTimestamp(),
+    };
+
+    mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({
-        portrait: {
-          type: 'ai-generated',
-          url: 'data:image/png;base64,mockimage',
-          generatedAt: getTimestamp()
-        }
-      })
+      json: () =>
+        Promise.resolve({
+          portrait: mockPortrait,
+        }),
     });
 
     render(
@@ -143,18 +150,28 @@ describe('PortraitStep Component', () => {
     // User clicks generate button
     await user.click(generateButton);
 
-    // Verify the API is called and component handles the interaction
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalled();
+      expect(generatePortraitSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          character: expect.objectContaining({ name: 'Elara Moonshadow' }),
+          world: mockWorldConfig,
+        })
+      );
     });
-    
-    // Button should be re-enabled after completion
+
+    expect(mockOnUpdate).toHaveBeenCalledWith({ portrait: mockPortrait });
     expect(generateButton).not.toBeDisabled();
+
+    generatePortraitSpy.mockRestore();
   });
 
   it('should show plain language error message on generation failure and log raw error to console', async () => {
     const user = userEvent.setup();
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const generatePortraitSpy = jest.spyOn(
+      generatePortraitModule,
+      'generatePortrait'
+    );
 
     // Mock failed API response with raw server error string
     mockFetch.mockResolvedValueOnce({
@@ -180,15 +197,17 @@ describe('PortraitStep Component', () => {
       expect(screen.getByText(/shortening your physical description/i)).toBeInTheDocument();
     });
 
+    expect(generatePortraitSpy).toHaveBeenCalled();
     // Retains raw error details in console logs for debugging
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[useAIGeneration]'),
+      expect.stringContaining('[usePortraitGeneration]'),
       expect.anything(),
-      expect.stringContaining('Generation error at /api/generate-portrait:'),
+      expect.stringContaining('Failed to generate portrait:'),
       expect.objectContaining({ message: 'Payload too large' })
     );
 
     consoleErrorSpy.mockRestore();
+    generatePortraitSpy.mockRestore();
   });
 
   it('should be skippable', () => {
