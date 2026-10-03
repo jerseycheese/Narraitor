@@ -54,7 +54,7 @@ export async function analyzeWorldDescription(
     });
 
     if (!effectiveKey) {
-      logger.error('API key is not configured - check GEMINI_API_KEY environment variable');
+      logger.error('API key is not configured - add a provider key in Settings');
       throw new Error('API key is not configured');
     }
     

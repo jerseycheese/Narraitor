@@ -10,10 +10,8 @@ export const getAIConfig = jest.fn(() => ({
 export const getGenerationConfig = jest.fn(() => ({}));
 export const getSafetySettings = jest.fn(() => []);
 
-// Keeps the real distinction: an omitted key falls back to the server key, an
-// explicit null does not.
 export const resolveEffectiveGeminiKey = jest.fn((requestKey?: string | null) =>
-  requestKey === undefined ? 'test-api-key' : requestKey ?? ''
+  requestKey ?? ''
 );
 
 export const getDefaultConfig = jest.fn((apiKeyOverride?: string | null, modelOverride?: string | null) => ({

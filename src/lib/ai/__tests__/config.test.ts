@@ -17,9 +17,9 @@ describe('getDefaultConfig', () => {
 });
 
 describe('resolveEffectiveGeminiKey', () => {
-  test('uses the server key when the caller resolved nothing', () => {
+  test('requires a player key when the caller resolved nothing', () => {
     process.env.GEMINI_API_KEY = 'env-key';
-    expect(resolveEffectiveGeminiKey()).toBe('env-key');
+    expect(resolveEffectiveGeminiKey()).toBe('');
   });
 
   test('prefers a key the caller resolved', () => {

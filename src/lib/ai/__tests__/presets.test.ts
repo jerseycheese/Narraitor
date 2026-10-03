@@ -16,12 +16,13 @@ describe('PROVIDER_PRESETS', () => {
     // deltas on openai/gpt-4o, 104 on gpt-5.6-luna, 78 on a self-hosted mistral.
     // Adding an id here without that run is the thing this test exists to make
     // somebody think twice about.
-    expect(available).toEqual(['gemini', 'openrouter', 'ollama', 'openai']);
+    expect(available).toEqual(['openrouter', 'gemini', 'ollama', 'openai']);
   });
 
-  it('notes that OpenRouter covers dozens of models with one key', () => {
+  it('recommends DeepSeek flash through OpenRouter', () => {
     const openrouter = PROVIDER_PRESETS.find((preset) => preset.id === 'openrouter');
-    expect(openrouter?.note).toBe('one key, dozens of models');
+    expect(PROVIDER_PRESETS[0]).toBe(openrouter);
+    expect(openrouter?.note).toBe('recommended: DeepSeek flash');
   });
 
   it('asks OpenAI for max_completion_tokens, which is the only name it accepts', () => {

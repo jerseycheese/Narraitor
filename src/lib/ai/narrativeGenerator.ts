@@ -23,7 +23,6 @@ import {
   type DebugInfoContext,
 } from './debugInfoBuilder';
 import { getActiveProviderModel } from '@/state/providerStore';
-import { DEFAULT_TEXT_MODEL } from './config';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { inferItemsLostFromNarrative } from '@/lib/narrative/itemLossInference';
 import { inferSegmentType } from '@/lib/utils/segmentTypeInference';
@@ -236,7 +235,7 @@ export class NarrativeGenerator {
           previousSegmentContent: previousSegment?.content,
           previousSegmentType: previousSegment?.type,
           tokenUsage: result.tokenUsage,
-          modelUsed: getActiveProviderModel() ?? DEFAULT_TEXT_MODEL,
+          modelUsed: getActiveProviderModel() ?? 'unknown',
           rawResponse: response.content,
         };
 
@@ -404,7 +403,7 @@ export class NarrativeGenerator {
           loreContext,
           characterIds,
           tokenUsage: result.tokenUsage,
-          modelUsed: getActiveProviderModel() ?? DEFAULT_TEXT_MODEL,
+          modelUsed: getActiveProviderModel() ?? 'unknown',
           rawResponse: response.content,
         };
 

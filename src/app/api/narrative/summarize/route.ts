@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
 import { withAIRoute } from '@/utils/apiHelpers';
+import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
@@ -28,7 +29,12 @@ export const POST = withAIRoute(async (request: NextRequest) => {
       );
     }
 
-    const geminiClient = createDefaultGeminiClient(resolveProviderCredential(request));
+    const provider = resolveProviderCredential(request);
+    if (!provider) {
+      return createAPIErrorResponse(new Error('API key not configured'), 412);
+    }
+
+    const geminiClient = createDefaultGeminiClient(provider);
     
     const prompt = `${instructions}
 

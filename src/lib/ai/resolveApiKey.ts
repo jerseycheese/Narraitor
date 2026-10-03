@@ -52,38 +52,15 @@ export type ProviderResolution =
 /**
  * Resolve the provider for a request.
  *
- * Priority for the key: the player's bring-your-own key (sent per request in
- * PROVIDER_API_KEY_HEADER) -> the server env key as a dev/local fallback. With
- * neither, this fails with NO_KEY, which reproduces today's "API key not
- * configured" behaviour exactly.
+ * Only the player's per-request key authorizes provider generation. A missing
+ * key fails with NO_KEY even when a server Gemini key is configured.
  *
- * SECURITY: type, endpoint and model are honoured only when the caller supplied
- * their own key in the same request. A deployment with a server env key would
- * otherwise let any anonymous caller name an endpoint and have the server post
- * that env key to it — key exfiltration, not just cost. On the env-key path the
- * provider is always Gemini with the default model.
- *
- * The MOCK_API_KEY sentinel only gates the env branch — a real player would
- * never type it. NextRequest is a type-only import, so this module stays safe
- * to pull into the client bundle.
+ * SECURITY: never substitute a server-owned key into player-controlled routing.
  */
 export function resolveProvider(request?: NextRequest): ProviderResolution {
   const headerKey = request?.headers.get(PROVIDER_API_KEY_HEADER)?.trim();
 
-  if (!headerKey) {
-    const envKey = process.env.GEMINI_API_KEY;
-    if (!envKey || envKey === 'MOCK_API_KEY') return { ok: false, reason: 'NO_KEY' };
-
-    return {
-      ok: true,
-      descriptor: {
-        type: 'gemini',
-        endpoint: '',
-        model: DEFAULT_TEXT_MODEL,
-        apiKey: envKey,
-      },
-    };
-  }
+  if (!headerKey) return { ok: false, reason: 'NO_KEY' };
 
   const type = readProviderType(request);
   if (!type) return { ok: false, reason: 'UNSUPPORTED_PROVIDER' };

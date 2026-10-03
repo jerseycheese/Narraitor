@@ -42,6 +42,16 @@ describe('/api/narrative/ending', () => {
     } as never);
   });
 
+  it('asks for a player key before generation', async () => {
+    const response = await POST(buildAIRequest('/api/narrative/ending', VALID_BODY, { withoutKey: true }));
+    expect(response.status).toBe(412);
+    expect(await response.json()).toMatchObject({
+      suggestion: 'Add your API key in Settings > Provider Setup to play.',
+      retryable: false,
+    });
+    expect(mockGenerateEnding).not.toHaveBeenCalled();
+  });
+
   it('rejects a body missing required ids without generating', async () => {
     const response = await POST(endingRequest({ endingType: 'story-complete' }));
     const data = await response.json();
