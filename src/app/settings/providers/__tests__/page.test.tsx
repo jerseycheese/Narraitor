@@ -98,7 +98,8 @@ const seedProviders = (providers: ProviderConfig[], activeProviderId: string | n
   useProviderStore.setState({ removeProvider: removeSpy });
 };
 
-beforeEach(() => {
+beforeEach(async () => {
+  await useProviderStore.persist.rehydrate();
   localStorage.clear();
   useProviderStore.getState().reset();
   jest.clearAllMocks();
