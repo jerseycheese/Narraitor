@@ -6,6 +6,7 @@ import { ToneSettings } from '@/types/tone-settings.types';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
 import { safeTrim } from '@/lib/utils';
 import { withAIRoute } from '@/utils/apiHelpers';
+import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
@@ -167,9 +168,15 @@ export const POST = withAIRoute(async (request: NextRequest) => {
       toneSettings: sanitizeToneSettings(rawBody?.toneSettings),
     };
 
+    const provider = resolveProviderCredential(request);
+    if (!provider) {
+      return createAPIErrorResponse(new Error('API key not configured'), 412);
+    }
+
     const summary = await generateStoryCheckpointSummary(
       payload,
-      resolveProviderCredential(request)
+      provider,
+      provider.model
     );
     return NextResponse.json(summary);
   } catch (error) {

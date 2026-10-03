@@ -41,6 +41,16 @@ describe('/api/narrative/summarize', () => {
     jest.clearAllMocks();
   });
 
+  it('asks for a player key before generation', async () => {
+    const response = await POST(buildAIRequest('/api/narrative/summarize', VALID_BODY, { withoutKey: true }));
+    expect(response.status).toBe(412);
+    expect(await response.json()).toMatchObject({
+      suggestion: 'Add your API key in Settings > Provider Setup to play.',
+      retryable: false,
+    });
+    expect(mockCreateClient).not.toHaveBeenCalled();
+  });
+
   it('rejects a request with no content before calling the model', async () => {
     respondWith('{}');
 

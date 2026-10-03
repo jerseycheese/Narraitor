@@ -28,9 +28,9 @@ describe('resolveApiKey', () => {
     expect(resolveApiKey(requestWithKey('byo-key'))).toBe('byo-key');
   });
 
-  test('falls back to the env key when no header is present', () => {
+  test('requires a player key even when the server has a key', () => {
     process.env.GEMINI_API_KEY = 'env-key';
-    expect(resolveApiKey(requestWithKey())).toBe('env-key');
+    expect(resolveApiKey(requestWithKey())).toBeNull();
   });
 
   test('returns null when env is the MOCK sentinel and no header', () => {

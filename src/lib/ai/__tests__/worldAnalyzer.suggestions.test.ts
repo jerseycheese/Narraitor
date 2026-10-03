@@ -57,7 +57,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
 
       mockGenerateContent.mockResolvedValue(mockAIResponse);
 
-      const result = await analyzeWorldDescription(worldDescription);
+      const result = await analyzeWorldDescription(worldDescription, 'player-key');
 
       // Verify the AI client was called correctly
       expect(mockGenerateContent).toHaveBeenCalledWith(
@@ -119,7 +119,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
 
       mockGenerateContent.mockResolvedValue(mockAIResponse);
 
-      const result = await analyzeWorldDescription(worldDescription);
+      const result = await analyzeWorldDescription(worldDescription, 'player-key');
 
       // JSON is successfully extracted from the response
       expect(result.attributes).toHaveLength(1);
@@ -134,7 +134,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
       // Simulate AI failure
       mockGenerateContent.mockRejectedValue(new Error('AI service unavailable'));
 
-      const result = await analyzeWorldDescription(worldDescription);
+      const result = await analyzeWorldDescription(worldDescription, 'player-key');
 
       // Should return default suggestions
       expect(result.attributes.length).toBeGreaterThan(0);
@@ -159,7 +159,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
 
       mockGenerateContent.mockResolvedValue(mockAIResponse);
 
-      const result = await analyzeWorldDescription(worldDescription);
+      const result = await analyzeWorldDescription(worldDescription, 'player-key');
 
       // Should fall back to default suggestions
       expect(result.attributes.length).toBeGreaterThan(0);
@@ -181,7 +181,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
 
       mockGenerateContent.mockResolvedValue(mockAIResponse);
 
-      const result = await analyzeWorldDescription(worldDescription);
+      const result = await analyzeWorldDescription(worldDescription, 'player-key');
 
       // All suggestions should have accepted: true for better UX
       result.attributes.forEach(attr => {
