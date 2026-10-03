@@ -1,4 +1,6 @@
 import { EntityID } from '@/types/common.types';
+import type { CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
+import type { WizardValidation } from '@/hooks/useWizardState';
 
 // Draft auto-save (useDraftAutoSave) configuration for character creation.
 
@@ -9,8 +11,8 @@ export function getCharacterDraftStorageKey(worldId: EntityID): string {
 export interface CharacterCreationDraft {
   currentStep: number;
   worldId: EntityID;
-  characterData: unknown;
-  validation: unknown;
+  characterData: Partial<CharacterCreationData>;
+  validation?: Record<number, WizardValidation>;
   lastSaved?: string;
 }
 
@@ -32,7 +34,7 @@ export function isValidCharacterDraft(value: unknown): value is CharacterCreatio
   return typeof candidate.currentStep === 'number' && typeof candidate.worldId === 'string';
 }
 
-function hasBackgroundData(background: Record<string, unknown>): boolean {
+function hasBackgroundData(background: Partial<CharacterCreationData['background']>): boolean {
   return !!(
     background.history ||
     background.personality ||
@@ -50,7 +52,7 @@ export function analyzeCharacterDraftRecovery(
     lastSaved: draft.lastSaved,
   };
 
-  const characterData = draft.characterData as Record<string, unknown> | null;
+  const characterData = draft.characterData;
   if (!characterData) {
     return preview;
   }
@@ -62,21 +64,21 @@ export function analyzeCharacterDraftRecovery(
   if (Array.isArray(characterData.attributes)) {
     preview.hasAttributes = characterData.attributes.length > 0;
     preview.totalAttributePoints = characterData.attributes.reduce(
-      (sum: number, attr: Record<string, unknown>) => sum + (Number(attr.value) || 0),
+      (sum, attr) => sum + (Number(attr?.value) || 0),
       0
     );
   }
 
   if (Array.isArray(characterData.skills)) {
     const selectedSkills = characterData.skills.filter(
-      (skill: Record<string, unknown>) => skill.isSelected
+      (skill) => skill?.isSelected
     );
     preview.hasSkills = selectedSkills.length > 0;
     preview.selectedSkillCount = selectedSkills.length;
   }
 
   if (characterData.background && typeof characterData.background === 'object') {
-    preview.hasBackground = hasBackgroundData(characterData.background as Record<string, unknown>);
+    preview.hasBackground = hasBackgroundData(characterData.background);
   }
 
   return preview;
@@ -86,21 +88,21 @@ export function analyzeCharacterDraftRecovery(
 export function hasCharacterDraftData(draft: CharacterCreationDraft | undefined): boolean {
   if (!draft || !draft.characterData) return false;
 
-  const characterData = draft.characterData as Record<string, unknown>;
+  const characterData = draft.characterData;
 
   const hasAttributePoints =
     Array.isArray(characterData.attributes) &&
     characterData.attributes.some(
-      (attr: Record<string, unknown>) => Number(attr.value || 0) > Number(attr.minValue || 0)
+      (attr) => Number(attr?.value || 0) > Number(attr?.minValue || 0)
     );
 
   const hasSelectedSkill =
     Array.isArray(characterData.skills) &&
-    characterData.skills.some((skill: Record<string, unknown>) => skill.isSelected);
+    characterData.skills.some((skill) => skill?.isSelected);
 
   const background =
     characterData.background && typeof characterData.background === 'object'
-      ? (characterData.background as Record<string, unknown>)
+      ? characterData.background
       : null;
 
   return !!(
