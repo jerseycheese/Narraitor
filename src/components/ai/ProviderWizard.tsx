@@ -6,6 +6,7 @@ import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardStep } from '@/components/shared/wizard/WizardStep';
 import { WizardNavigation } from '@/components/shared/wizard/WizardNavigation';
 import { Button } from '@/components/ui/button';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
@@ -119,6 +120,8 @@ const SELF_HOSTED_ERROR_MESSAGES: Record<string, string> = {
 
 export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
   const addProvider = useProviderStore((s) => s.addProvider);
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const canLeaveRef = useRef(false);
   const [verifyState, setVerifyState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [verifyResult, setVerifyResult] = useState<ValidationResult | null>(null);
   const [validatedConfig, setValidatedConfig] = useState<{
@@ -176,6 +179,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
         apiKey: keyToSend(data.apiKey, data.requiresApiKey),
         capabilities: { text: true, images: data.images, streaming: data.streaming },
       });
+      canLeaveRef.current = true;
       onComplete?.();
     },
     [addProvider, onComplete]
@@ -191,6 +195,27 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
 
   const { state, handlers, currentStep, isLastStep, stepValidation } = wizard;
   const { data } = state;
+
+  const hasUnsavedKey = Boolean(data.apiKey.trim());
+
+  useEffect(() => {
+    if (!hasUnsavedKey) return;
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (canLeaveRef.current) return;
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warnBeforeUnload);
+    return () => window.removeEventListener('beforeunload', warnBeforeUnload);
+  }, [hasUnsavedKey]);
+
+  const handleCancel = () => {
+    if (hasUnsavedKey && !canLeaveRef.current) {
+      setShowCancelConfirmation(true);
+    } else {
+      handlers.handleCancel();
+    }
+  };
 
   // Any change to the credentials or model invalidates a prior successful check
   useEffect(() => {
@@ -577,7 +602,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
             </Button>
             {verifyState === 'success' && (
               <div className="provider-verify-status" data-state="success">
-                Connected. Text {verifyResult?.capabilities?.text ? 'yes' : 'no'}, images{' '}
+                Connected. Save provider to finish. Text {verifyResult?.capabilities?.text ? 'yes' : 'no'}, images{' '}
                 {verifyResult?.capabilities?.images ? 'yes' : 'no'}.
               </div>
             )}
@@ -601,7 +626,7 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
       <WizardNavigation
         currentStep={currentStep}
         totalSteps={STEPS.length}
-        onCancel={handlers.handleCancel}
+        onCancel={handleCancel}
         onBack={handlers.handleBack}
         onNext={handlers.handleNext}
         onComplete={handlers.handleComplete}
@@ -609,6 +634,20 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
         completeLabel="Save provider"
         disabled={navDisabled}
         isLoading={state.isProcessing}
+      />
+      <ConfirmationDialog
+        isOpen={showCancelConfirmation}
+        onClose={() => setShowCancelConfirmation(false)}
+        onConfirm={() => {
+          canLeaveRef.current = true;
+          setShowCancelConfirmation(false);
+          handlers.handleCancel();
+        }}
+        title="Discard provider setup?"
+        message="This provider hasn't been saved. Leaving will discard the key you entered."
+        variant="warning"
+        confirmText="Discard provider"
+        cancelText="Keep editing"
       />
     </WizardContainer>
   );

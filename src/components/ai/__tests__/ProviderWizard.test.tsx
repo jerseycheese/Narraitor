@@ -77,7 +77,11 @@ describe('ProviderWizard', () => {
       capabilities: { text: true, images: true, streaming: true },
       model: 'gemini-2.5-flash',
     });
-    const onComplete = jest.fn();
+    const onComplete = jest.fn(() => {
+      const completingExit = new Event('beforeunload', { cancelable: true });
+      window.dispatchEvent(completingExit);
+      expect(completingExit.defaultPrevented).toBe(false);
+    });
     const user = userEvent.setup();
 
     render(<ProviderWizard onComplete={onComplete} />);
@@ -92,19 +96,50 @@ describe('ProviderWizard', () => {
 
     // Step 2: verify, then save.
     await user.click(screen.getByRole('button', { name: /test connection/i }));
-    await screen.findByText(/connected/i);
+    await screen.findByText(/connected\. save provider to finish/i);
 
     expect(mockValidate).toHaveBeenCalledWith(
       expect.objectContaining({ apiKey: 'AIza-test-key', type: 'gemini' })
     );
 
+    expect(Object.values(useProviderStore.getState().providers)).toHaveLength(0);
+    const unsavedExit = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(unsavedExit);
+    expect(unsavedExit.defaultPrevented).toBe(true);
+
     await user.click(screen.getByRole('button', { name: /save provider/i }));
 
     await waitFor(() => expect(onComplete).toHaveBeenCalled());
+    const savedExit = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(savedExit);
+    expect(savedExit.defaultPrevented).toBe(false);
     const providers = Object.values(useProviderStore.getState().providers);
     expect(providers).toHaveLength(1);
     expect(providers[0].type).toBe('gemini');
     expect(providers[0].encryptedApiKey).toBeTruthy();
+  });
+
+  test('warns before discarding an entered key and lets the player keep editing', async () => {
+    const onCancel = jest.fn();
+    const user = userEvent.setup();
+    render(<ProviderWizard onCancel={onCancel} />);
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.type(screen.getByLabelText(/api key/i), 'test-key');
+    await user.click(screen.getByRole('button', { name: /^cancel$/i }));
+
+    expect(screen.getByRole('dialog')).toHaveTextContent(/provider hasn't been saved/i);
+    expect(onCancel).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: /keep editing/i }));
+    expect(screen.getByLabelText(/api key/i)).toHaveValue('test-key');
+
+    await user.click(screen.getByRole('button', { name: /^cancel$/i }));
+    await user.click(screen.getByRole('button', { name: /discard provider/i }));
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    const discardedExit = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(discardedExit);
+    expect(discardedExit.defaultPrevented).toBe(false);
   });
 
   test('surfaces a friendly error when validation fails', async () => {
