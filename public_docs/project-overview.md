@@ -13,7 +13,7 @@ I built this AI storytelling app that lets you play RPG narratives in any fictio
 Middle Earth, the beaches of Normandy, something you invented last week: all fair game. It's designed for solo play when you want a narrative RPG experience but don't have a group or game master available.
 
 ## Current Status
-As of v1.11.0 (2026-10-01), the app is past MVP: all the main systems (world creation, character building, AI narrative generation, session persistence, multi-provider AI) are operational and have shipped through eleven releases. v1.11 built scene state and a stall-breaker for long-session coherence, but the re-measure showed no gain, so it ships switched off. Current work (v1.12) changes lever: making cheaper open-weight models work properly through OpenRouter, then testing whether 10-turn episodes keep the story strong. See [MVP Roadmap](./development/mvp-roadmap.md) and [RELEASES.md](../RELEASES.md) for the running detail.
+As of v1.12.0 (2026-10-03), the app is past MVP: all the main systems (world creation, character building, AI narrative generation, session persistence, multi-provider AI) are operational and have shipped through twelve releases. v1.11 built scene state for long-session coherence and ships switched off; v1.12 changed lever, making cheaper open-weight models work properly through OpenRouter, and DeepSeek flash beat the old baseline. Current work (v1.13) makes it the recommended default and clears out Gemini-only assumptions. See [MVP Roadmap](./development/mvp-roadmap.md) and [RELEASES.md](../RELEASES.md) for the running detail.
 
 ## Technical Foundation
 

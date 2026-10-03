@@ -4,6 +4,39 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.12.0 - 2026-10-03
+
+v1.12 made non-Gemini providers work properly, then answered the question v1.11 left open. With those fixes in, DeepSeek flash via OpenRouter beat the old control in every ten-turn block across six runs. That closes the narrative-cohesion arc for now: the model was one lever, and the next one is product shape, which is tracked for v1.14. The release covers 4 commits since [v1.11.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.11.0).
+
+**What's in this release**
+
+Providers:
+
+- Provider model lists load live from the provider instead of a hardcoded list, and provider setup was reworked around that ([#2264](https://github.com/jerseycheese/Narraitor/pull/2264), for [#2249](https://github.com/jerseycheese/Narraitor/issues/2249)).
+- OpenRouter's reasoning policy is configured per model, and the app handles a thinking model that uses up its whole token budget ([#2262](https://github.com/jerseycheese/Narraitor/pull/2262), for [#2251](https://github.com/jerseycheese/Narraitor/issues/2251)).
+- Model aliases with a leading `~` are accepted, and setup validates the same way generation does ([#2261](https://github.com/jerseycheese/Narraitor/pull/2261), for [#2252](https://github.com/jerseycheese/Narraitor/issues/2252)).
+
+Play:
+
+- The fatal-decision cooldown now covers deaths the narrator writes, not just the ones a choice triggers ([#2263](https://github.com/jerseycheese/Narraitor/pull/2263), for [#2250](https://github.com/jerseycheese/Narraitor/issues/2250)).
+
+Measured:
+
+- DeepSeek flash re-measure, n=3 per arm, blind-judged: 30-turn blocks 3.48 / 3.95 / 3.38 against the control's 2.86 / 2.43 / 2.50, and 10-turn runs averaging 3.52. Result: SHIP ([#2257](https://github.com/jerseycheese/Narraitor/issues/2257)).
+
+**Known incomplete**
+
+- The app still defaults to Gemini, and a request with no player key quietly falls back to the server's Gemini model ([#2258](https://github.com/jerseycheese/Narraitor/issues/2258)).
+- Choices can describe the previous scene after the prose moves on ([#2266](https://github.com/jerseycheese/Narraitor/issues/2266)).
+- Late-turn quality still varies a lot from run to run.
+
+**What's next**
+
+- v1.13: make DeepSeek flash the recommended default, clear out the Gemini-only assumptions, and fix the stale choices.
+- v1.14: 10-turn chapters that hand off through a recap ([#2265](https://github.com/jerseycheese/Narraitor/issues/2265)). A hand-run test scored 3.62, with all three runs judged real continuations.
+
+---
+
 ## v1.11.0 - 2026-10-01
 
 v1.11 built the scene-state mechanism meant to keep long stories coherent: the turn resolver now records who's in the scene, where it is, and which beats have happened, and a stall-breaker forces the story forward. The re-measure didn't clear the bar, so all of it ships switched off. What's live is one game-session controller instead of two, and a set of wizard and play-screen fixes. The release covers 16 commits since [v1.10.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.10.0).
