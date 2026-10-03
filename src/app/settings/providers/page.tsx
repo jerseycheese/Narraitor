@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { PageLayout } from '@/components/shared/PageLayout';
+import { LoadingState } from '@/components/ui/LoadingState';
 import { Button } from '@/components/ui/button';
 import { ProviderCard } from '@/components/ai/ProviderCard';
 import { ProviderWizard } from '@/components/ai/ProviderWizard';
@@ -17,6 +18,7 @@ import '@/components/ai/provider-config.css';
  * stored in this browser.
  */
 export default function ProvidersSettingsPage() {
+  const hasHydrated = useProviderStore((s) => s._hasHydrated);
   const providers = useProviderStore((s) => s.providers);
   const activeProviderId = useProviderStore((s) => s.activeProviderId);
   const validationStatus = useProviderStore((s) => s.validationStatus);
@@ -75,13 +77,15 @@ export default function ProvidersSettingsPage() {
       title="Providers"
       description="Add the provider key used to generate your stories. It stays in this browser, encrypted, and is only ever used to make your own requests."
       actions={
-        !showWizard && list.length > 0 ? (
+        hasHydrated && !showWizard && list.length > 0 ? (
           <Button onClick={() => setShowWizard(true)}>Add provider</Button>
         ) : undefined
       }
     >
       <div className="component-providers-page">
-        {showWizard ? (
+        {!hasHydrated ? (
+          <LoadingState variant="skeleton" message="Loading providers..." />
+        ) : showWizard ? (
           <ProviderWizard
             onComplete={() => setShowWizard(false)}
             onCancel={() => setShowWizard(false)}
