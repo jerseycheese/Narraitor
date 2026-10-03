@@ -3,9 +3,9 @@
 ## Where We Are
 **Major Milestone**: The core MVP is complete and past it. AI storytelling, world creation, character building, session persistence, navigation, and multi-provider AI (Gemini, OpenRouter, Ollama, OpenAI live; Claude adapter built but off pending a live-key check, #894) all work, and a player can go end to end through the loop.
 
-**Current Status**: v1.11.0 shipped on 2026-10-01. It ships scene state and the thread-ledger ending gate switched off, because the re-measure (#2205) showed no gain, plus one game-session controller and a batch of wizard fixes. v1.10.0 shipped on 2026-09-27. It fixed the play-loop bugs a September playtest round (#1818) surfaced — a session locking on turn 1, a death hanging on "Writing your story...", failures with no retry, prompt text leaking into the story — plus a batch of wizard fixes. See [RELEASES.md](../../RELEASES.md) for the full v1.2-through-v1.11 shipped history; this doc no longer tracks it issue-by-issue.
+**Current Status**: v1.12.0 shipped on 2026-10-03. OpenRouter models work without workarounds (#2252, #2251, #2249), narrator-written deaths respect the fatal cooldown (#2250), and the n=3 re-measure (#2257) came back SHIP for DeepSeek flash. v1.11.0 shipped on 2026-10-01. It ships scene state and the thread-ledger ending gate switched off, because the re-measure (#2205) showed no gain, plus one game-session controller and a batch of wizard fixes. v1.10.0 shipped on 2026-09-27. It fixed the play-loop bugs a September playtest round (#1818) surfaced — a session locking on turn 1, a death hanging on "Writing your story...", failures with no retry, prompt text leaking into the story — plus a batch of wizard fixes. See [RELEASES.md](../../RELEASES.md) for the full v1.2-through-v1.12 shipped history; this doc no longer tracks it issue-by-issue.
 
-Next up is [v1.12](https://github.com/jerseycheese/Narraitor/milestone/13). Four arcs of prompt and metadata work failed the same way, so it changes lever: OpenRouter models work without workarounds (#2252, #2251, #2249), narrator-written deaths respect the fatal cooldown (#2250), and a re-measure at n=3 plus 10-turn episodes (#2257) decides the default model and whether short episodes become the product shape.
+Next up is [v1.13](https://github.com/jerseycheese/Narraitor/milestone/14): make DeepSeek flash the recommended default, remove the Gemini-only assumptions left behind (#2258), and fix choices that describe the previous scene (#2266). After that, [v1.14](https://github.com/jerseycheese/Narraitor/milestone/15) builds 10-turn chapters that hand off through a recap (#2265).
 
 Landed since v1.1: the three-design-system migration
 ([ADR-011](../architecture/ADR-011-three-design-systems.md)), later collapsed to a single design
@@ -102,7 +102,7 @@ This is about getting ready for broader use beyond just personal development.
 
 ## Current Priority Queue
 
-The next release to main is **v1.12**, tracked in the [v1.12 GitHub milestone](https://github.com/jerseycheese/Narraitor/milestone/13) — see "Where We Are" above for its scope. Everything below through v1.2 has since shipped; the queues are kept as a record of what shipped and what didn't. This roadmap is a running log, not a snapshot. For the detailed shipped history from v1.2 through v1.11, see [RELEASES.md](../../RELEASES.md).
+The next release to main is **v1.13**, tracked in the [v1.13 GitHub milestone](https://github.com/jerseycheese/Narraitor/milestone/14) — see "Where We Are" above for its scope. Everything below through v1.2 has since shipped; the queues are kept as a record of what shipped and what didn't. This roadmap is a running log, not a snapshot. For the detailed shipped history from v1.2 through v1.12, see [RELEASES.md](../../RELEASES.md).
 
 ### Recently shipped (prior queues, kept for history)
 
