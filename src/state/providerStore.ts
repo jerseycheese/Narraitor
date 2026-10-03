@@ -40,6 +40,8 @@ export interface ProviderStore {
   validationStatus: Record<string, ProviderValidationRecord>;
   error: string | null;
   loading: boolean;
+  _hasHydrated: boolean;
+  setHasHydrated: (hasHydrated: boolean) => void;
 
   addProvider: (input: AddProviderInput) => Promise<string>;
   updateProvider: (
@@ -87,6 +89,8 @@ export const useProviderStore = create<ProviderStore>()(
   persist(
     (set, get) => ({
       ...INITIAL_STATE,
+      _hasHydrated: false,
+      setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
 
       addProvider: async (input) => {
         const id = generateUniqueId('provider');
@@ -235,6 +239,9 @@ export const useProviderStore = create<ProviderStore>()(
       name: STORE_NAME,
       storage: createProviderStorage(),
       version: 1,
+      onRehydrateStorage: (state) => () => {
+        state.setHasHydrated(true);
+      },
       partialize: (state) => ({
         providers: state.providers,
         activeProviderId: state.activeProviderId,
