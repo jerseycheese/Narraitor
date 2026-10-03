@@ -6,7 +6,7 @@ This system solves that by automatically detecting and tracking goals throughout
 
 ## How It Works
 
-**The AI Reads Between the Lines** - It's pretty smart about picking up both obvious goals ("Find the Sword of Light") and implied ones. When the wizard says "The dragon will attack at dawn," the system figures out that means "Stop the dragon attack" even though nobody explicitly said that. If the AI extraction fails for some reason, it falls back to pattern matching so you don't lose functionality.
+**The AI Reads Between the Lines** - The extraction prompt identifies both explicit goals ("Find the Sword of Light") and implied ones. When the wizard says "The dragon will attack at dawn," the system infers that means "Stop the dragon attack" even though nobody explicitly said that. If AI extraction fails, it falls back to pattern matching so you don't lose functionality.
 
 **Goals Have Lives** - Every goal gets tracked from birth to death. Whether it gets completed, abandoned, or blocked by circumstances, the system keeps notes on progress, tracks how often it gets mentioned, and maintains a timeline. This helps the AI understand what's currently hot and what's gone cold.
 

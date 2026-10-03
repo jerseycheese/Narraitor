@@ -1,8 +1,8 @@
 # Goal System API Reference
 
-The goal system is what makes our AI storytelling actually smart about tracking narrative threads. Instead of just generating random content, it remembers what your character is trying to accomplish and weaves those objectives into the story naturally.
+The goal system tracks narrative threads across turns. It records what your character is trying to accomplish and weaves those objectives into the story context.
 
-Think of it like having a really good dungeon master who never forgets that you're looking for your missing sister, trying to earn enough gold for new armor, and investigating those weird disappearances in town. The system tracks all of that automatically.
+Think of it like a dungeon master who tracks ongoing character objectives - looking for a missing sister, saving for equipment, or investigating local rumors - while running the active scene.
 
 ## Core Components
 

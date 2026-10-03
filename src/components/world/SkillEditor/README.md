@@ -1,8 +1,8 @@
 # SkillEditor Component
 
-Skills are where world building gets really interesting. This component handles creating and editing skills, but the tricky part is that skills can link to multiple attributes now - think "Persuasion" linking to both "Charisma" and "Intelligence".
+Handles creating and editing skills within a world, including linking individual skills to multiple governing attributes (such as "Persuasion" linking to both "Charisma" and "Intelligence").
 
-## What Makes This Complex
+## Multi-Attribute Linking
 
 Supporting multi-attribute skill linking without cluttering the UI is the main constraint here. In the old system, each skill was tied to exactly one attribute. Simple, but limiting. Now a skill like "Stealth" might use both "Dexterity" and "Intelligence" (for knowing where guards patrol), so checkboxes replaced the single dropdown.
 

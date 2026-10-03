@@ -138,7 +138,7 @@ function CharacterCreationWizard() {
 
 ### Data Preview Generation
 
-The component intelligently displays preview information based on available recovery data:
+The component conditionally displays preview fields based on available recovery data:
 
 ```typescript
 // Character name display

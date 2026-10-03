@@ -27,11 +27,11 @@ The stack:
 
 ## Core Features
 
-**World Creation**: The multi-step wizard lets you define any fictional universe. Describe what you have in mind and you get suggested attributes and skills tuned to that theme, all of them editable. Want "Force Sensitivity" as an attribute? No problem.
+**World Creation**: The multi-step wizard lets you define any fictional universe. Describe what you have in mind and you get suggested attributes and skills tuned to that theme, all of them editable.
 
 **Character Building**: Point-allocation system that adapts to your world's rules. Create characters with backgrounds that make sense for your setting. The wizard guides you through attribute allocation, skill selection, and story background. You can build multiple characters in the same world and switch between them, but each plays their own session — the player controls one character at a time; everyone else in the story is an NPC.
 
-**Adaptive AI Narratives**: This is the interesting part. The AI doesn't just generate random fantasy stories. It maintains context about your world's rules, your character's abilities, and the ongoing story to create narratives that feel consistent with your setting.
+**Adaptive AI Narratives**: The AI maintains context about your world's rules, your character's abilities, and the ongoing story to create narratives that feel consistent with your setting.
 
 **Choice Weighting**: Decisions get labeled by importance (Minor/Major/Critical) and alignment (Lawful/Neutral/Chaotic) so you can see which decisions carry weight for your character's development.
 
@@ -46,7 +46,10 @@ The player's key is encrypted at rest in the browser, decrypted only when a requ
 Built primarily for personal use: solo narrative RPG experiences when you want to explore stories in specific fictional universes without needing a group or game master.
 
 ## Development Philosophy
-**KISS approach**: Simple, maintainable code over clever solutions. **TDD workflow**: Tests before implementation to catch issues early. **Component-first**: Build in Storybook isolation before integration. **Domain boundaries**: Keep related functionality together.
+- **KISS approach**: Simple, maintainable code over clever solutions.
+- **TDD workflow**: Tests before implementation to catch issues early.
+- **Component-first**: Build in Storybook isolation before integration.
+- **Domain boundaries**: Keep related functionality together.
 
 ## Current Focus
 v1.12: OpenRouter models without workarounds (#2252, #2251, #2249), the fatal-cooldown fix (#2250), then a re-measure at n=3 plus 10-turn episodes (#2257). See [MVP Roadmap](./development/mvp-roadmap.md) for the active queue.
