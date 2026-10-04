@@ -1,5 +1,3 @@
-// src/state/providerStore.ts
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { generateUniqueId, getTimestamp } from '@/lib/utils';
@@ -82,6 +80,33 @@ const INITIAL_STATE = {
   error: null as string | null,
   loading: false,
 };
+
+let hasHydrated = false;
+const hydrationListeners = new Set<() => void>();
+
+function notifyHydrationChange(hydrated: boolean) {
+  hasHydrated = hydrated;
+  hydrationListeners.forEach((listener) => listener());
+}
+
+/**
+ * Subscribes to provider store rehydration completion.
+ * Does not update persisted state or trigger storage writes.
+ */
+export function subscribeProviderHydration(listener: () => void): () => void {
+  hydrationListeners.add(listener);
+  return () => {
+    hydrationListeners.delete(listener);
+  };
+}
+
+export function getProviderHydration(): boolean {
+  return (
+    hasHydrated ||
+    (typeof useProviderStore?.persist?.hasHydrated === 'function' &&
+      useProviderStore.persist.hasHydrated())
+  );
+}
 
 export const useProviderStore = create<ProviderStore>()(
   persist(
@@ -235,6 +260,12 @@ export const useProviderStore = create<ProviderStore>()(
       name: STORE_NAME,
       storage: createProviderStorage(),
       version: 1,
+      onRehydrateStorage: () => {
+        notifyHydrationChange(false);
+        return () => {
+          notifyHydrationChange(true);
+        };
+      },
       partialize: (state) => ({
         providers: state.providers,
         activeProviderId: state.activeProviderId,

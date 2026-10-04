@@ -190,4 +190,42 @@ describe('providerStore', () => {
     expect(useProviderStore.getState().validationStatus[id]).toBeUndefined();
     expect(await getActiveProviderKey()).toBe('AIza-rotated');
   });
+
+  test('rehydration read failure does not overwrite storage with initial empty state', async () => {
+    const originalStorage = useProviderStore.persist.getOptions().storage;
+    const setItemMock = jest.fn();
+    useProviderStore.persist.setOptions({
+      storage: {
+        getItem: jest.fn().mockRejectedValue(new Error('IndexedDB read error')),
+        setItem: setItemMock,
+        removeItem: jest.fn(),
+      },
+    });
+
+    try {
+      await useProviderStore.persist.rehydrate();
+      expect(setItemMock).not.toHaveBeenCalled();
+    } finally {
+      useProviderStore.persist.setOptions({ storage: originalStorage });
+    }
+  });
+
+  test('rehydration with null item does not write initial state to storage', async () => {
+    const originalStorage = useProviderStore.persist.getOptions().storage;
+    const setItemMock = jest.fn();
+    useProviderStore.persist.setOptions({
+      storage: {
+        getItem: jest.fn().mockResolvedValue(null),
+        setItem: setItemMock,
+        removeItem: jest.fn(),
+      },
+    });
+
+    try {
+      await useProviderStore.persist.rehydrate();
+      expect(setItemMock).not.toHaveBeenCalled();
+    } finally {
+      useProviderStore.persist.setOptions({ storage: originalStorage });
+    }
+  });
 });
