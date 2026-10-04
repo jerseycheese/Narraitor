@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useWizardFlow } from '@/components/shared/wizard/hooks/useWizardFlow';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardStep } from '@/components/shared/wizard/WizardStep';
@@ -119,9 +120,11 @@ const SELF_HOSTED_ERROR_MESSAGES: Record<string, string> = {
 };
 
 export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
+  const router = useRouter();
   const addProvider = useProviderStore((s) => s.addProvider);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const canLeaveRef = useRef(false);
+  const pendingNavigationHrefRef = useRef<string | null>(null);
   const [verifyState, setVerifyState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [verifyResult, setVerifyResult] = useState<ValidationResult | null>(null);
   const [validatedConfig, setValidatedConfig] = useState<{
@@ -200,17 +203,44 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
 
   useEffect(() => {
     if (!hasUnsavedKey) return;
+
     const warnBeforeUnload = (event: BeforeUnloadEvent) => {
       if (canLeaveRef.current) return;
       event.preventDefault();
       event.returnValue = '';
     };
+
+    const handleAnchorClick = (event: MouseEvent) => {
+      if (canLeaveRef.current || event.defaultPrevented) return;
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      const target = event.target as HTMLElement | null;
+      const anchor = target?.closest('a');
+      if (!anchor) return;
+
+      const href = anchor.getAttribute('href');
+      if (!href || href.startsWith('#') || anchor.target === '_blank' || anchor.hasAttribute('download')) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      pendingNavigationHrefRef.current = href;
+      setShowCancelConfirmation(true);
+    };
+
     window.addEventListener('beforeunload', warnBeforeUnload);
-    return () => window.removeEventListener('beforeunload', warnBeforeUnload);
+    document.addEventListener('click', handleAnchorClick, true);
+
+    return () => {
+      window.removeEventListener('beforeunload', warnBeforeUnload);
+      document.removeEventListener('click', handleAnchorClick, true);
+    };
   }, [hasUnsavedKey]);
 
   const handleCancel = () => {
     if (hasUnsavedKey && !canLeaveRef.current) {
+      pendingNavigationHrefRef.current = null;
       setShowCancelConfirmation(true);
     } else {
       handlers.handleCancel();
@@ -637,11 +667,20 @@ export function ProviderWizard({ onComplete, onCancel }: ProviderWizardProps) {
       />
       <ConfirmationDialog
         isOpen={showCancelConfirmation}
-        onClose={() => setShowCancelConfirmation(false)}
+        onClose={() => {
+          pendingNavigationHrefRef.current = null;
+          setShowCancelConfirmation(false);
+        }}
         onConfirm={() => {
           canLeaveRef.current = true;
           setShowCancelConfirmation(false);
-          handlers.handleCancel();
+          const destination = pendingNavigationHrefRef.current;
+          pendingNavigationHrefRef.current = null;
+          if (destination) {
+            router.push(destination);
+          } else {
+            handlers.handleCancel();
+          }
         }}
         title="Discard provider setup?"
         message="This provider hasn't been saved. Leaving will discard the key you entered."

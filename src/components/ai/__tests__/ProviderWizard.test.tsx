@@ -1,9 +1,11 @@
 import React from 'react';
+import Link from 'next/link';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn(), prefetch: jest.fn() }),
+  useRouter: () => ({ push: mockPush, replace: jest.fn(), prefetch: jest.fn() }),
 }));
 
 // crypto.subtle isn't available in jsdom — mock the encryption layer so the
@@ -140,6 +142,44 @@ describe('ProviderWizard', () => {
     const discardedExit = new Event('beforeunload', { cancelable: true });
     window.dispatchEvent(discardedExit);
     expect(discardedExit.defaultPrevented).toBe(false);
+  });
+
+  test('intercepts in-app link navigation when an unsaved key is entered', async () => {
+    mockPush.mockClear();
+    const user = userEvent.setup();
+    render(
+      <div>
+        <nav>
+          <Link href="/worlds">Worlds</Link>
+        </nav>
+        <ProviderWizard />
+      </div>
+    );
+
+    // Before typing a key, clicking the link does not open confirmation
+    await user.click(screen.getByRole('link', { name: 'Worlds' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /google gemini/i }));
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    await user.type(screen.getByLabelText(/api key/i), 'test-key');
+
+    // Click in-app link with unsaved key entered
+    await user.click(screen.getByRole('link', { name: 'Worlds' }));
+
+    expect(screen.getByRole('dialog')).toHaveTextContent(/provider hasn't been saved/i);
+    expect(mockPush).not.toHaveBeenCalled();
+
+    // User chooses to keep editing
+    await user.click(screen.getByRole('button', { name: /keep editing/i }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/api key/i)).toHaveValue('test-key');
+    expect(mockPush).not.toHaveBeenCalled();
+
+    // User clicks link again and chooses to discard
+    await user.click(screen.getByRole('link', { name: 'Worlds' }));
+    await user.click(screen.getByRole('button', { name: /discard provider/i }));
+    expect(mockPush).toHaveBeenCalledWith('/worlds');
   });
 
   test('surfaces a friendly error when validation fails', async () => {
