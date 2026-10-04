@@ -4,7 +4,7 @@
 
 /**
  * The one route that streams, and the only place the produce side of the
- * NDJSON contract meets the consume side in `clientGeminiClient`. Only the
+ * NDJSON contract meets the consume side in `clientAiClient`. Only the
  * network is faked here: the real Gemini adapter builds the upstream body and
  * parses every frame, and the route's own encoder turns those frames into the
  * lines the browser reads.

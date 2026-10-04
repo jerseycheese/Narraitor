@@ -14,7 +14,7 @@ import { http, HttpResponse } from 'msw';
 
 // Text-generation routes share one response contract: { content, finishReason }.
 // See src/utils/apiHelpers.ts (processGeminiTextRequest) and the client reader
-// in src/lib/ai/clientGeminiClient.ts.
+// in src/lib/ai/clientAiClient.ts.
 const textResponse = (content: string) =>
   HttpResponse.json({
     content,
@@ -25,7 +25,7 @@ const textResponse = (content: string) =>
 
 // /api/narrative/generate alone streams newline-delimited JSON (issue #1476)
 // instead of the single-JSON shape above — see processGeminiStreamingTextRequest
-// and ClientGeminiClient.generateContent's ndjson reader. One line is a valid
+// and ClientAIClient.generateContent's ndjson reader. One line is a valid
 // stream: just the terminal `done` event, carrying the same fields.
 const streamingTextResponse = (content: string) =>
   new HttpResponse(

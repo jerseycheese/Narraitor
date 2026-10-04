@@ -1,4 +1,4 @@
-import { ClientGeminiClient } from './clientGeminiClient';
+import { ClientAIClient } from './clientAiClient';
 import { DEFAULT_TEXT_MODEL } from './config';
 import type { AIClient } from './types';
 import type { ProviderCredential, ProviderDescriptor } from './providers/types';
@@ -51,7 +51,7 @@ export const createDefaultGeminiClient = (
 
   // In browser environment (client-side), use secure proxy
   if (typeof window !== 'undefined') {
-    return new ClientGeminiClient();
+    return new ClientAIClient();
   }
 
   const descriptor = toDescriptor(credential, modelOverride);

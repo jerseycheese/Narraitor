@@ -16,7 +16,7 @@ This gives us a few benefits:
 
 The system has a few key components:
 
-**`ClientGeminiClient`** - This is what your React components use. It makes requests to our secure API routes instead of calling Google directly.
+**`ClientAIClient`** - This is what your React components use. It makes requests to our secure API routes instead of calling Google directly.
 
 **`GeminiClient`** - The server-side client that actually talks to Google's API. This only runs on the server where the API keys are safe.
 
@@ -31,9 +31,9 @@ Plus configuration utilities and error handling with retry logic.
 For client-side components (which is most of the time):
 
 ```typescript
-import { ClientGeminiClient } from '@/lib/ai/clientGeminiClient';
+import { ClientAIClient } from '@/lib/ai/clientAiClient';
 
-const client = new ClientGeminiClient();
+const client = new ClientAIClient();
 const response = await client.generateContent('Tell me a story');
 console.log(response.content);
 ```
@@ -88,7 +88,7 @@ GEMINI_API_KEY=your-gemini-api-key
 
 The system includes smart retry logic for transient errors like network timeouts or rate limiting, but it won't retry things like authentication errors that need manual intervention.
 
-When using `ClientGeminiClient`, errors from the API routes are handled automatically:
+When using `ClientAIClient`, errors from the API routes are handled automatically:
 - Rate limit exceeded: Clear error message with retry guidance
 - Server errors: Graceful fallback with user-friendly messages
 - Network errors: Automatic retry with exponential backoff

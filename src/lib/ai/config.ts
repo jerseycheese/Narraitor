@@ -1,7 +1,7 @@
 // src/lib/ai/config.ts
 
 import { AIConfig, GenerationConfig, SafetySetting } from './types';
-import { GEMINI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
+import { AI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 
 /**
  * Default model for an explicitly selected Gemini provider. Other providers
@@ -22,7 +22,7 @@ export const getAIConfig = (): AIConfig => {
     modelName: DEFAULT_TEXT_MODEL,
     imageModelName: 'gemini-3.1-flash-image',
     maxRetries: 3,
-    timeout: GEMINI_ATTEMPT_TIMEOUT_MS
+    timeout: AI_ATTEMPT_TIMEOUT_MS
   };
 };
 
