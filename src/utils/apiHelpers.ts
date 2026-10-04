@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { globalRateLimiter, RateLimiter, type RateLimitResult } from './rateLimiter';
 import { resolveProvider, SERVER_MAX_OUTPUT_TOKENS, type ProviderResolutionFailure } from '../lib/ai/resolveApiKey';
 import { createAPIErrorResponse } from '../lib/utils/createAPIErrorResponse';
-import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../lib/constants/aiTimeouts';
+import { AI_ATTEMPT_TIMEOUT_MS } from '../lib/constants/aiTimeouts';
 import { requireProviderAdapter } from '../lib/ai/providers/adapterRegistry';
 import { geminiAdapter } from '../lib/ai/providers/gemini/adapter';
 import {
@@ -202,7 +202,7 @@ export async function makeGeminiRequest(
   endpoint: string,
   apiKey: string,
   payload: object,
-  timeoutMs: number = GEMINI_ATTEMPT_TIMEOUT_MS
+  timeoutMs: number = AI_ATTEMPT_TIMEOUT_MS
 ): Promise<Response> {
   return sendProviderRequest(
     endpoint,

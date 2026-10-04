@@ -1,4 +1,4 @@
-import { ClientGeminiClient } from '../clientGeminiClient';
+import { ClientAIClient } from '../clientAiClient';
 import { aiFetch } from '../aiFetch';
 
 jest.mock('../aiFetch');
@@ -26,7 +26,7 @@ function fakeStreamingResponse(lines: string[]) {
   };
 }
 
-describe('ClientGeminiClient.generateContent', () => {
+describe('ClientAIClient.generateContent', () => {
   beforeEach(() => {
     mockedAiFetch.mockReset();
   });
@@ -46,7 +46,7 @@ describe('ClientGeminiClient.generateContent', () => {
       ]) as unknown as Response
     );
 
-    const client = new ClientGeminiClient();
+    const client = new ClientAIClient();
     const onChunk = jest.fn();
 
     const result = await client.generateContent('a prompt', { onChunk });
@@ -68,7 +68,7 @@ describe('ClientGeminiClient.generateContent', () => {
       ]) as unknown as Response
     );
 
-    const client = new ClientGeminiClient();
+    const client = new ClientAIClient();
     const result = await client.generateContent('a prompt');
 
     expect(result.content).toBe('Hello');
@@ -78,7 +78,7 @@ describe('ClientGeminiClient.generateContent', () => {
     const doneLine = JSON.stringify({ done: true, content: 'Hello', finishReason: 'STOP' });
     mockedAiFetch.mockResolvedValue(fakeStreamingResponse([doneLine]) as unknown as Response);
 
-    const client = new ClientGeminiClient();
+    const client = new ClientAIClient();
     await client.generateContent('a prompt', { maxTokens: 6144 });
     mockedAiFetch.mockResolvedValue(fakeStreamingResponse([doneLine]) as unknown as Response);
     await client.generateContent('a prompt');
@@ -94,7 +94,7 @@ describe('ClientGeminiClient.generateContent', () => {
       fakeStreamingResponse([JSON.stringify({ error: 'connection reset' })]) as unknown as Response
     );
 
-    const client = new ClientGeminiClient();
+    const client = new ClientAIClient();
     await expect(client.generateContent('a prompt')).rejects.toThrow();
   });
 
@@ -106,7 +106,7 @@ describe('ClientGeminiClient.generateContent', () => {
       json: async () => ({ error: 'Rate limit exceeded. Please try again later.' }),
     } as unknown as Response);
 
-    const client = new ClientGeminiClient();
+    const client = new ClientAIClient();
     await expect(client.generateContent('a prompt')).rejects.toThrow(/rate limit/i);
   });
 });

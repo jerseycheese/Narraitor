@@ -7,10 +7,10 @@
  */
 
 /**
- * Server budget for a single Gemini attempt: makeGeminiRequest's
- * AbortController timeout and GeminiClient's per-attempt abort signal.
+ * Server budget for a single provider attempt: makeRequest / provider client's
+ * AbortController timeout and per-attempt abort signal.
  */
-export const GEMINI_ATTEMPT_TIMEOUT_MS = 30_000;
+export const AI_ATTEMPT_TIMEOUT_MS = 30_000;
 
 /**
  * Headroom the browser grants on top of the server budget it's waiting on:
@@ -21,12 +21,12 @@ const AI_CLIENT_HEADROOM_MS = 15_000;
 
 /**
  * Browser ceiling for single-attempt text routes (/api/narrative/generate,
- * /api/narrative/choices). Those routes make exactly one Gemini attempt via
- * makeGeminiRequest — no retries — so the client budget is one attempt plus
+ * /api/narrative/choices). Those routes make exactly one attempt via the
+ * provider request — no retries — so the client budget is one attempt plus
  * headroom, not the retry-loop worst case.
  */
 export const SINGLE_ATTEMPT_TEXT_TIMEOUT_MS =
-  GEMINI_ATTEMPT_TIMEOUT_MS + AI_CLIENT_HEADROOM_MS;
+  AI_ATTEMPT_TIMEOUT_MS + AI_CLIENT_HEADROOM_MS;
 
 /**
  * Browser ceiling for routes that run GeminiClient's retry loop server-side

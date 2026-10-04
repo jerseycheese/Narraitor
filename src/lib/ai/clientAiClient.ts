@@ -1,4 +1,4 @@
-// src/lib/ai/clientGeminiClient.ts
+// src/lib/ai/clientAiClient.ts
 
 import { AIClient, AIGenerateOptions, AIResponse, AIImageResponse, NarrativeStreamEvent, NarrativeStreamDone } from './types';
 import { userFriendlyError } from './userFriendlyErrors';
@@ -6,16 +6,16 @@ import { aiFetch } from './aiFetch';
 import { SINGLE_ATTEMPT_TEXT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 
 import Logger from '@/lib/utils/logger';
-const logger = new Logger('ClientGeminiClient');
+const logger = new Logger('ClientAIClient');
 
 /** Output ceiling for a narrative beat: 3-4 paragraphs plus its JSON metadata. */
 const NARRATIVE_MAX_OUTPUT_TOKENS = 2048;
 
 /**
- * Client-side proxy for Gemini API that routes through Next.js API routes
- * This ensures API keys are never exposed to the client
+ * Client-side proxy for the AI API that routes through Next.js API routes.
+ * This ensures API keys are never exposed to the client.
  */
-export class ClientGeminiClient implements AIClient {
+export class ClientAIClient implements AIClient {
   private baseUrl: string;
 
   constructor() {
@@ -58,7 +58,7 @@ export class ClientGeminiClient implements AIClient {
 
       return await response.json();
     } catch (error) {
-      logger.error(`ClientGeminiClient ${logContext} error:`, error);
+      logger.error(`ClientAIClient ${logContext} error:`, error);
       const friendlyMessage = userFriendlyError(error instanceof Error ? error : new Error('Unknown error'));
       throw new Error(friendlyMessage);
     }
@@ -151,7 +151,7 @@ export class ClientGeminiClient implements AIClient {
 
       return this.toAIResponse(finalEvent);
     } catch (error) {
-      logger.error(`ClientGeminiClient ${logContext} error:`, error);
+      logger.error(`ClientAIClient ${logContext} error:`, error);
       const friendlyMessage = userFriendlyError(error instanceof Error ? error : new Error('Unknown error'));
       throw new Error(friendlyMessage);
     }
@@ -171,8 +171,8 @@ export class ClientGeminiClient implements AIClient {
       '/api/narrative/generate',
       { prompt, config: { temperature: 0.7, maxTokens: options?.maxTokens ?? NARRATIVE_MAX_OUTPUT_TOKENS } },
       'generation',
-      // The route makes a single 30s Gemini attempt (makeGeminiRequest), so
-      // the wait ceiling is that budget + headroom, not the retry worst case.
+      // The route makes a single 30s attempt, so the wait ceiling is that
+      // budget + headroom, not the retry worst case.
       { signal: options?.signal, timeoutMs: SINGLE_ATTEMPT_TEXT_TIMEOUT_MS, onChunk: options?.onChunk }
     );
   }
@@ -227,7 +227,7 @@ export class ClientGeminiClient implements AIClient {
       // Any response (even errors) means the API route is available
       return response.status !== 404;
     } catch (error) {
-      logger.error('ClientGeminiClient availability check failed:', error);
+      logger.error('ClientAIClient availability check failed:', error);
       return false;
     }
   }

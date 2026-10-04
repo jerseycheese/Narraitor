@@ -79,7 +79,7 @@ export interface AIImageResponse {
  * underlying request (e.g. when a UI-level timeout races the generation);
  * implementations that can't cancel may ignore it. `onChunk` is an optional
  * progressive-reveal hook: implementations that stream (currently
- * ClientGeminiClient.generateContent) invoke it with each newly-visible
+ * ClientAIClient.generateContent) invoke it with each newly-visible
  * slice of narrative prose as it arrives, ahead of the final resolved
  * AIResponse. Implementations that don't stream simply never call it.
  * `maxTokens` raises or lowers the output ceiling for one call: callers whose

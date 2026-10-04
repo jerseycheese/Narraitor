@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server';
 import { processAIStreamingTextRequest, withAIRoute } from '@/utils/apiHelpers';
 
 // Vercel function budget. Must be a static literal (Next.js segment config);
-// sized as the single 30s Gemini attempt (GEMINI_ATTEMPT_TIMEOUT_MS in
+// sized as the single 30s attempt (AI_ATTEMPT_TIMEOUT_MS in
 // lib/constants/aiTimeouts) plus server-side overhead, so deploys don't ride
 // a plan default shorter than the attempt itself.
 export const maxDuration = 60;

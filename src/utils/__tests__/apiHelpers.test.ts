@@ -42,7 +42,7 @@ import {
   MAX_AI_BODY_BYTES,
 } from '../apiHelpers';
 import { DEFAULT_TEXT_MODEL, getAIConfig } from '../../lib/ai/config';
-import { GEMINI_ATTEMPT_TIMEOUT_MS } from '../../lib/constants/aiTimeouts';
+import { AI_ATTEMPT_TIMEOUT_MS } from '../../lib/constants/aiTimeouts';
 import { PROVIDER_API_KEY_HEADER, PROVIDER_MODEL_HEADER } from '../../lib/ai/providerKeyHeader';
 import { globalRateLimiter } from '../rateLimiter';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -98,7 +98,7 @@ describe('makeGeminiRequest', () => {
       const outcome = expect(pending).rejects.toThrow('Request timeout - please try again');
 
       // Still in-flight just before the 30s budget…
-      jest.advanceTimersByTime(GEMINI_ATTEMPT_TIMEOUT_MS - 1);
+      jest.advanceTimersByTime(AI_ATTEMPT_TIMEOUT_MS - 1);
       // …and aborted the moment it elapses.
       jest.advanceTimersByTime(1);
 

@@ -6,7 +6,7 @@ import type {
   ProviderTextResult,
   TextGenerationSpec,
 } from '../types';
-import { GEMINI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
+import { AI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 import { assertPublicProviderEndpoint } from '../endpointGuard';
 import Logger from '@/lib/utils/logger';
 
@@ -64,7 +64,7 @@ export async function readBoundedJson<T>(
   maxBytes: number = MAX_RESPONSE_BODY_BYTES,
   options: ReadBoundedJsonOptions = {}
 ): Promise<T> {
-  const { timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS, signal } = options;
+  const { timeoutMs = AI_ATTEMPT_TIMEOUT_MS, signal } = options;
   if (signal?.aborted) {
     throw new Error('Request aborted');
   }
@@ -206,7 +206,7 @@ export async function sendProviderRequest(
 ): Promise<Response> {
   const {
     method = 'POST',
-    timeoutMs = GEMINI_ATTEMPT_TIMEOUT_MS,
+    timeoutMs = AI_ATTEMPT_TIMEOUT_MS,
     playerSuppliedEndpoint = false,
     customHeaders,
     signal,
