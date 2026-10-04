@@ -5,6 +5,7 @@ import { EntityID } from '@/types/common.types';
 import { useDraftAutoSave } from '@/hooks/useDraftAutoSave';
 import { useCharacterCreationWizard, CharacterCreationData } from '@/hooks/useCharacterCreationWizard';
 import { useCharacterPointPools } from '@/hooks/useCharacterPointPools';
+import { useAttemptedSteps } from '@/hooks/useAttemptedSteps';
 import { finalizeCharacterCreation } from '@/lib/utils/characterFinalization';
 import {
   WizardContainer,
@@ -72,7 +73,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   // while invalid. Until then, a step's error banner stays hidden even
   // though the underlying validation is marked `touched` by a field blur
   // (see issue #2178) — per-field display is left to each step component.
-  const [attemptedSteps, setAttemptedSteps] = useState<Set<number>>(new Set());
+  const attemptedSteps = useAttemptedSteps();
 
   React.useEffect(() => {
     if (hasRecoveryData) {
@@ -144,6 +145,14 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     worldId,
     world
   });
+  const {
+    goToStep,
+    goNext,
+    goBack,
+    reset,
+    updateData,
+    setValidation,
+  } = wizard;
 
   // Sync wizard step with tutorial provider
   React.useEffect(() => {
@@ -173,9 +182,9 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
     const targetWizardStep = tourStepToWizardStep[stepIndex];
     if (targetWizardStep !== undefined && targetWizardStep !== wizard.state.currentStep) {
-      wizard.goToStep(targetWizardStep);
+      goToStep(targetWizardStep);
     }
-  }, [stepIndex, isTourActive, isPaused, showRecoveryDialog, currentTour, wizard.state.currentStep, wizard.goToStep]);
+  }, [stepIndex, isTourActive, isPaused, showRecoveryDialog, currentTour, wizard.state.currentStep, goToStep]);
 
   // Point pool managers
   const { attributePool, skillPool } = useCharacterPointPools({
@@ -196,19 +205,14 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   // Navigation handlers
   const handleNext = () => {
-    setAttemptedSteps((prev) => {
-      if (prev.has(wizard.state.currentStep)) return prev;
-      const next = new Set(prev);
-      next.add(wizard.state.currentStep);
-      return next;
-    });
+    attemptedSteps.mark(wizard.state.currentStep);
     saveWizardState();
-    wizard.goNext();
+    goNext();
   };
 
   const handleBack = () => {
     saveWizardState();
-    wizard.goBack();
+    goBack();
   };
 
   const handleCancel = () => {
@@ -264,26 +268,26 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         typeof data.currentStep === 'number' ? data.currentStep : initialStep;
       const restoredValidation = data.validation || {};
 
-      wizard.reset(restoredData, restoredStep, restoredValidation);
+      reset(restoredData, restoredStep, restoredValidation);
     } else if (choice === 'dismiss') {
       clearAutoSave();
-      wizard.reset(defaultCharacterData, initialStep, {});
+      reset(defaultCharacterData, initialStep, {});
     }
     setShowRecoveryDialog(false);
   };
 
   const handleUpdate = useCallback(
     (updates: Partial<CharacterCreationData>) => {
-      wizard.updateData(updates);
+      updateData(updates);
     },
-    [wizard.updateData]
+    [updateData]
   );
 
   const handleValidation = useCallback(
     (valid: boolean, errors: string[], fieldErrors?: Record<string, string>) => {
-      wizard.setValidation(wizard.state.currentStep, { valid, errors, touched: true, fieldErrors });
+      setValidation(wizard.state.currentStep, { valid, errors, touched: true, fieldErrors });
     },
-    [wizard.setValidation, wizard.state.currentStep]
+    [setValidation, wizard.state.currentStep]
   );
 
   const validateCurrentStep = useCallback(() => {
@@ -300,14 +304,9 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       if (validator) {
         const validation = validator(wizard.state.data);
         if (!validation.valid) {
-          wizard.goToStep(i);
-          wizard.setValidation(i, validation);
-          setAttemptedSteps((prev) => {
-            if (prev.has(i)) return prev;
-            const next = new Set(prev);
-            next.add(i);
-            return next;
-          });
+          goToStep(i);
+          setValidation(i, validation);
+          attemptedSteps.mark(i);
           return;
         }
       }
