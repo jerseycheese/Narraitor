@@ -198,6 +198,11 @@ const mockCharacter = {
   updatedAt: getTimestamp(),
 };
 
+type HydrationApi = {
+  hasHydrated?: () => boolean;
+  onFinishHydration?: (callback: () => void) => () => void;
+};
+
 type SessionStateDisplay = {
   status?: string;
   currentSceneId?: string | null;
@@ -345,21 +350,39 @@ export default function GameSessionTestHarness() {
     logger.info('Test inventory items added');
   }, [logger]);
 
-  // Set isClient to true once component mounts to avoid hydration mismatch
+  // Wait for persisted test data before mounting the session.
   useEffect(() => {
-    // Set client state
-    setIsClient(true);
-
-    // Create test world only once on initial mount
-    createTestWorld();
+    // IndexedDB hydration can replace seeds written before either store is ready.
+    const seedStores = [useWorldStore, useCharacterStore].map(
+      (store) => (store as unknown as { persist?: HydrationApi }).persist
+    );
+    const seedSubscriptions: (() => void)[] = [];
+    let hasSeededWorld = false;
+    const seedWorldOnce = () => {
+      if (
+        hasSeededWorld ||
+        seedStores.some(
+          (persist) => persist?.onFinishHydration && !persist.hasHydrated?.()
+        )
+      ) {
+        return;
+      }
+      hasSeededWorld = true;
+      seedSubscriptions.forEach((unsubscribe) => unsubscribe());
+      createTestWorld();
+      setIsClient(true);
+    };
+    seedStores.forEach((persist) => {
+      if (persist?.onFinishHydration && !persist.hasHydrated?.()) {
+        seedSubscriptions.push(persist.onFinishHydration(seedWorldOnce));
+      }
+    });
+    seedWorldOnce();
 
     // Add test inventory items after persistence hydrates so test data is consistent
     const inventoryPersist = (
       useInventoryStore as unknown as {
-        persist?: {
-          hasHydrated?: () => boolean;
-          onFinishHydration?: (callback: () => void) => () => void;
-        };
+        persist?: HydrationApi;
       }
     ).persist;
     let unsubscribeHydration: (() => void) | undefined;
@@ -397,6 +420,7 @@ export default function GameSessionTestHarness() {
       // Clean up
       clearInterval(intervalId);
       unsubscribeHydration?.();
+      seedSubscriptions.forEach((unsubscribe) => unsubscribe());
     };
   }, [createTestWorld, addTestInventoryItems, logger]);
 
