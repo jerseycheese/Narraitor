@@ -54,7 +54,7 @@ export function GameSessionConfirmationDialog({
   const descriptionWithContext =
     type === 'start-new'
       ? `${config.description}${currentProgress > 0 ? ` (${currentProgress} story segments so far).` : ''}`
-      : `${config.description.replace(/\bcharacter\b/, characterName || 'character')}${
+      : `${config.description.replace('the selected character', characterName || 'the selected character')}${
           currentProgress > 0 ? ` (${currentProgress} story segments so far).` : ''
         }`;
 

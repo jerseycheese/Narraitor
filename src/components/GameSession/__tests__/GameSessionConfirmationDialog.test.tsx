@@ -46,7 +46,7 @@ describe('GameSessionConfirmationDialog (exit)', () => {
 });
 
 describe('GameSessionConfirmationDialog (character-switch)', () => {
-  it('replaces character placeholder with the character name without mutating "Switching characters"', () => {
+  it('replaces "the selected character" with the character name', () => {
     render(
       <GameSessionConfirmationDialog
         isOpen
@@ -59,12 +59,12 @@ describe('GameSessionConfirmationDialog (character-switch)', () => {
 
     expect(
       screen.getByText(
-        'Switching characters ends the current session and starts a new one with the selected Elena the Brave. Your existing progress is saved so you can return later.'
+        'Switching characters ends the current session and starts a new one with Elena the Brave. Your existing progress is saved so you can return later.'
       )
     ).toBeInTheDocument();
   });
 
-  it('falls back to "selected character" when characterName is not provided', () => {
+  it('keeps "the selected character" when characterName is not provided', () => {
     render(
       <GameSessionConfirmationDialog
         isOpen
