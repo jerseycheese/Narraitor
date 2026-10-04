@@ -284,7 +284,7 @@ describe('WorldListScreen', () => {
     // Check for the correct message
     expect(
       screen.getByText(
-        'Are you sure you want to delete the world "World 1"? This will permanently delete all characters and saved sessions in this world.'
+        'Removes all characters and saved sessions for this world. This action cannot be undone.'
       )
     ).toBeInTheDocument();
 

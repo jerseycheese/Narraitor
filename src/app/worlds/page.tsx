@@ -156,7 +156,7 @@ export default function WorldsPage() {
   return (
     <PageLayout
       title="My Worlds"
-      description="Create unique story worlds, then manage characters and play through interactive narratives."
+      description="Create story worlds, manage characters, and play through stories."
       actions={
         <ActionButtonGroup actions={actionButtons} layout="horizontal" gap="sm" />
       }

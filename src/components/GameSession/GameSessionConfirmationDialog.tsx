@@ -27,7 +27,7 @@ const copyConfig: Record<GameSessionConfirmationDialogProps['type'], {
   'character-switch': {
     title: 'Switch Characters?',
     description:
-      'Switching characters ends the current session and starts a new one with the selected hero. Your existing progress is saved so you can return later.',
+      'Switching characters ends the current session and starts a new one with the selected character. Your existing progress is saved so you can return later.',
     confirmText: 'Switch Characters',
     cancelText: 'Stay with Current Character',
   },
@@ -54,7 +54,7 @@ export function GameSessionConfirmationDialog({
   const descriptionWithContext =
     type === 'start-new'
       ? `${config.description}${currentProgress > 0 ? ` (${currentProgress} story segments so far).` : ''}`
-      : `${config.description.replace('hero', characterName || 'selected hero')}${
+      : `${config.description.replace(/\bcharacter\b/, characterName || 'character')}${
           currentProgress > 0 ? ` (${currentProgress} story segments so far).` : ''
         }`;
 

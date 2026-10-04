@@ -44,3 +44,40 @@ describe('GameSessionConfirmationDialog (exit)', () => {
     expect(onConfirm).not.toHaveBeenCalled();
   });
 });
+
+describe('GameSessionConfirmationDialog (character-switch)', () => {
+  it('replaces character placeholder with the character name without mutating "Switching characters"', () => {
+    render(
+      <GameSessionConfirmationDialog
+        isOpen
+        onClose={jest.fn()}
+        onConfirm={jest.fn()}
+        type="character-switch"
+        characterName="Elena the Brave"
+      />
+    );
+
+    expect(
+      screen.getByText(
+        'Switching characters ends the current session and starts a new one with the selected Elena the Brave. Your existing progress is saved so you can return later.'
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('falls back to "selected character" when characterName is not provided', () => {
+    render(
+      <GameSessionConfirmationDialog
+        isOpen
+        onClose={jest.fn()}
+        onConfirm={jest.fn()}
+        type="character-switch"
+      />
+    );
+
+    expect(
+      screen.getByText(
+        'Switching characters ends the current session and starts a new one with the selected character. Your existing progress is saved so you can return later.'
+      )
+    ).toBeInTheDocument();
+  });
+});

@@ -21,7 +21,7 @@ const WORLD_TYPE_OPTIONS: WorldTypeOption[] = [
     id: 'original',
     label: 'Original World',
     description:
-      'Generate a completely original world with unique settings and themes',
+      'Generate an original world with its own settings and themes',
     requiresReference: false,
   },
   {

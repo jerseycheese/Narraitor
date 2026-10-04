@@ -111,7 +111,7 @@ const WorldTypeExampleComponent = (args: React.ComponentProps<typeof RadioGroup>
           <div>
             <div>Original World</div>
             <div>
-              Generate a completely original world with unique settings and themes
+              Generate an original world with its own settings and themes
             </div>
           </div>
         </label>
