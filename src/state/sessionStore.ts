@@ -686,9 +686,6 @@ export const useSessionStore = create<SessionStore>()(
   migrate: (persistedState: unknown, version?: number) => {
     try {
       const nextState = persistedState as Partial<SessionStore>;
-      if (nextState.autoSave && 'enabled' in nextState.autoSave) {
-        delete (nextState.autoSave as { enabled?: boolean }).enabled;
-      }
 
       // Migration from v2 to v3: Add tutorialProgress
       // CLEAN BREAK: No backward compatibility - all users get fresh tutorial state
