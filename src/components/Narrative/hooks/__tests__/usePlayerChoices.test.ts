@@ -2,7 +2,10 @@ import { renderHook, act } from '@testing-library/react';
 import { usePlayerChoices } from '../usePlayerChoices';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { createMockNarrativeStore, mockZustandStore } from '@/lib/test-utils';
-import type { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
+import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
+import { useWorldStore } from '@/state/worldStore';
+import { createMockWorld } from '@/lib/test-utils/testDataFactory';
+import { assembleSessionSnapshot } from '@/lib/narrative/sessionSnapshotAssembler';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 
 jest.mock('@/state/narrativeStore', () => ({ useNarrativeStore: jest.fn() }));
@@ -162,6 +165,54 @@ describe('usePlayerChoices', () => {
       { signal: expect.any(AbortSignal) }
     );
     expect(onChoicesGenerated).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends the completed action and scene move from the settled snapshot to the choices provider', async () => {
+    const sceneChange = 'The scout is free of the cabinet and follows you into the dining hall.';
+    const latestContent = [
+      'You stand beside the locked cabinet in the storage shed.',
+      'Rain rattles the roof while the hinges creak. '.repeat(12),
+      sceneChange,
+      'The lamps flicker while thunder rolls outside. '.repeat(12),
+      'You pause and consider your next action.',
+    ].join('\n\n');
+    setupStore({
+      getSessionSegments: jest.fn(() => [baseSegment, {
+        ...baseSegment,
+        id: 'seg-2',
+        content: latestContent,
+        metadata: { tags: [], location: 'Dining hall' },
+      }]),
+    });
+    useWorldStore.getState().worlds.w1 = createMockWorld({ id: 'w1' });
+    const snapshot = assembleSessionSnapshot('s1', { worldId: 'w1', characterId: 'c1' });
+    const sendChoices = jest.fn().mockResolvedValue({
+      content: 'Decision: What next?\nOptions:\n1. Inspect the window\n2. Speak to the scout\n3. Barricade the door',
+      finishReason: 'STOP',
+    });
+    const generator = new NarrativeGenerator({
+      generateContent: jest.fn(),
+      generateChoices: sendChoices,
+    });
+    const { result } = renderHook(() => usePlayerChoices({
+      sessionId: 's1',
+      worldId: 'w1',
+      characterId: 'c1',
+      narrativeGenerator: generator,
+      warnMissingSessionId: jest.fn(),
+      mountedRef: { current: true },
+      onError: jest.fn(),
+    }));
+
+    await act(async () => {
+      await result.current.generatePlayerChoices(snapshot);
+    });
+
+    expect(sendChoices).toHaveBeenCalledTimes(1);
+    const outgoingPrompt = sendChoices.mock.calls[0][0];
+    expect(outgoingPrompt).toContain('LOCATION: Dining hall');
+    expect(outgoingPrompt).toContain(sceneChange);
+    expect(outgoingPrompt).toContain(latestContent);
   });
 
   it('guards against overlapping generation (second call is a no-op)', async () => {

@@ -79,19 +79,6 @@ export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): str
   
   // Extract current location for context
   const location = narrativeContext?.currentLocation || '';
-  
-  // Include more of the narrative for context
-  // but still managing token usage intelligently
-  let shortContext = '';
-  if (recentContent.length <= 1000) {
-    // If content is reasonably short, use it all
-    shortContext = recentContent;
-  } else {
-    // For longer content, use first 400 chars + last 400 chars + middle indicator
-    const firstPart = recentContent.slice(0, 400);
-    const lastPart = recentContent.slice(-400);
-    shortContext = `${firstPart}\n\n[...narrative continues...]\n\n${lastPart}`;
-  }
 
   let skillsInfo = '';
   if (worldSkills && worldSkills.length > 0) {
@@ -156,7 +143,7 @@ LOCATION: ${location || 'Unknown location'}
 SITUATION: ${narrativeContext?.currentSituation || 'General scenario'}
 
 FULL CONTEXT:
-${shortContext}${skillsInfo}${protagonistInfo}${npcInfo}${settledInfo}
+${recentContent}${skillsInfo}${protagonistInfo}${npcInfo}${settledInfo}
 
 === CRITICAL INSTRUCTIONS ===
 You MUST create choices that directly respond to the specific situation described above. Do NOT create generic choices. Reference the specific characters, objects, and events mentioned in the context.
