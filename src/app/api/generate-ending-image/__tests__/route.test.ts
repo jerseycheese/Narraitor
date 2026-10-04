@@ -52,11 +52,18 @@ const mockWorld: World = {
   settings: { maxAttributes: 10, maxSkills: 20, attributePointPool: 25, skillPointPool: 30 },
 };
 
-const makeRequest = (body: unknown) =>
+const makeRequest = (body: unknown, withoutKey = false) =>
   new NextRequest('http://localhost:3000/api/generate-ending-image', {
     method: 'POST',
+    headers: withoutKey ? {} : {
+      'x-provider-api-key': 'player-gemini-key',
+      'x-provider-type': 'gemini',
+      'x-provider-model': 'gemini-2.5-flash',
+    },
     body: typeof body === 'string' ? body : JSON.stringify(body),
   });
+
+const originalGeminiKey = process.env.GEMINI_API_KEY;
 
 describe('/api/generate-ending-image', () => {
   beforeEach(() => {
@@ -67,7 +74,11 @@ describe('/api/generate-ending-image', () => {
   });
 
   afterEach(() => {
-    delete process.env.GEMINI_API_KEY;
+    if (originalGeminiKey === undefined) {
+      delete process.env.GEMINI_API_KEY;
+    } else {
+      process.env.GEMINI_API_KEY = originalGeminiKey;
+    }
   });
 
   it('returns 400 when no ending is provided', async () => {
@@ -98,10 +109,8 @@ describe('/api/generate-ending-image', () => {
     expect(data.imageGenerationPrompt).toBe('A sunrise over rebuilt rooftops.');
   });
 
-  it('falls back to a placeholder when the API key is missing', async () => {
-    delete process.env.GEMINI_API_KEY;
-
-    const response = await POST(makeRequest({ ending: mockEnding, world: mockWorld }));
+  it('falls back to a placeholder when the player key is missing even with a server key', async () => {
+    const response = await POST(makeRequest({ ending: mockEnding, world: mockWorld }, true));
     const data = await response.json();
 
     expect(response.status).toBe(200);

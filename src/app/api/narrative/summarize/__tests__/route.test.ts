@@ -51,6 +51,21 @@ describe('/api/narrative/summarize', () => {
     expect(mockCreateClient).not.toHaveBeenCalled();
   });
 
+  it('returns 400 when provider configuration is invalid', async () => {
+    const response = await POST(
+      buildAIRequest('/api/narrative/summarize', VALID_BODY, {
+        headers: {
+          'x-provider-type': 'unsupported-type',
+        },
+      })
+    );
+    expect(response.status).toBe(400);
+    const data = await response.json();
+    expect(data.title).toBe('Check Your Input');
+    expect(data.error).toBe("Some of what you entered doesn't look right.");
+    expect(mockCreateClient).not.toHaveBeenCalled();
+  });
+
   it('rejects a request with no content before calling the model', async () => {
     respondWith('{}');
 

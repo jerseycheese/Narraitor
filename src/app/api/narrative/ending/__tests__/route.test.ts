@@ -52,6 +52,21 @@ describe('/api/narrative/ending', () => {
     expect(mockGenerateEnding).not.toHaveBeenCalled();
   });
 
+  it('returns 400 when provider configuration is invalid', async () => {
+    const response = await POST(
+      buildAIRequest('/api/narrative/ending', VALID_BODY, {
+        headers: {
+          'x-provider-type': 'unsupported-type',
+        },
+      })
+    );
+    expect(response.status).toBe(400);
+    const data = await response.json();
+    expect(data.title).toBe('Check Your Input');
+    expect(data.error).toBe("Some of what you entered doesn't look right.");
+    expect(mockGenerateEnding).not.toHaveBeenCalled();
+  });
+
   it('rejects a body missing required ids without generating', async () => {
     const response = await POST(endingRequest({ endingType: 'story-complete' }));
     const data = await response.json();

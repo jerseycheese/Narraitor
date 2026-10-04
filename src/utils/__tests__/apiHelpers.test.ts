@@ -1,5 +1,11 @@
 const originalGeminiKey = process.env.GEMINI_API_KEY;
-afterEach(() => { process.env.GEMINI_API_KEY = originalGeminiKey; });
+afterEach(() => {
+  if (originalGeminiKey === undefined) {
+    delete process.env.GEMINI_API_KEY;
+  } else {
+    process.env.GEMINI_API_KEY = originalGeminiKey;
+  }
+});
 
 const mockJson = jest.fn((body: unknown, init?: { status?: number; headers?: Record<string, string> }) => {
   const headers = new Headers(init?.headers);

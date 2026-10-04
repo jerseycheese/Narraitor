@@ -11,7 +11,13 @@ import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerato
 const mockGenerateStoryCheckpointSummary = generateStoryCheckpointSummary as jest.MockedFunction<typeof generateStoryCheckpointSummary>;
 
 const originalGeminiKey = process.env.GEMINI_API_KEY;
-afterEach(() => { process.env.GEMINI_API_KEY = originalGeminiKey; });
+afterEach(() => {
+  if (originalGeminiKey === undefined) {
+    delete process.env.GEMINI_API_KEY;
+  } else {
+    process.env.GEMINI_API_KEY = originalGeminiKey;
+  }
+});
 
 describe('/api/narrative/story-checkpoint', () => {
   beforeEach(() => {
@@ -101,6 +107,24 @@ describe('/api/narrative/story-checkpoint', () => {
       suggestion: 'Add your API key in Settings > Provider Setup to play.',
       retryable: false,
     });
+    expect(mockGenerateStoryCheckpointSummary).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when provider endpoint is invalid', async () => {
+    const response = await POST(buildRequest({
+      worldId: 'world-1',
+      sessionId: 'session-1',
+      events: [{ id: 'event-1', description: 'Saved the village', timestamp: '2025-11-20T18:00:00Z' }],
+    }, {
+      'x-provider-api-key': 'openrouter-key',
+      'x-provider-type': 'openai-compatible',
+      'x-provider-endpoint': 'http://insecure-endpoint.local',
+      'x-provider-model': '~deepseek/deepseek-flash-latest',
+    }));
+    expect(response.status).toBe(400);
+    const data = await response.json();
+    expect(data.title).toBe('Check Your Input');
+    expect(data.error).toBe("Some of what you entered doesn't look right.");
     expect(mockGenerateStoryCheckpointSummary).not.toHaveBeenCalled();
   });
 

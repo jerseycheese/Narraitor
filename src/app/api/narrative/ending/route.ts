@@ -1,12 +1,12 @@
 // src/app/api/narrative/ending/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
+import { resolveProvider } from '@/lib/ai/resolveApiKey';
 import { generateEnding } from '@/lib/ai/endingGenerator';
 import { logger } from '@/lib/utils/logger';
 import type { EndingGenerationRequest, EndingType, EndingTone } from '@/types/narrative.types';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
-import { withAIRoute } from '@/utils/apiHelpers';
+import { createProviderResolutionErrorResponse, withAIRoute } from '@/utils/apiHelpers';
 import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 
 export const POST = withAIRoute(async (request: NextRequest) => {
@@ -66,10 +66,11 @@ export const POST = withAIRoute(async (request: NextRequest) => {
       hasCustomPrompt: !!body.customPrompt 
     });
 
-    const provider = resolveProviderCredential(request);
-    if (!provider) {
-      return createAPIErrorResponse(new Error('API key not configured'), 412);
+    const resolution = resolveProvider(request);
+    if (!resolution.ok) {
+      return createProviderResolutionErrorResponse(resolution.reason);
     }
+    const provider = resolution.descriptor;
 
     const result = await generateEnding(endingRequest, provider);
 

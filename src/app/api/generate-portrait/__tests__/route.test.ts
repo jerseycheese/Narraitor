@@ -26,11 +26,18 @@ const mockBuildPortraitPrompt = buildPortraitPrompt as jest.MockedFunction<typeo
 
 // The direct-prompt input format skips the AI-assisted prompt builder, which
 // keeps these tests on the generate-and-fall-back path they're about.
-const makeRequest = (body: unknown) =>
+const makeRequest = (body: unknown, withoutKey = false) =>
   new NextRequest('http://localhost:3000/api/generate-portrait', {
     method: 'POST',
+    headers: withoutKey ? {} : {
+      'x-provider-api-key': 'player-gemini-key',
+      'x-provider-type': 'gemini',
+      'x-provider-model': 'gemini-2.5-flash',
+    },
     body: typeof body === 'string' ? body : JSON.stringify(body),
   });
+
+const originalGeminiKey = process.env.GEMINI_API_KEY;
 
 describe('/api/generate-portrait', () => {
   beforeEach(() => {
@@ -39,7 +46,11 @@ describe('/api/generate-portrait', () => {
   });
 
   afterEach(() => {
-    delete process.env.GEMINI_API_KEY;
+    if (originalGeminiKey === undefined) {
+      delete process.env.GEMINI_API_KEY;
+    } else {
+      process.env.GEMINI_API_KEY = originalGeminiKey;
+    }
   });
 
   it('returns 400 when neither a prompt nor a character is provided', async () => {
@@ -66,10 +77,8 @@ describe('/api/generate-portrait', () => {
     expect(data.portrait.prompt).toBe('a weathered knight');
   });
 
-  it('falls back to a dicebear avatar when the API key is missing', async () => {
-    delete process.env.GEMINI_API_KEY;
-
-    const response = await POST(makeRequest({ prompt: 'a weathered knight' }));
+  it('falls back to a dicebear avatar when the player key is missing even with a server key', async () => {
+    const response = await POST(makeRequest({ prompt: 'a weathered knight' }, true));
     const data = await response.json();
 
     expect(response.status).toBe(200);
