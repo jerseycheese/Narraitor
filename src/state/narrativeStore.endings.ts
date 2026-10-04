@@ -108,7 +108,14 @@ export const createNarrativeEndingActions = (
       const allJournalEntries = journalState.entries
         ? Object.values(journalState.entries).filter(entry => entry.sessionId === params.sessionId)
         : [];
-      journalEntries = allJournalEntries.slice(-5); // Last 5 journal entries only
+      journalEntries = allJournalEntries.slice(-5).map(entry => {
+        if (!entry.metadata?.image) return entry;
+        const { image: _image, ...restMetadata } = entry.metadata;
+        return {
+          ...entry,
+          metadata: restMetadata,
+        };
+      });
 
       const currentTurn = countWorldClockTurns(allSegments);
       const worldClock = isFeatureEnabled('WORLD_CLOCK')
