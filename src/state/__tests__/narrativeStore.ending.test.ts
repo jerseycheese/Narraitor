@@ -11,6 +11,7 @@ import type {
 import type { JournalEntry } from '../../types/journal.types';
 import type { StoreCharacter } from '../characterStore.types';
 import { getTimestamp } from '@/lib/utils/timestamp';
+import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 
 jest.mock('@/lib/featureFlags', () => ({
   isFeatureEnabled: jest.fn(() => true),
@@ -146,6 +147,71 @@ describe('narrativeStore - Ending functionality', () => {
   });
 
   describe('generateEnding', () => {
+    it('omits large world, character, and journal art without mutating the source objects', async () => {
+      mockSuccessfulEndingGeneration(createMockGenerationResult());
+      const imageData = `data:image/png;base64,${'A'.repeat(1_500_000)}`;
+      const world = createMockWorld({
+        name: 'Fantasy World',
+        image: { url: imageData, type: 'ai-generated' },
+      });
+      const character = createMockCharacter({
+        portrait: { url: imageData, type: 'ai-generated' },
+      });
+      const journalEntry = createMockJournalEntry({
+        id: 'journal-1',
+        title: 'Defeated the Beast',
+        content: 'Mara stood victorious over the fallen beast.',
+        type: 'discovery',
+        significance: 'major',
+        metadata: {
+          tags: ['victory'],
+          automaticEntry: true,
+          image: {
+            url: imageData,
+            type: 'ai-generated',
+          },
+        },
+      });
+      useJournalStore.setState({
+        entries: {
+          [journalEntry.id]: journalEntry,
+        },
+      });
+
+      await useNarrativeStore.getState().generateEnding('player-choice', {
+        ...defaultEndingContext,
+        worldId: world.id,
+        world,
+        character,
+      });
+
+      const [, requestInit] = (global.fetch as jest.Mock).mock.calls[0];
+      const body = JSON.parse(requestInit.body);
+      expect(body).toMatchObject({
+        sessionId: 'session-123',
+        characterId: 'char-456',
+        worldId: world.id,
+        endingType: 'player-choice',
+        world: { name: 'Fantasy World', description: world.description },
+        character: { name: 'Mara Voss', description: 'A test character' },
+        narrativeSegments: [],
+        journalEntries: [
+          expect.objectContaining({
+            id: 'journal-1',
+            title: 'Defeated the Beast',
+            content: 'Mara stood victorious over the fallen beast.',
+          }),
+        ],
+      });
+      expect('image' in body.world).toBe(false);
+      expect('portrait' in body.character).toBe(false);
+      expect(body.journalEntries[0].metadata?.image).toBeUndefined();
+      expect(JSON.stringify(body)).not.toContain(imageData);
+      expect(world.image?.url).toBe(imageData);
+      expect(character.portrait?.url).toBe(imageData);
+      expect(useJournalStore.getState().entries[journalEntry.id].metadata?.image?.url).toBe(imageData);
+    });
+
     it('should generate and store a story ending', async () => {
       const mockGenerationResult = createMockGenerationResult();
       mockSuccessfulEndingGeneration(mockGenerationResult);

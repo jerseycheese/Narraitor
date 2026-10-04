@@ -12,6 +12,7 @@ import { useSessionStore } from './sessionStore';
 import { useJournalStore } from './journalStore';
 import { useWorldThreadStore } from './worldThreadStore';
 import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
+import { withoutWorldImage } from '@/lib/api/worldPayload';
 import type { NarrativeStoreSet, NarrativeStoreGet } from './narrativeStore.types';
 
 const FALLBACK_ENDING_TONE: EndingTone = 'hopeful';
@@ -107,7 +108,14 @@ export const createNarrativeEndingActions = (
       const allJournalEntries = journalState.entries
         ? Object.values(journalState.entries).filter(entry => entry.sessionId === params.sessionId)
         : [];
-      journalEntries = allJournalEntries.slice(-5); // Last 5 journal entries only
+      journalEntries = allJournalEntries.slice(-5).map(entry => {
+        if (!entry.metadata?.image) return entry;
+        const { image: _image, ...restMetadata } = entry.metadata;
+        return {
+          ...entry,
+          metadata: restMetadata,
+        };
+      });
 
       const currentTurn = countWorldClockTurns(allSegments);
       const worldClock = isFeatureEnabled('WORLD_CLOCK')
@@ -116,6 +124,11 @@ export const createNarrativeEndingActions = (
             currentTurn
           )
         : undefined;
+      const character = params.character
+        ? (({ portrait: _portrait, ...characterWithoutPortrait }) => characterWithoutPortrait)(
+            params.character
+          )
+        : params.character;
 
       // Route through server API to keep AI usage server-side and enable test mocking
       const response = await aiFetch('/api/narrative/ending', {
@@ -128,8 +141,8 @@ export const createNarrativeEndingActions = (
           endingType,
           desiredTone: params.desiredTone,
           customPrompt: params.customPrompt,
-          world: params.world, // Pass the world data from client
-          character: params.character, // Pass the character data from client
+          world: withoutWorldImage(params.world),
+          character,
           narrativeSegments, // Pass narrative segments from client
           journalEntries, // Pass journal entries from client
           worldClock,
