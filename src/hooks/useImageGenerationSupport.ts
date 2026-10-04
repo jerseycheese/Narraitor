@@ -16,23 +16,16 @@ import { supportsImages } from '@/lib/ai/providers/capabilities';
  * which provider is active, and `supportsImages` is a pure function of its type.
  * Threading a reason back through five image routes would buy nothing here.
  *
- * Text and image generation both require a player-configured provider; without
- * one, or when the active provider is not Gemini, image generation is unavailable.
+ * With no provider configured, generation runs on the server's own Gemini key,
+ * so images are supported and there is nothing to explain.
  */
 export function useImageGenerationSupport(): { supported: boolean; reason: string | null } {
   const activeProviderId = useProviderStore((state) => state.activeProviderId);
   const providers = useProviderStore((state) => state.providers);
 
   const activeType = activeProviderId ? providers[activeProviderId]?.type : undefined;
-  if (activeType && supportsImages(activeType)) {
+  if (!activeType || supportsImages(activeType)) {
     return { supported: true, reason: null };
-  }
-
-  if (!activeType) {
-    return {
-      supported: false,
-      reason: 'No AI provider configured. Add a Gemini provider to generate images.',
-    };
   }
 
   return {

@@ -7,7 +7,6 @@ import { logger } from '@/lib/utils/logger';
 import type { EndingGenerationRequest, EndingType, EndingTone } from '@/types/narrative.types';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
 import { createProviderResolutionErrorResponse, withAIRoute } from '@/utils/apiHelpers';
-import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 
 export const POST = withAIRoute(async (request: NextRequest) => {
   try {

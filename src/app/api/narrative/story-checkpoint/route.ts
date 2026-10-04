@@ -6,7 +6,6 @@ import { ToneSettings } from '@/types/tone-settings.types';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
 import { safeTrim } from '@/lib/utils';
 import { createProviderResolutionErrorResponse, withAIRoute } from '@/utils/apiHelpers';
-import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';

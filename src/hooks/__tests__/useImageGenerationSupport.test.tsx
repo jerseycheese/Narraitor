@@ -34,10 +34,10 @@ beforeEach(() => {
 });
 
 describe('useImageGenerationSupport', () => {
-  test('explains that a provider is needed when nothing is configured', () => {
+  test('says images are supported when nothing is configured, since the server key is Gemini', () => {
     render(<Probe />);
 
-    expect(screen.getByText(/no ai provider configured/i)).toBeInTheDocument();
+    expect(screen.getByText('supported')).toBeInTheDocument();
   });
 
   test('says images are supported on Gemini', async () => {

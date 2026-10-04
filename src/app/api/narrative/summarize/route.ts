@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { resolveProvider } from '@/lib/ai/resolveApiKey';
 import { createProviderResolutionErrorResponse, withAIRoute } from '@/utils/apiHelpers';
-import { createAPIErrorResponse } from '@/lib/utils/createAPIErrorResponse';
 
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
