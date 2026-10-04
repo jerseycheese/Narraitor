@@ -4,6 +4,35 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.13.0 - 2026-10-04
+
+v1.13 makes DeepSeek flash through OpenRouter the recommended text model and removes the silent server-key fallback. It fixes ending and world image requests that carried megabytes of artwork, resolves fresh session hangs after an ending, keeps passages over 1,000 characters from losing their middle so mid-passage scene changes reach the choices, fixes provider hydration state persistence, adds hydration guards to the development harness, and makes provider setup clearer about the separate Save step. Narrative-cohesion work stays paused.
+
+**What's in this release**
+
+- Ending requests omit world images, character portraits, and journal illustrations without changing the saved artwork ([#2272](https://github.com/jerseycheese/Narraitor/pull/2272), for [#2253](https://github.com/jerseycheese/Narraitor/issues/2253)).
+- Missing player credentials no longer substitute the server's Gemini key. Ending, summary, and checkpoint requests return provider-setup guidance. Checkpoints record the actual selected model, and narrative telemetry reports an unknown model honestly. OpenRouter leads the preset list with DeepSeek flash recommended ([#2271](https://github.com/jerseycheese/Narraitor/pull/2271), for [#2258](https://github.com/jerseycheese/Narraitor/issues/2258)).
+- A successful connection test tells players to save the provider. Cancel, in-app links, and browser unload warn before discarding an entered key, and saving clears that warning ([#2270](https://github.com/jerseycheese/Narraitor/pull/2270), for [#2256](https://github.com/jerseycheese/Narraitor/issues/2256)).
+- Provider list hydration is decoupled from store persistence to prevent failed reads from overwriting saved credentials, with hydration status surfaced via a dedicated client hook ([#2273](https://github.com/jerseycheese/Narraitor/pull/2273), for [#2255](https://github.com/jerseycheese/Narraitor/issues/2255)).
+- The development game-session harness waits for world and character store hydration before seeding test data ([#2283](https://github.com/jerseycheese/Narraitor/pull/2283), for [#2214](https://github.com/jerseycheese/Narraitor/issues/2214)).
+- On viewports narrower than 640px, the HUD toolbar wraps cleanly below the character pill instead of overlapping it ([#2282](https://github.com/jerseycheese/Narraitor/pull/2282), for [#2215](https://github.com/jerseycheese/Narraitor/issues/2215)).
+- Passages over 1,000 characters no longer lose their middle in choice prompt templates, so a scene change mid-passage reaches the choices ([#2287](https://github.com/jerseycheese/Narraitor/pull/2287), for [#2266](https://github.com/jerseycheese/Narraitor/issues/2266)).
+- World image regeneration requests omit the current world image from the payload to avoid payload-size limits ([#2285](https://github.com/jerseycheese/Narraitor/pull/2285), for [#2279](https://github.com/jerseycheese/Narraitor/issues/2279)).
+- Starting a new story with an ended character retires the old save and begins with an empty inventory, starting a fresh session without hanging on the loading screen ([#2288](https://github.com/jerseycheese/Narraitor/pull/2288), for [#2254](https://github.com/jerseycheese/Narraitor/issues/2254)).
+- The client AI proxy and per-attempt timeouts use provider-neutral names (`ClientAIClient` and `AI_ATTEMPT_TIMEOUT_MS`) across the request budget and client wrappers ([#2289](https://github.com/jerseycheese/Narraitor/pull/2289), for [#2258](https://github.com/jerseycheese/Narraitor/issues/2258)).
+
+**Known incomplete**
+
+- Provider setup's discard guard does not intercept browser history navigation (back/forward buttons) ([#2256](https://github.com/jerseycheese/Narraitor/issues/2256)).
+- Provider-neutral leftovers from [#2258](https://github.com/jerseycheese/Narraitor/issues/2258) (content-filter parity and model-id validation) are tracked in [#2291](https://github.com/jerseycheese/Narraitor/issues/2291).
+- Image generation remains Gemini-only. Scene state and the thread-ledger ending gate remain switched off.
+
+**What's next**
+
+- v1.14: 10-turn chapters that hand off through a recap ([#2265](https://github.com/jerseycheese/Narraitor/issues/2265)).
+
+---
+
 ## v1.12.0 - 2026-10-03
 
 v1.12 made non-Gemini providers work properly, then answered the question v1.11 left open. With those fixes in, DeepSeek flash via OpenRouter beat the old control in every ten-turn block across six runs. That closes the narrative-cohesion arc for now: the model was one lever, and the next one is product shape, which is tracked for v1.14. The release covers 4 commits since [v1.11.0](https://github.com/jerseycheese/Narraitor/releases/tag/v1.11.0).

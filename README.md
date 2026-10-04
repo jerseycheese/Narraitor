@@ -31,7 +31,7 @@ Two things it commits to:
 
 ## Before you play
 
-You supply your own model key. The simplest is a free [Google Gemini](https://aistudio.google.com/apikey) key, added once under Settings, then Providers. OpenAI, OpenRouter, and a server you run yourself also work.
+You supply your own model key. DeepSeek flash through [OpenRouter](https://openrouter.ai/keys) is the recommended text model. Add your key under Settings, then Providers, and select `~deepseek/deepseek-flash-latest`. Google Gemini, OpenAI, and a server you run yourself also work. Generated images require a Gemini provider.
 
 Everything is stored locally, so clearing your browser's site data really does delete your worlds and characters. Use the export in Settings if you want a backup.
 
@@ -50,7 +50,7 @@ npm install
 npm run dev
 ```
 
-The app comes up on `localhost:3000`. If you would rather not re-enter a key each time, copy `.env.example` to `.env.local` and set `GEMINI_API_KEY`. That is a local convenience only, and a player's own key always takes precedence.
+The app comes up on `localhost:3000`. Save your provider key once under Settings, then Providers. Player requests require that key; a server environment key no longer substitutes for missing setup.
 
 Running from a git worktree? `npm run dev` picks a stable per-worktree port so several checkouts can run at once. The URL is printed on start.
 
@@ -93,11 +93,11 @@ src/
 
 ## How it works
 
-**Generation.** Story text comes from Google Gemini through the app's own API routes (`/api/narrative/generate`, `/api/narrative/choices`, and others). Each prompt carries the world's rules, the character sheet, and recent story history so the writing stays consistent with the setting. The browser never calls the provider directly.
+**Generation.** Story text comes from the player's active provider through the app's own API routes (`/api/narrative/generate`, `/api/narrative/choices`, and others). Each prompt carries the world's rules, the character sheet, and recent story history so the writing stays consistent with the setting. The browser never calls the provider directly.
 
 **State and saves.** Each feature area has its own small [Zustand](https://github.com/pmndrs/zustand) store, saved to the browser's IndexedDB. Sessions survive a reload. If IndexedDB is unavailable the app keeps running in memory and tells you it will not persist.
 
-**Your key.** A player's key is encrypted in the browser. On each request it travels in a header, gets used once server-side for that call, and is never logged or stored. The `GEMINI_API_KEY` environment variable is a separate local-only fallback and stays on the server.
+**Your key.** A player's key is encrypted in the browser. On each request it travels in a header, gets used once server-side for that call, and is never logged or stored. Server environment keys stay on the server and never substitute for a missing player key.
 
 **Request limits.** All seventeen generation routes go through one wrapper (`withAIRoute`) that caps requests per IP (50 an hour in production, looser locally), rejects bodies over 64KB, holds output to a fixed ceiling, and strips provider error text before it reaches the client.
 
@@ -109,13 +109,13 @@ src/
 
 ## Roadmap
 
-Version 1.0 shipped in August 2026: a single-player release you run in your browser with your own key, no account needed. The releases since have been refinements rather than big new features, and each one is written up in [RELEASES.md](RELEASES.md). The current version is 1.12.
+Version 1.0 shipped in August 2026: a single-player release you run in your browser with your own key, no account needed. The releases since have been refinements rather than big new features, and each one is written up in [RELEASES.md](RELEASES.md). The current version is 1.13.
 
 Recent work: a visual redesign, generated images for worlds and journal entries and endings, better keyboard support, work on keeping longer stories consistent from turn to turn, and the option to generate with OpenAI or OpenRouter instead of Gemini (or your own server, if you run one).
 
 Version [1.8](https://github.com/jerseycheese/Narraitor/milestone/9) set shared visual rules for buttons, type and borders. Version [1.9](https://github.com/jerseycheese/Narraitor/milestone/10) applied them page by page: wizards, lists, detail and edit pages, the dashboard, journal and ending screen, settings, and the public pages.
 
-Version [1.10](https://github.com/jerseycheese/Narraitor/milestone/11) fixed the play-loop bugs a September playtest round turned up. Version [1.11](https://github.com/jerseycheese/Narraitor/milestone/12) built the game its own record of who's in the scene and what has already happened, but that didn't make long stories hold together, so it ships switched off. Version [1.12](https://github.com/jerseycheese/Narraitor/milestone/13) tried a different lever: making cheaper open-weight models work properly through OpenRouter. With those fixes, DeepSeek flash beat the old baseline in every block. Next is [1.13](https://github.com/jerseycheese/Narraitor/milestone/14), provider polish, then [1.14](https://github.com/jerseycheese/Narraitor/milestone/15), short chapters that hand off to each other.
+Version [1.10](https://github.com/jerseycheese/Narraitor/milestone/11) fixed the play-loop bugs a September playtest round turned up. Version [1.11](https://github.com/jerseycheese/Narraitor/milestone/12) built the game its own record of who's in the scene and what has already happened, but that didn't make long stories hold together, so it ships switched off. Version [1.12](https://github.com/jerseycheese/Narraitor/milestone/13) tried a different lever: making cheaper open-weight models work properly through OpenRouter. With those fixes, DeepSeek flash beat the old baseline in every block. Version [1.13](https://github.com/jerseycheese/Narraitor/milestone/14) recommends DeepSeek flash, removes the silent server-key fallback, keeps passages over 1,000 characters from losing their middle so mid-passage scene changes reach the choices, fixes fresh sessions after an ending, cuts oversized artwork payloads, and clarifies provider setup. Next is [1.14](https://github.com/jerseycheese/Narraitor/milestone/15), short chapters that hand off to each other.
 
 There are no plans for accounts or cloud saves: Narraitor stays on your device unless a clear reason to change that turns up, and [the reasoning is written down](public_docs/architecture/ADR-014-browser-local-until-named-trigger.md). Further out, the ideas worth exploring are shared worlds, voice narration, and mobile apps.
 
