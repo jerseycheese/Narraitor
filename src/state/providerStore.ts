@@ -1,5 +1,4 @@
-// src/state/providerStore.ts
-
+import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { generateUniqueId, getTimestamp } from '@/lib/utils';
@@ -40,8 +39,6 @@ export interface ProviderStore {
   validationStatus: Record<string, ProviderValidationRecord>;
   error: string | null;
   loading: boolean;
-  _hasHydrated: boolean;
-  setHasHydrated: (hasHydrated: boolean) => void;
 
   addProvider: (input: AddProviderInput) => Promise<string>;
   updateProvider: (
@@ -85,12 +82,43 @@ const INITIAL_STATE = {
   loading: false,
 };
 
+let hasHydrated = false;
+const hydrationListeners = new Set<() => void>();
+
+function notifyHydrationChange(hydrated: boolean) {
+  hasHydrated = hydrated;
+  hydrationListeners.forEach((listener) => listener());
+}
+
+/**
+ * Hook to track whether provider store persistence has loaded from storage.
+ * Does not update persisted state or trigger storage writes.
+ */
+export function useProviderHydration(): boolean {
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      hydrationListeners.add(onStoreChange);
+      return () => {
+        hydrationListeners.delete(onStoreChange);
+      };
+    },
+    () => hasHydrated || (typeof useProviderStore?.persist?.hasHydrated === 'function' && useProviderStore.persist.hasHydrated()),
+    () => false
+  );
+}
+
+export function isProviderStoreHydrated(): boolean {
+  return hasHydrated || (typeof useProviderStore?.persist?.hasHydrated === 'function' && useProviderStore.persist.hasHydrated());
+}
+
+export function setProviderHydratedForTesting(hydrated: boolean): void {
+  notifyHydrationChange(hydrated);
+}
+
 export const useProviderStore = create<ProviderStore>()(
   persist(
     (set, get) => ({
       ...INITIAL_STATE,
-      _hasHydrated: false,
-      setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
 
       addProvider: async (input) => {
         const id = generateUniqueId('provider');
@@ -239,8 +267,11 @@ export const useProviderStore = create<ProviderStore>()(
       name: STORE_NAME,
       storage: createProviderStorage(),
       version: 1,
-      onRehydrateStorage: (state) => () => {
-        state.setHasHydrated(true);
+      onRehydrateStorage: () => {
+        notifyHydrationChange(false);
+        return () => {
+          notifyHydrationChange(true);
+        };
       },
       partialize: (state) => ({
         providers: state.providers,

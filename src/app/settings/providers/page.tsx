@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ProviderCard } from '@/components/ai/ProviderCard';
 import { ProviderWizard } from '@/components/ai/ProviderWizard';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog/DeleteConfirmationDialog';
-import { useProviderStore } from '@/state/providerStore';
+import { useProviderStore, useProviderHydration } from '@/state/providerStore';
 import { presetHasFixedSamplingControlsForEndpoint } from '@/lib/ai/presets';
 import '@/components/ai/provider-config.css';
 
@@ -18,7 +18,7 @@ import '@/components/ai/provider-config.css';
  * stored in this browser.
  */
 export default function ProvidersSettingsPage() {
-  const hasHydrated = useProviderStore((s) => s._hasHydrated);
+  const hasHydrated = useProviderHydration();
   const providers = useProviderStore((s) => s.providers);
   const activeProviderId = useProviderStore((s) => s.activeProviderId);
   const validationStatus = useProviderStore((s) => s.validationStatus);

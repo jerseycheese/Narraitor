@@ -26,12 +26,10 @@ describe('ProvidersSettingsPage hydration', () => {
     'waits for delayed storage before showing providers (saved: %s)',
     async (hasSavedProvider) => {
       await useProviderStore.persist.rehydrate();
-      const pendingState = {
+      useProviderStore.setState({
         providers: {},
         activeProviderId: null,
-        _hasHydrated: false,
-      };
-      useProviderStore.setState(pendingState);
+      });
       const originalStorage = useProviderStore.persist.getOptions().storage;
       const provider = makeProvider('saved', 'Saved provider');
       const persistedState = {
@@ -80,30 +78,25 @@ describe('ProvidersSettingsPage hydration', () => {
       } else {
         expect(screen.getByText(/no provider yet/i)).toBeInTheDocument();
       }
-      expect(storage.setItem).toHaveBeenCalledWith('narraitor-provider-store', {
-        state: persistedState,
-        version: 1,
-      });
+      expect(storage.setItem).not.toHaveBeenCalled();
     }
   );
 
-  test('settles the loading state when storage cannot be read', async () => {
+  test('settles the loading state when storage cannot be read without overwriting storage', async () => {
     await useProviderStore.persist.rehydrate();
     useProviderStore.setState({
       providers: {},
       activeProviderId: null,
-      _hasHydrated: false,
     });
     const originalStorage = useProviderStore.persist.getOptions().storage;
-    useProviderStore.persist.setOptions({
-      storage: {
-        getItem: async () => {
-          throw new Error('Storage unavailable');
-        },
-        setItem: jest.fn(),
-        removeItem: jest.fn(),
+    const storage = {
+      getItem: async () => {
+        throw new Error('Storage unavailable');
       },
-    });
+      setItem: jest.fn(),
+      removeItem: jest.fn(),
+    };
+    useProviderStore.persist.setOptions({ storage });
     try {
       const hydration = useProviderStore.persist.rehydrate();
       render(<ProvidersSettingsPage />);
@@ -115,6 +108,7 @@ describe('ProvidersSettingsPage hydration', () => {
         screen.queryByText('Loading providers...')
       ).not.toBeInTheDocument();
       expect(screen.getByText(/no provider yet/i)).toBeInTheDocument();
+      expect(storage.setItem).not.toHaveBeenCalled();
     } finally {
       useProviderStore.persist.setOptions({ storage: originalStorage });
     }
