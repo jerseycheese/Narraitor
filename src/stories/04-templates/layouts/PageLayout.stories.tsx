@@ -115,7 +115,7 @@ export const WorldsPageExample: Story = {
   args: {
     title: 'My Worlds',
     description:
-      'Create unique story worlds, then manage characters and play through interactive narratives.',
+      'Create story worlds, manage characters, and play through stories.',
     actions: (
       <ActionButtonGroup
         actions={[

@@ -98,9 +98,8 @@ const WorldListScreen: React.FC = () => {
   };
 
   const worldToDelete = worlds.find((world) => world.id === worldToDeleteId);
-  const deleteMessage = worldToDelete
-    ? `Are you sure you want to delete the world "${worldToDelete.name}"? This will permanently delete all characters and saved sessions in this world.`
-    : 'Are you sure you want to delete this world? This will permanently delete all characters and saved sessions in this world.';
+  const deleteMessage =
+    'Removes all characters and saved sessions for this world. This action cannot be undone.';
 
   if (loading) {
     return (

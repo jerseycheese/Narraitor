@@ -64,10 +64,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
   return (
     <div className="component-basic-info-step">
-      <WizardFormSection
-        title="Basic Information"
-        description="Create your character by providing their name and basic details."
-      >
+      <WizardFormSection title="Basic Information">
       <div className="component-basic-info-layout">
         {/* Portrait placeholder */}
         <div>
