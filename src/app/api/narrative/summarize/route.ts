@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
-import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
-import { withAIRoute } from '@/utils/apiHelpers';
+import { resolveProvider } from '@/lib/ai/resolveApiKey';
+import { createProviderResolutionErrorResponse, withAIRoute } from '@/utils/apiHelpers';
 
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
@@ -28,7 +28,13 @@ export const POST = withAIRoute(async (request: NextRequest) => {
       );
     }
 
-    const geminiClient = createDefaultGeminiClient(resolveProviderCredential(request));
+    const resolution = resolveProvider(request);
+    if (!resolution.ok) {
+      return createProviderResolutionErrorResponse(resolution.reason);
+    }
+    const provider = resolution.descriptor;
+
+    const geminiClient = createDefaultGeminiClient(provider);
     
     const prompt = `${instructions}
 

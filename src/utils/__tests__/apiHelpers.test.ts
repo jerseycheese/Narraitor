@@ -1,3 +1,12 @@
+const originalGeminiKey = process.env.GEMINI_API_KEY;
+afterEach(() => {
+  if (originalGeminiKey === undefined) {
+    delete process.env.GEMINI_API_KEY;
+  } else {
+    process.env.GEMINI_API_KEY = originalGeminiKey;
+  }
+});
+
 const mockJson = jest.fn((body: unknown, init?: { status?: number; headers?: Record<string, string> }) => {
   const headers = new Headers(init?.headers);
   return {
@@ -127,8 +136,7 @@ describe('processAIStreamingTextRequest', () => {
   });
 
   it('errors without calling Gemini when no API key resolves', async () => {
-    // No header key, and jest.setup.ts pins GEMINI_API_KEY to the MOCK_API_KEY
-    // sentinel, which resolveApiKey treats as unset.
+    process.env.GEMINI_API_KEY = 'env-key';
     const response = await processAIStreamingTextRequest(fakeRequest({ prompt: 'hello' }), { errorContext: 'Test' });
     expect(global.fetch).not.toHaveBeenCalled();
     expect(response.status).toBe(412);

@@ -33,7 +33,7 @@ describe('validateEventSignificance', () => {
     });
 
     const result = await validateEventSignificance(
-      'Character hesitates near the transit car.'
+      'Character hesitates near the transit car.', {}, 'player-key'
     );
 
     expect(mockGenerateContent).toHaveBeenCalledWith(

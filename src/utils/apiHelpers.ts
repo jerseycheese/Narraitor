@@ -229,7 +229,7 @@ export interface AITextRequestOptions {
 }
 
 /** How a failed provider resolution is reported to the caller. */
-const RESOLUTION_ERRORS: Record<ProviderResolutionFailure, { message: string; status: number }> = {
+export const RESOLUTION_ERRORS: Record<ProviderResolutionFailure, { message: string; status: number }> = {
   // Missing player-supplied key is a client precondition failure, not a server crash.
   NO_KEY: { message: 'API key not configured', status: 412 },
   UNSUPPORTED_PROVIDER: {
@@ -242,6 +242,11 @@ const RESOLUTION_ERRORS: Record<ProviderResolutionFailure, { message: string; st
   },
   INVALID_MODEL: { message: '400 bad request: no valid model for this provider', status: 400 },
 };
+
+export function createProviderResolutionErrorResponse(reason: ProviderResolutionFailure): Response {
+  const { message, status } = RESOLUTION_ERRORS[reason];
+  return createAPIErrorResponse(new Error(message), status);
+}
 
 /**
  * Everything the two entry points below share: validate, resolve the provider,
@@ -273,8 +278,7 @@ async function prepareTextRequest(
 
   const resolution = resolveProvider(request);
   if (!resolution.ok) {
-    const { message, status } = RESOLUTION_ERRORS[resolution.reason];
-    return { ok: false, response: createAPIErrorResponse(new Error(message), status) };
+    return { ok: false, response: createProviderResolutionErrorResponse(resolution.reason) };
   }
 
   const rawTemp = requestData.config?.temperature;

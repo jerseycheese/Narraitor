@@ -1,11 +1,11 @@
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { resolveProviderCredential } from '@/lib/ai/resolveApiKey';
+import { resolveProvider } from '@/lib/ai/resolveApiKey';
 import { StoryCheckpointRequestBody } from '@/types/story-checkpoint.types';
 import { ToneSettings } from '@/types/tone-settings.types';
 import { generateStoryCheckpointSummary } from '@/lib/ai/storyCheckpointGenerator';
 import { safeTrim } from '@/lib/utils';
-import { withAIRoute } from '@/utils/apiHelpers';
+import { createProviderResolutionErrorResponse, withAIRoute } from '@/utils/apiHelpers';
 
 import Logger from '@/lib/utils/logger';
 import { reportServerError } from '@/lib/telemetry/reportServerError';
@@ -167,9 +167,16 @@ export const POST = withAIRoute(async (request: NextRequest) => {
       toneSettings: sanitizeToneSettings(rawBody?.toneSettings),
     };
 
+    const resolution = resolveProvider(request);
+    if (!resolution.ok) {
+      return createProviderResolutionErrorResponse(resolution.reason);
+    }
+    const provider = resolution.descriptor;
+
     const summary = await generateStoryCheckpointSummary(
       payload,
-      resolveProviderCredential(request)
+      provider,
+      provider.model
     );
     return NextResponse.json(summary);
   } catch (error) {

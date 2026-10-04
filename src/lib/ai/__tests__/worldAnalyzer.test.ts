@@ -48,7 +48,7 @@ describe('worldAnalyzer', () => {
 
     mockGenerateContent.mockResolvedValue(mockResponse);
 
-    await analyzeWorldDescription(description);
+    await analyzeWorldDescription(description, 'player-key');
 
     // Verify that the prompt is sent correctly to the AI service
     expect(mockGenerateContent).toHaveBeenCalledWith(
@@ -99,7 +99,7 @@ describe('worldAnalyzer', () => {
 
     mockGenerateContent.mockResolvedValue(mockResponse);
 
-    const result = await analyzeWorldDescription('Test description');
+    const result = await analyzeWorldDescription('Test description', 'player-key');
 
     // Test should expect what the mock is returning
     expect(result.attributes).toHaveLength(3);
@@ -156,7 +156,7 @@ describe('worldAnalyzer', () => {
   test('returns default suggestions on AI failure', async () => {
     mockGenerateContent.mockRejectedValue(new Error('AI service unavailable'));
 
-    const result = await analyzeWorldDescription('Test description');
+    const result = await analyzeWorldDescription('Test description', 'player-key');
 
     // Should return default suggestions
     expect(result.attributes).toHaveLength(6);
@@ -200,7 +200,7 @@ describe('worldAnalyzer', () => {
 
     mockGenerateContent.mockResolvedValue(mockResponse);
 
-    const result = await analyzeWorldDescription('Test description');
+    const result = await analyzeWorldDescription('Test description', 'player-key');
 
     // Should have default values filled in
     expect(result.attributes[0].minValue).toBe(1);
@@ -214,7 +214,7 @@ describe('worldAnalyzer', () => {
   test('handles network errors gracefully', async () => {
     mockGenerateContent.mockRejectedValue(new Error('Network error'));
 
-    const result = await analyzeWorldDescription('Test description');
+    const result = await analyzeWorldDescription('Test description', 'player-key');
 
     // Should not throw, should return defaults
     expect(result.attributes).toBeDefined();

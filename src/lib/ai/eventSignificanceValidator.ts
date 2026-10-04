@@ -52,12 +52,10 @@ export async function validateEventSignificance(
     // Build the validation prompt
     const prompt = buildValidationPrompt(majorEvent, context);
 
-    // Call Gemini Flash for validation with the player's own key. A player on
-    // another provider resolves to no Gemini key at all, and skipping the check
-    // is the right answer there — see resolveEffectiveGeminiKey.
+    // Skip Gemini validation when the player hasn't supplied a Gemini key.
     const descriptor = resolveGeminiDescriptor(credential, modelOverride);
     if (!descriptor) {
-      logger.warn('EventSignificanceValidator', 'GEMINI_API_KEY not found, defaulting to accepting event');
+      logger.warn('EventSignificanceValidator', 'No player Gemini key, defaulting to accepting event');
       return {
         isSignificant: true,
         reason: 'Validation skipped: API key not configured',

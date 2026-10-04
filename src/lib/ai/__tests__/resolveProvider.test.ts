@@ -268,7 +268,7 @@ describe('resolveProvider', () => {
    * headers without a caller-supplied key would let anyone name an endpoint and
    * have the server post that key to it.
    */
-  it('ignores routing headers on the env-key path', () => {
+  it('requires a player key regardless of routing headers or server key', () => {
     process.env.GEMINI_API_KEY = 'env-key';
 
     const resolution = resolveProvider(
@@ -279,9 +279,6 @@ describe('resolveProvider', () => {
       })
     );
 
-    expect(resolution).toEqual({
-      ok: true,
-      descriptor: { type: 'gemini', endpoint: '', model: DEFAULT_TEXT_MODEL, apiKey: 'env-key' },
-    });
+    expect(resolution).toEqual({ ok: false, reason: 'NO_KEY' });
   });
 });

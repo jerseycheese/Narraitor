@@ -29,14 +29,16 @@ The AI requests all go through server-side routes, with player-owned provider ke
 
 - **Rate limiting**: 50 requests/hour per IP in production (500 in dev) on the narrative generation routes, via `src/utils/rateLimiter.ts`; over the limit returns 429 with `X-RateLimit-*` headers
 - **Player provider keys**: saved through `/settings/providers`, encrypted in `useProviderStore`, decrypted just in time, and sent to Narraitor's same-origin API routes as `x-provider-api-key`
-- **Server fallback**: `GEMINI_API_KEY` never reaches the browser and is used only when a request has no player provider key
+- **Missing player key**: text requests ask players to add a provider key; server environment keys never substitute for a missing player key
 - **Proxy pattern**: Client-side code calls Next.js API routes, which handle the actual AI communication
 
 ## Provider Architecture
 
-Gemini is the default, but it's no longer the only path. Narraitor is BYO-key: players configure a provider under `/settings/providers`, and requests route through whichever one is active.
+DeepSeek flash through OpenRouter is the recommended text provider. Narraitor is BYO-key: players configure a provider under `/settings/providers`, and requests route through whichever one is active.
 
 As of 2026-09-28 (`develop`), `src/lib/ai/presets.ts` lists nine provider presets, four of which work end-to-end today (`available: true`): Google Gemini, OpenRouter, Ollama (self-hosted), and OpenAI. The rest — Anthropic Claude, Deepseek, Mistral, Together AI, Groq, and Perplexity — have adapters scaffolded (`src/lib/ai/providers/`) but ship `available: false` until someone runs a live streamed-turn check against each; see `RELEASES.md` and issue #894 for the Claude adapter's status specifically. Most non-Gemini providers share one OpenAI-compatible adapter (`src/lib/ai/providers/openai-compatible/`); Gemini and Claude each have their own (`providers/gemini/`, `providers/claude/`).
+
+Gemini safety settings are deliberately Gemini-only; other providers receive content-rating guidance in the prompt.
 
 Image generation stays on Gemini regardless of which provider handles text — see each preset's `capabilities.images` flag in `presets.ts`.
 
@@ -250,9 +252,9 @@ For network issues, AI requests run against explicit timeout budgets (see `src/l
 
 ## Configuration
 
-Environment variables are straightforward: `GEMINI_API_KEY` is an optional server-side fallback (never use a `NEXT_PUBLIC_` provider key), and `NEXT_PUBLIC_DEBUG_LOGGING=true` is optional for development debugging.
+Environment variables are straightforward: player keys come from provider settings, and any `GEMINI_API_KEY` environment value stays server-side without authorizing keyless player requests (never use a `NEXT_PUBLIC_` provider key), and `NEXT_PUBLIC_DEBUG_LOGGING=true` is optional for development debugging.
 
-The model configuration (`src/lib/ai/config.ts`) uses gemini-2.5-flash as the primary model and gemini-3.1-flash-image for image generation, temperature of 0.7 for creative content, and a 2048-token default output budget that individual callers can tighten (the significance validator caps at 200, for instance). Gemini's dynamic "thinking" is disabled by default — it burns latency and output-token budget on interactive game requests.
+The model configuration (`src/lib/ai/config.ts`) uses gemini-2.5-flash for explicitly selected Gemini text requests and gemini-3.1-flash-image for image generation, temperature of 0.7 for creative content, and a 2048-token default output budget that individual callers can tighten (the significance validator caps at 200, for instance). Gemini's dynamic "thinking" is disabled by default — it burns latency and output-token budget on interactive game requests.
 
 Timeout budgets live in `src/lib/constants/aiTimeouts.ts`, deliberately derived from each other so client and server can't drift: 30s for a single server-side Gemini attempt, 45s as the browser ceiling for single-attempt text routes, and 120s for routes that run the retry loop server-side or generate images.
 

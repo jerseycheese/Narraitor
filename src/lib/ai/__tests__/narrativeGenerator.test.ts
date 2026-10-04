@@ -304,6 +304,7 @@ describe('NarrativeGenerator', () => {
       expect(result.metadata.debugInfo?.templateName).toBe('Scene Template');
       expect(result.metadata.debugInfo?.fullPrompt).toBeDefined();
       expect(result.metadata.debugInfo?.rawResponse).toBe(mockAIResponse.content);
+      expect(result.metadata.debugInfo?.modelUsed).toBe('unknown');
     });
 
     it('labels debug info with Scene Template even when segmentType is transition because scene template is invoked', async () => {
@@ -371,6 +372,7 @@ describe('NarrativeGenerator', () => {
       expect(result.metadata.debugInfo?.templateName).toBe('Initial Scene Template');
       expect(result.metadata.debugInfo?.fullPrompt).toBeDefined();
       expect(result.metadata.debugInfo?.rawResponse).toBe(mockAIResponse.content);
+      expect(result.metadata.debugInfo?.modelUsed).toBe('unknown');
     });
 
     it('forwards fatalRiskAllowed and isFatalRepair to the initial scene template context', async () => {

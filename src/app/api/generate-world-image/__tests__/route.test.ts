@@ -30,6 +30,13 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { generateImageWithGemini } from '@/lib/ai/geminiImageGenerator';
 import type { World } from '@/types/world.types';
 
+const originalGeminiKey = process.env.GEMINI_API_KEY;
+const playerGeminiHeaders = {
+  'x-provider-api-key': 'player-gemini-key',
+  'x-provider-type': 'gemini',
+  'x-provider-model': 'gemini-2.5-flash',
+};
+
 // Create typed mocks
 const mockCreateDefaultGeminiClient = createDefaultGeminiClient as jest.MockedFunction<typeof createDefaultGeminiClient>;
 const mockGenerateImageWithGemini = generateImageWithGemini as jest.MockedFunction<typeof generateImageWithGemini>;
@@ -65,13 +72,18 @@ describe('/api/generate-world-image', () => {
   });
 
   afterEach(() => {
-    delete process.env.GEMINI_API_KEY;
+    if (originalGeminiKey === undefined) {
+      delete process.env.GEMINI_API_KEY;
+    } else {
+      process.env.GEMINI_API_KEY = originalGeminiKey;
+    }
   });
 
   describe('Request Validation', () => {
     it('should return 400 when no world data is provided', async () => {
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: playerGeminiHeaders,
         body: JSON.stringify({}),
       });
 
@@ -85,6 +97,7 @@ describe('/api/generate-world-image', () => {
     it('should return 400 when world data is null', async () => {
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: playerGeminiHeaders,
         body: JSON.stringify({ world: null }),
       });
 
@@ -112,6 +125,7 @@ describe('/api/generate-world-image', () => {
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: playerGeminiHeaders,
         body: JSON.stringify({
           world: mockWorld,
           customPrompt
@@ -141,6 +155,7 @@ describe('/api/generate-world-image', () => {
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: playerGeminiHeaders,
         body: JSON.stringify({ world: mockWorld }),
       });
 
@@ -197,6 +212,7 @@ describe('/api/generate-world-image', () => {
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: playerGeminiHeaders,
         body: JSON.stringify({ world: worldWithElements }),
       });
 
@@ -220,6 +236,7 @@ describe('/api/generate-world-image', () => {
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: playerGeminiHeaders,
         body: JSON.stringify({ world: mockWorld }),
       });
 
@@ -232,8 +249,7 @@ describe('/api/generate-world-image', () => {
 
   describe('Genre-Specific Image Generation', () => {
     it('should generate appropriate fallback for different genres', async () => {
-      // Mock no API key to force fallback
-      delete process.env.GEMINI_API_KEY;
+      // No player key, even though the server has one.
 
       const testGenres = ['fantasy', 'sci-fi', 'cyberpunk'];
 
@@ -241,6 +257,7 @@ describe('/api/generate-world-image', () => {
         const worldWithGenre = { ...mockWorld, genre };
         const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
           method: 'POST',
+          headers: {},
           body: JSON.stringify({ world: worldWithGenre }),
         });
 
@@ -270,6 +287,7 @@ describe('/api/generate-world-image', () => {
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: playerGeminiHeaders,
         body: JSON.stringify({ world: mockWorld }),
       });
 
@@ -293,6 +311,7 @@ describe('/api/generate-world-image', () => {
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: playerGeminiHeaders,
         body: JSON.stringify({ world: mockWorld }),
       });
 
@@ -308,21 +327,18 @@ describe('/api/generate-world-image', () => {
   });
 
   describe('Environment Configuration', () => {
-    it('should use fallback when API key is not configured or is mock', async () => {
+    it('uses fallback without a player key regardless of the server key', async () => {
       const testCases = [
-        { key: undefined, description: 'no API key' },
-        { key: 'MOCK_API_KEY', description: 'mock API key' }
+        { key: 'MOCK_API_KEY', description: 'mock API key' },
+        { key: 'server-key', description: 'real server key' }
       ];
 
       for (const { key } of testCases) {
-        if (key) {
-          process.env.GEMINI_API_KEY = key;
-        } else {
-          delete process.env.GEMINI_API_KEY;
-        }
+        process.env.GEMINI_API_KEY = key;
 
         const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
           method: 'POST',
+          headers: {},
           body: JSON.stringify({ world: mockWorld }),
         });
 
@@ -343,11 +359,12 @@ describe('/api/generate-world-image', () => {
      * Nothing rendered it, which is the only reason it went unnoticed.
      */
     it('does not build a client at all when no Gemini key resolves', async () => {
-      delete process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = 'server-key';
       mockCreateDefaultGeminiClient.mockClear();
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: {},
         body: JSON.stringify({ world: mockWorld }),
       });
 
@@ -368,6 +385,7 @@ describe('/api/generate-world-image', () => {
 
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: playerGeminiHeaders,
         body: JSON.stringify({ world: mockWorld }),
       });
 
@@ -384,6 +402,7 @@ describe('/api/generate-world-image', () => {
     it('should return 500 when request parsing fails', async () => {
       const request = new NextRequest('http://localhost:3000/api/generate-world-image', {
         method: 'POST',
+        headers: playerGeminiHeaders,
         body: 'invalid json',
       });
 
