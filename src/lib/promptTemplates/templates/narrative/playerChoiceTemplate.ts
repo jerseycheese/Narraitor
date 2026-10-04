@@ -1,5 +1,5 @@
 import { NarrativeContext } from '@/types/narrative.types';
-import { CHOICE_EXAMPLES, shouldIncludeExamples } from '../../examples';
+import { CHOICE_EXAMPLES } from '../../examples';
 import { protagonistGuidance } from './protagonistGuidance';
 
 interface PlayerChoiceTemplateContext {
@@ -41,18 +41,6 @@ export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): stri
   // Extract current location for context
   const location = narrativeContext?.currentLocation || '';
   
-  // Include more of the narrative for context
-  // but still managing token usage intelligently
-  let shortContext = '';
-  if (recentContent.length <= 1000) {
-    // If content is reasonably short, use it all
-    shortContext = recentContent;
-  } else {
-    // For longer content, use first 400 chars + last 400 chars + middle indicator
-    const firstPart = recentContent.slice(0, 400);
-    const lastPart = recentContent.slice(-400);
-    shortContext = `${firstPart}\n\n[...narrative continues...]\n\n${lastPart}`;
-  }
   
   // Build skills information for the prompt
   let skillsInfo = '';
@@ -91,7 +79,7 @@ CONSEQUENCES (REQUIRED WHEN A KNOWN CHARACTER IS AFFECTED):
 ${genre ? `Genre: ${genre}` : ''}
 
 CURRENT CONTEXT (brief summary):
-${shortContext}
+${recentContent}
 ${location ? `Current location: ${location}` : ''}${skillsInfo}${protagonistInfo}${npcInfo}
 
 INSTRUCTIONS:
@@ -192,10 +180,6 @@ Keep your response EXACTLY in this format. Include the Decision Weight line, Con
 
 IMPORTANT: Never include emojis anywhere in your response. Use only plain text - the user interface will add visual elements automatically.`;
 
-  const examplesSection = shouldIncludeExamples(shortContext.length)
-    ? CHOICE_EXAMPLES
-    : '';
-
-  return `${baseContent}${examplesSection}`;
+  return `${baseContent}${CHOICE_EXAMPLES}`;
 };
 

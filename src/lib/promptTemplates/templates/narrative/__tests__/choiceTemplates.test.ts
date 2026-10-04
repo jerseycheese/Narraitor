@@ -36,6 +36,34 @@ const countScaffoldedOptionLines = (prompt: string): number => {
   return optionsSection.split('\n').filter((line) => /^\d+\.\s/.test(line)).length;
 };
 
+describe('choice templates preserve scene changes within the latest prose', () => {
+  it.each([
+    ['plain', playerChoiceTemplate],
+    ['aligned', alignedChoiceTemplate],
+  ])('keeps the completed action and new location in the %s choices request', (_name, template) => {
+    const sceneChange = 'The scout is free of the cabinet and follows you into the dining hall.';
+    const latestContent = [
+      'You stand beside the locked cabinet in the storage shed.',
+      'Rain rattles the roof while the hinges creak. '.repeat(12),
+      sceneChange,
+      'The lamps flicker while thunder rolls outside. '.repeat(12),
+      'You pause and consider your next action.',
+    ].join('\n\n');
+
+    const prompt = template({
+      ...baseContext,
+      narrativeContext: {
+        ...narrativeContext,
+        recentSegments: [{ ...segment, content: latestContent }],
+        currentLocation: 'Dining hall',
+      },
+    });
+
+    expect(prompt).toContain(sceneChange);
+    expect(prompt).toContain(latestContent);
+  });
+});
+
 describe('choice templates ask for as many options as the interface shows', () => {
   it('scaffolds three options by default in the plain choice template', () => {
     const prompt = playerChoiceTemplate(baseContext);
