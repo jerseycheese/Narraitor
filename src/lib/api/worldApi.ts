@@ -1,5 +1,6 @@
 import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { aiFetch } from '@/lib/ai/aiFetch';
+import { withoutWorldImage } from '@/lib/api/worldPayload';
 
 export interface GenerateWorldParams {
   worldReference?: string;
@@ -56,7 +57,7 @@ export const worldApi = {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(params),
+      body: JSON.stringify({ ...params, world: withoutWorldImage(params.world) }),
     });
 
     if (!response.ok) {

@@ -3,6 +3,7 @@
 import { World } from '../../types/world.types';
 import { GeneratedImage } from '../../types/common.types';
 import { getTimestamp } from '@/lib/utils';
+import { withoutWorldImage } from '@/lib/api/worldPayload';
 
 import Logger from '@/lib/utils/logger';
 import { aiFetch } from './aiFetch';
@@ -59,7 +60,7 @@ export async function generateWorldImage(world: World, customPrompt?: string): P
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ world, customPrompt }),
+      body: JSON.stringify({ world: withoutWorldImage(world), customPrompt }),
     });
 
     if (!response.ok) {
