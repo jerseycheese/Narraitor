@@ -59,7 +59,16 @@ export async function generateWorldImage(world: World, customPrompt?: string): P
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ world, customPrompt }),
+      body: JSON.stringify({
+        world: {
+          name: world.name,
+          description: world.description,
+          genre: world.genre,
+          attributes: world.attributes.map(({ name }) => ({ name })),
+          skills: world.skills.map(({ name }) => ({ name })),
+        },
+        customPrompt,
+      }),
     });
 
     if (!response.ok) {
