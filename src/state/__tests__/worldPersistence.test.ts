@@ -2,6 +2,15 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { useWorldStore } from '../worldStore';
 import { IndexedDBAdapter } from '@/lib/storage/indexedDBAdapter';
 import { ResilientStorageMiddleware } from '@/lib/storage/resilientStorage';
+import {
+  createMockDB,
+  createMockIDB,
+  createMockRequest,
+  createMockStore,
+  setupMockTransaction,
+  setupSuccessfulOpen,
+  triggerSuccess,
+} from '@/lib/storage/__tests__/indexedDBAdapter.testHelpers';
 
 // Mock IndexedDB for testing
 const mockIndexedDB = () => {
@@ -303,22 +312,42 @@ describe('World Persistence Infrastructure', () => {
 
   describe('Storage Adapter Integration', () => {
     test('properly initializes IndexedDB adapter before first access', async () => {
-      // Mock the storage creation to avoid real IndexedDB initialization
-      const mockStorage = {
-        setItem: jest.fn().mockResolvedValue(undefined),
-        getItem: jest.fn().mockResolvedValue('{"test":"data"}'),
-      };
+      const mockIDBInstance = createMockIDB();
+      const mockDBInstance = createMockDB();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (global as any).indexedDB = mockIDBInstance;
+      setupSuccessfulOpen(mockIDBInstance, mockDBInstance);
 
-      // Test basic storage operations with mock
-      await mockStorage.setItem('test-key', JSON.stringify({ test: 'data' }));
-      const retrieved = await mockStorage.getItem('test-key');
+      const backing = new Map<string, unknown>();
+      backing.set('test-key', { test: 'data' });
 
-      expect(retrieved).toBe('{"test":"data"}');
-      expect(mockStorage.setItem).toHaveBeenCalledWith(
-        'test-key',
-        '{"test":"data"}'
-      );
-      expect(mockStorage.getItem).toHaveBeenCalledWith('test-key');
+      const mockStore = createMockStore();
+      mockStore.put.mockImplementation((record: { id: string; value: unknown }) => {
+        backing.set(record.id, record.value);
+        const req = createMockRequest();
+        triggerSuccess(req);
+        return req;
+      });
+      mockStore.get.mockImplementation((key: string) => {
+        const val = backing.get(key);
+        const req = createMockRequest(val !== undefined ? { value: val } : undefined);
+        triggerSuccess(req, val !== undefined ? { value: val } : undefined);
+        return req;
+      });
+      setupMockTransaction(mockDBInstance, mockStore);
+
+      const adapter = new IndexedDBAdapter();
+      expect(adapter.isInitialized).toBe(false);
+
+      // Reading uninitialized adapter triggers lazy initialization before first access
+      const retrieved = await adapter.getItem('test-key');
+      expect(adapter.isInitialized).toBe(true);
+      expect(retrieved).toBe(JSON.stringify({ test: 'data' }));
+
+      // Writing uninitialized/subsequent also persists through initialized store
+      await adapter.setItem('another-key', JSON.stringify({ saved: true }));
+      const roundTripped = await adapter.getItem('another-key');
+      expect(roundTripped).toBe(JSON.stringify({ saved: true }));
     });
 
     test('handles storage adapter unavailability gracefully', async () => {

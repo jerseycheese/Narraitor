@@ -251,20 +251,23 @@ describe('Persistence Integration - MVP', () => {
       mockStorage.getItem.mockRejectedValue(error);
       mockStorage.setItem.mockRejectedValue(error);
 
-      // Store should still function despite errors
-      const worldId = useWorldStore.getState().createWorld({
-        name: 'Error Test World',
-        description: 'A test world for persistence testing',
-        genre: 'fantasy',
-        attributes: [],
-        skills: [],
-        settings: {
-          maxAttributes: 6,
-          maxSkills: 8,
-          attributePointPool: 27,
-          skillPointPool: 20,
-        },
-      });
+      // Store should still function despite errors and not throw
+      let worldId: string | undefined;
+      expect(() => {
+        worldId = useWorldStore.getState().createWorld({
+          name: 'Error Test World',
+          description: 'A test world for persistence testing',
+          genre: 'fantasy',
+          attributes: [],
+          skills: [],
+          settings: {
+            maxAttributes: 6,
+            maxSkills: 8,
+            attributePointPool: 27,
+            skillPointPool: 20,
+          },
+        });
+      }).not.toThrow();
 
       expect(worldId).toBeDefined();
 
@@ -274,6 +277,15 @@ describe('Persistence Integration - MVP', () => {
 
       // Verify store attempted to persist
       expect(mockStorage.setItem).toHaveBeenCalled();
+
+      // After setItem rejects, assert world store still holds the created world intact
+      const storedWorld = useWorldStore.getState().worlds[worldId!];
+      expect(storedWorld).toBeDefined();
+      expect(storedWorld).toMatchObject({
+        id: worldId,
+        name: 'Error Test World',
+        genre: 'fantasy',
+      });
 
       // Clean up
       jest.useRealTimers();
