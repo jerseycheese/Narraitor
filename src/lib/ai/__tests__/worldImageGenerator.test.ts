@@ -14,7 +14,7 @@ describe('worldImageGenerator', () => {
   });
 
   it('omits world image data URL when generating world image', async () => {
-    const largeImageData = `data:image/png;base64,${'A'.repeat(100_000)}`;
+    const largeImageData = `data:image/png;base64,${'A'.repeat(1_000_000)}`;
     const world = createMockWorld({
       id: 'world-1',
       name: 'Cyber City',
@@ -35,16 +35,25 @@ describe('worldImageGenerator', () => {
       }),
     } as unknown as Response);
 
-    await generateWorldImage(world);
+    await generateWorldImage(world, 'A moonlit citadel');
 
     expect(mockAiFetch).toHaveBeenCalledTimes(1);
     const [url, init] = mockAiFetch.mock.calls[0];
     expect(url).toBe('/api/generate-world-image');
 
-    const body = JSON.parse(init?.body as string);
-    expect(body.world.name).toBe('Cyber City');
-    expect(body.world.image).toBeUndefined();
-    expect(init?.body).not.toContain(largeImageData);
+    const requestBodyJson = init?.body as string;
+    const requestBody = JSON.parse(requestBodyJson);
+    expect(requestBody).toEqual({
+      world: {
+        name: world.name,
+        description: world.description,
+        genre: world.genre,
+        attributes: world.attributes.map(({ name }) => ({ name })),
+        skills: world.skills.map(({ name }) => ({ name })),
+      },
+      customPrompt: 'A moonlit citadel',
+    });
+    expect(requestBodyJson.includes(largeImageData)).toBe(false);
     expect(world.image?.url).toBe(largeImageData);
   });
 });
