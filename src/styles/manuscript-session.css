@@ -1823,8 +1823,25 @@ body.manuscript-overlay-open {
 }
 
 @media (width < 640px) {
+  /* The character pill and icon toolbar together require ~392px of min-content,
+     which exceeds the 351px content box on a 375px viewport (#2215). Wrapping
+     the header below 640px lets the toolbar drop cleanly below the pill on
+     phones without clipping or hiding any actions. */
   .manuscript-overlay-header {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .manuscript-overlay-header-left,
+  .manuscript-overlay-header-right {
+    height: auto;
+  }
+
+  .manuscript-overlay-header-right {
+    margin-left: auto;
   }
 
   .manuscript-warning-action-button {
