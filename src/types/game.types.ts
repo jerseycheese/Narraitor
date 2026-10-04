@@ -36,10 +36,14 @@ export interface SavedSessionInfo {
 
 
 /**
+ * Reasons that trigger a save operation
+ */
+export type SaveTriggerReason = 'player-choice' | 'scene-change' | 'manual';
+
+/**
  * Auto-save status and metadata
  */
-interface AutoSaveState {
-  enabled: boolean;
+export interface AutoSaveState {
   lastSaveTime: string | null;
   status: 'idle' | 'saving' | 'saved' | 'error';
   errorMessage: string | null;
@@ -87,7 +91,6 @@ export interface SessionStore {
   getSessionLifecycle: (sessionId: string) => SessionLifecycleMetadata | undefined;
 
   // Auto-save actions
-  setAutoSaveEnabled: (enabled: boolean) => void;
   updateAutoSaveStatus: (status: AutoSaveState['status'], errorMessage?: string) => void;
   recordAutoSave: (timestamp: string) => void;
   

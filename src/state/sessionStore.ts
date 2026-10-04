@@ -79,7 +79,6 @@ const initialState = {
   sessionLifecycle: {} as Record<string, SessionLifecycleMetadata>,
   // Auto-save state
   autoSave: {
-    enabled: true,
     lastSaveTime: null,
     status: 'idle' as const,
     errorMessage: null,
@@ -556,15 +555,6 @@ export const useSessionStore = create<SessionStore>()(
   },
 
   // Auto-save methods
-  setAutoSaveEnabled: (enabled: boolean) => {
-    set(state => ({
-      autoSave: {
-        ...state.autoSave,
-        enabled
-      }
-    }));
-  },
-
   updateAutoSaveStatus: (status: 'idle' | 'saving' | 'saved' | 'error', errorMessage?: string) => {
     set(state => ({
       autoSave: {

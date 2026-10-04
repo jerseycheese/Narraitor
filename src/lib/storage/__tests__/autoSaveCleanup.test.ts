@@ -1,7 +1,13 @@
 /**
- * Tests for auto-save snapshot cleanup and confirmation of snapshot growth metrics.
+ * Tests for auto-save snapshot cleanup (Issue #2191).
+ *
+ * Historical context: Legacy auto-save wrote unpruned snapshots under
+ * `auto-save-${sessionId}-${Date.now()}` on every turn, causing quadratic
+ * storage growth (>50 KB over 10 turns due to cumulative narrative history).
+ * Legacy snapshot writing was removed in #2200; stores now persist directly
+ * via Zustand persist middleware.
+ *
  * Verifies Issue #2191 acceptance criteria:
- * - Documents real growth metrics of legacy auto-save snapshots.
  * - Confirms that the one-time sweep removes existing auto-save-* keys and preserves store keys.
  * - Confirms that gameplay choices do not create auto-save-* keys.
  */
@@ -19,59 +25,6 @@ import {
 } from './indexedDBAdapter.testHelpers';
 
 describe('AutoSave Snapshot Growth & Cleanup (Issue #2191)', () => {
-  it('confirms the quadratic growth of legacy auto-save snapshots over turns', () => {
-    // Measurement verification of legacy snapshot writing:
-    // auto-save-${sessionId}-${Date.now()} stored the full state every turn without pruning
-    const sessionId = 'session-2191';
-    const store = new Map<string, string>();
-
-    const measurements: Array<{ turn: number; keyCount: number; cumulativeBytes: number }> = [];
-
-    for (let turn = 1; turn <= 10; turn++) {
-      const segment = {
-        id: `segment-${turn}`,
-        sessionId,
-        content: `You step forward into the ancient ruins as dust swirls around your boots. Turn ${turn}: The shadows whisper secrets of the past, offering you a crucial choice between caution and ambition. You examine the strange runes carved into the stone archway.`,
-        choices: [
-          { id: `choice-${turn}-1`, text: 'Inspect the glowing glyph on the left pillar.', prompt: 'Inspect glyph' },
-          { id: `choice-${turn}-2`, text: 'Draw your weapon and advance cautiously into the darkness.', prompt: 'Advance with weapon' },
-          { id: `choice-${turn}-3`, text: 'Consult your field journal for translations of the symbols.', prompt: 'Read journal' },
-        ],
-        timestamp: new Date().toISOString(),
-        sceneId: `scene-${Math.floor(turn / 3) + 1}`,
-      };
-      const snapshot = {
-        session: { id: sessionId, status: 'active' },
-        world: { id: 'world-1', name: 'Aethelgard Reaches', description: 'Fractured magic archipelago' },
-        character: { id: 'char-1', name: 'Rowan Vance', stats: { intellect: 14, perception: 16 } },
-        narrative: { entries: Array(turn).fill(segment), currentEntry: segment },
-        journal: { entries: Array(turn).fill({ id: `entry-${turn}`, title: `Discovery ${turn}` }) },
-      };
-
-      const key = `auto-save-${sessionId}-${1700000000000 + turn}`;
-      const serialized = JSON.stringify({ state: snapshot, version: 1 });
-      store.set(key, serialized);
-
-      let keyCount = 0;
-      let cumulativeBytes = 0;
-      for (const [k, v] of store.entries()) {
-        if (k.startsWith('auto-save-')) {
-          keyCount++;
-          cumulativeBytes += Buffer.byteLength(k, 'utf8') + Buffer.byteLength(v, 'utf8');
-        }
-      }
-
-      measurements.push({ turn, keyCount, cumulativeBytes });
-    }
-
-    // Turn 1: 1 key (~1.8 KB)
-    expect(measurements[0].keyCount).toBe(1);
-    expect(measurements[0].cumulativeBytes).toBeGreaterThan(1500);
-
-    // Turn 10: 10 keys (cumulative size > 50 KB due to repeated narrative duplication)
-    expect(measurements[9].keyCount).toBe(10);
-    expect(measurements[9].cumulativeBytes).toBeGreaterThan(50000);
-  });
 
   describe('IndexedDBAdapter.sweepAutoSaveSnapshots', () => {
     let adapter: IndexedDBAdapter;

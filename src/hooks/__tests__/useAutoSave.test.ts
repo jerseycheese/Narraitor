@@ -23,7 +23,6 @@ const mockSessionStore: SessionStore = {
   savedSessions: {},
   sessionLifecycle: {},
   autoSave: {
-    enabled: true,
     lastSaveTime: null,
     status: 'idle',
     errorMessage: null,
@@ -61,7 +60,6 @@ const mockSessionStore: SessionStore = {
   upsertSessionLifecycle: jest.fn(),
   setSessionLifecycleStatus: jest.fn(),
   getSessionLifecycle: jest.fn(),
-  setAutoSaveEnabled: jest.fn(),
   updateAutoSaveStatus: jest.fn(),
   recordAutoSave: jest.fn(),
   isFirstTimeUser: jest.fn(),
@@ -101,7 +99,6 @@ describe('useAutoSave', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     _resetStorageStatusForTesting();
-    mockSessionStore.autoSave.enabled = true;
     mockSessionStore.autoSave.status = 'idle';
     mockSessionStore.autoSave.lastSaveTime = null;
     mockSessionStore.autoSave.errorMessage = null;
@@ -116,9 +113,7 @@ describe('useAutoSave', () => {
   it('should initialize with status from session store when storage is healthy', () => {
     const { result } = renderHook(() => useAutoSave());
 
-    expect(result.current.isEnabled).toBe(true);
     expect(result.current.status).toBe('idle');
-    expect(result.current.isRunning).toBe(true);
   });
 
   it('reflects error status and fallback notice when storage is unavailable', () => {
@@ -130,7 +125,6 @@ describe('useAutoSave', () => {
 
     expect(result.current.status).toBe('error');
     expect(result.current.errorMessage).toBe('IndexedDB write failed: QuotaExceededError');
-    expect(result.current.isRunning).toBe(false);
   });
 
   it('records auto-save and triggers success toast on manual save', async () => {
@@ -201,29 +195,6 @@ describe('useAutoSave', () => {
 
     expect(result.current.status).toBe('saved');
     expect(result.current.lastSaveTime).toBe('2026-01-01T00:00:00.000Z');
-  });
-
-  it('should allow enabling/disabling auto-save', () => {
-    (mockSessionStore.setAutoSaveEnabled as jest.Mock).mockImplementation((enabled: boolean) => {
-      mockSessionStore.autoSave.enabled = enabled;
-    });
-
-    const { result, rerender } = renderHook(() => useAutoSave());
-    expect(result.current.isEnabled).toBe(true);
-
-    act(() => {
-      result.current.setEnabled(false);
-    });
-    rerender();
-
-    expect(result.current.isEnabled).toBe(false);
-
-    act(() => {
-      result.current.setEnabled(true);
-    });
-    rerender();
-
-    expect(result.current.isEnabled).toBe(true);
   });
 
   it('retry calls triggerSave for manual save', async () => {

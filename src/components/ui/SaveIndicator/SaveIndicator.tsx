@@ -7,8 +7,7 @@ import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { clsx } from 'clsx';
 import { formatTime } from '@/lib/utils';
-
-export type SaveTriggerReason = 'player-choice' | 'scene-change' | 'manual';
+import type { SaveTriggerReason } from '@/types/game.types';
 
 export interface SaveIndicatorProps {
   status: 'idle' | 'saving' | 'saved' | 'error';

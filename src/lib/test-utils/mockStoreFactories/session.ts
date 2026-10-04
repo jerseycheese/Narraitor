@@ -14,7 +14,6 @@ export function createMockSessionStore(
     savedSessions: {},
     sessionLifecycle: {},
     autoSave: {
-      enabled: true,
       status: 'idle',
       lastSaveTime: null,
       errorMessage: null,
@@ -50,7 +49,6 @@ export function createMockSessionStore(
     upsertSessionLifecycle: jest.fn(),
     setSessionLifecycleStatus: jest.fn(),
     getSessionLifecycle: jest.fn(() => undefined),
-    setAutoSaveEnabled: jest.fn(),
     updateAutoSaveStatus: jest.fn(),
     recordAutoSave: jest.fn(),
     updateTutorialProgress: jest.fn(),
