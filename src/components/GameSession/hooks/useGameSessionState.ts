@@ -338,7 +338,7 @@ export const useGameSessionState = ({
       logger.debug('Starting new session, character:', sessionCharacterId);
       // Clear any existing ending state when starting new session
       useNarrativeStore.getState().clearEnding();
-      actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart);
+      actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart, true);
     }
   }, [sessionCharacterId, worldId, onSessionStart, actualSessionState, logger]);
   

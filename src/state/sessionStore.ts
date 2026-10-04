@@ -137,15 +137,6 @@ export const useSessionStore = create<SessionStore>()(
     // inventoryStore clears the character inventory (isForcedFresh) — old
     // session data is still preserved when changing characters.
     const isNewSession = isNewCharacterSession || !currentState.id || force;
-    if (sessionId && (isNewSession || force)) {
-      await storeEvents.emit<SessionFreshStartEvent>(StoreEventTypes.SESSION_FRESH_START, {
-        sessionId,
-        worldId,
-        characterId,
-        isNewSession,
-        isForcedFresh: force,
-      });
-    }
     const lifecycleEntry: SessionLifecycleMetadata = {
       id: sessionId,
       worldId,
@@ -168,6 +159,18 @@ export const useSessionStore = create<SessionStore>()(
       };
     });
     
+    // Publish the new identity before yielding so generation cannot start on
+    // the previous active session while sibling stores reset.
+    if (sessionId && (isNewSession || force)) {
+      await storeEvents.emit<SessionFreshStartEvent>(StoreEventTypes.SESSION_FRESH_START, {
+        sessionId,
+        worldId,
+        characterId,
+        isNewSession,
+        isForcedFresh: force,
+      });
+    }
+
     try {
       const activationTimestamp = getTimestamp();
       set(state => {
