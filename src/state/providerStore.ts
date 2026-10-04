@@ -1,4 +1,3 @@
-import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { generateUniqueId, getTimestamp } from '@/lib/utils';
@@ -91,28 +90,22 @@ function notifyHydrationChange(hydrated: boolean) {
 }
 
 /**
- * Hook to track whether provider store persistence has loaded from storage.
+ * Subscribes to provider store rehydration completion.
  * Does not update persisted state or trigger storage writes.
  */
-export function useProviderHydration(): boolean {
-  return useSyncExternalStore(
-    (onStoreChange) => {
-      hydrationListeners.add(onStoreChange);
-      return () => {
-        hydrationListeners.delete(onStoreChange);
-      };
-    },
-    () => hasHydrated || (typeof useProviderStore?.persist?.hasHydrated === 'function' && useProviderStore.persist.hasHydrated()),
-    () => false
+export function subscribeProviderHydration(listener: () => void): () => void {
+  hydrationListeners.add(listener);
+  return () => {
+    hydrationListeners.delete(listener);
+  };
+}
+
+export function getProviderHydration(): boolean {
+  return (
+    hasHydrated ||
+    (typeof useProviderStore?.persist?.hasHydrated === 'function' &&
+      useProviderStore.persist.hasHydrated())
   );
-}
-
-export function isProviderStoreHydrated(): boolean {
-  return hasHydrated || (typeof useProviderStore?.persist?.hasHydrated === 'function' && useProviderStore.persist.hasHydrated());
-}
-
-export function setProviderHydratedForTesting(hydrated: boolean): void {
-  notifyHydrationChange(hydrated);
 }
 
 export const useProviderStore = create<ProviderStore>()(

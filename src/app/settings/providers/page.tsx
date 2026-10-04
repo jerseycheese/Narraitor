@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { ProviderCard } from '@/components/ai/ProviderCard';
 import { ProviderWizard } from '@/components/ai/ProviderWizard';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog/DeleteConfirmationDialog';
-import { useProviderStore, useProviderHydration } from '@/state/providerStore';
+import { useProviderStore } from '@/state/providerStore';
+import { useProviderHydration } from '@/hooks/useProviderHydration';
 import { presetHasFixedSamplingControlsForEndpoint } from '@/lib/ai/presets';
 import '@/components/ai/provider-config.css';
 
