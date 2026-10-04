@@ -16,7 +16,7 @@ type FunnelStep =
 /**
  * Fire an anonymous funnel-step event to Vercel Web Analytics.
  *
- * Hard privacy constraint (#1366 / #1367): the ONLY thing sent is the fixed
+ * Hard privacy constraint: the ONLY thing sent is the fixed
  * step name from the FunnelStep union — never world names, character names,
  * prompts, or story text. The signature deliberately takes no free-form
  * payload, so there is no way for caller content to leak into analytics.

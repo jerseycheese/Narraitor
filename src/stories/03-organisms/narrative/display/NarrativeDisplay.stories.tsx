@@ -403,7 +403,7 @@ export const MixedSegmentTypes: Story = {
   },
 };
 
-// Term definitions — marginalia interaction (#1043)
+// Term definitions — marginalia interaction
 const WithTermDefinitionsStory: React.FC = () => {
   const [segment, setSegment] = React.useState<NarrativeSegment | null>(null);
 

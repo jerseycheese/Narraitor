@@ -14,7 +14,7 @@ import { truncate } from '@/lib/utils';
  * wrote, with no upstream cap.
  *
  * Rendered only when the WORLD_DESCRIPTION_IN_SCENE flag is on (see
- * sceneTemplate.ts). EXPERIMENT (#1865): whether this changes play at all is
+ * sceneTemplate.ts). EXPERIMENT: whether this changes play at all is
  * unmeasured — see narraitor-prompt-template-governance/eval-logs/
  * 1865-world-description-in-scene.md.
  */

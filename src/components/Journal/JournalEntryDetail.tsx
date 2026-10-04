@@ -26,7 +26,7 @@ export const JournalEntryDetail: React.FC<JournalEntryDetailProps> = ({
   onBack,
   showBackButton = false,
 }) => {
-  // Detect system events (Issue #176)
+  // Detect system events
   const isSystemEvent = isSystemEntry(entry);
 
   return (

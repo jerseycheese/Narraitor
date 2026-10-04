@@ -72,7 +72,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   // Steps the player has explicitly tried to advance past (Next or Create)
   // while invalid. Until then, a step's error banner stays hidden even
   // though the underlying validation is marked `touched` by a field blur
-  // (see issue #2178) — per-field display is left to each step component.
+  // — per-field display is left to each step component.
   const attemptedSteps = useAttemptedSteps();
 
   React.useEffect(() => {
@@ -380,7 +380,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   // Only show the wizard-level banner once the player has tried to advance
   // past this step; blurring a single field still validates (and gates
   // Next on) the whole step, but shouldn't surface every other field's
-  // error at once (see issue #2178). Per-field display for the current
+  // error at once. Per-field display for the current
   // step's own fields is handled inside that step component. Steps whose
   // validator has no `fieldErrors` fall back to the previous all-or-nothing
   // behavior via `getVisibleStepError`.

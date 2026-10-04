@@ -13,7 +13,7 @@ export default function Error({
   reset: () => void;
 }) {
   // A segment render crash never touches logger.error, so without this the most
-  // common client failure path would still be silent in production (#1641).
+  // common client failure path would still be silent in production.
   useEffect(() => {
     reportError(error, { source: 'error-boundary', digest: error.digest });
   }, [error]);

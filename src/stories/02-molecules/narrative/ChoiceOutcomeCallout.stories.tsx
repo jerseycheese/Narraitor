@@ -105,7 +105,7 @@ export const WithOutcome: Story = {
 };
 
 /**
- * Structured consequence chips (#468): the chosen option carried a trust
+ * Structured consequence chips: the chosen option carried a trust
  * delta and an alignment shift, surfaced under the decision text. Seeds the
  * narrative + NPC stores so the callout can resolve them.
  */

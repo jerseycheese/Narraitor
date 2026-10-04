@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getSiteUrl } from '@/lib/constants/site';
 
 /**
- * Crawl rules for the public site (#1636).
+ * Crawl rules for the public site.
  *
  * Only the four server-rendered marketing routes carry indexable content. The
  * app surfaces are client components reading from local storage, so a crawler

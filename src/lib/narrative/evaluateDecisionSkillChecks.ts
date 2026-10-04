@@ -131,7 +131,7 @@ export function evaluateDecisionSkillChecks({
  * roll on a critical decision is a survivable setback: the narrative reflects
  * the failure, and the AI can still mark the segment fatal in genuinely lethal
  * context. This keeps deadly stakes for the worst rolls without ending the
- * story on a single unlucky-but-ordinary failure (issue #1426).
+ * story on a single unlucky-but-ordinary failure.
  */
 export function isFatalCriticalDecision(
   decisionWeight: DecisionWeight | undefined,

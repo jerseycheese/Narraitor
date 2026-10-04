@@ -10,7 +10,7 @@ export function useTutorialAutoScroll(
   const prevStepIndexRef = useRef<number | null>(null);
   const lastStepIndexRef = useRef<number | null>(null);
   // Programmatic scrollIntoView isn't reachable by the CSS
-  // prefers-reduced-motion media query (#1678) -- jump instead of animating.
+  // prefers-reduced-motion media query -- jump instead of animating.
   const prefersReducedMotion = useReducedMotion();
   const scrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
 

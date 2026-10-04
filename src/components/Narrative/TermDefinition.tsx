@@ -49,7 +49,7 @@ export const TermDefinition: React.FC<TermDefinitionProps> = ({
   //
   // The note is anchored to the paragraph that names the term, but what bounds
   // it is the visible scroller, not the segment. Clamping against the segment
-  // is what broke the last attempt at this (#1592): a definition taller than
+  // is what broke the last attempt at this: a definition taller than
   // its own segment had no slot to fit in, and the tie-break pinned the bottom
   // and pushed the category badge and term name off the top of the scroller,
   // under its `overflow: hidden`.

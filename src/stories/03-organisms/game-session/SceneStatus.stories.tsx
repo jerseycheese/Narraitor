@@ -88,7 +88,7 @@ export const ParticipantsOnly: Story = {
 };
 
 /**
- * Trust-derived disposition labels (#468): once choices have shifted NPC
+ * Trust-derived disposition labels: once choices have shifted NPC
  * relationship state, each participant badge carries a disposition tag
  * (hostile through trusted). No relationship state, no tag.
  */

@@ -15,7 +15,7 @@ import Logger from '@/lib/utils/logger';
 const logger = new Logger('JournalAccessDev');
 
 /**
- * Test Harness for Issue #278: Journal Access During Gameplay
+ * Test Harness for Journal Access During Gameplay
  * Stage 2 Verification: Integration testing with realistic data
  *
  * Interactive Features:

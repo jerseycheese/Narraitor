@@ -76,7 +76,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     getById,
   });
 
-  // Marginalia term definitions (Issue #1058)
+  // Marginalia term definitions
   const { termNames, getDefinition } = useTermDefinitions(
     resolvedSegment?.worldId,
     resolvedSegment?.sessionId

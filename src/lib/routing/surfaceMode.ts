@@ -2,7 +2,7 @@ export type SurfaceMode = 'app' | 'manuscript';
 
 /**
  * Returns the top-level surface mode for a route path.
- * Two surfaces (#1655): the chrome-free manuscript for play, and app chrome
+ * Two surfaces: the chrome-free manuscript for play, and app chrome
  * everywhere else. See DESIGN.md "Surfaces".
  */
 export function getSurfaceMode(pathname: string): SurfaceMode {

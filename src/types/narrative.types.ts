@@ -51,7 +51,7 @@ export interface Decision {
   /**
    * The prompt that produced this decision's options (dev mode only). Segments
    * carry the scene/prose prompt on metadata.debugInfo; this is the choice
-   * generator's own prompt, which nothing captured before #1829 round 6 - a
+   * generator's own prompt, which nothing captured before round 6 - a
    * gap that made the alignment-mix instruction itself unverifiable.
    */
   debugInfo?: PromptDebugInfo;
@@ -260,7 +260,7 @@ export interface PromptDebugInfo {
    * anything the model wrote outside the fields a parser extracts, which
    * hides whether the model complied with a prompt instruction that isn't
    * itself one of those fields - e.g. whether it emitted an Alignment Mix
-   * line before #1829 round 6, nothing captured this and the question was
+   * line before round 6, nothing captured this and the question was
    * unanswerable after the fact.
    */
   rawResponse?: string;

@@ -1,5 +1,5 @@
 /**
- * Narrative-styled error copy for the game-session play loop (Issue #201).
+ * Narrative-styled error copy for the game-session play loop.
  *
  * Errors that surface while a story is being generated should read as part of
  * the story, not as technical faults. This maps an error to genre-neutral,

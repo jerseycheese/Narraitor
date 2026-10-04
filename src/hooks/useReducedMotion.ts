@@ -8,7 +8,7 @@ const supportsMatchMedia = () =>
   typeof window !== 'undefined' && typeof window.matchMedia === 'function';
 
 /**
- * Tracks the OS-level "reduce motion" preference (#1678). CSS handles the
+ * Tracks the OS-level "reduce motion" preference. CSS handles the
  * animation/transition side via the global media query in globals.css; this
  * hook exists only for the JS-driven motion that query can't reach --
  * react-joyride's scroll animation and the manual auto-scroll in

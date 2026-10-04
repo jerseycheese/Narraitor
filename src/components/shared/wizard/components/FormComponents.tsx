@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
 // Associates a WizardFormGroup's visible label with the wizard control it
-// wraps (#1529). The group generates an id, points its Label at it, and the
+// wraps. The group generates an id, points its Label at it, and the
 // wizard field components below pick the id up from context - so every
 // existing WizardFormGroup + WizardTextField/WizardSelect/WizardTextArea
 // pairing gets an accessible name without call-site changes.

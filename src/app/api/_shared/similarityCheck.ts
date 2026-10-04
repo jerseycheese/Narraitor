@@ -20,7 +20,7 @@ interface SimilarityCheckOptions {
   logger: SimilarityLogger;
   errorLogMessage: string;
   failureMessage: string;
-  /** Literal path of the calling route, for the error report (#1641). */
+  /** Literal path of the calling route, for the error report. */
   route: string;
 }
 

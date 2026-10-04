@@ -12,7 +12,7 @@ import '@/state/storeEventWiring';
 
 /**
  * Watches for a session that ended abnormally and surfaces the recovery prompt
- * anywhere in the app, since a crash can drop the player on any page (issue #221).
+ * anywhere in the app, since a crash can drop the player on any page.
  * Mounted once at the app shell level.
  */
 export function SessionRecoveryManager() {

@@ -7,7 +7,7 @@ interface ActiveGameSessionNarrativeColumnProps {
   controllerKey: string;
   sessionId: string;
   segmentCount: number;
-  /** See NarrativeHistoryManager's isGenerating/streamingContent (issue #1476). */
+  /** See NarrativeHistoryManager's isGenerating/streamingContent. */
   isGenerating?: boolean;
   streamingContent?: string;
 }

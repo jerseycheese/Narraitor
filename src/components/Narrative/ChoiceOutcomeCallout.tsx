@@ -79,7 +79,7 @@ const buildConsequenceChips = (
 
 /**
  * Displays a badge indicating that a narrative segment resulted from a player decision
- * (Issue #971 - Show decision consequences in narrative UI)
+ * (Show decision consequences in narrative UI)
  */
 const outcomeLabels: Record<DecisionOutcome, string> = {
   success: 'Success',

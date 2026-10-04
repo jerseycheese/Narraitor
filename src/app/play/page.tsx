@@ -16,7 +16,7 @@ import Logger from '@/lib/utils/logger';
 const logger = new Logger('Play');
 
 // GameSession drags in the full narrative/AI chain; load it on demand and reuse
-// the page's existing loading state so first paint stays light (issue #1357).
+// the page's existing loading state so first paint stays light.
 const GameSession = dynamic(() => import('@/components/GameSession/GameSession'), {
   ssr: false,
   loading: () => <LoadingPulse message="Preparing your adventure..." />,

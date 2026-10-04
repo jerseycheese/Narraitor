@@ -32,7 +32,7 @@ import { characterApi } from '@/lib/api/characterApi';
 
 // CharacterTable pulls @tanstack/react-table but only renders in table view,
 // and the generate dialog only matters once the page is interactive. Load both
-// on demand so the grid-default list page ships less up front (issue #1357).
+// on demand so the grid-default list page ships less up front.
 const CharacterTable = dynamic(
   () =>
     import('@/components/character/CharacterTable').then((m) => ({

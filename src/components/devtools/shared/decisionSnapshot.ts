@@ -1,6 +1,6 @@
 /**
  * Read-only snapshot of decision and prompt-debug state for the DevTools
- * decision inspectors (#212/#213). Reads the playerDecisionTracker singleton
+ * decision inspectors. Reads the playerDecisionTracker singleton
  * and the narrative store via getState() — a deliberate point-in-time snapshot
  * (refreshed on demand), never a live subscription, and never a mutation.
  */

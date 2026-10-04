@@ -53,7 +53,7 @@ export const useActiveGameSessionJournal = ({
     // Under Playwright (E2E/visual) skip the live AI summarize call — it would
     // hit /api/narrative/summarize with no AI key in CI, hang, and stall the
     // page load (the visual suite's page.goto timeouts). Use the local fallback
-    // so seeded pages render deterministically. Mirrors EndingScreen (#1323).
+    // so seeded pages render deterministically. Mirrors EndingScreen.
     if (isPlaywrightEnv()) {
       return {
         summary: createFallbackSummary(content),

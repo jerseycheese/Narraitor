@@ -18,7 +18,7 @@ import { getSurfaceRegister } from '@/lib/routing/surfaceMode';
 
 // Routes that own the play/create action inline, where a header CTA would just
 // duplicate it. Extends the suppression the retired workshop header applied to
-// /worlds alone; this is the double-Play fix (#1655).
+// /worlds alone; this is the double-Play fix.
 // Routes that own the play or create action inline. Their own control is the
 // better one — the roster's Play sets the character before routing, where the
 // header's only sets the world — and both land on the same play URL.
@@ -44,7 +44,7 @@ const BREADCRUMB_SUPPRESSED_ROUTES = new Set([
 ]);
 
 /**
- * HeaderNavigation - the app surface's only chrome (#1655).
+ * HeaderNavigation - the app surface's only chrome.
  */
 export function HeaderNavigation() {
   const {
@@ -67,7 +67,7 @@ export function HeaderNavigation() {
     isProductRegister && (shouldShowBreadcrumbs || hasWorlds);
   // Public context (no local worlds yet) brands to the landing page at /;
   // once this browser has app state, the brand is a home link to /dashboard
-  // so app users aren't sent back to the marketing front door (#1528).
+  // so app users aren't sent back to the marketing front door.
   const brandHref = hasWorlds ? '/dashboard' : '/';
 
   useKeyboardShortcuts(

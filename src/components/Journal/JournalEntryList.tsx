@@ -31,7 +31,7 @@ export const JournalEntryList: React.FC<JournalEntryListProps> = ({
   return (
     <div className={clsx('journal-entry-list', className)}>
       {entries.map((entry) => {
-        // Detect system events for list styling (Issue #176)
+        // Detect system events for list styling
         const isSystemEvent = isSystemEntry(entry);
 
         return (

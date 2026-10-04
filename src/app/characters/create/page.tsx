@@ -23,7 +23,7 @@ export default function CharacterCreatePage() {
   const effectiveWorldId = worldIdFromUrl || currentWorldId;
   // The wizard seeds its attribute/skill allocation from the world and captures it
   // once on mount, so it must not render until the world is actually hydrated — else
-  // the attributes step comes up with no sliders to allocate (#1455).
+  // the attributes step comes up with no sliders to allocate.
   const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
 
   // If URL has worldId but store doesn't, set it in the store

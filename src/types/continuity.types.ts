@@ -99,7 +99,7 @@ export interface ContinuitySceneChange {
 
 /**
  * The player's action referred to a private exchange with an NPC that the story
- * never told (#1857). Co-presence is already recorded per segment, so the void
+ * never told. Co-presence is already recorded per segment, so the void
  * becomes an assertable fact: how many narrated scenes the two have shared,
  * whether they were alone, and whether the NPC was recorded speaking in that
  * solo scene. The contract is omitted when a private exchange was narrated.

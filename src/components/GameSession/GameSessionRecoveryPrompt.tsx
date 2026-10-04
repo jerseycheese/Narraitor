@@ -20,7 +20,7 @@ interface GameSessionRecoveryPromptProps {
 /**
  * Recovery prompt shown when a previous game session ended unexpectedly
  * (browser crash, tab killed). Offers to restore the auto-saved session or to
- * step away and start fresh (issue #221).
+ * step away and start fresh.
  *
  * Built on the Radix dialog primitives directly — with its own scoped overlay
  * and surface classes — so it presents as a centered modal with its own focus

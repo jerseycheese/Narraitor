@@ -5,7 +5,7 @@ export type LoadingVariant = 'spinner' | 'pulse' | 'dots' | 'skeleton';
 type LoadingSize = 'sm' | 'md' | 'lg' | 'xl';
 
 /** Bounded spinner dimensions per size — the SVG has no intrinsic size, so without
- * this it expands to fill its container and reads as a giant ring (#1432 F5/F35). */
+ * this it expands to fill its container and reads as a giant ring (F5/F35). */
 const SPINNER_DIMENSIONS: Record<LoadingSize, string> = {
   sm: '1.5rem',
   md: '2.5rem',

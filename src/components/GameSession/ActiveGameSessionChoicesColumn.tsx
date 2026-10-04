@@ -33,7 +33,7 @@ interface ActiveGameSessionChoicesColumnProps {
   generationError?: NarrativeError | null;
   /** Retry the failed turn (only meaningful for transient/retryable errors). */
   onRetryGeneration?: () => void;
-  /** Suppress ChoiceSelector's number-key shortcuts while a modal/dialog is open over the session (#276). */
+  /** Suppress ChoiceSelector's number-key shortcuts while a modal/dialog is open over the session. */
   shortcutsSuspended?: boolean;
 }
 
