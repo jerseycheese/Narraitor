@@ -2,7 +2,7 @@
 
 Provides the interface for editing existing worlds after creation.
 
-## The Problem We're Solving
+## Editing Constraints
 
 Editing a world means starting from data that already exists. Maybe you're adding a skill, adjusting some attributes, or fixing a typo in the description. Either way the editor is working against a world that might already have characters and stories attached to it, which is the part the creation wizard never has to deal with.
 

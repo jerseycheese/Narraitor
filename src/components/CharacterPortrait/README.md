@@ -4,11 +4,11 @@ Displays character portraits across the app, pairing generated artwork with SVG 
 
 ## What It Does
 
-The component shows character portraits using actual AI-generated images when available, and covers the edge cases:
+The component shows character portraits using generated images when available, and covers fallback states:
 
-- **Real AI-Generated Portraits**: Uses Google's Imagen 3.0 API for actual character portraits
-- **Intelligent Fallbacks**: Character-specific SVG placeholders when API unavailable
-- **Character Initials**: Shows meaningful initials when no portrait exists
+- **Generated Portraits**: Uses Google's Imagen 3.0 API for character portraits
+- **SVG Placeholders**: Character-specific SVG placeholders when the API is unavailable
+- **Character Initials**: Shows initials when no portrait exists
 - **Loading States**: Visual feedback during portrait generation
 - **Error Handling**: Renders the supplied `error` message in place of the portrait
 - **Multiple Sizes**: Small, medium, and large variants

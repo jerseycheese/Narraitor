@@ -4,7 +4,7 @@ An onboarding flow that takes new players from zero to an active story session i
 
 ## How It Works
 
-**Just three steps** - Welcome (explains the value), World Concept (describe what you want), World Details (pick a name and theme). That's it.
+**Three steps** - Welcome (explains what the app does), World Concept (describe what you want), and World Details (pick a name and theme).
 
 **Sensible defaults** - Most settings are pre-filled, so you only have to make the decisions that actually matter.
 
@@ -20,7 +20,7 @@ An onboarding flow that takes new players from zero to an active story session i
 
 **Streamlined experience** - Replaces the generic "Start New Game" button with something that actually helps newcomers understand what they're getting into.
 
-**AI-assisted setup** - Suggestions and smart defaults based on what you're trying to create, rather than overwhelming you with every possible option.
+**AI-assisted setup** - Suggestions and pre-filled defaults based on what you describe, rather than showing every possible option at once.
 
 **Immediate validation** - No dead ends or confusing error states. The system guides you toward valid choices.
 

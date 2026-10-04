@@ -58,7 +58,7 @@ interface GeneratedImage {
 }
 ```
 
-## Smart Character Creation Integration
+## Character Creation Integration
 
 ### How It Works During Character Creation
 The portrait system hooks into character creation - no extra steps required:
