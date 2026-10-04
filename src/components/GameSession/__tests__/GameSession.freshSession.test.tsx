@@ -168,3 +168,48 @@ it('gives fresh=true generation the new session id before the opening arrives', 
     true
   );
 });
+
+it('resumes the new session after saving, Start New, and saving again', async () => {
+  const sessionClock = jest.spyOn(Date, 'now').mockReturnValue(1000);
+  try {
+    useSessionStore.setState({
+      id: null,
+      status: 'initializing',
+      worldId: null,
+      characterId: null,
+      savedSessions: {},
+      sessionLifecycle: {},
+    });
+    await useSessionStore
+      .getState()
+      .initializeSession('world-1', 'character-1');
+    const previousSessionId = useSessionStore.getState().id!;
+    useSessionStore
+      .getState()
+      .updateSavedSessionNarrativeCount(previousSessionId, 1);
+
+    const { result } = renderHook(() =>
+      useGameSessionState({ worldId: 'world-1', isClient: true })
+    );
+    sessionClock.mockReturnValue(2000);
+    await act(async () => {
+      result.current.handleNewSession();
+    });
+    const newSessionId = useSessionStore.getState().id!;
+    expect(newSessionId).not.toBe(previousSessionId);
+    act(() => {
+      useSessionStore
+        .getState()
+        .updateSavedSessionNarrativeCount(newSessionId, 1);
+    });
+
+    expect(
+      useSessionStore.getState().getSavedSession('world-1', 'character-1')?.id
+    ).toBe(newSessionId);
+    expect(
+      useSessionStore.getState().savedSessions[previousSessionId]
+    ).toBeUndefined();
+  } finally {
+    sessionClock.mockRestore();
+  }
+});

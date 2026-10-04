@@ -99,6 +99,7 @@ export const useGameSessionState = ({
       selectChoice: state.selectChoice,
       endSession: state.endSession,
       getSavedSession: state.getSavedSession,
+      deleteSavedSession: state.deleteSavedSession,
       resumeSavedSession: state.resumeSavedSession,
     }))
   );
@@ -336,6 +337,10 @@ export const useGameSessionState = ({
   const handleNewSession = useCallback(() => {
     if (sessionCharacterId && actualSessionState.initializeSession) {
       logger.debug('Starting new session, character:', sessionCharacterId);
+      const previousSave = actualSessionState.getSavedSession(worldId, sessionCharacterId);
+      if (previousSave) {
+        actualSessionState.deleteSavedSession(previousSave.id);
+      }
       // Clear any existing ending state when starting new session
       useNarrativeStore.getState().clearEnding();
       actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart, true);
