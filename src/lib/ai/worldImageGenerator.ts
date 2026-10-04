@@ -53,13 +53,20 @@ function buildPrompt(world: World): string {
 export async function generateWorldImage(world: World, customPrompt?: string): Promise<GeneratedImage> {
   try {
     const prompt = customPrompt || buildPrompt(world);
+    const worldForRequest = {
+      name: world.name,
+      description: world.description,
+      genre: world.genre,
+      attributes: world.attributes.map(({ name }) => ({ name })),
+      skills: world.skills.map(({ name }) => ({ name })),
+    };
 
     const response = await aiFetch('/api/generate-world-image', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ world, customPrompt }),
+      body: JSON.stringify({ world: worldForRequest, customPrompt }),
     });
 
     if (!response.ok) {
