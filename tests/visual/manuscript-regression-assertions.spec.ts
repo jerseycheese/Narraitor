@@ -1112,4 +1112,86 @@ test.describe('Manuscript regression assertions', () => {
       `Narrowest choice label was ${Math.round(geometry.narrowestLabelWidth)}px`
     ).toBeGreaterThan(0.5);
   });
+
+  for (const scheme of ['light', 'dark'] as const) {
+    test(`HUD character pill and icon toolbar do not overlap at 375px in ${scheme} mode (#2215)`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 375, height: 812 });
+      await seedTestData(page);
+      await mockApiEndpoints(page);
+
+      await page.addInitScript((mode) => {
+        window.localStorage.setItem('narraitor-color-scheme', mode);
+      }, scheme);
+
+      await page.goto('/worlds/world-cyberpunk-2077/play');
+      await page.waitForSelector('[data-testid="manuscript-session-shell"]', {
+        timeout: 10000,
+      });
+      await page.waitForSelector('.manuscript-hud-character-pill', {
+        timeout: 10000,
+      });
+      await page.waitForSelector('.manuscript-ds3-controls', {
+        timeout: 10000,
+      });
+
+      const metrics = await page.evaluate(() => {
+        const pill = document.querySelector('.manuscript-hud-character-pill');
+        const toolbar = document.querySelector('.manuscript-ds3-controls');
+        if (!pill || !toolbar) return null;
+
+        const pillRect = pill.getBoundingClientRect();
+        const toolbarRect = toolbar.getBoundingClientRect();
+
+        const horizontalOverlap =
+          Math.min(pillRect.right, toolbarRect.right) -
+          Math.max(pillRect.left, toolbarRect.left);
+        const verticalOverlap =
+          Math.min(pillRect.bottom, toolbarRect.bottom) -
+          Math.max(pillRect.top, toolbarRect.top);
+
+        const overlaps = horizontalOverlap > 0 && verticalOverlap > 0;
+        const toolbarWrappedBelow = toolbarRect.top >= pillRect.bottom - 1;
+        const clearSideBySide = pillRect.right <= toolbarRect.left;
+
+        return {
+          pill: {
+            left: Math.round(pillRect.left * 100) / 100,
+            right: Math.round(pillRect.right * 100) / 100,
+            top: Math.round(pillRect.top * 100) / 100,
+            bottom: Math.round(pillRect.bottom * 100) / 100,
+            width: Math.round(pillRect.width * 100) / 100,
+            height: Math.round(pillRect.height * 100) / 100,
+          },
+          toolbar: {
+            left: Math.round(toolbarRect.left * 100) / 100,
+            right: Math.round(toolbarRect.right * 100) / 100,
+            top: Math.round(toolbarRect.top * 100) / 100,
+            bottom: Math.round(toolbarRect.bottom * 100) / 100,
+            width: Math.round(toolbarRect.width * 100) / 100,
+            height: Math.round(toolbarRect.height * 100) / 100,
+          },
+          horizontalOverlap: Math.round(horizontalOverlap * 100) / 100,
+          verticalOverlap: Math.round(verticalOverlap * 100) / 100,
+          overlaps,
+          toolbarWrappedBelow,
+          clearSideBySide,
+        };
+      });
+
+      expect(metrics).not.toBeNull();
+      if (!metrics) throw new Error('HUD elements not found');
+
+      // Pill must be clear of toolbar: either toolbar wraps below, or pill right edge is <= toolbar left edge
+      expect(
+        metrics.toolbarWrappedBelow || metrics.clearSideBySide,
+        `Expected pill (right: ${metrics.pill.right}) to be at/left of toolbar (left: ${metrics.toolbar.left}) or toolbar wrapped below pill (pill bottom: ${metrics.pill.bottom}, toolbar top: ${metrics.toolbar.top})`
+      ).toBe(true);
+
+      // And no bounding box intersection
+      expect(metrics.overlaps).toBe(false);
+    });
+  }
 });
+
