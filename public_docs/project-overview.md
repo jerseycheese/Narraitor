@@ -2,7 +2,7 @@
 title: Narraitor Project Overview
 tags: [narraitor, overview]
 created: 2025-04-27
-updated: 2026-09-28
+updated: 2026-10-04
 ---
 
 # Narraitor Project Overview
@@ -13,7 +13,7 @@ I built this AI storytelling app that lets you play RPG narratives in any fictio
 Middle Earth, the beaches of Normandy, something you invented last week: all fair game. It's designed for solo play when you want a narrative RPG experience but don't have a group or game master available.
 
 ## Current Status
-As of v1.12.0 (2026-10-03), the app is past MVP: all the main systems (world creation, character building, AI narrative generation, session persistence, multi-provider AI) are operational and have shipped through twelve releases. v1.11 built scene state for long-session coherence and ships switched off; v1.12 changed lever, making cheaper open-weight models work properly through OpenRouter, and DeepSeek flash beat the old baseline. Current work (v1.13) makes it the recommended default and clears out Gemini-only assumptions. See [MVP Roadmap](./development/mvp-roadmap.md) and [RELEASES.md](../RELEASES.md) for the running detail.
+As of v1.13.0 (2026-10-04), the app is past MVP: world creation, character building, AI narrative generation, session persistence, and multi-provider AI are operational. DeepSeek flash through OpenRouter is the recommended text model. v1.13 removes the silent server-key fallback, keeps large artwork payloads out of ending and world generation requests, fixes fresh session restarts after an ending, keeps passages over 1,000 characters from losing their middle so mid-passage scene changes reach the choices, fixes provider hydration, and clarifies saving a tested provider. Scene state and the thread-ledger ending gate remain switched off. See [MVP Roadmap](./development/mvp-roadmap.md) and [RELEASES.md](../RELEASES.md) for the running detail.
 
 ## Technical Foundation
 
@@ -52,7 +52,7 @@ Built primarily for personal use: solo narrative RPG experiences when you want t
 - **Domain boundaries**: Keep related functionality together.
 
 ## Current Focus
-v1.12: OpenRouter models without workarounds (#2252, #2251, #2249), the fatal-cooldown fix (#2250), then a re-measure at n=3 plus 10-turn episodes (#2257). See [MVP Roadmap](./development/mvp-roadmap.md) for the active queue.
+v1.14: short chapters with a recap between them (#2265). Narrative-cohesion changes remain paused. See [MVP Roadmap](./development/mvp-roadmap.md) for the active queue.
 
 ## Technical Architecture
 Domain-driven structure with Zustand stores for each area (World, Character, Narrative, etc.). Shared component patterns for wizards and forms. AI service abstractions handle prompt management and context building. Everything's type-safe with validation.
