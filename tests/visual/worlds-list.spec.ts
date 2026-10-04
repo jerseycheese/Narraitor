@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import {
+  waitForContentStable,
+  hideDynamicContent,
+  waitForImagesLoadedIn,
+} from './utils/wait-helpers';
 import { seedTestData, seedBaseData } from './utils/seedTestData';
 
 /**
@@ -34,6 +38,7 @@ test.describe('Worlds List Visual Tests', () => {
     await page.goto('/worlds');
     await waitForContentStable(page);
     await hideDynamicContent(page);
+    await waitForImagesLoadedIn(page, '.worlds-screen');
     
     // Take screenshot of worlds page - should show populated worlds
     await expect(page).toHaveScreenshot('worlds-list.png', { fullPage: true });
@@ -47,6 +52,7 @@ test.describe('Worlds List Visual Tests', () => {
     await page.goto('/worlds');
     await waitForContentStable(page);
     await hideDynamicContent(page);
+    await waitForImagesLoadedIn(page, '.worlds-screen');
     await expect(page).toHaveScreenshot('worlds-list-dark.png', { fullPage: true });
   });
 });

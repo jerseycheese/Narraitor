@@ -4,6 +4,7 @@ import {
   hideDynamicContent,
   pinAppShell,
   waitForImagesLoaded,
+  waitForImagesLoadedIn,
 } from './utils/wait-helpers';
 import { seedTestData, seedBarelyStartedData } from './utils/seedTestData';
 import { waitForStoreReady } from './utils/tutorial-helpers';
@@ -57,6 +58,7 @@ test.describe('Mobile layouts', () => {
     await page.reload();
     await waitForContentStable(page);
     await page.waitForSelector('.worlds-screen', { timeout: 8000 });
+    await waitForImagesLoadedIn(page, '.worlds-screen');
     await settle(page);
     await expect(page).toHaveScreenshot('mobile-worlds-list.png', { fullPage: true });
   });
