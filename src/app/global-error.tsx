@@ -11,7 +11,7 @@ import '@/lib/theme/themes/ds3.css';
 import './globals.css';
 
 /**
- * Last-resort boundary for a crash in the root layout itself (#1641).
+ * Last-resort boundary for a crash in the root layout itself.
  *
  * Renders outside the app shell, so it can't use the theme, toast, or devtools
  * providers — plain markup and design tokens only.

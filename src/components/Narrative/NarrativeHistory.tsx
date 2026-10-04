@@ -45,7 +45,7 @@ interface NarrativeHistoryProps {
   isHydrating?: boolean;
   /**
    * The active generation's narrative prose so far, growing as tokens
-   * stream in from /api/narrative/generate (issue #1476). While isLoading is
+   * stream in from /api/narrative/generate. While isLoading is
    * true, this takes the place of the bare "Continuing your story..."
    * spinner as soon as the first token arrives — the spinner remains the
    * fallback for the gap before that.
@@ -273,7 +273,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   }, []);
   // A synthetic segment carrying the in-progress generation's prose so far,
   // rendered through the normal NarrativeDisplay presentation instead of the
-  // bare spinner once the first token arrives (issue #1476).
+  // bare spinner once the first token arrives.
   const streamingPreviewSegment: NarrativeSegment | null =
     isLoading && streamingContent
       ? {
@@ -381,7 +381,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
       if (scrollTarget) {
         scrollViewportRef.current = scrollTarget;
         // Passive: handleScroll only reads scroll position (no preventDefault),
-        // so mark it passive to avoid blocking scroll (issue #1358).
+        // so mark it passive to avoid blocking scroll.
         scrollTarget.addEventListener('scroll', handleScroll, { passive: true });
 
         // ResizeObserver: anchor scroll to bottom during content growth.

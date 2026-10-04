@@ -29,7 +29,7 @@ export const NoSkills: Story = {
   },
 };
 
-/** Alignment row + meter appear once a choice has shifted the axis (#468). */
+/** Alignment row + meter appear once a choice has shifted the axis. */
 export const WithAlignment: Story = {
   args: {
     character: {

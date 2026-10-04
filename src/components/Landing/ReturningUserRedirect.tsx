@@ -29,7 +29,7 @@ const hasLocalAppState = (): boolean => {
 
 /**
  * ReturningUserRedirect - routes returning browsers from the public landing
- * page (/) to /dashboard (#1528).
+ * page (/) to /dashboard.
  *
  * "Returning" is local-first: this browser has persisted worlds, characters,
  * or saved sessions. The stores hydrate asynchronously from IndexedDB, so the

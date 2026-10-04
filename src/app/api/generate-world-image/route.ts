@@ -17,7 +17,7 @@ interface GenerateWorldImageRequest {
 // Summarize the world's defined attributes/skills so a thin free-text description
 // still grounds the image in the world's actual theme. The manual wizard carries
 // these (via FinalizeStep's full world); the /worlds Generate path passes none, so
-// its prompt is unchanged. Names only — keep the prompt tight. (#1437)
+// its prompt is unchanged. Names only — keep the prompt tight.
 function describeWorldElements(world: World): string {
   const attributeNames = (world.attributes || []).map((attr) => attr.name).filter(Boolean);
   const skillNames = (world.skills || []).map((skill) => skill.name).filter(Boolean);

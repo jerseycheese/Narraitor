@@ -243,7 +243,7 @@ export default function GameSessionTestHarness() {
     }
 
     // Seed a couple of NPCs so consequence targets resolve by name in the
-    // choice contract and the SceneStatus disposition labels have data (#468).
+    // choice contract and the SceneStatus disposition labels have data.
     const npcStore = useNPCStore.getState();
     const seededNpcs = [
       { id: 'npc-marta', name: 'Marta' },

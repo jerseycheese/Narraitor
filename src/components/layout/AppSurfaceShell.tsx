@@ -11,7 +11,7 @@ interface AppSurfaceShellProps {
 }
 
 /**
- * AppSurfaceShell - two surfaces (#1655). The app surface carries one header,
+ * AppSurfaceShell - two surfaces. The app surface carries one header,
  * a conditional breadcrumb band, and a centered content column; the manuscript
  * surface (play) carries no chrome at all.
  *

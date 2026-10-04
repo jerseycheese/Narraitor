@@ -119,7 +119,7 @@ export default function PlayPage() {
 
   // Exit prompts confirmation only when there's narrative progress to abandon.
   // Auto-save means data isn't lost either way; the prompt just guards against
-  // accidental clicks mid-story (issue #268).
+  // accidental clicks mid-story.
   const handleBackClick = () => {
     if (currentProgress > 0) {
       setShowExitConfirmation(true);

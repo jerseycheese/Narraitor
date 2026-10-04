@@ -1,10 +1,10 @@
 /**
- * Unrecorded Exchange (#1857)
+ * Unrecorded Exchange
  *
  * The player types "ask Davies to repeat publicly what he told me privately"
  * and the model backfills a conversation the story never told; the lore
  * extractor then records the invention as canon. The ledger-fed contract
- * (#1856) cannot reach this, because a conversation that never happened leaves
+ * cannot reach this, because a conversation that never happened leaves
  * nothing in the ledger to assert.
  *
  * Co-presence and the primary speaker are already recorded, though.

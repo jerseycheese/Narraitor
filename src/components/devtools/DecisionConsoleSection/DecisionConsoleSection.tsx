@@ -29,7 +29,7 @@ const matchesSearch = (decision: PlayerDecision, query: string): boolean => {
 };
 
 /**
- * DecisionConsoleSection (#212, epic #1302)
+ * DecisionConsoleSection
  *
  * Searchable, read-only console over the playerDecisionTracker records:
  * filter by text/choice type/world, inspect full metadata per record, view

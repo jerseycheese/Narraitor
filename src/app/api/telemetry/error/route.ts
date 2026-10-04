@@ -14,7 +14,7 @@ import { logErrorReport } from '@/lib/telemetry/reportServerError';
 const MAX_BODY_CHARS = 4096;
 
 /**
- * Sink for client-side error reports (#1641).
+ * Sink for client-side error reports.
  *
  * The posted body is treated as hostile: every field is re-run through the
  * same sanitizers the client used and anything outside the schema is dropped,

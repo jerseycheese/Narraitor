@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getSiteUrl } from '@/lib/constants/site';
 
 /**
- * The public routes worth indexing (#1636) — every server-rendered page that
+ * The public routes worth indexing — every server-rendered page that
  * has real content. /welcome is excluded because it redirects, and everything
  * robots.ts disallows is excluded so the two files can't contradict each other.
  *

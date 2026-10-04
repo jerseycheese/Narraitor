@@ -4,8 +4,8 @@ import { getUserFriendlyError, ErrorType } from '@/lib/utils/errorUtils';
  * The shape of an error report and the sanitizers that build it — the whole
  * privacy contract lives in this file.
  *
- * Hard privacy constraint (#1641), the same allowlist-by-construction posture
- * as trackFunnelStep (#1367): the ONLY thing that travels is a closed
+ * Hard privacy constraint, the same allowlist-by-construction posture
+ * as trackFunnelStep: the ONLY thing that travels is a closed
  * vocabulary — a source from a fixed union, a sanitized error class name, a
  * category enum, a masked route, an optional hex digest, and stack frames with
  * the message header stripped.

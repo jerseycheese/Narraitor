@@ -33,7 +33,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
 }) => {
   // A field's "required"/length error only shows once the player has moved
   // past (blurred) that specific field — not as soon as any other field in
-  // this step is blurred (see issue #2178).
+  // this step is blurred.
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
 
   const updateBackground = (background: CharacterCreationData['background']) => {

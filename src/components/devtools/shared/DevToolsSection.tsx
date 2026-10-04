@@ -35,7 +35,7 @@ interface DevToolsSectionProps {
  *   <select>World selection dropdown</select>
  * </DevToolsSection>
  *
- * @since 1.0.0 - Created during Issue #184 code review for reusability
+ * @since 1.0.0 - Created during code review for reusability
  */
 export const DevToolsSection: React.FC<DevToolsSectionProps> = ({
   title,

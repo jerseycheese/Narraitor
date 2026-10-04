@@ -166,7 +166,7 @@ export default function WorldCreationWizard({
   // index, plus which steps the player has explicitly tried to advance past
   // (clicked Next while invalid). A field's own error only surfaces once
   // it's been touched, unless the step was attempted, in which case every
-  // failing field's error shows (see issue #2178).
+  // failing field's error shows.
   const [touchedFieldsByStep, setTouchedFieldsByStep] = useState<Record<number, Set<string>>>({});
   const attemptedSteps = useAttemptedSteps();
   const { mark: markAttemptedStep, reset: resetAttemptedSteps } = attemptedSteps;

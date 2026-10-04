@@ -97,7 +97,7 @@ interface UseEndingDetectionOptions {
  * deliberately NOT treated as high-signal: under the rebalanced lethality a
  * critical failure is usually a survivable setback, not an ending, so running
  * the ending check on every critical outcome surfaced spurious "wrap it up"
- * prompts mid-story (issue #1426). Genuinely lethal moments still end the run
+ * prompts mid-story. Genuinely lethal moments still end the run
  * via the fatal-outcome tag, and climactic resolutions get majorEvent.
  */
 function shouldRunEndingCheck(

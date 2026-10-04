@@ -152,7 +152,7 @@ class Logger {
    * Logs an error message, and in production forwards it to the error sink.
    *
    * Every logger.error call site in the app funnels through here, which is why
-   * this is the one hook the client needs (#1641). The report is built from the
+   * this is the one hook the client needs. The report is built from the
    * Error among the arguments, not from args[0] — the first argument is usually
    * a label string, and reporting it would ship a stack-less report.
    */

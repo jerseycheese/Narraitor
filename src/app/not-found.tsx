@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Global not-found page for unknown routes (#1535).
+ * Global not-found page for unknown routes.
  *
  * Renders inside the app shell via the root layout, so a stale bookmark or a
  * typo lands on branded copy with a way back into the player flow instead of

@@ -4,7 +4,7 @@ import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 const ENDPOINT = '/api/telemetry/error';
 
 /**
- * Client transport for an error report (#1641).
+ * Client transport for an error report.
  *
  * Only the sanitized report from buildErrorReport is sent — see that file for
  * the privacy contract. Dev stays console-only: the sink exists because

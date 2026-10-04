@@ -230,7 +230,7 @@ export interface AITextRequestOptions {
 
 /** How a failed provider resolution is reported to the caller. */
 const RESOLUTION_ERRORS: Record<ProviderResolutionFailure, { message: string; status: number }> = {
-  // Missing player-supplied key is a client precondition failure, not a server crash (#2028).
+  // Missing player-supplied key is a client precondition failure, not a server crash.
   NO_KEY: { message: 'API key not configured', status: 412 },
   UNSUPPORTED_PROVIDER: {
     message: '400 bad request: that provider type is not supported yet',

@@ -8,8 +8,8 @@ import { trackFunnelStep } from '@/lib/analytics/trackFunnelStep';
 const VISITED_KEY = 'narraitor-visited';
 
 /**
- * FunnelAnalytics — fires the named, anonymous funnel-step conversion events
- * (#1367). Page views come for free from <Analytics />; this adds the
+ * FunnelAnalytics — fires the named, anonymous funnel-step conversion events.
+ * Page views come for free from <Analytics />; this adds the
  * conversion signals that page views alone do not cleanly capture:
  *   - landing       — first touch on the public landing page
  *   - session-started — entering a play (manuscript) route
@@ -35,7 +35,7 @@ export function FunnelAnalytics() {
     }
   }, []);
 
-  // Route-based funnel steps. The landing page owns the root route (#1528),
+  // Route-based funnel steps. The landing page owns the root route,
   // so the landing step fires on / — real first-touch traffic, not just
   // visitors who knew the old /welcome URL.
   useEffect(() => {

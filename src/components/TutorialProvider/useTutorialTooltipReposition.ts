@@ -17,7 +17,7 @@ const getDocumentPosition = (selector: string | null) => {
  * react-joyride places a step's tooltip once, when the step opens, and never
  * re-measures it against the viewport. Any later scroll or reflow leaves the
  * tooltip on its original coordinates, so on a short phone viewport it can end
- * up hanging past the bottom edge with its body text unreadable (#1644).
+ * up hanging past the bottom edge with its body text unreadable.
  *
  * Feed the returned callback to Joyride's `floaterProps.getPopper` to capture
  * the tooltip's Popper instance. This hook then re-runs its positioning (which

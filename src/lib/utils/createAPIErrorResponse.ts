@@ -8,8 +8,8 @@ import { reportServerError } from '@/lib/telemetry/reportServerError';
  * Automatically converts errors to user-friendly messages and includes
  * all necessary fields for consistent client-side error handling.
  *
- * Server failures (status >= 500) are also forwarded to the error sink
- * (#1641). This is the single hook covering every route that runs through
+ * Server failures (status >= 500) are also forwarded to the error sink.
+ * This is the single hook covering every route that runs through
  * processGeminiTextRequest — narrative/generate, narrative/choices,
  * ai/validate-provider — plus generate-character and generate-world, which is
  * why those 17 routes didn't each need editing. A client 4xx is the caller's

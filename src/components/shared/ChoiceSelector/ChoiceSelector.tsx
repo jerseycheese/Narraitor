@@ -58,7 +58,7 @@ interface ChoiceSelectorProps {
   // True while a modal/dialog (shortcuts help, a drawer, End Story
   // confirmation, ...) is open over the session. Suppresses the number-key
   // shortcuts below so a player interacting with that overlay can't also
-  // silently select a choice behind it (#276 review follow-up).
+  // silently select a choice behind it (review follow-up).
   shortcutsSuspended?: boolean;
 }
 

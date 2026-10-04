@@ -131,7 +131,7 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
     : '';
 
   const backgroundSection = formatPlayerBackground(playerCharacterBackground);
-  // Carries the world's founding description into every turn (shipped #1865).
+  // Carries the world's founding description into every turn.
   const worldDescriptionSection = isFeatureEnabled('WORLD_DESCRIPTION_IN_SCENE')
     ? worldDescriptionBlock(worldDescription)
     : '';

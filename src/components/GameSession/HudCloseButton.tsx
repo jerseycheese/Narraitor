@@ -9,7 +9,7 @@ interface HudCloseButtonProps {
 }
 
 /**
- * The single Close control for the game-session HUD (#1424): one component so the
+ * The single Close control for the game-session HUD: one component so the
  * only way to leave a session can't drift apart across the app.
  */
 export function HudCloseButton({ onBack }: HudCloseButtonProps) {

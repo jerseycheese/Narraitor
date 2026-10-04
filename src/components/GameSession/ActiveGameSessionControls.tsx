@@ -33,7 +33,7 @@ const ActiveGameSessionControls: React.FC<ActiveGameSessionControlsProps> = ({
 }) => {
   const cancelButtonRef = React.useRef<HTMLButtonElement>(null);
 
-  // Escape/focus parity with the shared ConfirmationDialog (#1536): Escape
+  // Escape/focus parity with the shared ConfirmationDialog: Escape
   // dismisses, and initial focus lands on Cancel because ending the story is
   // irreversible - the same choice the shared dialog makes for destructive
   // confirmations.

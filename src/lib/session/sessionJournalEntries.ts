@@ -6,7 +6,7 @@ import { formatSessionDuration, calculateNextSessionNumber } from '@/lib/utils/s
 import type { SessionStartedEvent, SessionEndedEvent } from '@/lib/state/storePubSub';
 
 /**
- * Session-boundary journal entries (Issue #176).
+ * Session-boundary journal entries.
  *
  * Relocated out of sessionStore so it doesn't import sibling stores —
  * sessionStore emits SESSION_STARTED / SESSION_ENDED and these handlers

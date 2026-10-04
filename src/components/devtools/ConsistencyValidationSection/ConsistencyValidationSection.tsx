@@ -53,7 +53,7 @@ const CONTINUITY_BADGE_VARIANTS: Record<
  * @example
  * ```tsx * // Used within DevToolsPanel * <CollapsibleSection title="Consistency Validation" initialCollapsed={true}> * <ConsistencyValidationSection /> * </CollapsibleSection> *```
  * 
- * @since 1.0.0 - Issue #184: AI Consistency Validation System
+ * @since 1.0.0 - AI Consistency Validation System
  */
 export const ConsistencyValidationSection = () => {
   const [selectedWorldId, setSelectedWorldId] = useState<string>('');

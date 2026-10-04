@@ -9,7 +9,7 @@ import type { Decision } from '@/types/narrative.types';
 import './DecisionFlowSection.css';
 
 /**
- * DecisionFlowSection (#213, epic #1302)
+ * DecisionFlowSection
  *
  * Read-only trace of how each decision was created, presented, selected, and
  * recorded: origin segment → AI-generated options (alignment/custom-input) →

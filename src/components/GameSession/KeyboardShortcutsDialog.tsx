@@ -8,7 +8,7 @@ interface ShortcutEntry {
   description: string;
 }
 
-// Only the shortcuts actually wired up in the game session (#276). Keep this
+// Only the shortcuts actually wired up in the game session. Keep this
 // list in sync with ChoiceSelector's number-key handling and the 'j'/'c'/'?'
 // bindings in ActiveGameSession.
 const SHORTCUTS: ShortcutEntry[] = [

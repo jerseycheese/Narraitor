@@ -186,7 +186,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
     // Skip checkpoint generation under Playwright (E2E/visual) — it POSTs to
     // /api/narrative/story-checkpoint, which hangs with no AI key in CI and
     // stalls the page load (the visual suite's page.goto timeouts). Seeded
-    // pages don't need a generated checkpoint. Mirrors EndingScreen (#1323).
+    // pages don't need a generated checkpoint. Mirrors EndingScreen.
     if (isPlaywrightEnv()) {
       return;
     }

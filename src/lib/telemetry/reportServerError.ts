@@ -20,7 +20,7 @@ export function logErrorReport(report: ErrorReport): void {
 }
 
 /**
- * Server-side sink for an error report (#1641). Same sanitized shape as the
+ * Server-side sink for an error report. Same sanitized shape as the
  * client path — see errorReport.ts for what does and doesn't travel.
  *
  * Never throws.

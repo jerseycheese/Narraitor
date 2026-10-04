@@ -1,5 +1,5 @@
 /**
- * Public site identity and origin (#1636).
+ * Public site identity and origin.
  *
  * SERVER-ONLY. `VERCEL_PROJECT_PRODUCTION_URL` and `VERCEL_URL` carry no
  * `NEXT_PUBLIC_` prefix, so Next never inlines them into client bundles — a

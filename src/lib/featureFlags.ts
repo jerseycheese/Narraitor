@@ -28,11 +28,11 @@ const FEATURE_FLAG_DEFAULTS = {
   // The world can take something from the character: the post-segment
   // extraction records a cost (a condition written to the character, an item
   // loss attributed to the thread that took it) and the scene prompt carries
-  // the character's conditions. On since the #1983 live matrix evaluation;
+  // the character's conditions. On since the live matrix evaluation;
   // the env var is the kill switch.
   WORLD_COST: true,
   // Renders the world's founding description in the per-turn scene prompt.
-  // Measured and shipped in issue #1865: keeps world-specific contextual pressure
+  // Measured and shipped: keeps world-specific contextual pressure
   // (e.g. deadlines, stakes) alive across 20+ turns without prompt amnesia or looping.
   // See narraitor-prompt-template-governance/eval-logs/1865-world-description-in-scene.md.
   WORLD_DESCRIPTION_IN_SCENE: true,
@@ -47,7 +47,7 @@ const FEATURE_FLAG_DEFAULTS = {
   // already-settled block. Off by default until live evaluation passes.
   SETTLED_COMMITMENT_CHOICES: false,
   // Attributes world costs to the player decision that directly incurred them.
-  // Shipped default-on following successful paired live evaluation (#2020).
+  // Shipped default-on following successful paired live evaluation.
   DECISION_ATTRIBUTED_WORLD_COSTS: true,
   // Decide 'is the story done' from the thread ledger, not from the last six majorEvent strings.
   ENDING_GATE_THREAD_LEDGER: false,

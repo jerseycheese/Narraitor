@@ -2,7 +2,7 @@
 
 /**
  * useSessionRecovery — detects a session that ended abnormally and offers to
- * restore it (issue #221).
+ * restore it.
  *
  * A surviving recovery marker (see sessionRecoveryMarker) means the previous run
  * never shut down cleanly. The persisted session + narrative state is already

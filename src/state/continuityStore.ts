@@ -20,7 +20,7 @@ interface ContinuityState {
 /**
  * Holds continuity-guardrail validation results captured after each narrative
  * generation so the DevTools ConsistencyValidationSection can show live
- * detection/correction outcomes (#409/#412). Populated client-side by
+ * detection/correction outcomes. Populated client-side by
  * `applyContinuityGuardrail` in `narrativeGenerator.continuity.ts`.
  */
 export const useContinuityStore = create<ContinuityState>((set) => ({

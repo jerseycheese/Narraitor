@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 
 /**
- * LegalPage — shared layout for the lightweight privacy/terms surfaces (#1366).
+ * LegalPage — shared layout for the lightweight privacy/terms surfaces.
  * Token-driven server component. Structural treatment lives in src/app/legal.css
  * under .component-legal* selectors (mirrors the About/dashboard pattern).
  */

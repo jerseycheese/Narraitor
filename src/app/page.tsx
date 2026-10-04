@@ -4,7 +4,7 @@ import { Landing, ReturningUserRedirect } from '@/components/Landing';
 // written for this page, so re-declaring them here would only invite drift.
 
 /**
- * Public entry point (#1528). Anonymous visitors (no local worlds, characters,
+ * Public entry point. Anonymous visitors (no local worlds, characters,
  * or saved sessions) see the Landing front door; returning browsers are routed
  * to /dashboard by ReturningUserRedirect once the persisted stores hydrate.
  */

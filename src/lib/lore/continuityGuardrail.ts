@@ -1,12 +1,12 @@
 /**
- * Continuity Guardrail (#409/#412)
+ * Continuity Guardrail
  *
  * Pure contradiction detection for generated narrative. Builds a compact
  * "continuity contract" from established state (lore facts, NPC relationships,
  * recent decisions, and the ledger builders in `continuityLedger.ts`) and
  * checks new prose against it deterministically, so the fast path adds
  * microseconds — an AI correction call only happens when an issue is detected
- * (per #441's sub-200ms generation-impact constraint).
+ * (per the sub-200ms generation-impact constraint).
  *
  * Like `loreContext.ts`, this module takes data as parameters and imports no
  * stores; store reads live in `lib/ai/narrativeGenerator.continuity.ts`.
@@ -102,8 +102,8 @@ export interface BuildContinuityContractArgs {
    */
   inventoryItemIds?: EntityID[];
   /**
-   * Prior exchanges the player's action claims but the session never narrated
-   * (#1857). Passed through rather than derived here: co-presence lives on the
+   * Prior exchanges the player's action claims but the session never narrated.
+   * Passed through rather than derived here: co-presence lives on the
    * narrative store, and this module stays store-free. Optional so the existing
    * fixtures keep compiling.
    */

@@ -1,6 +1,6 @@
 /**
  * LoreManagementSection Component
- * Issue #182: Store world facts for developer tools and debugging
+ * Store world facts for developer tools and debugging
  * 
  * Provides developer-facing interface for managing world facts
  */

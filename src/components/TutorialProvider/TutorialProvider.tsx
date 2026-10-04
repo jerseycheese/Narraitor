@@ -104,7 +104,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
   useTutorialAutoScroll(run, steps, stepIndex);
   // Native Joyride scrolling isn't reached by the CSS prefers-reduced-motion
-  // media query (#1678) -- collapse its scroll animation to instant instead.
+  // media query -- collapse its scroll animation to instant instead.
   const prefersReducedMotion = useReducedMotion();
 
   const activeTarget = steps[stepIndex]?.target;
@@ -119,7 +119,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
 
   // Force Joyride to re-measure the spotlight when the active step's target resizes
   // (e.g. a CollapsibleSection expanding). Without this, the spotlight stays at the
-  // initial measurement and visually drifts off the target. See issue #1012.
+  // initial measurement and visually drifts off the target.
   useEffect(() => {
     if (!run || isPaused) return;
     const step = steps[stepIndex];
@@ -164,7 +164,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
   // single ~67KB module. TutorialProvider sits in the root layout, so a static
   // import would ship that runtime on every page even though most sessions never
   // start a tour. Load it on first tour start instead, and read its
-  // STATUS/ACTIONS/EVENTS enums from the loaded module (issue #1357).
+  // STATUS/ACTIONS/EVENTS enums from the loaded module.
   const ensureJoyrideRuntime = useCallback(async (): Promise<JoyrideModule | null> => {
     if (joyrideRuntimeRef.current) {
       return joyrideRuntimeRef.current;

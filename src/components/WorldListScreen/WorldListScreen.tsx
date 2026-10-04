@@ -20,7 +20,7 @@ import {
 import { readString, writeString } from '@/lib/utils/browserStorage';
 
 // WorldTable pulls @tanstack/react-table but only renders in table view; the
-// list defaults to grid, so load it on demand (issue #1357).
+// list defaults to grid, so load it on demand.
 const WorldTable = dynamic(
   () =>
     import('@/components/world/WorldTable').then((m) => ({

@@ -6,7 +6,7 @@ import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 
 // Load the devtools panel only on demand so its module graph is reliably kept
 // out of the production bundle — the dev-only render guard below still gates
-// whether it ever renders (issue #1357).
+// whether it ever renders.
 const DevToolsPanel = dynamic(
   () => import('@/components/devtools').then((m) => ({ default: m.DevToolsPanel })),
   { ssr: false }

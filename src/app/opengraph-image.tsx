@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 /**
- * Branded share card (#1636). Inherited by every route unless that route
+ * Branded share card. Inherited by every route unless that route
  * declares its own `openGraph` block — see the comment in layout.tsx.
  *
  * The mark carries the card, not artwork from a sample world: the pitch is that
