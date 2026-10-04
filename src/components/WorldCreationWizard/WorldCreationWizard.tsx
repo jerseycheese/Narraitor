@@ -7,6 +7,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useProviderStore } from '@/state/providerStore';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
+import { useAttemptedSteps } from '@/hooks/useAttemptedSteps';
 import {
   Validator,
   alwaysValid,
@@ -167,7 +168,8 @@ export default function WorldCreationWizard({
   // it's been touched, unless the step was attempted, in which case every
   // failing field's error shows (see issue #2178).
   const [touchedFieldsByStep, setTouchedFieldsByStep] = useState<Record<number, Set<string>>>({});
-  const [attemptedSteps, setAttemptedSteps] = useState<Set<number>>(new Set());
+  const attemptedSteps = useAttemptedSteps();
+  const { mark: markAttemptedStep, reset: resetAttemptedSteps } = attemptedSteps;
   const wizardDataRef = useRef(initialWorldData);
 
   React.useEffect(() => {
@@ -205,6 +207,17 @@ export default function WorldCreationWizard({
     steps: WIZARD_STEPS,
     onStepValidation: handleStepValidation,
   });
+  const {
+    goToStep,
+    goNext,
+    goBack,
+    reset,
+    updateData,
+    setValidation,
+    setProcessing,
+    setError,
+    clearError,
+  } = wizard;
 
   wizardDataRef.current = wizard.state.data;
 
@@ -235,23 +248,23 @@ export default function WorldCreationWizard({
 
   const handleRecoverProgress = useCallback(() => {
     if (autoSaveData) {
-      wizard.reset(
+      reset(
         autoSaveData.worldData,
         autoSaveData.currentStep
       );
       dismissRecovery();
     }
     setTouchedFieldsByStep({});
-    setAttemptedSteps(new Set());
+    resetAttemptedSteps();
     setShowRecoveryModal(false);
-  }, [autoSaveData, wizard.reset, dismissRecovery]);
+  }, [autoSaveData, reset, dismissRecovery, resetAttemptedSteps]);
 
   const handleDismissRecovery = useCallback(() => {
     clearAutoSave();
     setTouchedFieldsByStep({});
-    setAttemptedSteps(new Set());
+    resetAttemptedSteps();
     setShowRecoveryModal(false);
-  }, [clearAutoSave]);
+  }, [clearAutoSave, resetAttemptedSteps]);
 
   // Sync wizard step with tutorial provider
   React.useEffect(() => {
@@ -281,9 +294,9 @@ export default function WorldCreationWizard({
 
     const targetWizardStep = tourStepToWizardStep[stepIndex];
     if (targetWizardStep !== undefined && targetWizardStep !== wizard.state.currentStep) {
-      wizard.goToStep(targetWizardStep);
+      goToStep(targetWizardStep);
     }
-  }, [stepIndex, isTourActive, isPaused, showRecoveryModal, currentTour, wizard.state.currentStep, wizard.goToStep]);
+  }, [stepIndex, isTourActive, isPaused, showRecoveryModal, currentTour, wizard.state.currentStep, goToStep]);
 
   const shouldAutoStartTour = useMemo(() => {
     if (worldCreationProgress.skipped) return false;
@@ -341,17 +354,17 @@ export default function WorldCreationWizard({
   const generateAISuggestions = useCallback(async () => {
     const description = wizard.state.data.description;
     if (!description || description.trim().length < 50) {
-      wizard.setError('ai', 'Add at least a short paragraph (50+ characters) so the system understands your world.');
+      setError('ai', 'Add at least a short paragraph (50+ characters) so the system understands your world.');
       return;
     }
 
-    wizard.setProcessing(true);
-    wizard.clearError('ai');
+    setProcessing(true);
+    clearError('ai');
 
     try {
       const suggestions = await analyzeWorldDescriptionClient(description);
       
-      wizard.updateData({ 
+      updateData({ 
         ...withoutSuggestedEntries(wizardDataRef.current),
         aiSuggestions: suggestions,
         aiSuggestionsGenerated: true,
@@ -362,7 +375,7 @@ export default function WorldCreationWizard({
       
       // Use default suggestions as fallback
       const defaultSuggestions = getDefaultSuggestions();
-      wizard.updateData({ 
+      updateData({ 
         ...withoutSuggestedEntries(wizardDataRef.current),
         aiSuggestions: defaultSuggestions,
         aiSuggestionsGenerated: true,
@@ -371,51 +384,46 @@ export default function WorldCreationWizard({
       // The generic "service trouble" message is wrong when the real cause is
       // no provider key at all — that's not a service outage, and telling the
       // player to wait for it to "recover" is a dead end with no actual fix.
-      wizard.setError(
+      setError(
         'ai',
         hasConfiguredKey
           ? 'We had trouble reaching the generation service, so we loaded starter suggestions. You can generate again once the service recovers.'
           : 'Generating suggestions needs a provider key. Add one in Settings, then regenerate — starter suggestions are loaded for now.'
       );
     } finally {
-      wizard.setProcessing(false);
+      setProcessing(false);
     }
   }, [
     wizard.state.data.description,
-    wizard.setError,
-    wizard.setProcessing,
-    wizard.clearError,
-    wizard.updateData,
+    setError,
+    setProcessing,
+    clearError,
+    updateData,
     hasConfiguredKey,
   ]);
 
   const clearAISuggestions = useCallback(() => {
     // Removes suggested attributes and skills on both review steps; custom
     // entries the player added stay.
-    wizard.updateData({
+    updateData({
       ...withoutSuggestedEntries(wizardDataRef.current),
       aiSuggestions: undefined,
       aiSuggestionsGenerated: false,
       aiSuggestionMeta: undefined,
     });
-  }, [wizard.updateData]);
+  }, [updateData]);
 
   const handleNext = useCallback(async () => {
     // The player explicitly tried to advance past this step: from here on,
     // show every failing field's error for it, not just touched ones.
-    setAttemptedSteps((prev) => {
-      if (prev.has(wizard.state.currentStep)) return prev;
-      const next = new Set(prev);
-      next.add(wizard.state.currentStep);
-      return next;
-    });
+    markAttemptedStep(wizard.state.currentStep);
 
     // Next stays enabled while the step is invalid so the player can ask why
     // they can't advance: record the step's validation (which surfaces every
     // error now that it's attempted) and stop before any AI call.
     const stepValidation = handleStepValidation(wizard.state.currentStep, wizard.state.data);
     if (!stepValidation.valid) {
-      wizard.setValidation(wizard.state.currentStep, stepValidation);
+      setValidation(wizard.state.currentStep, stepValidation);
       return;
     }
 
@@ -424,14 +432,15 @@ export default function WorldCreationWizard({
       await generateAISuggestions();
     }
 
-    wizard.goNext();
+    goNext();
   }, [
     wizard.state.currentStep,
     wizard.state.data,
-    wizard.setValidation,
-    wizard.goNext,
+    setValidation,
+    goNext,
     handleStepValidation,
     generateAISuggestions,
+    markAttemptedStep,
   ]);
 
   const getDefaultSuggestions = () => ({
@@ -448,8 +457,8 @@ export default function WorldCreationWizard({
   });
 
   const handleBack = useCallback(() => {
-    wizard.goBack();
-  }, [wizard.goBack]);
+    goBack();
+  }, [goBack]);
 
   const handleCancel = useCallback(() => {
     // Check if user has made meaningful changes
@@ -520,7 +529,7 @@ export default function WorldCreationWizard({
       setCurrentWorld(worldId);
 
       // Store the world ID in wizard state
-      wizard.updateData({ createdWorldId: worldId });
+      updateData({ createdWorldId: worldId });
       clearAutoSave();
 
       // Generate world image asynchronously after creation (only if no image was already generated)
@@ -552,7 +561,7 @@ export default function WorldCreationWizard({
     }
   }, [
     wizard.state.data,
-    wizard.updateData,
+    updateData,
     createWorld,
     finishWizard,
     clearAutoSave,
@@ -562,10 +571,9 @@ export default function WorldCreationWizard({
     // Step components spread the entire step data plus one changed value
     // into `updates`, so diff against the last known data to find which
     // field(s) actually changed rather than treating every key as touched.
-    const prevData = wizardDataRef.current as unknown as Record<string, unknown>;
-    const updatesRecord = updates as unknown as Record<string, unknown>;
-    const changedKeys = Object.keys(updatesRecord).filter(
-      (key) => updatesRecord[key] !== prevData[key]
+    const prevData = wizardDataRef.current;
+    const changedKeys = (Object.keys(updates) as (keyof WorldCreationData)[]).filter(
+      (key) => updates[key] !== prevData[key]
     );
 
     if (changedKeys.length > 0) {
@@ -577,8 +585,8 @@ export default function WorldCreationWizard({
       });
     }
 
-    wizard.updateData(updates);
-  }, [wizard.updateData, wizard.state.currentStep]);
+    updateData(updates);
+  }, [updateData, wizard.state.currentStep]);
 
   const stepProps = {
     worldData: wizard.state.data,
