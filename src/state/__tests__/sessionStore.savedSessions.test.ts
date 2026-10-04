@@ -31,7 +31,6 @@ const resetSessionStore = () => {
     characterId: null,
     savedSessions: {},
     autoSave: {
-      enabled: true,
       lastSaveTime: null,
       status: 'idle',
       errorMessage: null,

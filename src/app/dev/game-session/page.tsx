@@ -501,7 +501,6 @@ export default function GameSessionTestHarness() {
                   characterId: null,
                   savedSessions: {},
                   autoSave: {
-                    enabled: true,
                     lastSaveTime: null,
                     status: 'idle',
                     errorMessage: null,

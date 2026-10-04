@@ -31,7 +31,6 @@ const resetSessionStore = () => {
     savedSessions: {},
     sessionLifecycle: {},
     autoSave: {
-      enabled: true,
       lastSaveTime: null,
       status: 'idle',
       errorMessage: null,

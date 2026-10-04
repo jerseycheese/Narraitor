@@ -16,13 +16,12 @@ import {
   subscribeStorageStatus,
 } from '@/state/persistence';
 import { StorageStatus } from '@/lib/storage/resilientStorage';
-import type { SaveTriggerReason } from '@/components/ui/SaveIndicator';
+import type { SaveTriggerReason } from '@/types/game.types';
 
 export type { SaveTriggerReason };
 
 export const useAutoSave = () => {
   const autoSaveState = useSessionStore((state) => state.autoSave);
-  const sessionStatus = useSessionStore((state) => state.status);
   const toast = useToast();
 
   // Keep session store autoSave status aligned with resilient storage health
@@ -74,18 +73,6 @@ export const useAutoSave = () => {
     [toast]
   );
 
-  const setEnabled = useCallback((enabled: boolean) => {
-    useSessionStore.getState().setAutoSaveEnabled(enabled);
-  }, []);
-
-  const start = useCallback(() => {
-    useSessionStore.getState().setAutoSaveEnabled(true);
-  }, []);
-
-  const stop = useCallback(() => {
-    useSessionStore.getState().setAutoSaveEnabled(false);
-  }, []);
-
   const retry = useCallback(async () => {
     return triggerSave('manual');
   }, [triggerSave]);
@@ -98,18 +85,13 @@ export const useAutoSave = () => {
 
   return {
     // State
-    isEnabled: autoSaveState.enabled,
     status: effectiveStatus,
     lastSaveTime: autoSaveState.lastSaveTime,
     errorMessage: effectiveErrorMessage,
     totalSaves: autoSaveState.totalSaves,
-    isRunning: autoSaveState.enabled && sessionStatus === 'active' && !isStorageUnavailable,
 
     // Actions
-    start,
-    stop,
     triggerSave,
-    setEnabled,
     retry,
   };
 };
