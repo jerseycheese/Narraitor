@@ -34,6 +34,8 @@ export const useLoreStore = create<LoreStore>()(
         facts: state.facts,
         factHistory: state.factHistory,
         mergeAuditLog: state.mergeAuditLog,
+        // Totals only: the event log is capped, in-memory telemetry.
+        loreUsage: state.loreUsage,
       }),
       migrate: createPreserveMigrate(getInitialState),
     }

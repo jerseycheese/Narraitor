@@ -28,8 +28,7 @@ export function getLoreContextForPrompt(
   if (
     options?.recordUsage &&
     context.factIds &&
-    context.factIds.length > 0 &&
-    process.env.NODE_ENV !== 'production'
+    context.factIds.length > 0
   ) {
     recordLoreUsage({
       worldId,
@@ -48,7 +47,7 @@ export function checkAndRecordLoreMentions(
   responseText: string,
   source: LoreUsageSource
 ): void {
-  if (process.env.NODE_ENV === 'production' || !responseText) return;
+  if (!responseText) return;
 
   const { getLoreContext, recordLoreMentions } = useLoreStore.getState();
   const context = getLoreContext(worldId, sessionId);

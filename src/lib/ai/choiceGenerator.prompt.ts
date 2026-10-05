@@ -294,7 +294,7 @@ const enhancePromptWithLore = (
   snapshot?: SessionSnapshot
 ): string => {
   if (snapshot?.loreContext !== undefined) {
-    if (snapshot.loreContext && process.env.NODE_ENV !== 'production') {
+    if (snapshot.loreContext) {
       try {
         const { getLoreContext, recordLoreUsage } = useLoreStore.getState();
         const context = getLoreContext(worldId, sessionId);
@@ -307,7 +307,7 @@ const enhancePromptWithLore = (
           });
         }
       } catch {
-        // Dev/test telemetry only, safe to ignore errors
+        // Usage counts only feed chapter carryover ranking; never fail a prompt over them
       }
     }
     return prompt + snapshot.loreContext;
