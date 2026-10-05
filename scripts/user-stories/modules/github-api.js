@@ -146,25 +146,6 @@ export async function fetchIssueByNumber(owner, repo, issueNumber, token) {
 }
 
 /**
- * Create a new GitHub issue
- * @param {string} owner - Repository owner
- * @param {string} repo - Repository name
- * @param {string} title - Issue title
- * @param {string} body - Issue body
- * @param {string[]} labels - Array of label names
- * @param {string} token - GitHub API token
- * @returns {Promise<Object>} - Created issue
- */
-export async function createIssue(owner, repo, title, body, labels = [], token) {
-  return githubRequest(
-    'POST',
-    `/repos/${owner}/${repo}/issues`,
-    { title, body, labels },
-    token
-  );
-}
-
-/**
  * Update an existing GitHub issue
  * @param {string} owner - Repository owner
  * @param {string} repo - Repository name

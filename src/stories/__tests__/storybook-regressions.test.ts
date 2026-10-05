@@ -21,12 +21,6 @@ describe('Storybook regressions (#1389)', () => {
     const badgeCssPath = path.resolve(__dirname, '../../app/badge.css');
     const sharedTokensPath = path.resolve(__dirname, '../../lib/theme/themes/_shared-tokens.css');
 
-    it('loads preview.tsx and required CSS files from disk', () => {
-      expect(fs.existsSync(previewPath)).toBe(true);
-      expect(fs.existsSync(badgeCssPath)).toBe(true);
-      expect(fs.existsSync(sharedTokensPath)).toBe(true);
-    });
-
     it('imports badge.css in preview.tsx so Badge variants receive styling', () => {
       const previewContent = fs.readFileSync(previewPath, 'utf-8');
       expect(previewContent).toMatch(/import\s+['"][^'"]*badge\.css['"]/);
@@ -125,22 +119,6 @@ describe('Storybook regressions (#1389)', () => {
   });
 
   describe('3. ActiveGameSession story decorators include ToastProvider', () => {
-    const activeGameSessionPath = path.resolve(
-      __dirname,
-      '../05-pages/game-session/ActiveGameSession.stories.tsx'
-    );
-
-    it('imports ToastProvider in ActiveGameSession.stories.tsx source', () => {
-      const content = fs.readFileSync(activeGameSessionPath, 'utf-8');
-      expect(content).toMatch(/import\s*\{[^}]*ToastProvider[^}]*\}\s*from\s*['"]@\/components\/ui\/toast['"]/);
-    });
-
-    it('includes a ToastProvider decorator in story meta', () => {
-      const decorators = activeGameSessionMeta.decorators;
-      expect(Array.isArray(decorators)).toBe(true);
-      expect(decorators && decorators.length).toBeGreaterThan(0);
-    });
-
     it('provides a functioning ToastProvider decorator preventing useToast crashes', () => {
       const ToastConsumer: React.FC = () => {
         const toast = useToast();

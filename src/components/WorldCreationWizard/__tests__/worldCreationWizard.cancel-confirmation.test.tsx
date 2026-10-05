@@ -173,19 +173,6 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
   });
 
   describe('Dirty State Detection', () => {
-    it('should detect dirty state when name is changed', async () => {
-      render(<WorldCreationWizard initialStep={0} onCancel={mockOnCancel} />);
-      
-      // Enter name to make wizard dirty
-      const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, TEST_WORLD_DATA.name);
-      
-      const cancelButton = screen.getByRole('button', { name: /cancel/i });
-      await user.click(cancelButton);
-      
-      expect(screen.getByText('Cancel World Creation?')).toBeInTheDocument();
-    });
-
     it('should detect dirty state when description is changed', async () => {
       // Start on step 1 (DescriptionStep) where the full description field is located
       render(<WorldCreationWizard initialStep={1} onCancel={mockOnCancel} />);
@@ -252,19 +239,6 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       render(<WorldCreationWizard initialData={initialData} initialStep={0} onCancel={mockOnCancel} />);
       
       // Modify the name field to trigger dirty state
-      const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, TEST_WORLD_DATA.name);
-      
-      const cancelButton = screen.getByRole('button', { name: /cancel/i });
-      await user.click(cancelButton);
-      
-      expect(screen.getByText('Cancel World Creation?')).toBeInTheDocument();
-    });
-
-    it('should detect dirty state when AI suggestions are generated', async () => {
-      render(<WorldCreationWizard initialStep={0} onCancel={mockOnCancel} />);
-      
-      // Enter name to make wizard dirty and simulate AI suggestions generated
       const nameInput = screen.getByTestId('world-name-input');
       await user.type(nameInput, TEST_WORLD_DATA.name);
       

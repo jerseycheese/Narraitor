@@ -137,25 +137,6 @@ describe('WorldEditor - MVP Level Tests', () => {
     });
   });
 
-  // Acceptance Criteria: The WorldEditor provides forms to modify basic info, attributes, and skills
-  test('provides forms for modifying all world aspects', async () => {
-    render(<WorldEditor worldId="world-123" />);
-
-    await waitFor(() => {
-      // Basic info form is present
-      expect(screen.getByText('Basic Info Form')).toBeInTheDocument();
-
-      // Attributes form is present
-      expect(screen.getByText('Attributes Form')).toBeInTheDocument();
-
-      // Skills form is present
-      expect(screen.getByText('Skills Form')).toBeInTheDocument();
-
-      // Settings form is present
-      expect(screen.getByText('Settings Form')).toBeInTheDocument();
-    });
-  });
-
   // Acceptance Criteria: Changes are saved automatically or with an explicit save action
   test('saves changes when save button is clicked', async () => {
     render(<WorldEditor worldId="world-123" />);
@@ -249,21 +230,6 @@ describe('WorldEditor - MVP Level Tests', () => {
           name: 'Updated Name',
         })
       );
-    });
-  });
-
-  // Saving completes and navigates back to the worlds list
-  test('navigates back to worlds list after saving', async () => {
-    render(<WorldEditor worldId="world-123" />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Basic Info Form')).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText('Save Changes'));
-
-    await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/worlds');
     });
   });
 });

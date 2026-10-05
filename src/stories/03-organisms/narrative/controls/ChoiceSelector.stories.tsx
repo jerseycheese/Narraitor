@@ -104,7 +104,6 @@ const createAlignedDecision = (): Decision => ({
 export const AlignedChoices: Story = {
   args: {
     decision: createAlignedDecision(),
-    showHints: true,
   },
 };
 
@@ -265,7 +264,6 @@ export const WithSkillRequirements: Story = {
     characterSkills: createMockCharacter().skills,
     worldSkills: createMockWorldSkills(),
     inventoryItems: [],
-    showHints: true,
   },
   parameters: {
     docs: {
@@ -282,7 +280,6 @@ export const WithItemRequirements: Story = {
     characterSkills: createMockCharacter().skills,
     worldSkills: createMockWorldSkills(),
     inventoryItems: createMockInventoryItems(),
-    showHints: true,
   },
   parameters: {
     docs: {

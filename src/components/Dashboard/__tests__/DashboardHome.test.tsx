@@ -264,12 +264,5 @@ describe('DashboardHome', () => {
           const main = screen.getByRole('main');
             expect(main).toBeInTheDocument();
         });
-    it('has accessible heading structure', () => {
-      render(<DashboardHome />);
-
-      // Should have proper heading hierarchy
-      const headings = screen.getAllByRole('heading');
-      expect(headings.length).toBeGreaterThan(0);
-    });
   });
 });

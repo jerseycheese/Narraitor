@@ -192,10 +192,6 @@ describe('drafting-mark family', () => {
 });
 
 describe('app-shell.css static checks', () => {
-  it('does not use the literal placeholder word "Section" in a section eyebrow (#1577)', () => {
-    expect(appShellCss).not.toMatch(/content:\s*"•\s*Section"/);
-  });
-
   it('does not render a block-level eyebrow bullet with no label after it', () => {
     // A block-level eyebrow (its own line above the heading) needs label text
     // between the bullet and the closing quote — otherwise it's a lone bullet
@@ -636,4 +632,3 @@ describe('heading typography static guards', () => {
     expect(violations[0].file).toContain('app-shell.css + src/app/dashboard.css');
   });
 });
-

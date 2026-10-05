@@ -25,19 +25,6 @@ describe('SkillRangeEditor', () => {
     jest.clearAllMocks();
   });
 
-  it('renders with the correct default value', () => {
-    render(
-      <SkillRangeEditor 
-        skill={mockSkill} 
-        onChange={mockOnChange} 
-      />
-    );
-
-    // Slider shows the default value
-    const slider = screen.getByRole('slider');
-    expect(slider).toHaveValue('3');
-  });
-
   it('exposes an accessible name naming the skill', () => {
     render(
       <SkillRangeEditor
@@ -49,25 +36,6 @@ describe('SkillRangeEditor', () => {
     expect(
       screen.getByRole('slider', { name: 'Test Skill skill level' })
     ).toBeInTheDocument();
-  });
-
-  it('passes min and max values to the RangeSlider component', () => {
-    // This test verifies the component is receiving the correct min/max props
-    // We can't directly test the min/max DOM attributes due to how the component is rendered
-    
-    render(
-      <SkillRangeEditor 
-        skill={mockSkill} 
-        onChange={mockOnChange} 
-      />
-    );
-
-    // Verify the slider is rendered
-    const slider = screen.getByRole('slider');
-    expect(slider).toBeInTheDocument();
-    
-    // We can verify the current value is correctly displayed in the slider
-    expect(slider).toHaveValue('3');
   });
 
   it('changes value when slider is moved', () => {

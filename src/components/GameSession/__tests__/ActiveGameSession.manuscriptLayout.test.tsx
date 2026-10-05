@@ -230,22 +230,6 @@ describe('ActiveGameSession Manuscript Layout', () => {
     expect(within(choicesColumn).getByRole('button', { name: /end story/i })).toBeInTheDocument();
   });
 
-  it('renders End Story button in the action rail', async () => {
-    (isFeatureEnabled as jest.Mock).mockImplementation((flag) => flag === 'PROGRESSIVE_DISCLOSURE');
-
-    render(
-      <ActiveGameSession
-        worldId={mockWorldId}
-        sessionId={mockSessionId}
-        onChoiceSelected={jest.fn()}
-      />
-    );
-
-    const choicesColumn = await screen.findByTestId('choices-column');
-    const endStoryButton = within(choicesColumn).getByRole('button', { name: /end story/i });
-    expect(endStoryButton).toBeInTheDocument();
-  });
-
   it('does not have narrativeMaxHeight constraint in manuscript mode', async () => {
     // We'll verify this by checking that ActiveGameSessionNarrativeColumn
     // doesn't receive the narrativeMaxHeight prop anymore
@@ -728,4 +712,3 @@ describe('ActiveGameSession Manuscript Layout', () => {
     });
   });
 });
-

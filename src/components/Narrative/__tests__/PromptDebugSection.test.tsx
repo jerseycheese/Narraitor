@@ -20,16 +20,6 @@ const mockDebugInfo: PromptDebugInfo = {
 };
 
 describe('PromptDebugSection', () => {
-  it('should render the debug section', () => {
-    render(<PromptDebugSection debugInfo={mockDebugInfo} />);
-    expect(screen.getByText(/Prompt Debug Info/i)).toBeInTheDocument();
-  });
-
-  it('should display template name', () => {
-    render(<PromptDebugSection debugInfo={mockDebugInfo} />);
-    expect(screen.getByText('Scene Template')).toBeInTheDocument();
-  });
-
   it('should display AI model', () => {
     render(<PromptDebugSection debugInfo={mockDebugInfo} />);
     expect(screen.getByText('gemini-2.0-flash')).toBeInTheDocument();

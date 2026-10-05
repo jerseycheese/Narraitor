@@ -81,13 +81,5 @@ describe('devToolsSettings', () => {
       const loaded = loadDevToolsSettings();
       expect(loaded.showPromptDebugInfo).toBe(true);
     });
-
-    it('should preserve other settings when updating one', () => {
-      // Future-proof: if we add more settings, this test ensures they're preserved
-      updateSetting('showPromptDebugInfo', true);
-
-      const loaded = loadDevToolsSettings();
-      expect(loaded.showPromptDebugInfo).toBe(true);
-    });
   });
 });
