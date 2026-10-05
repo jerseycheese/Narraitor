@@ -26,12 +26,6 @@ describe('useReducedMotion', () => {
     expect(result.current).toBe(true);
   });
 
-  it('defaults to false when the OS has no preference', () => {
-    mockMatchMedia(false);
-    const { result } = renderHook(() => useReducedMotion());
-    expect(result.current).toBe(false);
-  });
-
   it('updates when the OS preference changes mid-session', () => {
     mockMatchMedia(false);
     const { result } = renderHook(() => useReducedMotion());

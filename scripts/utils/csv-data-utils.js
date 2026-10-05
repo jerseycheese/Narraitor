@@ -42,12 +42,6 @@ export function findCsvRowByIssueNumber(loadedCsvRows, issueNumber, owner, repo)
   return null;
 }
 
-// Strip frontmatter from template
-export function stripFrontmatter(template) {
-  const frontmatterRegex = /^---\n([\s\S]*?)\n---\n/;
-  return template.replace(frontmatterRegex, '');
-}
-
 // Process empty placeholders with sensible defaults
 export function processEmptyPlaceholders(body) {
   return body

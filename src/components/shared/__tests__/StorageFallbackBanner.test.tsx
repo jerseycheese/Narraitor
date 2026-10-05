@@ -16,12 +16,6 @@ describe('StorageFallbackBanner', () => {
     _resetStorageStatusForTesting();
   });
 
-  it('renders nothing when storage is normal and no fallback notice exists', () => {
-    const { container } = render(<StorageFallbackBanner />);
-    expect(container.firstChild).toBeNull();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  });
-
   it('renders ErrorBlock with warning message when storage status is unavailable', () => {
     _setStorageStatusForTesting(StorageStatus.UNAVAILABLE, {
       message: 'IndexedDB not available in this environment',

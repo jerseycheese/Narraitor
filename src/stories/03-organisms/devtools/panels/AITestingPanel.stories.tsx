@@ -45,27 +45,3 @@ export const Default: Story = {
     }
   }
 };
-
-
-/**
- * Compact version for smaller DevTools panels
- */
-export const Compact: Story = {
-  args: {},
-  decorators: [
-    (Story) => (
-      <div>
-        <div>
-          <Story />
-        </div>
-      </div>
-    ),
-  ],
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows how the panel adapts to smaller sizes.'
-      }
-    }
-  }
-};

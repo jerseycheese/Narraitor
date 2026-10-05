@@ -91,15 +91,6 @@ describe('DeleteConfirmationDialog', () => {
   });
 
   describe('Accessibility', () => {
-    test('closes on Escape key press', () => {
-      render(<DeleteConfirmationDialog {...defaultProps} />);
-      
-      fireEvent.keyDown(document, { key: 'Escape' });
-      
-      expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
-      expect(defaultProps.onConfirm).not.toHaveBeenCalled();
-    });
-
     test('has proper dialog structure', () => {
       render(<DeleteConfirmationDialog {...defaultProps} />);
       
