@@ -59,6 +59,8 @@ async function createChapterCheckpointInner(
     .slice(0, endIndex)
     .findLastIndex((segment) => Boolean(segment.metadata.chapter));
   const chapterSegments = segments.slice(priorBoundary + 1, endIndex + 1);
+  // Player decisions don't carry narrativeSegmentId, so scope them by time.
+  const chapterStart = new Date(chapterSegments[0]?.timestamp ?? 0).getTime();
   const character = characterId
     ? useCharacterStore.getState().characters[characterId]
     : undefined;
@@ -93,10 +95,10 @@ async function createChapterCheckpointInner(
     })),
     decisions: state
       .getSessionDecisions(sessionId)
-      .filter((decision) =>
-        chapterSegments.some(
-          (segment) => segment.id === decision.narrativeSegmentId
-        )
+      .filter(
+        (decision) =>
+          decision.selectedAt &&
+          new Date(decision.selectedAt).getTime() >= chapterStart
       )
       .slice(-5)
       .map((decision) => ({

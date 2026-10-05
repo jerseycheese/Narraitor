@@ -101,3 +101,28 @@ describe('useEndingDetection frequency gating', () => {
     expect(mockGenerateContent).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('useEndingDetection with CHAPTERS on', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env.NEXT_PUBLIC_FEATURE_CHAPTERS = 'true';
+    mockGenerateContent.mockResolvedValue({
+      content: JSON.stringify({ suggestEnding: false, confidence: 'low', endingType: 'none', reason: 'x' }),
+    });
+  });
+  afterEach(() => {
+    delete process.env.NEXT_PUBLIC_FEATURE_CHAPTERS;
+  });
+
+  it('skips only the chapter boundary segment', async () => {
+    const { result } = renderDetection(makeSegments(2));
+    await result.current.checkForEndingIndicators(segment('3', { chapter: { number: 1 } }));
+    expect(mockGenerateContent).not.toHaveBeenCalled();
+  });
+
+  it('still checks ordinary segments', async () => {
+    const { result } = renderDetection(makeSegments(2));
+    await result.current.checkForEndingIndicators(segment('3'));
+    expect(mockGenerateContent).toHaveBeenCalledTimes(1);
+  });
+});

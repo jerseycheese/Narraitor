@@ -92,3 +92,23 @@ it('waits for inventory hydration before spending its only recap request', async
   hydrationState.mockRestore();
   rehydrate.mockRestore();
 });
+
+it("includes this chapter's selected decisions without needing narrativeSegmentId", async () => {
+  useNarrativeStore.setState({
+    decisions: {
+      early: { id: 'early', prompt: 'Old', options: [], selectedAt: new Date('2025-12-01') },
+      late: {
+        id: 'late',
+        prompt: 'Open the gate?',
+        options: [{ id: 'o1', text: 'Open it' }],
+        selectedOptionId: 'o1',
+        selectedAt: new Date('2026-01-02'),
+      },
+    },
+    sessionDecisions: { 'session-1': ['early', 'late'] },
+  });
+  mockFetch.mockResolvedValue({ ok: false } as Response);
+  await createChapterCheckpoint(boundary, 'character-1');
+  const body = JSON.parse(mockFetch.mock.calls[0][1]?.body as string);
+  expect(body.decisions).toEqual([{ id: 'late', text: 'Open it' }]);
+});
