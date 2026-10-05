@@ -221,6 +221,22 @@ export const createNarrativeEndingActions = (
     }
   },
 
+  completeChapterRecap: (segmentId: EntityID, recap: string) => {
+    const segment = get().segments[segmentId];
+    if (!isFeatureEnabled('CHAPTERS') || !segment?.metadata.chapter) return;
+    get().updateSegment(segmentId, {
+      metadata: { ...segment.metadata, chapter: { ...segment.metadata.chapter, recap } },
+    });
+  },
+
+  continueChapter: (segmentId: EntityID) => {
+    const segment = get().segments[segmentId];
+    if (!isFeatureEnabled('CHAPTERS') || !segment?.metadata.chapter?.recap) return;
+    get().updateSegment(segmentId, {
+      metadata: { ...segment.metadata, chapter: { ...segment.metadata.chapter, continued: true } },
+    });
+  },
+
   clearEnding: () => set({ currentEnding: null, endingError: null }),
 
   setCurrentEnding: (ending: StoryEnding | null) => set({ currentEnding: ending, endingError: null }),

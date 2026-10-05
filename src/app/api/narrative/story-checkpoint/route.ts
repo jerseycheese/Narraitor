@@ -1,3 +1,4 @@
+import { isFeatureEnabled } from '@/lib/featureFlags';
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveProvider } from '@/lib/ai/resolveApiKey';
@@ -149,7 +150,17 @@ export const POST = withAIRoute(async (request: NextRequest) => {
           .filter((seg: string) => Boolean(seg))
       : undefined;
 
+    const chapterMode = isFeatureEnabled('CHAPTERS') && rawBody?.mode === 'chapter';
+    const sanitizeList = (value: unknown): string[] => Array.isArray(value)
+      ? value.filter((entry): entry is string => typeof entry === 'string').map(entry => safeTrim(entry).slice(0, 200)).filter(Boolean).slice(0, 10)
+      : [];
     const payload: StoryCheckpointRequestBody = {
+      ...(chapterMode ? {
+        mode: 'chapter' as const,
+        previousChapterRecap: typeof rawBody.previousChapterRecap === 'string' ? safeTrim(rawBody.previousChapterRecap).slice(0, 850) : undefined,
+        cast: sanitizeList(rawBody.cast), holding: sanitizeList(rawBody.holding),
+        openThreads: sanitizeList(rawBody.openThreads),
+      } : {}),
       worldId,
       sessionId,
       characterId: rawBody?.characterId ? safeTrim(String(rawBody.characterId)) : undefined,

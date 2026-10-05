@@ -68,6 +68,8 @@ export const buildNarrativeContext = (
     : undefined;
 
   return {
+    ...(isFeatureEnabled('CHAPTERS') && request.narrativeContext?.chapter
+      ? { chapter: request.narrativeContext.chapter } : {}),
     worldName: world.name,
     worldDescription: world.description,
     genre: world.genre,

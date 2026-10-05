@@ -153,7 +153,7 @@ export function useEndingDetection({
 
   const checkForEndingIndicators = useCallback(
     async (newSegment: NarrativeSegment) => {
-      if (endingSuggestedRef.current || !onEndingSuggested) return;
+      if (newSegment.metadata?.chapter || endingSuggestedRef.current || !onEndingSuggested) return;
 
       const allSegments = [...segments, newSegment];
       if (allSegments.length < MIN_SEGMENTS_FOR_ANALYSIS) return;

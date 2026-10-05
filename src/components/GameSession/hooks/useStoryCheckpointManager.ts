@@ -1,3 +1,6 @@
+import { createChapterCheckpoint } from '@/lib/narrative/chapterCheckpoint';
+import type { NarrativeSegment } from '@/types/narrative.types';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 import * as React from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -182,7 +185,14 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
     return lookup;
   }, [characters]);
 
-  const createCheckpoint = React.useCallback(async () => {
+  const createCheckpoint = React.useCallback(async (chapterBoundary?: NarrativeSegment) => {
+    if (isFeatureEnabled('CHAPTERS') && chapterBoundary) {
+      setStatus('loading');
+      await createChapterCheckpoint(chapterBoundary, characterId);
+      setStatus('success');
+      return;
+    }
+    if (isFeatureEnabled('CHAPTERS')) return;
     // Skip checkpoint generation under Playwright (E2E/visual) — it POSTs to
     // /api/narrative/story-checkpoint, which hangs with no AI key in CI and
     // stalls the page load (the visual suite's page.goto timeouts). Seeded
@@ -273,7 +283,7 @@ export const useStoryCheckpointManager = ({ worldId, sessionId, characterId }: U
   const lastAttemptedEventIdsRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
-    if (pendingEvents.length === 0 || status === 'loading') {
+    if (isFeatureEnabled('CHAPTERS') || pendingEvents.length === 0 || status === 'loading') {
       return;
     }
 

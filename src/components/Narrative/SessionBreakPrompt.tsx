@@ -3,6 +3,8 @@ import type { SessionMetrics } from './hooks/useSessionPacing';
 
 export interface SessionBreakPromptProps {
   isOpen: boolean;
+  chapterNumber?: number;
+  chapterRecap?: string;
   onDismiss: () => void;
   onContinue?: () => void;
   sessionMetrics?: Partial<SessionMetrics>;
@@ -15,11 +17,15 @@ export interface SessionBreakPromptProps {
  */
 export const SessionBreakPrompt: React.FC<SessionBreakPromptProps> = ({
   isOpen,
+  chapterNumber,
+  chapterRecap,
   onDismiss,
   onContinue,
   sessionMetrics,
   className = '',
 }) => {
+  const isPreparingChapter = chapterNumber !== undefined && !chapterRecap;
+  const dismiss = isPreparingChapter ? () => {} : onDismiss;
   const continueButtonRef = useRef<HTMLButtonElement>(null);
   const dismissButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -29,18 +35,24 @@ export const SessionBreakPrompt: React.FC<SessionBreakPromptProps> = ({
     const previousActiveElement = document.activeElement as HTMLElement | null;
 
     // Focus primary action on mount
-    continueButtonRef.current?.focus();
+    if (chapterNumber !== undefined) dismissButtonRef.current?.focus();
+    else continueButtonRef.current?.focus();
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        onDismiss();
+        if (!isPreparingChapter) onDismiss();
         return;
       }
 
       if (e.key === 'Tab') {
         const dismissBtn = dismissButtonRef.current;
         const continueBtn = continueButtonRef.current;
+        if (chapterNumber !== undefined && dismissBtn) {
+          e.preventDefault();
+          dismissBtn.focus();
+          return;
+        }
         if (!dismissBtn || !continueBtn) return;
 
         if (e.shiftKey) {
@@ -62,7 +74,7 @@ export const SessionBreakPrompt: React.FC<SessionBreakPromptProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
       previousActiveElement?.focus?.();
     };
-  }, [isOpen, onDismiss]);
+  }, [isOpen, onDismiss, isPreparingChapter, chapterNumber]);
 
   if (!isOpen) return null;
 
@@ -84,7 +96,7 @@ export const SessionBreakPrompt: React.FC<SessionBreakPromptProps> = ({
     <div
       className={['session-break-prompt-overlay', className].filter(Boolean).join(' ')}
       role="presentation"
-      onClick={onDismiss}
+      onClick={dismiss}
     >
       <div
         className="session-break-prompt"
@@ -96,12 +108,15 @@ export const SessionBreakPrompt: React.FC<SessionBreakPromptProps> = ({
       >
         <div className="session-break-prompt-content">
           <h2 id="session-break-prompt-title" className="session-break-prompt-title">
-            Good stopping point
+            {chapterNumber !== undefined ? `Chapter ${chapterNumber} complete` : 'Good stopping point'}
           </h2>
           <p id="session-break-prompt-desc" className="session-break-prompt-description">
-            You have reached a natural pause in the story. Take a breather, step away, or keep reading whenever you are ready.
+            {chapterNumber !== undefined
+              ? isPreparingChapter ? 'Preparing the recap for your next chapter...' : 'Your game continues from this recap.'
+              : 'You have reached a natural pause in the story. Take a breather, step away, or keep reading whenever you are ready.'}
           </p>
 
+          {chapterRecap && <p className="session-break-prompt-description">{chapterRecap.split('\n').map((line, index) => <React.Fragment key={line}>{index > 0 && <br />}{line}</React.Fragment>)}</p>}
           {(elapsedMinutes > 0 || (segmentCount !== undefined && segmentCount > 0)) && (
             <div className="session-break-prompt-metrics">
               {elapsedMinutes > 0 && (
@@ -131,18 +146,19 @@ export const SessionBreakPrompt: React.FC<SessionBreakPromptProps> = ({
             ref={dismissButtonRef}
             type="button"
             className="session-break-prompt-dismiss-button"
-            onClick={onDismiss}
+            onClick={dismiss}
+            aria-disabled={isPreparingChapter || undefined}
           >
-            Dismiss
+            {chapterNumber !== undefined ? isPreparingChapter ? 'Preparing recap' : 'Continue next chapter' : 'Dismiss'}
           </button>
-          <button
+          {chapterNumber === undefined && <button
             ref={continueButtonRef}
             type="button"
             className="session-break-prompt-continue-button"
             onClick={handleContinue}
           >
             Continue reading
-          </button>
+          </button>}
         </div>
       </div>
     </div>

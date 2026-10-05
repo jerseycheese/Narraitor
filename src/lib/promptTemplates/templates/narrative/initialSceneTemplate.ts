@@ -1,3 +1,4 @@
+import { chapterBlock } from './chapterBlock';
 import { sceneBeatBlock } from './sceneBeatBlock';
 import { majorEventGuidelines } from './majorEventGuidelines';
 import type { NarrativeTemplateContext } from './context';
@@ -29,7 +30,7 @@ export const initialSceneTemplate = (context: NarrativeTemplateContext) => {
 
   return `You are creating the opening scene for a ${genre} story world called "${worldName}".
 
-World Description: ${worldDescription}
+${chapterBlock(context)}World Description: ${worldDescription}
 Tone: ${tone}
 World Attributes: ${JSON.stringify(attributes)}
 ${playerCharacterName ? `Player Character: ${playerCharacterName} (THE PLAYER - write from their perspective using "you")` : ''}

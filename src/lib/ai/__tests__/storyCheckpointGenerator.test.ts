@@ -79,3 +79,35 @@ describe('generateStoryCheckpointSummary', () => {
     expect(result.model).toBe('fallback');
   });
 });
+
+
+describe('chapter recap', () => {
+  const generateContent = jest.fn();
+  beforeEach(() => {
+    generateContent.mockClear();
+    mockCreateDefaultGeminiClient.mockReturnValue({ generateContent } as never);
+    process.env.NEXT_PUBLIC_FEATURE_CHAPTERS = 'true';
+  });
+  afterEach(() => { delete process.env.NEXT_PUBLIC_FEATURE_CHAPTERS; });
+
+  it('returns five labeled bounded lines from one provider request', async () => {
+    generateContent.mockResolvedValue({ content: JSON.stringify({ recap: {
+      previously: 'The council fell. '.repeat(100), whereItStopped: 'At the gate.',
+      cast: 'Maera: missing.', holding: 'Council seal.', openThreads: 'Find Maera.',
+    } }) });
+    const result = await generateStoryCheckpointSummary({ ...basePayload, mode: 'chapter' });
+    expect(result.chapterRecap?.split('\n').map(line => line.split(':')[0])).toEqual([
+      'Previously', 'Where it stopped', 'Cast', 'Holding', 'Open threads',
+    ]);
+    expect(result.chapterRecap?.length).toBeLessThanOrEqual(850);
+    expect(generateContent).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses canon for a malformed response without making a second request', async () => {
+    generateContent.mockResolvedValue({ content: 'not json' });
+    const result = await generateStoryCheckpointSummary({ ...basePayload, mode: 'chapter', holding: ['Council seal'] });
+    expect(result.chapterRecap).toContain('Previously: Maera dissolved the council');
+    expect(result.chapterRecap).toContain('Holding: Council seal');
+    expect(generateContent).toHaveBeenCalledTimes(1);
+  });
+});

@@ -1,5 +1,6 @@
 // src/lib/narrative/turnResolver.ts
 
+import { getChapterContext } from './chapters';
 import type { EntityID } from '@/types/common.types';
 import { FIRST_SEGMENT_LOCATION } from '@/types/narrative.types';
 import type {
@@ -70,7 +71,8 @@ const recentSceneSegments = (
   segments: readonly NarrativeSegment[],
   limit = 3
 ): NarrativeSegment[] => {
-  const recent = segments.slice(-limit);
+  const chapterSegments = isFeatureEnabled('CHAPTERS') ? getChapterContext(segments).recentSegments : segments;
+  const recent = chapterSegments.slice(-limit);
   let latestBoundary = -1;
   recent.forEach((segment, index) => {
     if (segment.metadata?.tags?.includes(WORLD_CLOCK_TRANSITION_TAG)) {
@@ -90,6 +92,12 @@ const didWorldClockTransitionLastClockTurn = (
   }
   return false;
 };
+
+function assertChapterRecapReady(sessionId: EntityID): void {
+  if (!isFeatureEnabled('CHAPTERS')) return;
+  const chapter = getChapterContext(useNarrativeStore.getState().getSessionSegments(sessionId));
+  if (chapter.isOpening && !chapter.recap) throw new Error('Chapter recap is still being prepared.');
+}
 
 function withTurnLock<T>(
   sessionId: EntityID,
@@ -242,9 +250,12 @@ async function resolveTurnInner(
   const ids = { worldId, characterId };
   if (isFeatureEnabled('SCENE_STATE')) await waitForSceneStoreHydration();
 
+  assertChapterRecapReady(sessionId);
+
   // Pre-turn snapshot for prompt context
   const preTurnSnapshot = assembleSessionSnapshot(sessionId, ids);
-  const recentSegments = recentSceneSegments(preTurnSnapshot.segments);
+  const chapter = isFeatureEnabled('CHAPTERS') ? getChapterContext(preTurnSnapshot.segments) : undefined;
+  const recentSegments = recentSceneSegments(chapter?.recentSegments ?? preTurnSnapshot.segments);
   const sceneState = preTurnSnapshot.sceneState;
   const presentNpcNames = sceneState?.presentNpcIds.map(
     (id) => preTurnSnapshot.npcs.find((npc) => npc.id === id)?.name ?? id
@@ -312,6 +323,7 @@ async function resolveTurnInner(
             worldId,
             currentSceneId: `scene-${Date.now()}`,
             characterIds: characterId ? [characterId] : [],
+            ...(chapter ? { chapter, currentLocation: preTurnSnapshot.segments.at(-1)?.metadata.location } : {}),
             previousSegments: [...recentSegments],
             currentTags: mergeTurnTags(
               recentSegments[recentSegments.length - 1]?.metadata?.tags ?? [],
@@ -545,6 +557,7 @@ async function resolveItemUseTurnInner(
   generator: NarrativeGenerator
 ): Promise<ItemUseTurnOutcome> {
   const { sessionId, worldId, characterId, itemId } = command;
+  assertChapterRecapReady(sessionId);
   if (isFeatureEnabled('SCENE_STATE')) await waitForSceneStoreHydration();
   const generationError = useNarrativeStore.getState().generationError;
   const activeSessionId = useSessionStore.getState().id;
@@ -634,6 +647,7 @@ async function resolveItemUseTurnInner(
     }
   };
 
+  const chapter = isFeatureEnabled('CHAPTERS') ? getChapterContext(preTurnSnapshot.segments) : undefined;
   let generated: NarrativeGenerationResult;
   try {
     generated = await generateItemUsageNarrative(
@@ -669,8 +683,9 @@ async function resolveItemUseTurnInner(
           sessionId,
           currentSceneId: `item-usage-${item.id}`,
           characterIds: [characterId],
-          previousSegments: preTurnSnapshot.segments.slice(-5),
-          recentSegments: preTurnSnapshot.segments.slice(-5),
+          ...(chapter ? { chapter: { ...chapter, isEnding: false }, currentLocation: preTurnSnapshot.segments.at(-1)?.metadata.location } : {}),
+          previousSegments: (chapter?.recentSegments ?? preTurnSnapshot.segments).slice(-5),
+          recentSegments: (chapter?.recentSegments ?? preTurnSnapshot.segments).slice(-5),
           currentTags: ['item-usage', `item-${item.categoryId}`],
           currentSituation: `Player used item "${item.name}". Survival constraint active: do NOT kill or incapacitate the player.`,
           fatalRiskAllowed: false,
@@ -985,6 +1000,16 @@ async function commitAndSettleGeneratedTurn({
       playerCharacterName,
       acquiredItems
     );
+  }
+
+  if (isFeatureEnabled('CHAPTERS') && !isFirstSegment && !isFatalCriticalFailure) {
+    const chapter = getChapterContext(useNarrativeStore.getState().getSessionSegments(sessionId).slice(0, -1));
+    const current = useNarrativeStore.getState().segments[storedSegmentId];
+    if (chapter.isEnding && current && isWorldClockTurnSegment(current) && !isSessionEndingSegment(current)) {
+      useNarrativeStore.getState().updateSegment(storedSegmentId, {
+        type: 'ending', metadata: { ...current.metadata, chapter: { number: chapter.number } },
+      });
+    }
   }
 
   const settledSegment =

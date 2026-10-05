@@ -10,6 +10,7 @@
  * in the browser.
  */
 const FEATURE_FLAG_DEFAULTS = {
+  CHAPTERS: false,
   // Client-side typewriter reveal over an already-complete response.
   // Real token streaming from /api/narrative/generate now
   // covers the same "text should arrive progressively" goal for the live
@@ -66,6 +67,7 @@ const resolve = (value: string | undefined, defaultValue: boolean): boolean =>
   defaultValue ? value !== 'false' : value === 'true';
 
 const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
+  CHAPTERS: resolve(process.env.NEXT_PUBLIC_FEATURE_CHAPTERS, FEATURE_FLAG_DEFAULTS.CHAPTERS),
   BUFFERED_STREAMING: resolve(
     process.env.NEXT_PUBLIC_FEATURE_BUFFERED_STREAMING,
     FEATURE_FLAG_DEFAULTS.BUFFERED_STREAMING
