@@ -202,10 +202,22 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [processedChoices, setProcessedChoices] = useState<Set<string>>(
     new Set()
   );
-  // Segments are the only source: processedChoices holds option IDs, which never
-  // match decision IDs, so mixing them double-counts every answered turn.
+  // Answered decisions come from the store plus segment metadata, deduped by decision ID.
+  // processedChoices holds option IDs, which never match decision IDs, so counting
+  // them too double-counts every answered turn. The store side covers a turn whose
+  // segment has not committed (pending or failed generation). The joined string keeps
+  // the selector result referentially stable.
+  const answeredDecisionIdsKey = useNarrativeStore((state) =>
+    state
+      .getSessionDecisions(sessionId)
+      .filter((decision) => decision.selectedOptionId)
+      .map((decision) => decision.id)
+      .join('|')
+  );
   const totalDecisionCount = useMemo(() => {
-    const decisionIds = new Set<string>();
+    const decisionIds = new Set<string>(
+      answeredDecisionIdsKey ? answeredDecisionIdsKey.split('|') : []
+    );
     for (const segment of segments) {
       const id = segment.metadata?.causedByDecisionId;
       if (id) {
@@ -213,7 +225,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       }
     }
     return decisionIds.size;
-  }, [segments]);
+  }, [segments, answeredDecisionIdsKey]);
   const {
     showBreakPrompt,
     dismissBreakPrompt,
