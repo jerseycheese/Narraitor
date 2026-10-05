@@ -202,6 +202,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [processedChoices, setProcessedChoices] = useState<Set<string>>(
     new Set()
   );
+  // Segments are the only source: processedChoices holds option IDs, which never
+  // match decision IDs, so mixing them double-counts every answered turn.
   const totalDecisionCount = useMemo(() => {
     const decisionIds = new Set<string>();
     for (const segment of segments) {
@@ -210,11 +212,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         decisionIds.add(id);
       }
     }
-    for (const id of processedChoices) {
-      decisionIds.add(id);
-    }
     return decisionIds.size;
-  }, [segments, processedChoices]);
+  }, [segments]);
   const {
     showBreakPrompt,
     dismissBreakPrompt,
