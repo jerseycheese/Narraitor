@@ -1,3 +1,4 @@
+import { storyCheckpointTemplate } from './storyCheckpointTemplate';
 import { baseNarrativeTemplate } from './baseNarrativeTemplate';
 import { initialSceneTemplate } from './initialSceneTemplate';
 import { sceneTemplate } from './sceneTemplate';
@@ -8,6 +9,7 @@ import { skillAcknowledgmentTemplate } from './skillAcknowledgmentTemplate';
 import { actionTemplate } from './actionTemplate';
 
 export const narrativeTemplates = [
+  { id: 'narrative/storyCheckpoint', generate: storyCheckpointTemplate },
   {
     id: 'narrative/base',
     generate: baseNarrativeTemplate

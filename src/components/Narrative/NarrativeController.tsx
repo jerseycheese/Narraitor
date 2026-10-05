@@ -1,3 +1,4 @@
+import { ChapterHandoffPrompt } from './ChapterHandoffPrompt';
 import React, {
   useEffect,
   useState,
@@ -911,11 +912,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
   return (
     <div className={`narrative-controller ${className || ''}`}>
-      <SessionBreakPrompt
+      {isFeatureEnabled('CHAPTERS') ? <ChapterHandoffPrompt worldId={worldId} sessionId={sessionId} characterId={characterId} /> : <SessionBreakPrompt
         isOpen={showBreakPrompt}
         onDismiss={dismissBreakPrompt}
         sessionMetrics={pacingMetrics}
-      />
+      />}
       {!hideHistory && (
         <NarrativeHistory
           segments={segments}

@@ -1,3 +1,5 @@
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import { getChapterContext } from '@/lib/narrative/chapters';
 import type { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { mergeTurnTags } from '@/lib/narrative/turnTags';
 import { useCharacterStore } from '@/state/characterStore';
@@ -103,11 +105,13 @@ export async function generateItemUsageNarrative(
   }
 
   try {
-    const previousSegments = useNarrativeStore
+    const allSegments = useNarrativeStore
       .getState()
       .getSessionSegments(sessionId);
+    const chapter = isFeatureEnabled('CHAPTERS') ? getChapterContext(allSegments) : undefined;
+    const previousSegments = chapter?.recentSegments ?? allSegments;
     const recentSegments = previousSegments.slice(-5);
-    const lastSegment = previousSegments[previousSegments.length - 1];
+    const lastSegment = allSegments[allSegments.length - 1];
     const currentTags = mergeTurnTags(lastSegment?.metadata?.tags || [], [
       'item-usage',
       `item-${item.categoryId}`,
@@ -167,6 +171,7 @@ export async function generateItemUsageNarrative(
           sessionId,
           currentSceneId: `item-usage-${item.id}`,
           characterIds: [characterId],
+          ...(chapter ? { chapter: { ...chapter, isEnding: false } } : {}),
           previousSegments,
           recentSegments,
           currentTags,

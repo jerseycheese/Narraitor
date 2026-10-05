@@ -1,3 +1,4 @@
+import { isFeatureEnabled } from '@/lib/featureFlags';
 import type { NarrativeSegment } from '@/types/narrative.types';
 
 /**
@@ -10,7 +11,6 @@ import type { NarrativeSegment } from '@/types/narrative.types';
  * keep playing, and would then still need choices.
  */
 export const isSessionEndingSegment = (segment: NarrativeSegment): boolean => {
-  if (segment.type === 'ending') return true;
   if (
     segment.metadata?.fatalRiskAllowed !== false &&
     segment.metadata?.tags?.includes('fatal-outcome')
@@ -19,6 +19,9 @@ export const isSessionEndingSegment = (segment: NarrativeSegment): boolean => {
   }
   if (segment.metadata?.endingId != null || segment.metadata?.endingData != null) {
     return true;
+  }
+  if (segment.type === 'ending') {
+    return !(isFeatureEnabled('CHAPTERS') && segment.metadata?.chapter);
   }
   return false;
 };

@@ -3,6 +3,23 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { SessionBreakPrompt } from '../SessionBreakPrompt';
 
 describe('SessionBreakPrompt', () => {
+  it('holds the chapter dialog until its recap arrives, with focus kept inside', () => {
+    const onDismiss = jest.fn();
+    const { rerender } = render(<SessionBreakPrompt isOpen chapterNumber={1} onDismiss={onDismiss} />);
+    const waiting = screen.getByRole('button', { name: 'Preparing recap' });
+    expect(waiting).toHaveFocus();
+    fireEvent.click(waiting);
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.keyDown(window, { key: 'Tab' });
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(waiting).toHaveFocus();
+    rerender(<SessionBreakPrompt isOpen chapterNumber={1} chapterRecap="Previously: Reached the gate." onDismiss={onDismiss} />);
+    const proceed = screen.getByRole('button', { name: 'Continue next chapter' });
+    expect(proceed).toHaveFocus();
+    fireEvent.click(proceed);
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
   it('does not render when isOpen is false', () => {
     render(<SessionBreakPrompt isOpen={false} onDismiss={jest.fn()} />);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

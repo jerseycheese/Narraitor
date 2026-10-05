@@ -1,3 +1,4 @@
+import { chapterBlock } from './chapterBlock';
 import { stallBreakerBlock } from './stallBreakerBlock';
 import { sceneBeatBlock } from './sceneBeatBlock';
 import { PERSPECTIVE_EXAMPLES, shouldIncludeExamples } from '../../examples';
@@ -141,7 +142,7 @@ ${npcRoster.map((npc: { id: string; name: string; description?: string }) => `- 
 
 World: ${worldName}
 Tone: ${tone}${characterSkillContext ? characterSkillContext : ''}${enhancedCharacterContext ? enhancedCharacterContext : ''}
-${worldDescriptionSection}${backgroundSection}
+${chapterBlock(context)}${worldDescriptionSection}${backgroundSection}
 STORY SO FAR:
 ${recentContent}
 

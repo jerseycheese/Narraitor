@@ -128,3 +128,15 @@ export const MilestoneToasts: Story = {
     </ToastProvider>
   ),
 };
+
+
+export const ChapterRecapPreparing: Story = {
+  render: () => <SessionBreakPrompt isOpen chapterNumber={1} onDismiss={() => {}} />,
+};
+
+export const ChapterRecapReady: Story = {
+  render: () => <SessionBreakPrompt
+    isOpen chapterNumber={1} onDismiss={() => {}}
+    chapterRecap={'Previously: You secured the council seal.\nWhere it stopped: At the harbor gate.\nCast: The guard stands beside you.\nHolding: Council seal.\nOpen threads: Find the missing envoy.'}
+  />,
+};

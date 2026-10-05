@@ -1,6 +1,11 @@
 import type { StoryCheckpointRequestBody } from '@/types/story-checkpoint.types';
 
 interface BuildStoryCheckpointPayloadParams {
+  mode?: 'chapter';
+  previousChapterRecap?: string;
+  cast?: string[];
+  holding?: string[];
+  openThreads?: string[];
   worldId: string;
   sessionId: string;
   characterId?: string;
@@ -14,6 +19,7 @@ interface BuildStoryCheckpointPayloadParams {
 }
 
 export const buildStoryCheckpointPayload = ({
+  mode, previousChapterRecap, cast, holding, openThreads,
   worldId,
   sessionId,
   characterId,
@@ -30,6 +36,7 @@ export const buildStoryCheckpointPayload = ({
     .filter((goal) => goal.length > 0);
 
   return {
+    ...(mode === 'chapter' ? { mode, previousChapterRecap, cast, holding, openThreads } : {}),
     worldId,
     sessionId,
     characterId,

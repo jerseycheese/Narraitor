@@ -95,6 +95,24 @@ describe('/api/narrative/story-checkpoint', () => {
     );
   });
 
+  it('accepts chapter context and returns its recap with the flag on', async () => {
+    process.env.NEXT_PUBLIC_FEATURE_CHAPTERS = 'true';
+    const chapterRecap = 'Previously: Saved the village.\nWhere it stopped: Gate.\nCast: Maera: alive.\nHolding: Seal.\nOpen threads: Find the council.';
+    mockGenerateStoryCheckpointSummary.mockResolvedValue({ chapterRecap } as never);
+    const response = await POST(buildRequest({
+      worldId: 'world-1', sessionId: 'session-1', mode: 'chapter',
+      events: [{ id: 'event-1', description: 'Saved the village', timestamp: '2025-11-20T18:00:00Z' }],
+      cast: ['Maera: alive'], holding: ['Seal'], openThreads: ['Find the council'],
+    }));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ chapterRecap });
+    expect(mockGenerateStoryCheckpointSummary).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: 'chapter', cast: ['Maera: alive'], holding: ['Seal'], openThreads: ['Find the council'] }),
+      expect.anything(), expect.anything(),
+    );
+    delete process.env.NEXT_PUBLIC_FEATURE_CHAPTERS;
+  });
+
   it('asks for a player key even when the server has a Gemini key', async () => {
     process.env.GEMINI_API_KEY = 'env-key';
     const response = await POST(buildRequest({

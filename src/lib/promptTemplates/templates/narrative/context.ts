@@ -1,3 +1,5 @@
+import type { ChapterContext } from '@/types/narrative.types';
+import type { StoryCheckpointRequestBody } from '@/types/story-checkpoint.types';
 import type { WorldAttribute } from '@/types/world.types';
 import type { WorldClockPromptContext } from '@/types/worldThread.types';
 
@@ -60,6 +62,9 @@ export interface SettledCommitmentDTO {
  * fields a given template needs (see narrativeGenerator / narrativeGenerator.prompt).
  */
 export interface NarrativeTemplateContext {
+  chapter?: Omit<ChapterContext, 'recentSegments'>;
+  checkpoint?: StoryCheckpointRequestBody;
+  checkpointToneInstructions?: string;
   worldName?: string;
   worldDescription?: string;
   genre?: string;

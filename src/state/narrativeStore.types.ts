@@ -70,6 +70,8 @@ export interface NarrativeStore {
     world?: World;
     character?: StoreCharacter;
   }) => Promise<void>;
+  completeChapterRecap: (segmentId: EntityID, recap: string) => void;
+  continueChapter: (segmentId: EntityID) => void;
   clearEnding: () => void;
   setCurrentEnding: (ending: StoryEnding | null) => void;
   updateCurrentEnding: (updater: (ending: StoryEnding | null) => StoryEnding | null) => void;

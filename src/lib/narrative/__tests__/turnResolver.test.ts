@@ -309,6 +309,59 @@ describe('TurnResolver', () => {
     seedStores();
   });
 
+  describe('chapter hand-off', () => {
+    beforeEach(() => {
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      isFeatureEnabled.mockImplementation((flag: string) => flag === 'CHAPTERS');
+    });
+    afterEach(() => {
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      isFeatureEnabled.mockReturnValue(false);
+    });
+
+    it('feeds item actions and their survival repair from the recap, without older prose', async () => {
+      const ids = seedItemUseStores();
+      const boundary: NarrativeSegment = {
+        id: 'chapter-item-boundary', sessionId: ids.sessionId, worldId: ids.worldId,
+        content: 'Old chapter prose.', type: 'ending', timestamp: new Date('2026-01-01'),
+        createdAt: '2026-01-01', updatedAt: '2026-01-01',
+        metadata: { tags: [], chapter: { number: 1, recap: 'Previously: Reached the gate.' } },
+      };
+      useNarrativeStore.setState({ segments: { [boundary.id]: boundary }, sessionSegments: { [ids.sessionId]: [boundary.id] } });
+      const generator = makeItemUseGenerator();
+      jest.mocked(generator.generateSegment)
+        .mockResolvedValueOnce(makeGenerationResult({ content: 'You die on the spot.', metadata: { characterIds: [], tags: ['fatal-outcome'] } }))
+        .mockResolvedValueOnce(makeGenerationResult({ content: 'You stagger but stay alive.', metadata: { characterIds: [], tags: [] } }));
+      await resolveItemUseTurn(ids, generator);
+      for (const [request] of jest.mocked(generator.generateSegment).mock.calls) {
+        expect(request.narrativeContext?.chapter).toMatchObject({ number: 2, isOpening: true, recap: 'Previously: Reached the gate.' });
+        expect(request.narrativeContext?.previousSegments).toEqual([]);
+        expect(request.narrativeContext?.recentSegments).toEqual([]);
+      }
+    });
+
+    it('settles a playable tenth-turn ending and delivers only the recap to chapter two', async () => {
+      const generator = makeMockGenerator();
+      for (let turn = 1; turn <= 10; turn += 1) {
+        await resolveTurn(makeCommand({ choiceId: `choice-${turn}` }), generator);
+      }
+      const boundary = useNarrativeStore.getState().getSessionSegments('session-1').at(-1)!;
+      expect(boundary.type).toBe('ending');
+      expect(boundary.metadata.chapter).toEqual({ number: 1 });
+      expect(useNarrativeStore.getState().isSessionEnded('session-1')).toBe(false);
+      await expect(resolveTurn(makeCommand({ choiceId: 'premature' }), generator)).rejects.toThrow('Chapter recap is still being prepared.');
+      const recap = 'Previously: Reached the gate.\nWhere it stopped: Gate.\nCast: Guard: present.\nHolding: Seal.\nOpen threads: Cross the bridge.';
+      useNarrativeStore.getState().completeChapterRecap(boundary.id, recap);
+      useNarrativeStore.getState().continueChapter(boundary.id);
+      await resolveTurn(makeCommand({ choiceId: 'chapter-two' }), generator);
+      const request = jest.mocked(generator.generateSegment).mock.calls.at(-1)![0];
+      expect(request.narrativeContext?.recentSegments).toEqual([]);
+      expect(request.narrativeContext?.previousSegments).toEqual([]);
+      expect(request.narrativeContext?.chapter).toMatchObject({ number: 2, isOpening: true, recap });
+      expect(sceneTemplate({ chapter: request.narrativeContext?.chapter })).toContain(recap);
+    });
+  });
+
   describe('resolveTurn', () => {
     describe('scene stall breaker', () => {
       const quietTurnLimit = 5;

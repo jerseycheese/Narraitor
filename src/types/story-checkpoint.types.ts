@@ -19,6 +19,11 @@ export interface StoryCheckpointDecisionPayload {
 }
 
 export interface StoryCheckpointRequestBody {
+  mode?: 'chapter';
+  previousChapterRecap?: string;
+  cast?: string[];
+  holding?: string[];
+  openThreads?: string[];
   worldId: EntityID;
   sessionId: EntityID;
   characterId?: EntityID;
@@ -32,6 +37,7 @@ export interface StoryCheckpointRequestBody {
 }
 
 export interface StoryCheckpointResponseBody {
+  chapterRecap?: string;
   segment: string; // 50-75 word immutable segment about events in this checkpoint only
   highlights: string[];
   majorEvents: string[];

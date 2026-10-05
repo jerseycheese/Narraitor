@@ -289,6 +289,7 @@ export interface NarrativeMetadata {
   characters?: GeneratedCharacterMetadata[];
   // Dialogue-specific metadata
   speakerId?: EntityID;
+  chapter?: { number: number; recap?: string; recapRequested?: boolean; continued?: boolean };
   // Ending-specific metadata
   endingId?: string;
   endingData?: StoryEnding;
@@ -344,7 +345,16 @@ export interface NarrativeGenerationRequest {
 /**
  * Represents narrative context for generation
  */
+export interface ChapterContext {
+  number: number;
+  isEnding: boolean;
+  isOpening: boolean;
+  recap?: string;
+  recentSegments: NarrativeSegment[];
+}
+
 export interface NarrativeContext {
+  chapter?: ChapterContext;
   worldId: EntityID;
   currentSceneId: EntityID;
   characterIds: EntityID[];
