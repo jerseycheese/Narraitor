@@ -162,4 +162,95 @@ describe('NarrativeController session pacing integration', () => {
     const decisionsLabel = screen.getByText('Decisions made');
     expect(decisionsLabel.nextElementSibling).toHaveTextContent('2');
   });
+
+  it('counts an answered turn once when the chosen option is also recorded on a segment', async () => {
+    const answeredSegments = Array.from({ length: 5 }, (_, i) => ({
+      id: `seg-${i + 1}`,
+      sessionId: 'test-session',
+      worldId: 'test-world',
+      content: `Beat ${i + 1}`,
+      type: 'scene' as const,
+      metadata: { tags: [], causedByDecisionId: `decision-${i + 1}` },
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      characterIds: [],
+    }));
+
+    mockZustandStore(
+      useNarrativeStore as jest.MockedFunction<typeof useNarrativeStore>,
+      createMockNarrativeStore({
+        _hasHydrated: true,
+        getSessionSegments: jest.fn().mockReturnValue(answeredSegments),
+        getSessionDecisions: jest.fn().mockReturnValue([]),
+      })
+    );
+
+    render(
+      <ToastProvider>
+        <NarrativeController
+          worldId="test-world"
+          sessionId="test-session"
+          triggerGeneration={true}
+          choiceId="option-5"
+          generateChoices={false}
+          enableSessionPacing={true}
+        />
+      </ToastProvider>
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(15 * 60 * 1000);
+    });
+
+    const decisionsLabel = screen.getByText('Decisions made');
+    expect(decisionsLabel.nextElementSibling).toHaveTextContent('5');
+  });
+
+  it('counts a selected decision whose segment has not committed, without double-counting', async () => {
+    const answeredSegments = Array.from({ length: 4 }, (_, i) => ({
+      id: `seg-${i + 1}`,
+      sessionId: 'test-session',
+      worldId: 'test-world',
+      content: `Beat ${i + 1}`,
+      type: 'scene' as const,
+      metadata: { tags: [], causedByDecisionId: `decision-${i + 1}` },
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      characterIds: [],
+    }));
+    const selectedDecisions = [1, 2, 3, 4, 5].map((n) => ({
+      id: `decision-${n}`,
+      selectedOptionId: `option-${n}`,
+    }));
+
+    mockZustandStore(
+      useNarrativeStore as jest.MockedFunction<typeof useNarrativeStore>,
+      createMockNarrativeStore({
+        _hasHydrated: true,
+        getSessionSegments: jest.fn().mockReturnValue(answeredSegments),
+        getSessionDecisions: jest.fn().mockReturnValue(selectedDecisions),
+      })
+    );
+
+    render(
+      <ToastProvider>
+        <NarrativeController
+          worldId="test-world"
+          sessionId="test-session"
+          triggerGeneration={false}
+          generateChoices={false}
+          enableSessionPacing={true}
+        />
+      </ToastProvider>
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(15 * 60 * 1000);
+    });
+
+    const decisionsLabel = screen.getByText('Decisions made');
+    expect(decisionsLabel.nextElementSibling).toHaveTextContent('5');
+  });
 });
