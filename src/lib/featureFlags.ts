@@ -51,6 +51,8 @@ const FEATURE_FLAG_DEFAULTS = {
   DECISION_ATTRIBUTED_WORLD_COSTS: true,
   // Decide 'is the story done' from the thread ledger, not from the last six majorEvent strings.
   ENDING_GATE_THREAD_LEDGER: false,
+  // 10-turn chapters with a recap hand-off between them.
+  CHAPTERS: false,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAG_DEFAULTS;
@@ -103,6 +105,10 @@ const getFeatureFlags = (): Record<FeatureFlag, boolean> => ({
   ENDING_GATE_THREAD_LEDGER: resolve(
     process.env.NEXT_PUBLIC_FEATURE_ENDING_GATE_THREAD_LEDGER,
     FEATURE_FLAG_DEFAULTS.ENDING_GATE_THREAD_LEDGER
+  ),
+  CHAPTERS: resolve(
+    process.env.NEXT_PUBLIC_FEATURE_CHAPTERS,
+    FEATURE_FLAG_DEFAULTS.CHAPTERS
   ),
 });
 

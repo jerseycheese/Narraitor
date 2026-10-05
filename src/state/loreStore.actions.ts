@@ -18,6 +18,7 @@ import {
   createStoreError,
   type UserFriendlyError,
 } from '@/lib/utils/errorUtils';
+import { isFeatureEnabled } from '@/lib/featureFlags';
 import { logger } from '@/lib/utils/logger';
 
 import { getInitialState } from './loreStore.state';
@@ -69,6 +70,8 @@ const MAX_LORE_USAGE_EVENTS = 200;
 const MIN_MENTION_TERM_LENGTH = 3;
 
 // ─── Base CRUD ──────────────────────────────────────────────────────────────
+
+const DEFAULT_CHAPTER_CARRYOVER_COUNT = 5;
 
 const createBaseActions = (set: SetState, get: GetState) => ({
   create: (factData: Omit<LoreFact, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -652,6 +655,49 @@ export const createLoreUsageActions = (set: SetState, get: GetState) => ({
         ),
       };
     });
+  },
+
+  promoteChapterLore: (
+    worldId: EntityID,
+    sessionId: EntityID,
+    topCount: number = DEFAULT_CHAPTER_CARRYOVER_COUNT
+  ): EntityID[] => {
+    if (!isFeatureEnabled('CHAPTERS')) return [];
+
+    const { facts, loreUsage } = get();
+    const usageScore = (id: EntityID) =>
+      (loreUsage[id]?.usageCount ?? 0) + (loreUsage[id]?.mentionCount ?? 0);
+
+    const promotedIds = Object.values(facts)
+      .filter(
+        (fact) =>
+          fact.worldId === worldId &&
+          fact.sessionId === sessionId &&
+          fact.visibility === 'session-private'
+      )
+      .sort(
+        (a, b) =>
+          usageScore(b.id) - usageScore(a.id) ||
+          importanceRank(b.metadata?.importance) -
+            importanceRank(a.metadata?.importance)
+      )
+      .slice(0, topCount)
+      .map((fact) => fact.id);
+
+    if (promotedIds.length === 0) return [];
+
+    const promotedSet = new Set(promotedIds);
+    set((state) => ({
+      facts: Object.fromEntries(
+        Object.entries(state.facts).map(([id, fact]) => [
+          id,
+          promotedSet.has(id)
+            ? { ...fact, visibility: 'world-shared' as const }
+            : fact,
+        ])
+      ),
+    }));
+    return promotedIds;
   },
 
   clearLoreUsage: (worldId?: EntityID) => {
