@@ -186,11 +186,12 @@ by name, don't wait to be asked. Two that carry the strongest "run me" contract:
 `narraitor-pattern-alignment-skill` after any change under `src/`, before committing.
 `.claude/skills/` is the full list; don't enumerate it here, it rots.
 
-### Running in Claude Code cloud
+### Running in Claude Code cloud and worktrees
 
-Cloud sessions clone this repo fresh, so the `SessionStart` hook in `.claude/settings.json`
-runs `scripts/install_pkgs.sh` to `npm ci` on startup. Unit tests, type-check, lint, and
-build all work on the Linux cloud VM.
+The `SessionStart` hook in `.claude/settings.json` (and `npm run dev`) runs
+`scripts/install_pkgs.sh`. In a linked git worktree it symlinks the main checkout's
+`node_modules` when the lockfiles match; cloud sessions and fresh checkouts get `npm ci`.
+Unit tests, type-check, lint, and build all work on the Linux cloud VM.
 
 **Don't run the visual-regression or E2E suites in cloud** (`test:visual`, `test:e2e:*`) —
 the Playwright baselines are macOS-only and will fail on pixel diffs against a Linux runner.
