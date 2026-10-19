@@ -12,6 +12,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+"scripts/install_pkgs.sh"
 "scripts/sync-local-env.sh"
 
 port="$(node scripts/worktree-port.js)"
