@@ -204,8 +204,17 @@ const buildOtherCharacterContext = (
       return null;
     }
 
+    // Thread snippets are raw second-person prose ("You collapse, mortally
+    // wounded"), which the model reads as the current player's own state. Only
+    // share a story that actually crossed into this character's.
     const threads = Object.values(worldState.playerCharacterThreads)
-      .filter((thread) => thread.characterId !== activeCharacterId)
+      .filter(
+        (thread) =>
+          thread.characterId !== activeCharacterId &&
+          thread.crossCharacterReferences?.some(
+            (reference) => reference.characterId === activeCharacterId
+          )
+      )
       .sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated))
       .slice(0, MAX_OTHER_CHARACTER_THREADS);
 
