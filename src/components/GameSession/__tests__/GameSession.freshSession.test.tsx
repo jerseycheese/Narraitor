@@ -213,3 +213,20 @@ it('resumes the new session after saving, Start New, and saving again', async ()
     sessionClock.mockRestore();
   }
 });
+
+describe('ended sessions without ?fresh=true', () => {
+  it('starts a new session instead of resuming the ended save', async () => {
+    renderHook(() => useGameSessionState({ worldId: 'world-1', isClient: true }));
+    await waitFor(() => expect(useSessionStore.getState().status).toBe('active'));
+    expect(useSessionStore.getState().id).not.toBe(endedSessionId);
+  });
+
+  it('moves a player stuck on an ended active session to a new one', async () => {
+    useSessionStore.setState({ status: 'active' });
+    renderHook(() => useGameSessionState({ worldId: 'world-1', isClient: true }));
+    await waitFor(() =>
+      expect(useSessionStore.getState().id).not.toBe(endedSessionId)
+    );
+    expect(useSessionStore.getState().status).toBe('active');
+  });
+});
