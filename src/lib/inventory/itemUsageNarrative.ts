@@ -29,6 +29,8 @@ interface ItemUsageNarrativeRequest {
   sessionId: EntityID;
   usageDetails: ItemUsageNarrativeDetails;
   sceneState?: ItemUsageNarrativeSceneState;
+  /** Set when regenerating after a lethal draft on this protected turn. */
+  isFatalRepair?: boolean;
 }
 
 /**
@@ -94,6 +96,7 @@ export async function generateItemUsageNarrative(
     sessionId,
     usageDetails,
     sceneState,
+    isFatalRepair,
   }: ItemUsageNarrativeRequest,
   generator: NarrativeGenerator
 ): Promise<NarrativeGenerationResult> {
@@ -166,6 +169,7 @@ export async function generateItemUsageNarrative(
         sessionId,
         characterIds: [characterId],
         fatalRiskAllowed: false,
+        ...(isFatalRepair ? { isFatalRepair: true } : {}),
         narrativeContext: {
           worldId,
           sessionId,
@@ -185,6 +189,7 @@ export async function generateItemUsageNarrative(
             },
           ],
           fatalRiskAllowed: false,
+          ...(isFatalRepair ? { isFatalRepair: true } : {}),
           ...(sceneState ? { sceneState } : {}),
         },
         generationParameters: {
@@ -192,6 +197,7 @@ export async function generateItemUsageNarrative(
           desiredLength: 'short',
           includedTopics,
           fatalRiskAllowed: false,
+          ...(isFatalRepair ? { isFatalRepair: true } : {}),
         },
       }
     );
