@@ -229,4 +229,29 @@ describe('ended sessions without ?fresh=true', () => {
     );
     expect(useSessionStore.getState().status).toBe('active');
   });
+
+  it('waits for narrative hydration before deciding the session ended', async () => {
+    useSessionStore.setState({ status: 'active' });
+    let finishHydration = () => {};
+    const hydrated = jest
+      .spyOn(useNarrativeStore.persist, 'hasHydrated')
+      .mockReturnValue(false);
+    jest
+      .spyOn(useNarrativeStore.persist, 'onFinishHydration')
+      .mockImplementation((callback) => {
+        finishHydration = () => callback(useNarrativeStore.getState());
+        return () => {};
+      });
+    try {
+      renderHook(() => useGameSessionState({ worldId: 'world-1', isClient: true }));
+      expect(useSessionStore.getState().id).toBe(endedSessionId);
+      hydrated.mockReturnValue(true);
+      act(() => finishHydration());
+      await waitFor(() =>
+        expect(useSessionStore.getState().id).not.toBe(endedSessionId)
+      );
+    } finally {
+      jest.restoreAllMocks();
+    }
+  });
 });

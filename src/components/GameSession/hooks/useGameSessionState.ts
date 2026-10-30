@@ -77,7 +77,21 @@ export const useGameSessionState = ({
   
   // Local state for error handling
   const [error, setError] = useState<Error | null>(null);
-  
+
+  // The init effect reads ended-session markers from the narrative store, so it
+  // has to wait for that store's IndexedDB hydration on a cold load.
+  const [isNarrativeHydrated, setIsNarrativeHydrated] = useState(
+    () => useNarrativeStore.persist?.hasHydrated?.() ?? true
+  );
+  useEffect(() => {
+    const narrativePersist = useNarrativeStore.persist;
+    if (!narrativePersist?.onFinishHydration || narrativePersist.hasHydrated()) {
+      setIsNarrativeHydrated(true);
+      return;
+    }
+    return narrativePersist.onFinishHydration(() => setIsNarrativeHydrated(true));
+  }, []);
+
   // Scope each store subscription to the slice this hook actually uses, so the
   // game session doesn't re-render on every unrelated store write during play.
   // Session state itself is consumed via the dedicated subscription below; here
@@ -222,8 +236,8 @@ export const useGameSessionState = ({
   
   // Initialize session with correct character when component mounts
   useEffect(() => {
-    if (!isClient) return;
-    
+    if (!isClient || !isNarrativeHydrated) return;
+
     // Get current store state to check for existing session
     const currentStoreState = useSessionStore.getState();
     const { isSessionEnded } = useNarrativeStore.getState();
@@ -283,7 +297,7 @@ export const useGameSessionState = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClient, worldExists, sessionState.status, sessionCharacterId, disableAutoResume]); // Dependencies carefully selected to avoid infinite loops
+  }, [isClient, isNarrativeHydrated, worldExists, sessionState.status, sessionCharacterId, disableAutoResume]); // Dependencies carefully selected to avoid infinite loops
   
   // Subscribe to session store changes directly to avoid polling issues
   useEffect(() => {
