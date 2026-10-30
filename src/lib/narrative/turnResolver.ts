@@ -192,6 +192,51 @@ function flushProtectedChunks(
   }
 }
 
+const FORBIDDEN_LETHAL_OUTCOME_MESSAGE =
+  'Forbidden lethal narrative outcome generated on a protected turn.';
+
+interface FatalRepairOptions {
+  playerCharacterName?: string;
+  /** Names the draft in log lines, e.g. "initial scene draft". */
+  draftLabel: string;
+  logContext: Record<string, unknown>;
+  /** Share one budget across calls when a turn may generate more than once. */
+  repairBudget?: { remaining: number };
+}
+
+/**
+ * Generates a draft for a protected turn and repairs it once if it's lethal:
+ * regenerate with the repair flag set, and reject the turn if the repair is
+ * still lethal.
+ */
+async function generateWithFatalRepair(
+  generate: (isFatalRepair: boolean) => Promise<NarrativeGenerationResult>,
+  { playerCharacterName, draftLabel, logContext, repairBudget = { remaining: 1 } }: FatalRepairOptions
+): Promise<NarrativeGenerationResult> {
+  const draft = await generate(false);
+  if (!isLethalNarrativeDraft(draft, playerCharacterName)) return draft;
+
+  if (repairBudget.remaining < 1) {
+    logger.error(
+      `[TurnResolver] Forbidden lethal ${draftLabel} generated after fatal repair budget exhausted; rejecting turn`,
+      logContext
+    );
+    throw new Error(FORBIDDEN_LETHAL_OUTCOME_MESSAGE);
+  }
+  repairBudget.remaining -= 1;
+  logger.warn(`[TurnResolver] Forbidden lethal ${draftLabel} generated; attempting repair`, logContext);
+
+  const repaired = await generate(true);
+  if (isLethalNarrativeDraft(repaired, playerCharacterName)) {
+    logger.error(
+      `[TurnResolver] Forbidden lethal ${draftLabel} persisted after repair; rejecting turn`,
+      logContext
+    );
+    throw new Error(FORBIDDEN_LETHAL_OUTCOME_MESSAGE);
+  }
+  return repaired;
+}
+
 /**
  * Advance the story by one Turn. Handles everything between "the player
  * picked a choice" and "the next Decision can safely read state":
@@ -357,49 +402,26 @@ async function resolveTurnInner(
     );
   };
 
-  let fatalRepairsAttempted = 0;
-  const ensureNonLethalDraft = async (
-    draft: NarrativeGenerationResult,
-    isStallRetry: boolean
-  ): Promise<NarrativeGenerationResult> => {
-    if (!isProtectedTurn || !isLethalNarrativeDraft(draft, preTurnSnapshot.character?.name)) {
-      return draft;
-    }
+  const fatalRepairBudget = { remaining: 1 };
+  const generateTurnSegment = (isStallRetry: boolean) =>
+    isProtectedTurn
+      ? generateWithFatalRepair(
+          (isFatalRepair) => generateSegment(isStallRetry, isFatalRepair),
+          {
+            playerCharacterName: preTurnSnapshot.character?.name,
+            draftLabel: 'draft on protected turn',
+            logContext: { sessionId, turnIndex: currentTurn },
+            repairBudget: fatalRepairBudget,
+          }
+        )
+      : generateSegment(isStallRetry);
 
-    if (fatalRepairsAttempted >= 1) {
-      logger.error(
-        '[TurnResolver] Forbidden lethal draft generated after fatal repair budget exhausted on protected turn; rejecting turn',
-        { sessionId, turnIndex: currentTurn }
-      );
-      throw new Error('Forbidden lethal narrative outcome generated on a protected turn.');
-    }
-
-    fatalRepairsAttempted += 1;
-    logger.warn('[TurnResolver] Forbidden lethal draft generated on protected turn; attempting repair', {
-      sessionId,
-      turnIndex: currentTurn,
-    });
-
-    const repaired = await generateSegment(isStallRetry, true);
-    if (isLethalNarrativeDraft(repaired, preTurnSnapshot.character?.name)) {
-      logger.error(
-        '[TurnResolver] Forbidden lethal draft persisted after repair on protected turn; rejecting turn',
-        { sessionId, turnIndex: currentTurn }
-      );
-      throw new Error('Forbidden lethal narrative outcome generated on a protected turn.');
-    }
-
-    return repaired;
-  };
-
-  let result = await generateSegment();
-  result = await ensureNonLethalDraft(result, false);
+  let result = await generateTurnSegment(false);
 
   if (shouldBreakSceneStall) {
     const target = result.metadata.sceneTransition?.to?.trim();
     if (!target || target === FIRST_SEGMENT_LOCATION) {
-      result = await generateSegment(true);
-      result = await ensureNonLethalDraft(result, true);
+      result = await generateTurnSegment(true);
       const retryTarget = result.metadata.sceneTransition?.to?.trim();
       if (!retryTarget || retryTarget === FIRST_SEGMENT_LOCATION) {
         const currentPlace = [
@@ -487,50 +509,28 @@ async function resolveInitialTurnInner(
       }
     : undefined;
 
-  let result = await awaitGeneration(
-    () => generator.generateInitialScene(
-      worldId,
-      characterId ? [characterId] : [],
-      sessionId,
-      {
-        signal: command.signal,
-        onChunk: chunkHandler,
-        generationParameters: {
-          fatalRiskAllowed: false,
-        },
-      }
-    ),
-    command.signal
+  const result = await generateWithFatalRepair(
+    (isFatalRepair) => {
+      bufferedChunks = [];
+      return awaitGeneration(
+        () => generator.generateInitialScene(
+          worldId,
+          characterId ? [characterId] : [],
+          sessionId,
+          {
+            signal: command.signal,
+            onChunk: chunkHandler,
+            generationParameters: {
+              fatalRiskAllowed: false,
+              ...(isFatalRepair ? { isFatalRepair: true } : {}),
+            },
+          }
+        ),
+        command.signal
+      );
+    },
+    { playerCharacterName, draftLabel: 'initial scene draft', logContext: { sessionId } }
   );
-
-  if (isLethalNarrativeDraft(result, playerCharacterName)) {
-    logger.warn('[TurnResolver] Forbidden lethal initial scene draft generated; attempting repair', {
-      sessionId,
-    });
-    bufferedChunks = [];
-    result = await awaitGeneration(
-      () => generator.generateInitialScene(
-        worldId,
-        characterId ? [characterId] : [],
-        sessionId,
-        {
-          signal: command.signal,
-          onChunk: chunkHandler,
-          generationParameters: {
-            fatalRiskAllowed: false,
-            isFatalRepair: true,
-          },
-        }
-      ),
-      command.signal
-    );
-    if (isLethalNarrativeDraft(result, playerCharacterName)) {
-      logger.error('[TurnResolver] Forbidden lethal initial scene draft persisted after repair; rejecting turn', {
-        sessionId,
-      });
-      throw new Error('Forbidden lethal narrative outcome generated on a protected turn.');
-    }
-  }
 
   flushProtectedChunks(
     command.onChunk,
@@ -647,69 +647,26 @@ async function resolveItemUseTurnInner(
     }
   };
 
-  const chapter = isFeatureEnabled('CHAPTERS') ? getChapterContext(preTurnSnapshot.segments) : undefined;
   let generated: NarrativeGenerationResult;
   try {
-    generated = await generateItemUsageNarrative(
-      {
-        item,
-        characterId,
-        worldId,
-        sessionId,
-        usageDetails,
-        ...(projectedSceneState ? { sceneState: projectedSceneState } : {}),
-      },
-      generator
+    generated = await generateWithFatalRepair(
+      (isFatalRepair) => generateItemUsageNarrative(
+        {
+          item,
+          characterId,
+          worldId,
+          sessionId,
+          usageDetails,
+          ...(projectedSceneState ? { sceneState: projectedSceneState } : {}),
+          ...(isFatalRepair ? { isFatalRepair: true } : {}),
+        },
+        generator
+      ),
+      { playerCharacterName: character.name, draftLabel: 'item-use draft', logContext: { sessionId, itemId } }
     );
   } catch (error) {
     rollbackItemUsage();
     throw error;
-  }
-
-  if (isLethalNarrativeDraft(generated, character.name)) {
-    logger.warn('[TurnResolver] Forbidden lethal item-use draft generated; attempting repair', {
-      sessionId,
-      itemId,
-    });
-    try {
-      generated = await generator.generateSegment({
-        worldId,
-        sessionId,
-        characterIds: [characterId],
-        fatalRiskAllowed: false,
-        isFatalRepair: true,
-        narrativeContext: {
-          worldId,
-          sessionId,
-          currentSceneId: `item-usage-${item.id}`,
-          characterIds: [characterId],
-          ...(chapter ? { chapter: { ...chapter, isEnding: false }, currentLocation: preTurnSnapshot.segments.at(-1)?.metadata.location } : {}),
-          previousSegments: (chapter?.recentSegments ?? preTurnSnapshot.segments).slice(-5),
-          recentSegments: (chapter?.recentSegments ?? preTurnSnapshot.segments).slice(-5),
-          currentTags: ['item-usage', `item-${item.categoryId}`],
-          currentSituation: `Player used item "${item.name}". Survival constraint active: do NOT kill or incapacitate the player.`,
-          fatalRiskAllowed: false,
-          isFatalRepair: true,
-        },
-        generationParameters: {
-          segmentType: 'action',
-          desiredLength: 'short',
-          fatalRiskAllowed: false,
-          isFatalRepair: true,
-        },
-      });
-    } catch (error) {
-      rollbackItemUsage();
-      throw error;
-    }
-    if (isLethalNarrativeDraft(generated, character.name)) {
-      logger.error('[TurnResolver] Forbidden lethal item-use draft persisted after repair; rejecting turn', {
-        sessionId,
-        itemId,
-      });
-      rollbackItemUsage();
-      throw new Error('Forbidden lethal narrative outcome generated on a protected turn.');
-    }
   }
 
   const content = generated.content?.trim()
@@ -891,16 +848,14 @@ async function commitAndSettleGeneratedTurn({
     result.metadata?.fatalRiskAllowed ?? fatalRiskAllowed ?? false;
 
   const sanitizedMetadataTags = (result.metadata?.tags || []).filter(
-    (tag) => resolvedFatalRiskAllowed !== false || tag !== 'fatal-outcome'
+    (tag) => resolvedFatalRiskAllowed || tag !== 'fatal-outcome'
   );
   result = {
     ...result,
     metadata: {
       ...result.metadata,
       tags: sanitizedMetadataTags,
-      ...(resolvedFatalRiskAllowed !== undefined
-        ? { fatalRiskAllowed: resolvedFatalRiskAllowed }
-        : {}),
+      fatalRiskAllowed: resolvedFatalRiskAllowed,
     },
   };
 
@@ -1016,7 +971,7 @@ async function commitAndSettleGeneratedTurn({
     useNarrativeStore.getState().segments[storedSegmentId] ?? storedSegment;
 
   const isTurnFatal =
-    resolvedFatalRiskAllowed !== false &&
+    resolvedFatalRiskAllowed &&
     (isFatalCriticalFailure ||
       settledSegment.metadata?.tags?.includes('fatal-outcome') === true);
 
