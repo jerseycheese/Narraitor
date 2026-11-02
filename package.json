@@ -66,7 +66,7 @@
     "explore": "skott --visualization"
   },
   "dependencies": {
-    "@google/genai": "^0.13.0",
+    "@google/genai": "^2.32.0",
     "@lenml/tokenizer-gemini": "^3.7.2",
     "@popperjs/core": "^2.11.8",
     "@radix-ui/react-dialog": "^1.1.15",
