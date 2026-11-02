@@ -1,7 +1,8 @@
 // src/lib/narrative/fatalDraftValidation.ts
 
-import type { NarrativeGenerationResult } from '@/types/narrative.types';
+import type { NarrativeGenerationResult, NarrativeSegment } from '@/types/narrative.types';
 import { escapeRegExp } from '@/lib/utils/formatters';
+import { isSessionEndingSegment } from './isSessionEndingSegment';
 
 function maskHypotheticals(text: string, playerName?: string): string {
   const playerRef =
@@ -138,24 +139,18 @@ function buildPlayerDeathPatterns(playerName?: string): RegExp[] {
 }
 
 /**
- * Validates whether a narrative generation draft describes character death,
- * carries fatal metadata, or terminates the session.
+ * Validates whether a narrative draft describes character death, carries fatal
+ * metadata, or terminates the session. Only a stored segment can end the
+ * session: a generation result's `segmentType` never includes `'ending'`.
  */
 export function isLethalNarrativeDraft(
-  draft: NarrativeGenerationResult | { content?: string; metadata?: unknown; segmentType?: string },
+  draft: NarrativeGenerationResult | NarrativeSegment | Pick<NarrativeGenerationResult, 'content'>,
   playerCharacterName?: string
 ): boolean {
-  const metadata = (draft as NarrativeGenerationResult).metadata;
-  if (metadata?.tags?.includes('fatal-outcome')) {
+  if ('metadata' in draft && draft.metadata?.tags?.includes('fatal-outcome')) {
     return true;
   }
-  if ((draft as { segmentType?: string }).segmentType === 'ending') {
-    return true;
-  }
-  if (
-    (metadata as { endingId?: string; endingData?: unknown } | undefined)?.endingId != null ||
-    (metadata as { endingId?: string; endingData?: unknown } | undefined)?.endingData != null
-  ) {
+  if ('type' in draft && isSessionEndingSegment(draft)) {
     return true;
   }
 

@@ -1,5 +1,25 @@
 import { isLethalNarrativeDraft } from '../fatalDraftValidation';
-import type { NarrativeGenerationResult } from '@/types/narrative.types';
+import { isFeatureEnabled } from '@/lib/featureFlags';
+import type { NarrativeGenerationResult, NarrativeSegment } from '@/types/narrative.types';
+
+jest.mock('@/lib/featureFlags', () => ({
+  isFeatureEnabled: jest.fn().mockReturnValue(false),
+}));
+
+const makeSegment = (
+  overrides: Partial<Omit<NarrativeSegment, 'metadata'>> & {
+    metadata?: Partial<NarrativeSegment['metadata']>;
+  } = {}
+): NarrativeSegment => ({
+  id: 'seg-1',
+  content: 'The path winds through the dark woods.',
+  type: 'scene',
+  timestamp: new Date(),
+  createdAt: '2026-10-30T00:00:00.000Z',
+  updatedAt: '2026-10-30T00:00:00.000Z',
+  ...overrides,
+  metadata: { tags: [], ...overrides.metadata },
+});
 
 const makeDraft = (
   overrides: Partial<NarrativeGenerationResult> = {}
@@ -21,21 +41,26 @@ describe('isLethalNarrativeDraft', () => {
     expect(isLethalNarrativeDraft(draft)).toBe(true);
   });
 
-  it('returns true when segmentType is ending', () => {
-    const draft = makeDraft();
-    (draft as unknown as { segmentType: string }).segmentType = 'ending';
-    expect(isLethalNarrativeDraft(draft)).toBe(true);
+  it('returns true for a session-ending segment', () => {
+    expect(isLethalNarrativeDraft(makeSegment({ type: 'ending' }))).toBe(true);
+    expect(
+      isLethalNarrativeDraft(
+        makeSegment({ metadata: { tags: [], endingId: 'ending-1' } })
+      )
+    ).toBe(true);
   });
 
-  it('returns true when metadata carries endingId', () => {
-    const draft = makeDraft({
-      metadata: {
-        characterIds: [],
-        tags: [],
-        endingId: 'ending-1',
-      } as unknown as NarrativeGenerationResult['metadata'],
-    });
-    expect(isLethalNarrativeDraft(draft)).toBe(true);
+  it('returns false for a chapter-ending segment', () => {
+    (isFeatureEnabled as jest.Mock).mockImplementation((flag: string) => flag === 'CHAPTERS');
+    try {
+      expect(
+        isLethalNarrativeDraft(
+          makeSegment({ type: 'ending', metadata: { tags: [], chapter: { number: 1 } } })
+        )
+      ).toBe(false);
+    } finally {
+      (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+    }
   });
 
   it('returns true for second-person lethal prose patterns', () => {

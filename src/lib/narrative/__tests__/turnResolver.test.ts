@@ -2641,30 +2641,60 @@ describe('TurnResolver', () => {
       expect(useInventoryStore.getState().items[ids.itemId]).toBeUndefined();
     });
 
-    it('rolls back inventory and surfaces error when item-use fatal repair fails', async () => {
+    it('repairs a lethal item-use draft with the same scene state as the first attempt', async () => {
+      const ids = seedItemUseStores(1);
+      useSceneStore.setState({ scenes: {} });
+      useSceneStore.getState().recordBeat(ids.sessionId, {
+        id: 'gate-opened',
+        text: 'The rusted gate swung open.',
+        turnIndex: 1,
+      });
+      const { isFeatureEnabled } = jest.requireMock('@/lib/featureFlags');
+      (isFeatureEnabled as jest.Mock).mockImplementation(
+        (flag: string) => flag === 'SCENE_STATE'
+      );
+      const lethalResult = makeGenerationResult({
+        content: 'You drink the draught and fall to your knees before you die from blood loss.',
+        segmentType: 'action',
+        metadata: { characterIds: [], tags: ['item-usage'] },
+      });
+      const generator = makeItemUseGenerator();
+      (generator.generateSegment as jest.Mock).mockResolvedValueOnce(lethalResult);
+
+      try {
+        const outcome = await resolveItemUseTurn(ids, generator);
+
+        expect(outcome.success).toBe(true);
+        const [firstCall, repairCall] = (generator.generateSegment as jest.Mock).mock.calls;
+        expect(repairCall[0].generationParameters.isFatalRepair).toBe(true);
+        expect(repairCall[0].narrativeContext.sceneState).toEqual(
+          firstCall[0].narrativeContext.sceneState
+        );
+        expect(repairCall[0].narrativeContext.sceneState?.completedBeats).toHaveLength(1);
+      } finally {
+        (isFeatureEnabled as jest.Mock).mockReturnValue(false);
+      }
+    });
+
+    it('falls back to local item-use prose when the fatal repair call fails', async () => {
       const ids = seedItemUseStores(1);
       const lethalResult = makeGenerationResult({
         content: 'You drink the draught and fall to your knees before you die from blood loss.',
         segmentType: 'action',
         metadata: { characterIds: [], tags: ['item-usage'] },
       });
-      const generator = {
-        generateSegment: jest
-          .fn()
-          .mockResolvedValueOnce(lethalResult)
-          .mockRejectedValueOnce(new Error('AI item repair service unavailable')),
-      } as unknown as NarrativeGenerator;
+      const generator = makeItemUseGenerator();
+      (generator.generateSegment as jest.Mock)
+        .mockResolvedValueOnce(lethalResult)
+        .mockRejectedValueOnce(new Error('AI item repair service unavailable'));
 
-      await expect(resolveItemUseTurn(ids, generator)).rejects.toThrow(
-        'AI item repair service unavailable'
-      );
+      const outcome = await resolveItemUseTurn(ids, generator);
 
-      const itemAfter = useInventoryStore.getState().items[ids.itemId];
-      expect(itemAfter).toBeDefined();
-      expect(itemAfter.quantity).toBe(1);
-
-      const segments = useNarrativeStore.getState().getSessionSegments(ids.sessionId);
-      expect(segments).toHaveLength(0);
+      expect(outcome.success).toBe(true);
+      if (!outcome.success) throw new Error('Expected outcome to be successful');
+      expect(outcome.turn.isFatal).toBe(false);
+      expect(outcome.turn.segment.content).not.toContain('die');
+      expect(useInventoryStore.getState().items[ids.itemId]).toBeUndefined();
     });
   });
 
