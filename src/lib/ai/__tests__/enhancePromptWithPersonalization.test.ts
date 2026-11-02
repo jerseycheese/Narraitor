@@ -168,4 +168,45 @@ describe('enhancePromptWithPersonalization Integration', () => {
     // Assert
     expect(result).toContain('Base prompt');
   });
+
+  test('only shares another character\'s story when it crossed into this one', async () => {
+    const thread = (characterId: string, summary: string, crossedInto: string[]) => ({
+      id: `thread-${characterId}`,
+      characterId,
+      worldId: 'world-1',
+      summary,
+      highlights: [summary],
+      sessionIds: [`session-${characterId}`],
+      crossCharacterReferences: crossedInto.map((id) => ({
+        characterId: id,
+        summary,
+        sessionId: `session-${characterId}`,
+        lastReferencedAt: '2026-10-01T00:00:00.000Z',
+      })),
+      lastUpdated: '2026-10-01T00:00:00.000Z',
+    });
+    (useWorldStore.getState as jest.Mock).mockReturnValue({
+      worlds: { 'world-1': mockWorld },
+      worldStates: {
+        'world-1': {
+          playerCharacterThreads: {
+            'thread-char-a': thread('char-a', 'You collapse in the mud, mortally wounded.', []),
+            'thread-char-b': thread('char-b', 'You share a fire with Hero at the ford.', ['char-1']),
+          },
+        },
+      },
+    });
+    (useCharacterStore.getState as jest.Mock).mockReturnValue({
+      characters: {
+        'char-1': mockCharacter,
+        'char-a': { ...mockCharacter, id: 'char-a', name: 'Aria' },
+        'char-b': { ...mockCharacter, id: 'char-b', name: 'Bram' },
+      },
+    });
+
+    const result = await enhancePromptWithPersonalization('BASE', 'world-1', ['char-1'], 'session-1');
+
+    expect(result).not.toContain('mortally wounded');
+    expect(result).toContain('Bram');
+  });
 });

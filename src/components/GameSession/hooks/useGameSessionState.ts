@@ -77,7 +77,21 @@ export const useGameSessionState = ({
   
   // Local state for error handling
   const [error, setError] = useState<Error | null>(null);
-  
+
+  // The init effect reads ended-session markers from the narrative store, so it
+  // has to wait for that store's IndexedDB hydration on a cold load.
+  const [isNarrativeHydrated, setIsNarrativeHydrated] = useState(
+    () => useNarrativeStore.persist?.hasHydrated?.() ?? true
+  );
+  useEffect(() => {
+    const narrativePersist = useNarrativeStore.persist;
+    if (!narrativePersist?.onFinishHydration || narrativePersist.hasHydrated()) {
+      setIsNarrativeHydrated(true);
+      return;
+    }
+    return narrativePersist.onFinishHydration(() => setIsNarrativeHydrated(true));
+  }, []);
+
   // Scope each store subscription to the slice this hook actually uses, so the
   // game session doesn't re-render on every unrelated store write during play.
   // Session state itself is consumed via the dedicated subscription below; here
@@ -222,19 +236,35 @@ export const useGameSessionState = ({
   
   // Initialize session with correct character when component mounts
   useEffect(() => {
-    if (!isClient) return;
-    
+    if (!isClient || !isNarrativeHydrated) return;
+
     // Get current store state to check for existing session
     const currentStoreState = useSessionStore.getState();
-    
+    const { isSessionEnded } = useNarrativeStore.getState();
+    const isActiveMatch =
+      currentStoreState.status === 'active' &&
+      currentStoreState.worldId === worldId &&
+      currentStoreState.characterId === sessionCharacterId;
+
+    // An ended session refuses new segments, so landing on one leaves the play
+    // screen on its loading skeleton forever. That state also persists, so this
+    // recovers players who are already stuck there.
+    if (
+      isActiveMatch &&
+      worldExists &&
+      sessionCharacterId &&
+      currentStoreState.id &&
+      isSessionEnded(currentStoreState.id)
+    ) {
+      actualSessionState.initializeSession?.(worldId, sessionCharacterId, onSessionStart, true);
+      return;
+    }
+
     // If store already has an active session that matches our requirements, don't
     // re-initialize — but re-arm the crash-recovery marker. A clean refresh clears
     // it on pagehide, and this remount path skips initializeSession/resumeSavedSession,
     // so without this a crash before the next save would leave no marker.
-    if (!disableAutoResume &&
-        currentStoreState.status === 'active' &&
-        currentStoreState.worldId === worldId &&
-        currentStoreState.characterId === sessionCharacterId) {
+    if (!disableAutoResume && isActiveMatch) {
       currentStoreState.refreshRecoveryMarker?.();
       return;
     }
@@ -246,8 +276,9 @@ export const useGameSessionState = ({
       
       // Check if there's a saved session for this world/character combo
       const currentSavedSession = actualSessionState.getSavedSession?.(worldId, sessionCharacterId);
-      
-      if (currentSavedSession && !disableAutoResume) {
+      const isSavedSessionEnded = !!currentSavedSession && isSessionEnded(currentSavedSession.id);
+
+      if (currentSavedSession && !disableAutoResume && !isSavedSessionEnded) {
         logger.debug('[useGameSessionState] Found saved session:', currentSavedSession.id);
         // Resume the saved session
         if (actualSessionState.resumeSavedSession) {
@@ -257,11 +288,16 @@ export const useGameSessionState = ({
         // Initialize a new session if:
         // 1. No saved session exists, OR
         // 2. disableAutoResume is true (fresh session requested)
-        actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart, disableAutoResume);
+        actualSessionState.initializeSession(
+          worldId,
+          sessionCharacterId,
+          onSessionStart,
+          disableAutoResume || isSavedSessionEnded
+        );
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClient, worldExists, sessionState.status, sessionCharacterId, disableAutoResume]); // Dependencies carefully selected to avoid infinite loops
+  }, [isClient, isNarrativeHydrated, worldExists, sessionState.status, sessionCharacterId, disableAutoResume]); // Dependencies carefully selected to avoid infinite loops
   
   // Subscribe to session store changes directly to avoid polling issues
   useEffect(() => {
