@@ -4,8 +4,6 @@ A solo role-playing game where the story answers to the world you built. You def
 
 It runs entirely in your browser. No account, nothing stored on a server, and it generates on a model key you bring yourself.
 
-**[Play it at narraitor-six.vercel.app](https://narraitor-six.vercel.app/)**
-
 ![The Narraitor landing page](public_docs/images/readme-landing.png)
 
 ## What makes it different
