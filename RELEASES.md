@@ -4,6 +4,32 @@ Releases get tagged manually from `develop` and fast-forwarded to `main`. Each e
 
 ---
 
+## v1.13.1 - 2026-11-02
+
+v1.13.1 fixes a player's report: after ending a story, New Story could load forever, and one character's story could leak into another's in the same world. It also fixes the lethal-draft check and the session-break turn count, and clears new security advisories in dependencies. The chapter work from the v1.14 milestone is in this tag but stays switched off.
+
+**What's in this release**
+
+- New Story after an ending starts a new story instead of reopening the one that just ended. A player already stuck on that loading screen gets a new story the next time they open the game ([#2321](https://github.com/jerseycheese/Narraitor/pull/2321), for [#2312](https://github.com/jerseycheese/Narraitor/issues/2312)).
+- A character only gets another character's story in their prompts when the two stories actually crossed. Before this, unrelated characters in a world shared their latest lines, and a line like "You collapse, mortally wounded" read as if it had happened to the new character ([#2321](https://github.com/jerseycheese/Narraitor/pull/2321), for [#2312](https://github.com/jerseycheese/Narraitor/issues/2312)).
+- The lethal-draft check now catches session endings, which it was missing because it read the wrong field. The item-use repair sees the same scene as the first attempt, and if the repair call fails, the turn falls back to local item prose instead of rolling back ([#2323](https://github.com/jerseycheese/Narraitor/pull/2323), for [#2305](https://github.com/jerseycheese/Narraitor/issues/2305)).
+- The session-break prompt counts each answered turn once ([#2295](https://github.com/jerseycheese/Narraitor/pull/2295), for [#2240](https://github.com/jerseycheese/Narraitor/issues/2240)).
+- Dependency updates clear production audit advisories: `next` 15.5.28, `sharp` 0.35.5, and `source-map-js` 1.2.2 ([#2310](https://github.com/jerseycheese/Narraitor/pull/2310)), plus `@google/genai` 2.32, which removes zod 3 from the production tree ([#2322](https://github.com/jerseycheese/Narraitor/pull/2322)).
+- Chapter groundwork ships behind the default-off `CHAPTERS` flag ([#2298](https://github.com/jerseycheese/Narraitor/pull/2298), for [#2292](https://github.com/jerseycheese/Narraitor/issues/2292); [#2297](https://github.com/jerseycheese/Narraitor/pull/2297), for [#2293](https://github.com/jerseycheese/Narraitor/issues/2293)). One part runs with the flag off: lore usage totals are now recorded in production and saved in the browser, ready for chapter carryover.
+- Unused helpers and redundant tests are gone ([#2296](https://github.com/jerseycheese/Narraitor/pull/2296)), and new worktrees link the main checkout's `node_modules` ([#2311](https://github.com/jerseycheese/Narraitor/pull/2311)). Neither changes anything for players.
+
+**Known incomplete**
+
+- A stuck player whose tab was killed still sees the Welcome back dialog saying their story was kept safe, on top of the new opening. That story was already cleared by New Story, and both buttons land in the new story.
+- Chapters stay off until the re-measure runs ([#2265](https://github.com/jerseycheese/Narraitor/issues/2265)), and `promoteChapterLore` has no production caller ([#2304](https://github.com/jerseycheese/Narraitor/issues/2304)).
+- Image generation remains Gemini-only. Scene state and the thread-ledger ending gate remain switched off.
+
+**What's next**
+
+- v1.14: 10-turn chapters that hand off through a recap ([#2265](https://github.com/jerseycheese/Narraitor/issues/2265)).
+
+---
+
 ## v1.13.0 - 2026-10-04
 
 v1.13 makes DeepSeek flash through OpenRouter the recommended text model and removes the silent server-key fallback. It fixes ending and world image requests that carried megabytes of artwork, resolves fresh session hangs after an ending, keeps passages over 1,000 characters from losing their middle so mid-passage scene changes reach the choices, fixes provider hydration state persistence, adds hydration guards to the development harness, and makes provider setup clearer about the separate Save step. Narrative-cohesion work stays paused.
