@@ -104,7 +104,7 @@ describe('useGameSessionState', () => {
 
   test('handles end session', () => {
     const onSessionEnd = jest.fn();
-    const router = { push: jest.fn() };
+    const router = { push: jest.fn(), replace: jest.fn() };
     
     const { result } = renderHook(() => useGameSessionState({
       worldId: 'test-world',
@@ -234,26 +234,68 @@ describe('useGameSessionState', () => {
     );
   });
 
-  test('drops ?fresh=true from the URL once the fresh session has started', () => {
-    mockSessionStoreState.getSavedSession = jest.fn(() => undefined);
+  test('drops only ?fresh=true once the fresh session starts, then resumes it instead of the old save', () => {
+    window.history.pushState({}, '', '/worlds/test-world/play?fresh=true&autoResume=true');
+    const oldSave = {
+      id: 'saved-session-1',
+      worldId: 'test-world',
+      characterId: 'test-character-id',
+      lastPlayed: '2026-09-25T12:00:00Z',
+      narrativeCount: 3,
+    };
+    mockSessionStoreState.getSavedSession = jest.fn(() => oldSave);
     mockSessionStoreState.status = 'initializing';
     const onSessionStart = jest.fn();
+    const router = { push: jest.fn(), replace: jest.fn() };
+
+    const { rerender } = renderHook(
+      ({ fresh }) => useGameSessionState({
+        worldId: 'test-world',
+        isClient: true,
+        disableAutoResume: fresh,
+        onSessionStart,
+        router,
+        initialState: { status: 'initializing' },
+      }),
+      { initialProps: { fresh: true } }
+    );
+
+    const onComplete = (mockSessionStoreState.initializeSession as jest.Mock).mock.calls[0][2];
+    expect(router.replace).not.toHaveBeenCalled();
+
+    // initializeSession has made the new session live by the time it calls back.
+    Object.assign(mockSessionStoreState, {
+      id: 'new-session',
+      status: 'active',
+      worldId: 'test-world',
+      characterId: 'test-character-id',
+    });
+    onComplete();
+    expect(onSessionStart).toHaveBeenCalledTimes(1);
+    expect(router.replace).toHaveBeenCalledWith('/worlds/test-world/play?autoResume=true');
+
+    // The replace re-renders the page without ?fresh=true.
+    rerender({ fresh: false });
+    expect(mockSessionStoreState.resumeSavedSession).not.toHaveBeenCalled();
+    expect(mockSessionStoreState.initializeSession).toHaveBeenCalledTimes(1);
+  });
+
+  test('leaves the URL alone if the player navigated away before the fresh session started', () => {
+    window.history.pushState({}, '', '/dashboard');
+    mockSessionStoreState.getSavedSession = jest.fn(() => undefined);
+    mockSessionStoreState.status = 'initializing';
     const router = { push: jest.fn(), replace: jest.fn() };
 
     renderHook(() => useGameSessionState({
       worldId: 'test-world',
       isClient: true,
       disableAutoResume: true,
-      onSessionStart,
       router,
       initialState: { status: 'initializing' },
     }));
 
-    const onComplete = (mockSessionStoreState.initializeSession as jest.Mock).mock.calls[0][2];
+    (mockSessionStoreState.initializeSession as jest.Mock).mock.calls[0][2]();
     expect(router.replace).not.toHaveBeenCalled();
-    onComplete();
-    expect(onSessionStart).toHaveBeenCalledTimes(1);
-    expect(router.replace).toHaveBeenCalledWith('/worlds/test-world/play');
   });
 
   test('preserves normal resume behavior and resumes saved session when disableAutoResume is false', () => {
