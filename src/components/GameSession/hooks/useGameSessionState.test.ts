@@ -234,6 +234,28 @@ describe('useGameSessionState', () => {
     );
   });
 
+  test('drops ?fresh=true from the URL once the fresh session has started', () => {
+    mockSessionStoreState.getSavedSession = jest.fn(() => undefined);
+    mockSessionStoreState.status = 'initializing';
+    const onSessionStart = jest.fn();
+    const router = { push: jest.fn(), replace: jest.fn() };
+
+    renderHook(() => useGameSessionState({
+      worldId: 'test-world',
+      isClient: true,
+      disableAutoResume: true,
+      onSessionStart,
+      router,
+      initialState: { status: 'initializing' },
+    }));
+
+    const onComplete = (mockSessionStoreState.initializeSession as jest.Mock).mock.calls[0][2];
+    expect(router.replace).not.toHaveBeenCalled();
+    onComplete();
+    expect(onSessionStart).toHaveBeenCalledTimes(1);
+    expect(router.replace).toHaveBeenCalledWith('/worlds/test-world/play');
+  });
+
   test('preserves normal resume behavior and resumes saved session when disableAutoResume is false', () => {
     const savedSessionData = {
       id: 'saved-session-1',

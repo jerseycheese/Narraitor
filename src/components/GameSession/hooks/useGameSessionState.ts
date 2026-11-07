@@ -49,7 +49,7 @@ interface UseGameSessionStateOptions {
   onSessionEnd?: () => void;
   initialState?: Partial<GameSessionState>;
   disableAutoResume?: boolean;
-  router?: { push: (url: string) => void };
+  router?: { push: (url: string) => void; replace?: (url: string) => void };
 }
 
 export const useGameSessionState = ({
@@ -288,10 +288,18 @@ export const useGameSessionState = ({
         // Initialize a new session if:
         // 1. No saved session exists, OR
         // 2. disableAutoResume is true (fresh session requested)
+        // A fresh request is one-shot: once the new session is live, drop
+        // ?fresh=true so a reload resumes it instead of starting yet another.
+        const onStart = disableAutoResume && router?.replace
+          ? () => {
+              onSessionStart?.();
+              router.replace?.(`/worlds/${worldId}/play`);
+            }
+          : onSessionStart;
         actualSessionState.initializeSession(
           worldId,
           sessionCharacterId,
-          onSessionStart,
+          onStart,
           disableAutoResume || isSavedSessionEnded
         );
       }
