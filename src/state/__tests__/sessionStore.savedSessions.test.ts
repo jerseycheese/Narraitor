@@ -189,4 +189,25 @@ describe('Session Persistence: savedSessions collection', () => {
       expect(savedSession.narrativeCount).toBe(1);
     });
   });
+
+  describe('getSavedSession', () => {
+    it('returns the most recently played save when a character has more than one', () => {
+      const save = (id: string, lastPlayed: string) => ({
+        id,
+        worldId: 'world-1',
+        characterId: 'char-1',
+        lastPlayed,
+        narrativeCount: 3,
+      });
+      // Start New keeps the old save, so the newer story sits second in the map.
+      useSessionStore.setState({
+        savedSessions: {
+          'session-old': save('session-old', '2026-11-01T10:00:00.000Z'),
+          'session-new': save('session-new', '2026-11-02T10:00:00.000Z'),
+        },
+      });
+
+      expect(useSessionStore.getState().getSavedSession('world-1', 'char-1')?.id).toBe('session-new');
+    });
+  });
 });

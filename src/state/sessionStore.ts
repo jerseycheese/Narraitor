@@ -349,11 +349,12 @@ export const useSessionStore = create<SessionStore>()(
   },
   
   getSavedSession: (worldId: string, characterId: string) => {
+    // Start New keeps the previous save, so a character can have several.
+    // The one played last is the one to resume (same rule as the dashboard).
     const { savedSessions } = get();
-    const found = Object.values(savedSessions).find(
-      session => session.worldId === worldId && session.characterId === characterId
-    );
-    return found;
+    return Object.values(savedSessions)
+      .filter(session => session.worldId === worldId && session.characterId === characterId)
+      .sort((a, b) => new Date(b.lastPlayed).getTime() - new Date(a.lastPlayed).getTime())[0];
   },
   
   resumeSavedSession: (sessionId: string) => {

@@ -14,6 +14,7 @@ import {
 } from '@/components/shared/cards';
 import { formatDate, initialOf } from '@/lib/utils';
 import { Hero } from '@/components/shared/Hero';
+import { isPlaywrightEnv } from '@/lib/utils/isPlaywrightEnv';
 import { Badge } from '@/components/ui/badge';
 import { resolveSessionCharacterId } from '@/lib/session/sessionCharacter';
 import { Play, Pencil, Trash, UserPlus, Users } from 'lucide-react';
@@ -165,6 +166,9 @@ const WorldCard: React.FC<WorldCardProps> = ({
                         alt=""
                         width={40}
                         height={40}
+                        // Same reason as Hero: on CI the on-demand optimizer
+                        // can stall and leave the portrait blank in visual tests.
+                        unoptimized={isPlaywrightEnv()}
                       />
                     ) : (
                       <div className="world-card-character-pill-initial">
