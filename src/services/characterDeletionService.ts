@@ -1,4 +1,3 @@
-import { useJournalStore } from '@/state/journalStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { PlayerCharacterThreadUpdate, CharacterRelationshipRemoval, WorldStateUpdate } from '@/types/world-state.types';
@@ -7,34 +6,13 @@ import Logger from '@/lib/utils/logger';
 const logger = new Logger('CharacterDeletionService');
 
 /**
- * Deletes a character and all related data (journal entries, world state).
+ * Deletes a character and its world-state thread and relationships.
  *
- * Attempts to clean up all journal entries associated with the given character.
- * If journal cleanup fails, a warning is logged and deletion still proceeds.
+ * Its sessions (story, journal, goals, lore) go through the CHARACTER_DELETED
+ * cleanup in sessionCleanup.ts, which finds older sessions by the journal
+ * entries that carry the characterId, so nothing here may delete those first.
  */
 export async function deleteCharacterWithCleanup(characterId: string): Promise<void> {
-  try {
-    const journalStore = useJournalStore.getState();
-    const allEntries = Object.values(journalStore.entries);
-    const characterSessions = new Set<string>();
-
-    allEntries.forEach((entry) => {
-      if (entry.characterId === characterId) {
-        characterSessions.add(entry.sessionId);
-      }
-    });
-
-    characterSessions.forEach(sessionId => {
-      try {
-        journalStore.deleteSessionEntries(sessionId);
-      } catch (error) {
-        logger.warn('Failed to clean up journal session:', sessionId, error);
-      }
-    });
-  } catch (error) {
-    logger.warn('Failed to clean up journal entries for character:', characterId, error);
-  }
-
   const characterStore = useCharacterStore.getState();
   const character = characterStore.characters[characterId];
   const worldId = character?.worldId;

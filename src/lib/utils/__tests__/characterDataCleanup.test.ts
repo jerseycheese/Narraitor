@@ -96,11 +96,27 @@ describe('character deletion cleanup', () => {
     // An older story left with no saved session or lifecycle entry, as after
     // a fresh start and a reload; only its records' characterId points to it
     seedStory('session-orphan', 'world-1', goneId, 'Timbuktu');
+    const checkpoint = (sessionId: string, text: string) => ({
+      id: `cp-${sessionId}`, sessionId, createdAt: '2026-01-01', segment: `${text} checkpoint`, highlights: [], eventIds: [],
+    });
+    const event = (sessionId: string, characterId: string, text: string) => ({
+      id: `ev-${sessionId}`, sessionId, characterId, timestamp: '2026-01-01', description: `${text} event`,
+    });
+    useWorldStore.setState({
+      worlds: { 'world-1': { id: 'world-1', name: 'World' } },
+      worldStates: {
+        'world-1': {
+          ...useWorldStore.getState().getWorldState('world-1'),
+          storyCheckpoints: [checkpoint('session-orphan', 'Timbuktu'), checkpoint('session-kept', 'Quixote')],
+          majorEvents: [event('session-orphan', goneId, 'Timbuktu'), event('session-kept', keptId, 'Quixote')],
+        },
+      },
+    } as never);
     useLoreStore.getState().addFact('shared_place', 'Shared lore', 'locations', 'manual', 'world-1');
     saveSession('session-kept', 'world-1', keptId);
     seedStory('session-kept', 'world-1', keptId, 'Quixote');
 
-    await useCharacterStore.getState().deleteCharacter(goneId);
+    await deleteCharacterWithCleanup(goneId);
 
     const exported = JSON.stringify((await exportGameState()).data);
     expect(exported).not.toContain('Zanzibar');
@@ -109,7 +125,7 @@ describe('character deletion cleanup', () => {
     expect(useSessionStore.getState().savedSessions['session-gone']).toBeUndefined();
     expect(useSessionStore.getState().savedSessions['session-active']).toBeUndefined();
     expect(useSessionStore.getState()).toMatchObject({ id: null, characterId: null, playerChoices: [] });
-    ['story', 'journal', 'goal', 'thread', 'lore'].forEach((kind) => {
+    ['story', 'journal', 'goal', 'thread', 'lore', 'checkpoint', 'event'].forEach((kind) => {
       expect(exported).toContain(`Quixote ${kind}`);
     });
     expect(exported).toContain('Shared lore');

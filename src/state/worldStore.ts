@@ -66,6 +66,7 @@ export interface WorldStore extends CrudStore<World> {
   mergeWorldState: (incomingState: WorldState) => void;
   getWorldState: (worldId: EntityID, options?: { includeEndedSessions?: boolean }) => WorldState;
   getRawWorldState: (worldId: EntityID) => WorldState | undefined;
+  clearSessionHistory: (sessionId: EntityID) => void;
 }
 
 // World Store implementation with persistence
@@ -440,6 +441,24 @@ export const useWorldStore = create<WorldStore>()(
               }
             };
           });
+        },
+
+        // Drop a session's story checkpoints and major events, which quote the story
+        clearSessionHistory: (sessionId) => {
+          set(state => ({
+            worldStates: Object.fromEntries(
+              Object.entries(state.worldStates).map(([worldId, worldState]) => [
+                worldId,
+                {
+                  ...worldState,
+                  majorEvents: (worldState.majorEvents ?? []).filter(event => event.sessionId !== sessionId),
+                  storyCheckpoints: (worldState.storyCheckpoints ?? []).filter(
+                    checkpoint => checkpoint.sessionId !== sessionId
+                  ),
+                },
+              ])
+            ),
+          }));
         },
 
         mergeWorldState: (incomingState) => {

@@ -12,6 +12,7 @@ import { useSceneStore } from '@/state/sceneStore';
 import { useGoalStore } from '@/state/goalStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useLoreStore } from '@/state/loreStore';
+import { useWorldStore } from '@/state/worldStore';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('SessionCleanup');
@@ -105,6 +106,12 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
     errors.push(error instanceof Error ? error : new Error(String(error)));
   }
 
+  try {
+    useWorldStore.getState().clearSessionHistory(sessionId);
+  } catch (error) {
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
+
   // Remove session record last to maintain referential integrity
   try {
     useSceneStore.getState().clearScene(sessionId);
@@ -127,8 +134,8 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
 
 /**
  * Clean up every session that belongs to a deleted character: its story
- * segments, decisions, journal entries, goals, world threads and
- * saved-session record.
+ * segments, decisions, journal entries, goals, world threads, lore, story
+ * checkpoints and saved-session record.
  *
  * Subscribed to CHARACTER_DELETED in src/state/storeEventWiring.ts. Without it
  * the character's story stays in IndexedDB and ships in every export.
