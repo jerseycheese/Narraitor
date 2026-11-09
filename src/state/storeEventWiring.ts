@@ -27,8 +27,10 @@ import {
   StoreEventTypes,
   type SessionStartedEvent,
   type SessionEndedEvent,
+  type CharacterDeletedEvent,
 } from '@/lib/state/storePubSub';
 import { handleSessionStarted, handleSessionEnded } from '@/lib/session/sessionJournalEntries';
+import { cleanupCharacterSessions } from '@/lib/utils/sessionCleanup';
 
 // subscribeOnce (keyed, deduped per bus instance) so a re-evaluated module —
 // HMR in dev, or this side-effect import being pulled in more than once —
@@ -44,4 +46,12 @@ storeEvents.subscribeOnce<SessionEndedEvent>(
   StoreEventTypes.SESSION_ENDED,
   handleSessionEnded,
   'session-journal:ended'
+);
+
+// A deleted character's story, journal and saved sessions go with it, so they
+// don't linger in IndexedDB or ship in a later export.
+storeEvents.subscribeOnce<CharacterDeletedEvent>(
+  StoreEventTypes.CHARACTER_DELETED,
+  ({ characterId }) => cleanupCharacterSessions(characterId),
+  'session-cleanup:character-deleted'
 );

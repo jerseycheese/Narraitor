@@ -80,6 +80,7 @@ const mockGetWorldState = jest.fn((worldId: string, options?: { includeEndedSess
   return getActiveWorldState(worldId, current);
 });
 
+const mockClearSessionHistory = jest.fn();
 const mockGetRawWorldState = jest.fn((worldId: string) => {
   return mockState.worldStates[worldId];
 });
@@ -136,6 +137,7 @@ interface WorldStoreActions {
   mergeWorldState: jest.Mock;
   getWorldState: jest.Mock;
   getRawWorldState: jest.Mock;
+  clearSessionHistory: jest.Mock;
   reset: jest.Mock;
   setError: jest.Mock;
   clearError: jest.Mock;
@@ -377,6 +379,7 @@ const mockWorldStore = jest.fn((selector?: (state: WorldStore) => any) => {
     mergeWorldState: mockMergeWorldState,
     getWorldState: mockGetWorldState,
     getRawWorldState: mockGetRawWorldState,
+    clearSessionHistory: mockClearSessionHistory,
     reset: mockReset,
     setError: mockSetError,
     clearError: mockClearError,
@@ -421,6 +424,7 @@ const mockGetState = jest.fn((): WorldStore => {
     mergeWorldState: mockMergeWorldState,
     getWorldState: mockGetWorldState,
     getRawWorldState: mockGetRawWorldState,
+    clearSessionHistory: mockClearSessionHistory,
     reset: mockReset,
     setError: mockSetError,
     clearError: mockClearError,

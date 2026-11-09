@@ -1,8 +1,13 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useRouter, useParams } from 'next/navigation';
 import '@testing-library/jest-dom';
 import CharacterViewPage from '../page';
+import { deleteCharacterWithCleanup } from '@/services/characterDeletionService';
+
+jest.mock('@/services/characterDeletionService', () => ({
+  deleteCharacterWithCleanup: jest.fn(() => Promise.resolve()),
+}));
 
 // Mock Next.js navigation
 jest.mock('next/navigation', () => ({
@@ -138,5 +143,14 @@ describe('CharacterViewPage', () => {
     
     // Should show back navigation
     expect(screen.getByText('Back to Characters')).toBeInTheDocument();
+  });
+  test('deletes through the cleanup that also clears world state', async () => {
+    render(<CharacterViewPage />);
+
+    fireEvent.click(screen.getByText('Delete Character'));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Test Character' }));
+
+    await waitFor(() => expect(deleteCharacterWithCleanup).toHaveBeenCalledWith('char-123'));
+    expect(mockPush).toHaveBeenCalledWith('/characters');
   });
 });
