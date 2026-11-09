@@ -2,6 +2,8 @@
  * Deleting a character removes its story, journal, goals, world threads and
  * saved sessions, so a later export carries no trace of them.
  */
+jest.unmock('@/state/worldStore');
+
 import '@/state/storeEventWiring';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -10,6 +12,8 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useGoalStore } from '@/state/goalStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useLoreStore } from '@/state/loreStore';
+import { useWorldStore } from '@/state/worldStore';
+import { deleteCharacterWithCleanup } from '@/services/characterDeletionService';
 import { exportGameState } from '@/lib/storage/exportService';
 import { createTestCharacterData } from '@/state/__tests__/characterStore.testHelpers';
 
@@ -89,6 +93,9 @@ describe('character deletion cleanup', () => {
       currentEnding: { sessionId: 'session-active', characterId: goneId, worldId: 'world-1', epilogue: 'Ouagadougou epilogue' },
     } as never);
     seedStory('session-active', 'world-1', goneId, 'Ouagadougou');
+    // An older story left with no saved session or lifecycle entry, as after
+    // a fresh start and a reload; only its records' characterId points to it
+    seedStory('session-orphan', 'world-1', goneId, 'Timbuktu');
     useLoreStore.getState().addFact('shared_place', 'Shared lore', 'locations', 'manual', 'world-1');
     saveSession('session-kept', 'world-1', keptId);
     seedStory('session-kept', 'world-1', keptId, 'Quixote');
@@ -98,6 +105,7 @@ describe('character deletion cleanup', () => {
     const exported = JSON.stringify((await exportGameState()).data);
     expect(exported).not.toContain('Zanzibar');
     expect(exported).not.toContain('Ouagadougou');
+    expect(exported).not.toContain('Timbuktu');
     expect(useSessionStore.getState().savedSessions['session-gone']).toBeUndefined();
     expect(useSessionStore.getState().savedSessions['session-active']).toBeUndefined();
     expect(useSessionStore.getState()).toMatchObject({ id: null, characterId: null, playerChoices: [] });
@@ -105,5 +113,27 @@ describe('character deletion cleanup', () => {
       expect(exported).toContain(`Quixote ${kind}`);
     });
     expect(exported).toContain('Shared lore');
+  });
+  it("drops the deleted character's world thread", async () => {
+    const goneId = useCharacterStore.getState().createCharacter(createTestCharacterData({ name: 'Gone', worldId: 'world-1' }));
+    useWorldStore.setState({ worlds: { 'world-1': { id: 'world-1', name: 'World' } } } as never);
+    const worldState = useWorldStore.getState().getWorldState('world-1');
+    useWorldStore.setState({
+      worldStates: {
+        'world-1': {
+          ...worldState,
+          playerCharacterThreads: {
+            'thread-gone': {
+              id: 'thread-gone', characterId: goneId, worldId: 'world-1', summary: 'Kilimanjaro summary',
+              highlights: [], sessionIds: [], crossCharacterReferences: [], lastUpdated: '2026-01-01',
+            },
+          },
+        },
+      },
+    } as never);
+
+    await deleteCharacterWithCleanup(goneId);
+
+    expect(JSON.stringify((await exportGameState()).data)).not.toContain('Kilimanjaro');
   });
 });

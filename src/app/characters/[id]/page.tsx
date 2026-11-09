@@ -15,13 +15,13 @@ import { CharacterDetailsDisplay } from '@/components/characters/CharacterDetail
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { deleteCharacterWithCleanup } from '@/services/characterDeletionService';
 
 export default function CharacterViewPage() {
   const params = useParams();
   const router = useRouter();
   const characterId = params.id as string;
-  const { characters, setCurrentCharacter, deleteCharacter } =
-    useCharacterStore();
+  const { characters, setCurrentCharacter } = useCharacterStore();
   const { worlds } = useWorldStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -32,7 +32,7 @@ export default function CharacterViewPage() {
   useEffect(() => setMounted(true), []);
 
   const handleDelete = async () => {
-    await deleteCharacter(characterId);
+    await deleteCharacterWithCleanup(characterId);
     router.push('/characters');
   };
 

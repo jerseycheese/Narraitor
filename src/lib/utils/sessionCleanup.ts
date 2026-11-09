@@ -146,6 +146,15 @@ export async function cleanupCharacterSessions(characterId: string): Promise<voi
   Object.values(sessionLifecycle).forEach((session) => {
     if (session.characterId === characterId) sessionIds.add(session.id);
   });
+  // sessionLifecycle isn't persisted and a fresh start drops the old saved
+  // session, so a reloaded character's earlier stories are only reachable
+  // through the records that carry its characterId.
+  Object.values(useJournalStore.getState().entries).forEach((entry) => {
+    if (entry.characterId === characterId && entry.sessionId) sessionIds.add(entry.sessionId);
+  });
+  Object.values(useGoalStore.getState().goals).forEach((goal) => {
+    if (goal.characterId === characterId && goal.sessionId) sessionIds.add(goal.sessionId);
+  });
   if (activeSessionId && activeCharacterId === characterId) {
     sessionIds.add(activeSessionId);
     // End it first so the live fields (and their persisted choice text) reset

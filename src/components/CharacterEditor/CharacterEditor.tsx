@@ -17,6 +17,7 @@ import { generatePortrait } from '@/lib/api/generatePortrait';
 import { calculateSkillPointPool } from '@/components/CharacterCreationWizard/utils/skillAllocation';
 
 import { formatPlainLanguageError } from '@/lib/utils/errorUtils';
+import { deleteCharacterWithCleanup } from '@/services/characterDeletionService';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('CharacterEditor');
@@ -129,7 +130,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   };
   
   const handleDelete = async () => {
-    await useCharacterStore.getState().deleteCharacter(characterId);
+    await deleteCharacterWithCleanup(characterId);
     router.push('/characters');
   };
   
