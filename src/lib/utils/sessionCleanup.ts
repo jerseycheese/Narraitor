@@ -9,6 +9,8 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useJournalStore } from '@/state/journalStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useSceneStore } from '@/state/sceneStore';
+import { useGoalStore } from '@/state/goalStore';
+import { useWorldThreadStore } from '@/state/worldThreadStore';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('SessionCleanup');
@@ -47,7 +49,7 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
 
   // Cleanup order is important for data integrity:
   // 1. Narrative data (segments and decisions)
-  // 2. Journal entries
+  // 2. Journal entries, goals and world threads
   // 3. Scene state
   // 4. Session record (last to maintain referential integrity)
 
@@ -75,6 +77,19 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
     errors.push(error instanceof Error ? error : new Error(String(error)));
   }
 
+  // Goals and world threads quote the story, so they go with it
+  try {
+    useGoalStore.getState().clearSessionGoals(sessionId);
+  } catch (error) {
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
+
+  try {
+    useWorldThreadStore.getState().clearSessionThreads(sessionId);
+  } catch (error) {
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
+
   // Remove session record last to maintain referential integrity
   try {
     useSceneStore.getState().clearScene(sessionId);
@@ -97,7 +112,8 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
 
 /**
  * Clean up every session that belongs to a deleted character: its story
- * segments, decisions, journal entries and saved-session record.
+ * segments, decisions, journal entries, goals, world threads and
+ * saved-session record.
  *
  * Subscribed to CHARACTER_DELETED in src/state/storeEventWiring.ts. Without it
  * the character's story stays in IndexedDB and ships in every export.
