@@ -11,6 +11,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useSceneStore } from '@/state/sceneStore';
 import { useGoalStore } from '@/state/goalStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
+import { useLoreStore } from '@/state/loreStore';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('SessionCleanup');
@@ -86,6 +87,12 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
 
   try {
     useWorldThreadStore.getState().clearSessionThreads(sessionId);
+  } catch (error) {
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
+
+  try {
+    useLoreStore.getState().clearSessionLore(sessionId);
   } catch (error) {
     errors.push(error instanceof Error ? error : new Error(String(error)));
   }

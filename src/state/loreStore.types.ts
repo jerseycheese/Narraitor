@@ -81,5 +81,6 @@ export interface LoreStore extends CrudStore<LoreFact> {
     source?: LoreUsageSource;
   }) => void;
   clearLoreUsage: (worldId?: EntityID) => void;
+  clearSessionLore: (sessionId: EntityID) => void;
   promoteChapterLore: (worldId: EntityID, sessionId: EntityID, topCount?: number) => EntityID[];
 }

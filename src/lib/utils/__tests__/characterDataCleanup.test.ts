@@ -9,6 +9,7 @@ import { useJournalStore } from '@/state/journalStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useGoalStore } from '@/state/goalStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
+import { useLoreStore } from '@/state/loreStore';
 import { exportGameState } from '@/lib/storage/exportService';
 import { createTestCharacterData } from '@/state/__tests__/characterStore.testHelpers';
 
@@ -54,6 +55,9 @@ const seedStory = (sessionId: string, worldId: string, characterId: string, text
     entities: { ...state.entities, [thread.id]: thread },
     sessionThreads: { ...state.sessionThreads, [sessionId]: [thread.id] },
   }) as never);
+  const lore = useLoreStore.getState();
+  const factId = lore.addFact(`${text.toLowerCase()}_place`, `${text} lore`, 'locations', 'narrative', worldId, sessionId);
+  lore.recordLoreMentions({ worldId, sessionId, factIds: [factId], responseText: `You reach ${text} lore.` });
 };
 
 describe('character deletion cleanup', () => {
@@ -63,6 +67,7 @@ describe('character deletion cleanup', () => {
     useNarrativeStore.setState({ segments: {}, sessionSegments: {}, decisions: {}, sessionDecisions: {} });
     useGoalStore.setState({ goals: {}, entities: {}, sessionGoals: {}, activeGoalIds: [] });
     useWorldThreadStore.setState({ threads: {}, entities: {}, sessionThreads: {}, seedAttempts: {} });
+    useLoreStore.getState().reset();
     useSessionStore.setState({ id: null, characterId: null, worldId: null, savedSessions: {}, sessionLifecycle: {} });
   });
 
@@ -75,6 +80,7 @@ describe('character deletion cleanup', () => {
     // A session known only as the active one, not saved yet
     useSessionStore.setState({ id: 'session-active', worldId: 'world-1', characterId: goneId });
     seedStory('session-active', 'world-1', goneId, 'Ouagadougou');
+    useLoreStore.getState().addFact('shared_place', 'Shared lore', 'locations', 'manual', 'world-1');
     saveSession('session-kept', 'world-1', keptId);
     seedStory('session-kept', 'world-1', keptId, 'Quixote');
 
@@ -84,8 +90,9 @@ describe('character deletion cleanup', () => {
     expect(exported).not.toContain('Zanzibar');
     expect(exported).not.toContain('Ouagadougou');
     expect(useSessionStore.getState().savedSessions['session-gone']).toBeUndefined();
-    ['story', 'journal', 'goal', 'thread'].forEach((kind) => {
+    ['story', 'journal', 'goal', 'thread', 'lore'].forEach((kind) => {
       expect(exported).toContain(`Quixote ${kind}`);
     });
+    expect(exported).toContain('Shared lore');
   });
 });

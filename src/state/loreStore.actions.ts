@@ -723,6 +723,37 @@ export const createLoreUsageActions = (set: SetState, get: GetState) => ({
       ),
     }));
   },
+
+  /**
+   * Drop the lore a session's story produced: its facts (with their history
+   * and usage stats) and its usage events, which carry story excerpts.
+   * Facts with no sessionId are left alone.
+   */
+  clearSessionLore: (sessionId: EntityID) => {
+    set((state) => {
+      const sessionFactIds = new Set(
+        Object.values(state.facts)
+          .filter((fact) => fact.sessionId === sessionId)
+          .map((fact) => fact.id)
+      );
+      const keep = ([id]: [string, unknown]) => !sessionFactIds.has(id);
+      const facts = Object.fromEntries(Object.entries(state.facts).filter(keep));
+
+      return {
+        facts,
+        entities: Object.fromEntries(Object.entries(state.entities).filter(keep)),
+        factHistory: Object.fromEntries(Object.entries(state.factHistory).filter(keep)),
+        loreUsage: Object.fromEntries(Object.entries(state.loreUsage).filter(keep)),
+        loreUsageEvents: state.loreUsageEvents.filter(
+          (event) => event.sessionId !== sessionId
+        ),
+        currentEntityId:
+          state.currentEntityId && sessionFactIds.has(state.currentEntityId)
+            ? null
+            : state.currentEntityId,
+      };
+    });
+  },
 });
 
 // ─── Combined base actions export ───────────────────────────────────────────
