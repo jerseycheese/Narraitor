@@ -94,3 +94,28 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
     logger.error('Error during session cleanup:', errors);
   }
 }
+
+/**
+ * Clean up every session that belongs to a deleted character: its story
+ * segments, decisions, journal entries and saved-session record.
+ *
+ * Subscribed to CHARACTER_DELETED in src/state/storeEventWiring.ts. Without it
+ * the character's story stays in IndexedDB and ships in every export.
+ *
+ * @param characterId - The ID of the deleted character
+ */
+export async function cleanupCharacterSessions(characterId: string): Promise<void> {
+  const { id: activeSessionId, characterId: activeCharacterId, savedSessions, sessionLifecycle } =
+    useSessionStore.getState();
+
+  const sessionIds = new Set<string>();
+  Object.values(savedSessions).forEach((session) => {
+    if (session.characterId === characterId) sessionIds.add(session.id);
+  });
+  Object.values(sessionLifecycle).forEach((session) => {
+    if (session.characterId === characterId) sessionIds.add(session.id);
+  });
+  if (activeSessionId && activeCharacterId === characterId) sessionIds.add(activeSessionId);
+
+  await Promise.all(Array.from(sessionIds, (sessionId) => cleanupSessionData(sessionId)));
+}
