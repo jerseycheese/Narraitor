@@ -70,6 +70,14 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
     errors.push(error instanceof Error ? error : new Error(String(error)));
   }
 
+  // The persisted ending holds the session's epilogue text
+  try {
+    const narrativeStore = useNarrativeStore.getState();
+    if (narrativeStore.currentEnding?.sessionId === sessionId) narrativeStore.clearEnding();
+  } catch (error) {
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
+
   // Clean up journal entries
   try {
     const journalStore = useJournalStore.getState();
@@ -138,7 +146,13 @@ export async function cleanupCharacterSessions(characterId: string): Promise<voi
   Object.values(sessionLifecycle).forEach((session) => {
     if (session.characterId === characterId) sessionIds.add(session.id);
   });
-  if (activeSessionId && activeCharacterId === characterId) sessionIds.add(activeSessionId);
+  if (activeSessionId && activeCharacterId === characterId) {
+    sessionIds.add(activeSessionId);
+    // End it first so the live fields (and their persisted choice text) reset
+    // and the crash-recovery marker goes; the cleanup below then removes what
+    // ending it saved.
+    await useSessionStore.getState().endSession();
+  }
 
   await Promise.all(Array.from(sessionIds, (sessionId) => cleanupSessionData(sessionId)));
 }

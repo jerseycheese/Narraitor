@@ -364,8 +364,9 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
               return;
             }
 
-            // Emit event for other stores to handle cleanup
-            storeEvents.emit<CharacterDeletedEvent>(StoreEventTypes.CHARACTER_DELETED, {
+            // Emit event for other stores to handle cleanup; awaited after the
+            // set below so the character's sessions are gone before this resolves
+            const cleanup = storeEvents.emit<CharacterDeletedEvent>(StoreEventTypes.CHARACTER_DELETED, {
               characterId: id,
             });
 
@@ -390,6 +391,8 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
                 error: null,
               };
             });
+
+            await cleanup;
           },
 
           setCurrent: (id) => {
@@ -726,12 +729,14 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
               .filter(([, char]) => char.worldId === worldId)
               .map(([id]) => id);
 
-            // Emit events for other stores to handle cleanup
-            charactersInWorld.forEach((characterId) => {
-              storeEvents.emit<CharacterDeletedEvent>(StoreEventTypes.CHARACTER_DELETED, {
-                characterId,
-              });
-            });
+            // Emit events for other stores to handle cleanup; awaited after the set below
+            const cleanup = Promise.all(
+              charactersInWorld.map((characterId) =>
+                storeEvents.emit<CharacterDeletedEvent>(StoreEventTypes.CHARACTER_DELETED, {
+                  characterId,
+                })
+              )
+            );
 
             set((state) => {
               const charactersToKeep = Object.fromEntries(
@@ -758,6 +763,8 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> =
                   : state.currentEntityId,
               };
             });
+
+            await cleanup;
           },
         };
       },

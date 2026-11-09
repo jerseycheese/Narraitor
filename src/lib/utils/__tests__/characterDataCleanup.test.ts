@@ -64,7 +64,7 @@ describe('character deletion cleanup', () => {
   beforeEach(() => {
     useCharacterStore.getState().reset();
     useJournalStore.setState({ entries: {}, sessionEntries: {} });
-    useNarrativeStore.setState({ segments: {}, sessionSegments: {}, decisions: {}, sessionDecisions: {} });
+    useNarrativeStore.setState({ segments: {}, sessionSegments: {}, decisions: {}, sessionDecisions: {}, currentEnding: null });
     useGoalStore.setState({ goals: {}, entities: {}, sessionGoals: {}, activeGoalIds: [] });
     useWorldThreadStore.setState({ threads: {}, entities: {}, sessionThreads: {}, seedAttempts: {} });
     useLoreStore.getState().reset();
@@ -78,7 +78,16 @@ describe('character deletion cleanup', () => {
     saveSession('session-gone', 'world-1', goneId);
     seedStory('session-gone', 'world-1', goneId, 'Zanzibar');
     // A session known only as the active one, not saved yet
-    useSessionStore.setState({ id: 'session-active', worldId: 'world-1', characterId: goneId });
+    useSessionStore.setState({
+      id: 'session-active',
+      worldId: 'world-1',
+      characterId: goneId,
+      status: 'active',
+      playerChoices: [{ id: 'choice-1', text: 'Ouagadougou choice', isSelected: false }],
+    } as never);
+    useNarrativeStore.setState({
+      currentEnding: { sessionId: 'session-active', characterId: goneId, worldId: 'world-1', epilogue: 'Ouagadougou epilogue' },
+    } as never);
     seedStory('session-active', 'world-1', goneId, 'Ouagadougou');
     useLoreStore.getState().addFact('shared_place', 'Shared lore', 'locations', 'manual', 'world-1');
     saveSession('session-kept', 'world-1', keptId);
@@ -90,6 +99,8 @@ describe('character deletion cleanup', () => {
     expect(exported).not.toContain('Zanzibar');
     expect(exported).not.toContain('Ouagadougou');
     expect(useSessionStore.getState().savedSessions['session-gone']).toBeUndefined();
+    expect(useSessionStore.getState().savedSessions['session-active']).toBeUndefined();
+    expect(useSessionStore.getState()).toMatchObject({ id: null, characterId: null, playerChoices: [] });
     ['story', 'journal', 'goal', 'thread', 'lore'].forEach((kind) => {
       expect(exported).toContain(`Quixote ${kind}`);
     });
