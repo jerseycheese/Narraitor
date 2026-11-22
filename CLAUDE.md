@@ -169,10 +169,20 @@ components.
 
 ## Pointers
 
-README.md (product overview), RELEASES.md (one section per version), CONTEXT.md (domain
+README.md (product overview), RELEASES.md (one section per version), GLOSSARY.md (domain
 vocabulary — world, turn, decision, provider — referenced by several local skills),
 DESIGN.md (design-system map), `public_docs/architecture/` (ADRs),
 `public_docs/development/release-process.md`.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in this repo's GitHub Issues, through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` at the repo root, with ADRs in `public_docs/architecture/`. See `docs/agents/domain.md`.
 
 ## Claude Code specifics
 
