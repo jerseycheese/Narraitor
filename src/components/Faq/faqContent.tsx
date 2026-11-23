@@ -148,7 +148,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
         question: 'Which model does it use?',
         answer: (
           <p>
-            <code>gemini-2.5-flash</code> by default. The setup wizard offers{' '}
+            <code>gemini-3.6-flash</code> by default. The setup wizard offers{' '}
             <code>gemini-2.5-pro</code> if you&apos;d rather trade speed for
             depth, and every other provider brings its own list &mdash; on a
             model you host yourself, you type the name of whatever you installed.

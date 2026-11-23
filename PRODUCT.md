@@ -72,7 +72,7 @@ The stack itself lives in CLAUDE.md and is not repeated here.
 - State lives in Zustand stores under `src/state/`, persisted to IndexedDB. There is no backend
   database and no user account system.
 - Generation runs through `src/lib/ai/`, keyed by the player's own provider key. Gemini
-  (`gemini-2.5-flash`, per `src/lib/ai/config.ts`) is the default and the longest-proven.
+  (`gemini-3.6-flash`, per `src/lib/ai/config.ts`) is the default and the longest-proven.
   OpenRouter, Ollama and OpenAI are available too. The rest of the presets in
   `src/lib/ai/presets.ts` stay out of reach until someone runs a live streamed turn through
   each.

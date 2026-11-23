@@ -10,11 +10,12 @@ import {
   PROVIDER_API_KEY_HEADER,
   PROVIDER_MODEL_HEADER,
 } from '@/lib/ai/providerKeyHeader';
+import { DEFAULT_TEXT_MODEL } from '@/lib/ai/config';
 import type { Character } from '@/types/character.types';
 import type { World } from '@/types/world.types';
 
 const liveProviderKey = process.env.NARRAITOR_LIVE_GEMINI_API_KEY;
-const liveModel = process.env.NARRAITOR_LIVE_GEMINI_MODEL ?? 'gemini-2.5-flash';
+const liveModel = process.env.NARRAITOR_LIVE_GEMINI_MODEL ?? DEFAULT_TEXT_MODEL;
 const describeLive = liveProviderKey ? describe : describe.skip;
 
 const world: World = {

@@ -4,6 +4,7 @@
 
 jest.mock('@/lib/ai/defaultGeminiClient');
 
+import { DEFAULT_TEXT_MODEL } from '../config';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { generateStoryCheckpointSummary } from '../storyCheckpointGenerator';
 import type { StoryCheckpointRequestBody } from '@/types/story-checkpoint.types';
@@ -64,7 +65,7 @@ describe('generateStoryCheckpointSummary', () => {
     expect(result.highlights).toEqual(['Council dissolved', 'Royal guard split']);
     expect(result.majorEvents).toEqual(['Maera disbands the council']);
     // Records the model the default client actually runs on, not the AI echo.
-    expect(result.model).toBe('gemini-2.5-flash');
+    expect(result.model).toBe(DEFAULT_TEXT_MODEL);
     expect(mockClient.generateContent).toHaveBeenCalledTimes(1);
   });
 
