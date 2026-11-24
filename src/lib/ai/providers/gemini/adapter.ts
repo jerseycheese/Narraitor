@@ -117,7 +117,7 @@ export const geminiAdapter: ProviderAdapter = {
         topP: descriptor.topPOverride ?? 1.0,
         topK: 40,
         maxOutputTokens: descriptor.maxTokensOverride ?? spec.maxTokens,
-        // Disable gemini-2.5-flash dynamic thinking: it adds latency and eats
+        // Disable dynamic thinking: it adds latency and eats
         // into the (small) maxOutputTokens budget meant for visible prose.
         thinkingConfig: { thinkingBudget: 0 },
       },

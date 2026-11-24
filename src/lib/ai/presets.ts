@@ -56,7 +56,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     endpoint: 'https://generativelanguage.googleapis.com',
     requiresEndpoint: false,
     modelDiscovery: true,
-    defaultModel: 'gemini-2.5-flash',
+    defaultModel: 'gemini-3.6-flash',
     capabilities: { text: true, images: true, streaming: true },
     helpUrl: 'https://aistudio.google.com/apikey',
     available: true,

@@ -7,7 +7,7 @@ import { AI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
  * Default model for an explicitly selected Gemini provider. Other providers
  * carry their own model in the resolved request descriptor.
  */
-export const DEFAULT_TEXT_MODEL = 'gemini-2.5-flash';
+export const DEFAULT_TEXT_MODEL = 'gemini-3.6-flash';
 
 /**
  * Gets AI configuration from environment variables.
@@ -36,7 +36,7 @@ export const getGenerationConfig = (): GenerationConfig => {
     topP: 1.0,
     topK: 40,
     maxOutputTokens: 2048,
-    // gemini-2.5-flash does dynamic "thinking" by default, which burns latency
+    // Gemini flash models think dynamically by default, which burns latency
     // and output-token budget on these interactive game requests. Disable it.
     thinkingConfig: { thinkingBudget: 0 }
   };
