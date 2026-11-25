@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAIRoute, makeGeminiRequest } from '@/utils/apiHelpers';
 import { DEFAULT_TEXT_MODEL, getSafetySettings } from '@/lib/ai/config';
+import { getThinkingConfig } from '@/lib/ai/thinkingConfig';
 import { PROVIDER_API_KEY_HEADER } from '@/lib/ai/providerKeyHeader';
 import { getProviderAdapter } from '@/lib/ai/providers/adapterRegistry';
 import { claudeAdapter } from '@/lib/ai/providers/claude/adapter';
@@ -128,7 +129,10 @@ async function validateGemini(key: string, requestedModel?: unknown) {
       key,
       {
         contents: [{ parts: [{ text: 'ping' }] }],
-        generationConfig: { maxOutputTokens: 1, thinkingConfig: { thinkingBudget: 0 } },
+        generationConfig: {
+          maxOutputTokens: 1,
+          thinkingConfig: getThinkingConfig(effectiveModel),
+        },
         safetySettings: getSafetySettings(),
       },
       PING_TIMEOUT_MS

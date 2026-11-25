@@ -11,6 +11,7 @@ import type {
 import type { SafetySetting } from '../../types';
 import type { ContentRating } from '../../safety/contentRatingGuidance';
 import { applyGeminiPromptOverrides } from '../promptOverrides';
+import { getThinkingConfig } from '../../thinkingConfig';
 
 /**
  * Gemini's native REST API, behind the generic provider contract.
@@ -117,9 +118,7 @@ export const geminiAdapter: ProviderAdapter = {
         topP: descriptor.topPOverride ?? 1.0,
         topK: 40,
         maxOutputTokens: descriptor.maxTokensOverride ?? spec.maxTokens,
-        // Disable dynamic thinking: it adds latency and eats
-        // into the (small) maxOutputTokens budget meant for visible prose.
-        thinkingConfig: { thinkingBudget: 0 },
+        thinkingConfig: getThinkingConfig(descriptor.model),
       },
       safetySettings: getSafetySettingsForRating(spec.contentRating),
     };

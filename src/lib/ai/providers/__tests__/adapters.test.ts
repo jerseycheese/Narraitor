@@ -1,3 +1,4 @@
+import { DEFAULT_TEXT_MODEL } from '../../config';
 import { geminiAdapter } from '../gemini/adapter';
 import { openAICompatibleAdapter } from '../openai-compatible/adapter';
 import { claudeAdapter } from '../claude/adapter';
@@ -40,6 +41,15 @@ describe('geminiAdapter', () => {
     expect(geminiAdapter.buildUrl(GEMINI, { ...SPEC, stream: true })).toBe(
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse'
     );
+  });
+
+  it('sends the default model a thinking level, never the 2.5-era budget', () => {
+    const body = geminiAdapter.buildBody({ ...GEMINI, model: DEFAULT_TEXT_MODEL }, SPEC);
+
+    expect(body).toMatchObject({
+      generationConfig: { thinkingConfig: { thinkingLevel: 'MINIMAL' } },
+    });
+    expect(JSON.stringify(body)).not.toContain('thinkingBudget');
   });
 
   it('ignores a descriptor endpoint, so no header can steer a Gemini call', () => {
