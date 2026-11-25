@@ -11,12 +11,14 @@ import Logger from '@/lib/utils/logger';
 const logger = new Logger('ResilientStorage');
 
 /**
- * Storage health status. Only reported when falling back — there is no
+ * Storage health status. Only reported when saving stops — there is no
  * "healthy" signal, since `onStatusChange` is never called on the happy path.
  */
 export enum StorageStatus {
   /** Using memory-only fallback */
   UNAVAILABLE = 'unavailable',
+  /** Another tab saved newer data, so this one no longer writes */
+  STALE = 'stale',
 }
 
 /**
@@ -40,6 +42,7 @@ export interface ResilientStorageConfig {
 export class ResilientStorageMiddleware {
   private adapter: IndexedDBAdapter | null = null;
   private memoryStorage: Map<string, string> = new Map();
+  private isStale = false;
   private readonly onStatusChange: (status: StorageStatus, notice?: StorageFallbackNotice | null) => void;
 
   constructor(config: ResilientStorageConfig = {}) {
@@ -56,7 +59,7 @@ export class ResilientStorageMiddleware {
       return;
     }
     try {
-      this.adapter = new IndexedDBAdapter();
+      this.adapter = new IndexedDBAdapter({ refuseStaleWrites: true });
       await this.adapter.initialize();
 
       // Check if IndexedDB is actually available (not just that initialize didn't throw)
@@ -107,6 +110,10 @@ export class ResilientStorageMiddleware {
    * Set item in storage (IndexedDB or memory fallback)
    */
   async setItem(key: string, value: string): Promise<void> {
+    // Every key is off limits once one was stale: saving the others would leave
+    // records pointing at things that were never saved.
+    if (this.isStale) return;
+
     // Try IndexedDB first
     if (this.adapter) {
       try {
@@ -115,6 +122,10 @@ export class ResilientStorageMiddleware {
         this.memoryStorage.set(key, value);
         return;
       } catch (error) {
+        if ((error as Error | null)?.name === 'StaleWriteError') {
+          this.markStale((error as Error).message);
+          return;
+        }
         logger.error('[Storage] IndexedDB write failed, switching to memory:', error);
         this.adapter = null;
         this.onStatusChange(StorageStatus.UNAVAILABLE, {
@@ -127,10 +138,23 @@ export class ResilientStorageMiddleware {
     this.memoryStorage.set(key, value);
   }
 
+  private markStale(message: string): void {
+    if (this.isStale) return;
+    this.isStale = true;
+    logger.warn(`[Storage] ${message}; this tab has stopped saving`);
+    // The notice can reach the player through the save indicator, so it carries
+    // no storage key.
+    this.onStatusChange(StorageStatus.STALE, {
+      message: 'Another tab saved newer changes',
+    });
+  }
+
   /**
    * Remove item from storage
    */
   async removeItem(key: string): Promise<void> {
+    if (this.isStale) return;
+
     if (this.adapter) {
       try {
         await this.adapter.removeItem(key);

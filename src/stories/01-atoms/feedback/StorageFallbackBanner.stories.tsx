@@ -24,3 +24,12 @@ export const StorageUnavailable: Story = {
     return <StorageFallbackBanner />;
   },
 };
+
+export const ChangedInAnotherTab: Story = {
+  render: () => {
+    _setStorageStatusForTesting(StorageStatus.STALE, {
+      message: 'narraitor-world-store was changed in another tab',
+    });
+    return <StorageFallbackBanner />;
+  },
+};

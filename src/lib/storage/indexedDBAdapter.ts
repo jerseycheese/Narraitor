@@ -1,3 +1,9 @@
+function serializeRecord(record: { value?: unknown } | undefined): string | null {
+  if (!record?.value) return null;
+  // Handle both JSON and string data
+  return typeof record.value === 'string' ? record.value : JSON.stringify(record.value);
+}
+
 /**
  * IndexedDB adapter for Zustand persistence
  * Provides simple storage operations for MVP implementation
@@ -12,6 +18,17 @@ export class IndexedDBAdapter {
   private version = 1;
   private storeName = 'narraitor-store';
   private db: IDBDatabase | null = null;
+  /** What this adapter last read or wrote under each key. */
+  private knownValues = new Map<string, string | null>();
+  private readonly refuseStaleWrites: boolean;
+
+  /**
+   * @param options.refuseStaleWrites Reject a write when another tab has changed
+   * the key since this adapter last read or wrote it.
+   */
+  constructor(options: { refuseStaleWrites?: boolean } = {}) {
+    this.refuseStaleWrites = options.refuseStaleWrites ?? false;
+  }
 
   /**
    * Check if the database is initialized
@@ -88,17 +105,9 @@ export class IndexedDBAdapter {
         const request = store.get(key);
 
         request.onsuccess = () => {
-          const result = request.result;
-          if (result && result.value) {
-            // Handle both JSON and string data
-            if (typeof result.value === 'string') {
-              resolve(result.value);
-            } else {
-              resolve(JSON.stringify(result.value));
-            }
-          } else {
-            resolve(null);
-          }
+          const value = serializeRecord(request.result);
+          this.knownValues.set(key, value);
+          resolve(value);
         };
 
         request.onerror = () => resolve(null);
@@ -112,7 +121,8 @@ export class IndexedDBAdapter {
    * Set an item in storage
    * @param key - The key to store the value under
    * @param value - The value to store (as JSON string)
-   * @throws DOMException for quota exceeded or other storage errors
+   * @throws DOMException for quota exceeded or other storage errors, and a
+   * `StaleWriteError` one when stale writes are refused
    */
   async setItem(key: string, value: string): Promise<void> {
     if (!this.db) {
@@ -136,28 +146,57 @@ export class IndexedDBAdapter {
           dataToStore = value;
         }
 
-        const request = store.put({ 
-          id: key, 
-          value: dataToStore 
-        }, key);
+        const put = () => {
+          const request = store.put({
+            id: key,
+            value: dataToStore
+          }, key);
 
-        request.onsuccess = () => {
-          // Don't wait for oncomplete in the request handler
-          resolve();
+          request.onsuccess = () => {
+            // Don't wait for oncomplete in the request handler
+            resolve();
+          };
+
+          request.onerror = (event) => {
+            const error = (event.target as IDBRequest).error;
+            if (error?.name === 'QuotaExceededError') {
+              reject(new DOMException('QuotaExceededError'));
+            } else {
+              reject(error);
+            }
+          };
         };
 
-        request.onerror = (event) => {
-          const error = (event.target as IDBRequest).error;
-          if (error?.name === 'QuotaExceededError') {
-            reject(new DOMException('QuotaExceededError'));
-          } else {
+        if (!this.refuseStaleWrites) {
+          put();
+          return;
+        }
+
+        // Compare and write inside one transaction, so no other tab can write
+        // in between.
+        const read = store.get(key);
+        read.onerror = () => reject(read.error);
+        read.onsuccess = () => {
+          const known = this.knownValues.get(key);
+          // Nothing changed in this tab, so there is nothing to save, and a
+          // newer value from another tab must not be overwritten.
+          if (known === value) {
+            resolve();
+            return;
+          }
+          const stored = serializeRecord(read.result);
+          if (known !== undefined && stored !== known && stored !== value) {
+            reject(
+              new DOMException(`${key} was changed in another tab`, 'StaleWriteError')
+            );
+            return;
+          }
+          this.knownValues.set(key, value);
+          try {
+            put();
+          } catch (error) {
             reject(error);
           }
-        };
-
-        // Use transaction oncomplete
-        transaction.oncomplete = () => {
-          // Already resolved in onsuccess
         };
       } catch (error) {
         reject(error);
@@ -178,6 +217,8 @@ export class IndexedDBAdapter {
     if (!this.db || typeof indexedDB === 'undefined') {
       return;
     }
+
+    this.knownValues.delete(key);
 
     return new Promise((resolve) => {
       try {
