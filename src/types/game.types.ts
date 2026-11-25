@@ -17,6 +17,7 @@ export interface PlayerChoice {
  */
 export interface GameSessionState {
   id?: string | null;
+  worldId?: string | null;
   status: 'initializing' | 'loading' | 'active' | 'paused' | 'ended';
   currentSceneId: string | null;
   playerChoices: PlayerChoice[];

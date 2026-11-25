@@ -269,8 +269,10 @@ export const useGameSessionState = ({
       return;
     }
     
-    // Only initialize if session is not already active and we haven't already initiated
-    if (sessionState.status === 'initializing' && worldExists && sessionCharacterId) {
+    // Only initialize if this world has no session yet. Another world's session,
+    // synced in while narrative hydration was pending, doesn't count.
+    const isOtherWorld = !!currentStoreState.worldId && currentStoreState.worldId !== worldId;
+    if ((sessionState.status === 'initializing' || isOtherWorld) && worldExists && sessionCharacterId) {
       // Clear any existing ending state when starting any session
       useNarrativeStore.getState().clearEnding();
       
