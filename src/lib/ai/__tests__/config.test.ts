@@ -14,6 +14,15 @@ describe('getDefaultConfig', () => {
   test('falls back to the default model when none was resolved', () => {
     expect(getDefaultConfig('key').modelName).toBe(DEFAULT_TEXT_MODEL);
   });
+
+  test('picks the thinking setting for the model it runs on', () => {
+    expect(getDefaultConfig('key').generationConfig.thinkingConfig).toEqual({
+      thinkingLevel: 'MINIMAL',
+    });
+    expect(getDefaultConfig('key', 'gemini-2.5-pro').generationConfig.thinkingConfig).toEqual({
+      thinkingBudget: 0,
+    });
+  });
 });
 
 describe('resolveEffectiveGeminiKey', () => {

@@ -42,7 +42,7 @@ Use **Google Gemini** (via the `@google/genai` SDK) as the AI provider, and put 
 so on — which attach the key and call Gemini server-side. The client never sees the key or a
 `googleapis.com` URL.
 
-The default text model is `gemini-2.5-flash` (`src/lib/ai/config.ts`); image generation uses a
+The default text model is `gemini-3.6-flash` (`src/lib/ai/config.ts`); image generation uses a
 Gemini image model. A shared route wrapper (`withAIRoute` in `src/utils/apiHelpers.ts`) guards all
 AI routes with in-memory per-IP rate limiting (`src/utils/rateLimiter.ts`, 50/hr in production),
 a 64KB request body size cap (HTTP 413), and a server-enforced max output token ceiling (4096).
@@ -75,7 +75,7 @@ where latency is felt directly.
 - The server env key never reaches the client at all. (Under BYO-key the player's own key does
   live in the browser — see the 2026-08-01 note above and the Downsides below.)
 - The API routes are a single choke point for validation, rate limiting, and error handling.
-- `gemini-2.5-flash` keeps interactive generation fast and inexpensive.
+- The Gemini Flash tier keeps interactive generation fast and inexpensive.
 
 ### Downsides
 

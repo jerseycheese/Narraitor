@@ -1,5 +1,6 @@
 // src/lib/ai/types.ts
 
+import type { ThinkingConfig } from '@google/genai';
 import { FormattingOptions } from '../utils/textFormatter';
 
 /**
@@ -43,8 +44,8 @@ export interface GenerationConfig {
   topP?: number;
   topK?: number;
   maxOutputTokens?: number;
-  /** Gemini 2.5 thinking control. thinkingBudget: 0 disables dynamic thinking. */
-  thinkingConfig?: { thinkingBudget?: number };
+  /** Gemini thinking control, built per model by getThinkingConfig. */
+  thinkingConfig?: ThinkingConfig;
 }
 
 /**

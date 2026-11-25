@@ -3,6 +3,7 @@ import { logger } from '@/lib/utils/logger';
 import { getAIConfig, resolveEffectiveGeminiKey } from './config';
 import { extractJsonObject } from './parseJSON';
 import { applyGeminiPromptOverrides } from './providers/promptOverrides';
+import { getThinkingConfig } from './thinkingConfig';
 import type { ProviderCredential, ProviderDescriptor } from './providers/types';
 
 /**
@@ -75,7 +76,7 @@ export async function validateEventSignificance(
         maxOutputTokens: descriptor.maxTokensOverride ?? 200,
         // Thinking tokens count against maxOutputTokens, and 200 of them would
         // be spent deliberating instead of answering. This is a yes/no call.
-        thinkingConfig: { thinkingBudget: 0 },
+        thinkingConfig: getThinkingConfig(descriptor.model),
       },
     });
 

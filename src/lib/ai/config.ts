@@ -1,6 +1,7 @@
 // src/lib/ai/config.ts
 
 import { AIConfig, GenerationConfig, SafetySetting } from './types';
+import { getThinkingConfig } from './thinkingConfig';
 import { AI_ATTEMPT_TIMEOUT_MS } from '@/lib/constants/aiTimeouts';
 
 /**
@@ -28,17 +29,18 @@ export const getAIConfig = (): AIConfig => {
 
 /**
  * Gets generation configuration for AI model
+ * @param model - the model the request runs on; thinking settings differ by model
  * @returns Generation configuration
  */
-export const getGenerationConfig = (): GenerationConfig => {
+export const getGenerationConfig = (
+  model: string = DEFAULT_TEXT_MODEL
+): GenerationConfig => {
   return {
     temperature: 0.7,
     topP: 1.0,
     topK: 40,
     maxOutputTokens: 2048,
-    // Gemini flash models think dynamically by default, which burns latency
-    // and output-token budget on these interactive game requests. Disable it.
-    thinkingConfig: { thinkingBudget: 0 }
+    thinkingConfig: getThinkingConfig(model)
   };
 };
 
@@ -76,12 +78,13 @@ export const getDefaultConfig = (
   modelOverride?: string | null
 ) => {
   const aiConfig = getAIConfig();
+  const modelName = modelOverride ?? aiConfig.modelName;
   return {
     apiKey: resolveEffectiveGeminiKey(apiKeyOverride),
-    modelName: modelOverride ?? aiConfig.modelName,
+    modelName,
     maxRetries: aiConfig.maxRetries,
     timeout: aiConfig.timeout,
-    generationConfig: getGenerationConfig(),
+    generationConfig: getGenerationConfig(modelName),
     safetySettings: getSafetySettings()
   };
 };

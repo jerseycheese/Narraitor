@@ -33,7 +33,7 @@ export class GeminiClient implements AIClient {
   constructor(config: AIServiceConfig) {
     this.config = {
       ...config,
-      generationConfig: config.generationConfig || getGenerationConfig(),
+      generationConfig: config.generationConfig || getGenerationConfig(config.modelName),
       safetySettings: config.safetySettings || getSafetySettings()
     };
     
