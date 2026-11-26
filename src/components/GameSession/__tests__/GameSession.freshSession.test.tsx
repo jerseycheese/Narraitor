@@ -169,6 +169,30 @@ it('gives fresh=true generation the new session id before the opening arrives', 
   );
 });
 
+it('remounts the play surface on a new session when Start New replaces a live story', async () => {
+  useNarrativeStore.setState({ endedSessions: {} });
+  useSessionStore.setState({ status: 'active' });
+  let rerender: (ui: React.ReactElement) => void = () => {};
+  await act(async () => {
+    ({ rerender } = render(<GameSession worldId="world-1" />));
+  });
+  const livePlaySurface = screen.getByRole('button', { name: 'Store opening' });
+  expect(useSessionStore.getState().id).toBe(endedSessionId);
+
+  await act(async () => {
+    rerender(<GameSession worldId="world-1" disableAutoResume />);
+  });
+
+  await waitFor(() =>
+    expect(useSessionStore.getState().id).not.toBe(endedSessionId)
+  );
+  const newPlaySurface = screen.getByRole('button', { name: 'Store opening' });
+  expect(newPlaySurface).not.toBe(livePlaySurface);
+  expect(newPlaySurface.getAttribute('data-session-id')).toBe(
+    useSessionStore.getState().id
+  );
+});
+
 it('resumes the new session after saving, Start New, and saving again', async () => {
   const sessionClock = jest.spyOn(Date, 'now').mockReturnValue(1000);
   try {

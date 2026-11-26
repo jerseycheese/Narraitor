@@ -400,6 +400,9 @@ const GameSession: React.FC<GameSessionProps> = ({
     // Use the new narrative integration component
     return (
       <ActiveGameSession
+        // A replaced session must not inherit the last one's selected choice,
+        // which would answer the new opening scene on the player's behalf.
+        key={stableSessionId}
         worldId={worldId}
         sessionId={stableSessionId}
         world={world}
