@@ -20,6 +20,7 @@ import {
   SkillCheckRoll,
 } from '@/types/narrative.types';
 import { isSessionEndingSegment } from '@/lib/narrative/isSessionEndingSegment';
+import { isAwaitingChoices } from '@/lib/narrative/isAwaitingChoices';
 import { getNarrativeError } from '@/lib/narrative/narrativeErrors';
 import {
   evaluateDecisionSkillChecks,
@@ -421,6 +422,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     sessionKey,
   ]);
 
+  const resumedSessionRef = useRef<string | null>(null);
+
   // Load segments after hydration is complete
   useEffect(() => {
     if (!hasHydrated) {
@@ -513,16 +516,22 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       initialGenerationInitiated.current = true; // Prevent any attempt to generate an initial scene
     }
 
-    // If we already have narrative content and no decisions yet, proactively generate choices
+    // If the latest passage has no choices of its own yet, generate them. With
+    // an answered decision on file this only runs on the first load: a later
+    // run can land mid-turn, before the turn asks for its own choices.
+    const isFirstLoad = resumedSessionRef.current !== sessionId;
+    resumedSessionRef.current = sessionId;
     try {
       const existingDecisions = useNarrativeStore
         .getState()
         .getSessionDecisions(sessionId);
       if (
         generateChoices &&
-        existingSegments.length > 0 &&
-        existingDecisions.length === 0 &&
-        !isSessionEndingSegment(existingSegments[existingSegments.length - 1])
+        (isFirstLoad || existingDecisions.length === 0) &&
+        isAwaitingChoices(
+          existingSegments[existingSegments.length - 1],
+          existingDecisions[existingDecisions.length - 1]?.id
+        )
       ) {
         setTimeout(() => {
           if (mountedRef.current) {

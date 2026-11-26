@@ -31,4 +31,40 @@ describe('useActiveGameSessionEffects', () => {
 
     expect(result.current.isGeneratingChoices).toBe(false);
   });
+
+  it('waits on choices when a resumed passage came from the latest decision', () => {
+    const decisionId = useNarrativeStore.getState().addDecision('session-2', {
+      prompt: 'What will you do?',
+      options: [{ id: 'option-1', text: 'Look around', alignment: 'neutral' }],
+      selectedOptionId: 'option-1',
+      decisionWeight: 'minor',
+    });
+    useNarrativeStore.getState().addSegment('session-2', {
+      content: 'You look around the quiet hall.',
+      type: 'scene',
+      characterIds: [],
+      metadata: { tags: [], causedByDecisionId: decisionId },
+      worldId: 'world-1',
+      timestamp: new Date(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    const { result } = renderHook(() => {
+      const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
+      const [, setIsGenerating] = React.useState(false);
+      const [, setInitialized] = React.useState(false);
+
+      useActiveGameSessionEffects({
+        sessionId: 'session-2',
+        controllerKey: 'controller-2',
+        setIsGenerating,
+        setInitialized,
+        setIsGeneratingChoices,
+      });
+
+      return isGeneratingChoices;
+    });
+
+    expect(result.current).toBe(true);
+  });
 });
