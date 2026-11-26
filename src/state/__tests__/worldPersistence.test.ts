@@ -10,6 +10,7 @@ import {
   setupMockTransaction,
   setupSuccessfulOpen,
   triggerSuccess,
+  triggerCommit,
 } from '@/lib/storage/__tests__/indexedDBAdapter.testHelpers';
 
 // Mock IndexedDB for testing
@@ -325,7 +326,7 @@ describe('World Persistence Infrastructure', () => {
       mockStore.put.mockImplementation((record: { id: string; value: unknown }) => {
         backing.set(record.id, record.value);
         const req = createMockRequest();
-        triggerSuccess(req);
+        triggerCommit(req, mockTransaction);
         return req;
       });
       mockStore.get.mockImplementation((key: string) => {
@@ -334,7 +335,7 @@ describe('World Persistence Infrastructure', () => {
         triggerSuccess(req, val !== undefined ? { value: val } : undefined);
         return req;
       });
-      setupMockTransaction(mockDBInstance, mockStore);
+      const mockTransaction = setupMockTransaction(mockDBInstance, mockStore);
 
       const adapter = new IndexedDBAdapter();
       expect(adapter.isInitialized).toBe(false);

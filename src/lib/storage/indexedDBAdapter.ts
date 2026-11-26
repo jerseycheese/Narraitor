@@ -141,11 +141,6 @@ export class IndexedDBAdapter {
           value: dataToStore 
         }, key);
 
-        request.onsuccess = () => {
-          // Don't wait for oncomplete in the request handler
-          resolve();
-        };
-
         request.onerror = (event) => {
           const error = (event.target as IDBRequest).error;
           if (error?.name === 'QuotaExceededError') {
@@ -155,9 +150,11 @@ export class IndexedDBAdapter {
           }
         };
 
-        // Use transaction oncomplete
-        transaction.oncomplete = () => {
-          // Already resolved in onsuccess
+        // A successful request can still abort at commit (e.g. a full disk),
+        // so only a completed transaction counts as written.
+        transaction.oncomplete = () => resolve();
+        transaction.onabort = () => {
+          reject(transaction.error ?? new DOMException('Transaction aborted', 'AbortError'));
         };
       } catch (error) {
         reject(error);
