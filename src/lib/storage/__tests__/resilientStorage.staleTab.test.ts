@@ -180,4 +180,17 @@ describe('ResilientStorageMiddleware with a second tab open', () => {
     expect(onStatusChange).toHaveBeenCalledTimes(1);
     expect(onStatusChange).toHaveBeenCalledWith(StorageStatus.UNAVAILABLE, expect.anything());
   });
+
+  it('does not blame another tab when saving the fingerprint of a read aborts', async () => {
+    records.set('worlds', { id: 'worlds', value: JSON.parse(worlds('Old')) });
+    const onStatusChange = jest.fn();
+    const first = new ResilientStorageMiddleware({ onStatusChange });
+
+    abortNextWrite = true;
+    await first.getItem('worlds');
+    await first.setItem('worlds', worlds('Old', 'New'));
+
+    expect(await first.getItem('worlds')).toBe(worlds('Old', 'New'));
+    expect(onStatusChange).not.toHaveBeenCalled();
+  });
 });

@@ -130,7 +130,7 @@ export class IndexedDBAdapter {
             resolve(value);
             return;
           }
-          this.recordRead(store, key, value, () => resolve(value));
+          this.recordRead(transaction, store, key, value, () => resolve(value));
         };
 
         request.onerror = () => resolve(null);
@@ -145,6 +145,7 @@ export class IndexedDBAdapter {
    * was last saved by something that doesn't keep one.
    */
   private recordRead(
+    transaction: IDBTransaction,
     store: IDBObjectStore,
     key: string,
     value: string | null,
@@ -159,6 +160,10 @@ export class IndexedDBAdapter {
       if ((shared[key] ?? null) !== read) {
         if (read === null) delete shared[key];
         else shared[key] = read;
+        // If the correction never commits, the tab has to keep expecting what
+        // is still stored, or its next write looks like another tab's change.
+        const stored = request.result?.value?.[key] ?? null;
+        transaction.onabort = () => this.knownFingerprints.set(key, stored);
         store.put({ id: FINGERPRINTS_KEY, value: shared }, FINGERPRINTS_KEY);
       }
       done();
