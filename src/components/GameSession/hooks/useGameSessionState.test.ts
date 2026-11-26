@@ -280,6 +280,57 @@ describe('useGameSessionState', () => {
     expect(mockSessionStoreState.initializeSession).toHaveBeenCalledTimes(1);
   });
 
+  test('replaces the live story once when ?fresh=true arrives mid-session', () => {
+    window.history.pushState({}, '', '/worlds/test-world/play');
+    mockSessionStoreState.getSavedSession = jest.fn(() => undefined);
+    Object.assign(mockSessionStoreState, {
+      id: 'live-session',
+      status: 'active',
+      worldId: 'test-world',
+      characterId: 'test-character-id',
+    });
+    const router = { push: jest.fn(), replace: jest.fn() };
+
+    const { result, rerender } = renderHook(
+      ({ fresh }) => useGameSessionState({
+        worldId: 'test-world',
+        isClient: true,
+        disableAutoResume: fresh,
+        router,
+      }),
+      { initialProps: { fresh: false } }
+    );
+    expect(mockSessionStoreState.initializeSession).not.toHaveBeenCalled();
+
+    window.history.pushState({}, '', '/worlds/test-world/play?fresh=true');
+    rerender({ fresh: true });
+
+    expect(mockSessionStoreState.initializeSession).toHaveBeenCalledTimes(1);
+    expect(mockSessionStoreState.initializeSession).toHaveBeenCalledWith(
+      'test-world',
+      'test-character-id',
+      expect.any(Function),
+      true
+    );
+    const onComplete = (mockSessionStoreState.initializeSession as jest.Mock).mock.calls[0][2];
+    onComplete();
+    expect(router.replace).toHaveBeenCalledWith('/worlds/test-world/play');
+
+    // The status moves while ?fresh=true is still on the URL.
+    act(() => {
+      result.current.setSessionState((prev) => ({ ...prev, status: 'loading' }));
+    });
+    act(() => {
+      result.current.setSessionState((prev) => ({ ...prev, status: 'active' }));
+    });
+    expect(mockSessionStoreState.initializeSession).toHaveBeenCalledTimes(1);
+
+    // A second Start New in the same visit works too.
+    rerender({ fresh: false });
+    rerender({ fresh: true });
+    expect(mockSessionStoreState.initializeSession).toHaveBeenCalledTimes(2);
+  });
+
   test('leaves the URL alone if the player navigated away before the fresh session started', () => {
     window.history.pushState({}, '', '/dashboard');
     mockSessionStoreState.getSavedSession = jest.fn(() => undefined);
