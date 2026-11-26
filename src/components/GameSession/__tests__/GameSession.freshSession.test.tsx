@@ -255,3 +255,55 @@ describe('ended sessions without ?fresh=true', () => {
     }
   });
 });
+
+it('starts a world\'s own session when another world\'s is still active on a cold load', async () => {
+  useSessionStore.setState({ id: 'live-session', status: 'active' });
+  useWorldStore.setState((state) => ({
+    worlds: { ...state.worlds, 'world-2': createMockWorld({ id: 'world-2' }) },
+  }));
+  useCharacterStore.setState((state) => ({
+    characters: {
+      ...state.characters,
+      'character-2': createMockCharacter({ id: 'character-2', worldId: 'world-2' }),
+    },
+  }));
+  let finishHydration = () => {};
+  const hydrated = jest
+    .spyOn(useNarrativeStore.persist, 'hasHydrated')
+    .mockReturnValue(false);
+  jest
+    .spyOn(useNarrativeStore.persist, 'onFinishHydration')
+    .mockImplementation((callback) => {
+      finishHydration = () => callback(useNarrativeStore.getState());
+      return () => {};
+    });
+  try {
+    await act(async () => {
+      render(<GameSession worldId="world-2" />);
+    });
+    expect(mockGenerationSessionIds).toHaveLength(0);
+    hydrated.mockReturnValue(true);
+    await act(async () => finishHydration());
+    expect(useSessionStore.getState().worldId).toBe('world-2');
+    expect(new Set(mockGenerationSessionIds)).toEqual(
+      new Set([useSessionStore.getState().id])
+    );
+  } finally {
+    jest.restoreAllMocks();
+  }
+});
+
+it('leaves another world\'s active session alone on a world with no characters', async () => {
+  useSessionStore.setState({ id: 'live-session', status: 'active' });
+  useWorldStore.setState((state) => ({
+    worlds: { ...state.worlds, 'world-2': createMockWorld({ id: 'world-2' }) },
+  }));
+
+  await act(async () => {
+    render(<GameSession worldId="world-2" />);
+  });
+
+  expect(screen.getByTestId('game-session-no-characters')).toBeInTheDocument();
+  expect(mockGenerationSessionIds).toHaveLength(0);
+  expect(useSessionStore.getState().id).toBe('live-session');
+});

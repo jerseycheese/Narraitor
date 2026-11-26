@@ -91,6 +91,7 @@ const GameSession: React.FC<GameSessionProps> = ({
   } = hookResult;
 
   const sessionState = testSessionState || hookSessionState;
+  const isOtherWorldSession = !!sessionState.worldId && sessionState.worldId !== worldId;
   
   // Create a stable session ID that won't change on re-renders
   const stableSessionId = useMemo(() => {
@@ -144,6 +145,10 @@ const GameSession: React.FC<GameSessionProps> = ({
   // Update session store when session ID changes
   useEffect(() => {
     if (!stableSessionId) return;
+
+    // Another world's session keeps its own ID until this world starts or resumes one
+    const storeWorldId = useSessionStore.getState().worldId;
+    if (storeWorldId && storeWorldId !== worldId) return;
     
     // Only clear segments if this is a brand new session (not resuming existing)
     const narrativeState = useNarrativeStore.getState();
@@ -161,7 +166,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     if (useSessionStore.getState().setSessionId) {
       useSessionStore.getState().setSessionId(stableSessionId);
     }
-  }, [stableSessionId]);
+  }, [stableSessionId, worldId]);
   
   // Focus management for state transitions
   useEffect(() => {
@@ -289,7 +294,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     );
   }
   
-  if (sessionState.status === 'initializing') {
+  if (sessionState.status === 'initializing' || isOtherWorldSession) {
     // Check if there's a saved session to resume
     if (savedSession && !sessionState.id) {
       // Show loading if auto-resuming
