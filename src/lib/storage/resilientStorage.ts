@@ -110,8 +110,8 @@ export class ResilientStorageMiddleware {
    * Set item in storage (IndexedDB or memory fallback)
    */
   async setItem(key: string, value: string): Promise<void> {
-    // Every key is off limits once one was stale: saving the others would leave
-    // records pointing at things that were never saved.
+    // Nothing is saved after the first refusal: records that went through alone
+    // could point at things that were never saved.
     if (this.isStale) return;
 
     // Try IndexedDB first

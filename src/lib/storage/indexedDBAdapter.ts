@@ -1,7 +1,24 @@
+/**
+ * Record in the same store listing a fingerprint of every key a guarded adapter
+ * has read or written, so a write can check them all without reading them all.
+ */
+const FINGERPRINTS_KEY = 'narraitor-write-fingerprints';
+
+type Fingerprints = Record<string, string>;
+
 function serializeRecord(record: { value?: unknown } | undefined): string | null {
   if (!record?.value) return null;
   // Handle both JSON and string data
   return typeof record.value === 'string' ? record.value : JSON.stringify(record.value);
+}
+
+/** Length plus 32-bit FNV-1a: tells two saved versions of a record apart. */
+function fingerprint(value: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < value.length; i++) {
+    hash = Math.imul(hash ^ value.charCodeAt(i), 0x01000193);
+  }
+  return `${value.length}:${hash >>> 0}`;
 }
 
 /**
@@ -18,13 +35,13 @@ export class IndexedDBAdapter {
   private version = 1;
   private storeName = 'narraitor-store';
   private db: IDBDatabase | null = null;
-  /** What this adapter last read or wrote under each key. */
-  private knownValues = new Map<string, string | null>();
+  /** Fingerprint of what this adapter last read or wrote under each key. */
+  private knownFingerprints = new Map<string, string | null>();
   private readonly refuseStaleWrites: boolean;
 
   /**
-   * @param options.refuseStaleWrites Reject a write when another tab has changed
-   * the key since this adapter last read or wrote it.
+   * @param options.refuseStaleWrites Reject every write once another tab has
+   * changed any key this adapter has read or written.
    */
   constructor(options: { refuseStaleWrites?: boolean } = {}) {
     this.refuseStaleWrites = options.refuseStaleWrites ?? false;
@@ -100,14 +117,20 @@ export class IndexedDBAdapter {
 
     try {
       return new Promise((resolve) => {
-        const transaction = this.db!.transaction([this.storeName], 'readonly');
+        const transaction = this.db!.transaction(
+          [this.storeName],
+          this.refuseStaleWrites ? 'readwrite' : 'readonly'
+        );
         const store = transaction.objectStore(this.storeName);
         const request = store.get(key);
 
         request.onsuccess = () => {
           const value = serializeRecord(request.result);
-          this.knownValues.set(key, value);
-          resolve(value);
+          if (!this.refuseStaleWrites) {
+            resolve(value);
+            return;
+          }
+          this.recordRead(store, key, value, () => resolve(value));
         };
 
         request.onerror = () => resolve(null);
@@ -115,6 +138,41 @@ export class IndexedDBAdapter {
     } catch {
       return null;
     }
+  }
+
+  /**
+   * Remembers what was read and corrects the shared fingerprint if the record
+   * was last saved by something that doesn't keep one.
+   */
+  private recordRead(
+    store: IDBObjectStore,
+    key: string,
+    value: string | null,
+    done: () => void
+  ): void {
+    const read = value === null ? null : fingerprint(value);
+    const request = store.get(FINGERPRINTS_KEY);
+    request.onerror = done;
+    request.onsuccess = () => {
+      this.knownFingerprints.set(key, read);
+      const shared: Fingerprints = { ...request.result?.value };
+      if ((shared[key] ?? null) !== read) {
+        if (read === null) delete shared[key];
+        else shared[key] = read;
+        store.put({ id: FINGERPRINTS_KEY, value: shared }, FINGERPRINTS_KEY);
+      }
+      done();
+    };
+  }
+
+  /** Drops a deleted record's shared fingerprint, so other tabs see it changed. */
+  private forgetFingerprint(store: IDBObjectStore, key: string): void {
+    const request = store.get(FINGERPRINTS_KEY);
+    request.onsuccess = () => {
+      const shared: Fingerprints = { ...request.result?.value };
+      delete shared[key];
+      store.put({ id: FINGERPRINTS_KEY, value: shared }, FINGERPRINTS_KEY);
+    };
   }
 
   /**
@@ -174,25 +232,31 @@ export class IndexedDBAdapter {
 
         // Compare and write inside one transaction, so no other tab can write
         // in between.
-        const read = store.get(key);
+        const next = fingerprint(value);
+        const read = store.get(FINGERPRINTS_KEY);
         read.onerror = () => reject(read.error);
         read.onsuccess = () => {
-          const known = this.knownValues.get(key);
           // Nothing changed in this tab, so there is nothing to save, and a
           // newer value from another tab must not be overwritten.
-          if (known === value) {
+          if (this.knownFingerprints.get(key) === next) {
             resolve();
             return;
           }
-          const stored = serializeRecord(read.result);
-          if (known !== undefined && stored !== known && stored !== value) {
+          const shared: Fingerprints = { ...read.result?.value };
+          const changed = Array.from(this.knownFingerprints).find(([name, known]) => {
+            const current = shared[name] ?? null;
+            return current !== known && !(name === key && current === next);
+          });
+          if (changed) {
             reject(
-              new DOMException(`${key} was changed in another tab`, 'StaleWriteError')
+              new DOMException(`${changed[0]} was changed in another tab`, 'StaleWriteError')
             );
             return;
           }
-          this.knownValues.set(key, value);
+          this.knownFingerprints.set(key, next);
+          shared[key] = next;
           try {
+            store.put({ id: FINGERPRINTS_KEY, value: shared }, FINGERPRINTS_KEY);
             put();
           } catch (error) {
             reject(error);
@@ -218,7 +282,7 @@ export class IndexedDBAdapter {
       return;
     }
 
-    this.knownValues.delete(key);
+    this.knownFingerprints.delete(key);
 
     return new Promise((resolve) => {
       try {
@@ -231,6 +295,10 @@ export class IndexedDBAdapter {
         };
 
         request.onerror = () => resolve(); // Don't fail on deletion errors
+
+        if (this.refuseStaleWrites) {
+          this.forgetFingerprint(store, key);
+        }
         
         transaction.oncomplete = () => {
           // Already resolved in onsuccess

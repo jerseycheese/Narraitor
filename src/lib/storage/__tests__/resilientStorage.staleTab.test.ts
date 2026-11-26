@@ -91,6 +91,28 @@ describe('ResilientStorageMiddleware with a second tab open', () => {
     expect(onStatusChange).toHaveBeenCalledWith(StorageStatus.STALE, expect.anything());
   });
 
+  it('refuses a write to a record the other tab left alone', async () => {
+    const { first, second, onStatusChange } = await openTwoTabs();
+    await second.getItem('characters');
+
+    await first.setItem('worlds', worlds('From Tab One'));
+    await second.setItem('characters', worlds('Orphan'));
+
+    expect(records.has('characters')).toBe(false);
+    expect(onStatusChange).toHaveBeenCalledWith(StorageStatus.STALE, expect.anything());
+  });
+
+  it('refuses to bring back a record the other tab deleted', async () => {
+    records.set('worlds', { id: 'worlds', value: JSON.parse(worlds('Old')) });
+    const { first, second, onStatusChange } = await openTwoTabs();
+
+    await first.removeItem('worlds');
+    await second.setItem('worlds', worlds('Old', 'Stale'));
+
+    expect(records.has('worlds')).toBe(false);
+    expect(onStatusChange).toHaveBeenCalledWith(StorageStatus.STALE, expect.anything());
+  });
+
   it('leaves the newer data alone when the stale tab re-saves what it already had', async () => {
     records.set('worlds', { id: 'worlds', value: JSON.parse(worlds('Old')) });
     const { first, second, onStatusChange } = await openTwoTabs();
@@ -102,15 +124,20 @@ describe('ResilientStorageMiddleware with a second tab open', () => {
     expect(onStatusChange).not.toHaveBeenCalled();
   });
 
-  it('keeps saving back-to-back writes from the only tab that is writing', async () => {
-    const { first } = await openTwoTabs();
+  it('keeps saving back-to-back writes across records from the only tab that is writing', async () => {
+    const onStatusChange = jest.fn();
+    const first = new ResilientStorageMiddleware({ onStatusChange });
+    await Promise.all([first.getItem('worlds'), first.getItem('characters')]);
 
     await Promise.all([
       first.setItem('worlds', worlds('A')),
+      first.setItem('characters', worlds('Hero')),
       first.setItem('worlds', worlds('A', 'B')),
     ]);
     await first.setItem('worlds', worlds('B'));
 
     expect(await first.getItem('worlds')).toBe(worlds('B'));
+    expect(await first.getItem('characters')).toBe(worlds('Hero'));
+    expect(onStatusChange).not.toHaveBeenCalled();
   });
 });
