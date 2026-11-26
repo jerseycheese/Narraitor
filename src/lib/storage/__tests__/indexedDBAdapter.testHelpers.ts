@@ -21,6 +21,8 @@ export interface MockTransaction {
   objectStore: jest.Mock;
   oncomplete: (() => void) | null;
   onerror: ((ev: Event) => void) | null;
+  onabort: (() => void) | null;
+  error: DOMException | null;
 }
 
 export interface MockDB {
@@ -53,10 +55,12 @@ export const createMockStore = (): MockStore => ({
 /**
  * Creates a mock transaction
  */
-const createMockTransaction = (store: MockStore): MockTransaction => ({
+export const createMockTransaction = (store: MockStore): MockTransaction => ({
   objectStore: jest.fn(() => store),
   oncomplete: null,
-  onerror: null
+  onerror: null,
+  onabort: null,
+  error: null
 });
 
 /**
@@ -102,6 +106,18 @@ export const triggerSuccess = <T>(
   }, 0);
 };
 
+/**
+ * Triggers a successful write: the request succeeds, then the transaction commits
+ */
+export const triggerCommit = (
+  request: MockRequest,
+  transaction: MockTransaction
+): void => {
+  setTimeout(() => {
+    request.onsuccess?.({} as Event);
+    transaction.oncomplete?.();
+  }, 0);
+};
 
 /**
  * Sets up a mock database with a transaction that returns the given store

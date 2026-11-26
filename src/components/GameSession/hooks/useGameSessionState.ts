@@ -234,8 +234,13 @@ export const useGameSessionState = ({
     }
   };
   
+  // One start per ?fresh=true request: the init effect re-runs on status
+  // changes while the flag is still on the URL.
+  const isFreshRequestHandledRef = useRef(false);
+
   // Initialize session with correct character when component mounts
   useEffect(() => {
+    if (!disableAutoResume) isFreshRequestHandledRef.current = false;
     if (!isClient || !isNarrativeHydrated) return;
 
     // Get current store state to check for existing session
@@ -246,17 +251,34 @@ export const useGameSessionState = ({
       currentStoreState.worldId === worldId &&
       currentStoreState.characterId === sessionCharacterId;
 
-    // An ended session refuses new segments, so landing on one leaves the play
-    // screen on its loading skeleton forever. That state also persists, so this
-    // recovers players who are already stuck there.
+    // A fresh request is one-shot: once the new session is live, drop
+    // ?fresh=true so a reload resumes it instead of starting yet another.
+    // Reads the live URL so a player who already navigated away stays put.
+    const onStart = disableAutoResume && router
+      ? () => {
+          onSessionStart?.();
+          const url = new URL(window.location.href);
+          if (url.searchParams.get('fresh') !== 'true') return;
+          url.searchParams.delete('fresh');
+          router.replace(`${url.pathname}${url.search}`);
+        }
+      : onSessionStart;
+
+    // Replace the live session in two cases:
+    // - Start New adds ?fresh=true without leaving the play screen.
+    // - An ended session refuses new segments, so landing on one leaves the play
+    //   screen on its loading skeleton forever. That state also persists, so this
+    //   recovers players who are already stuck there.
     if (
       isActiveMatch &&
       worldExists &&
       sessionCharacterId &&
       currentStoreState.id &&
-      isSessionEnded(currentStoreState.id)
+      ((disableAutoResume && !isFreshRequestHandledRef.current) ||
+        isSessionEnded(currentStoreState.id))
     ) {
-      actualSessionState.initializeSession?.(worldId, sessionCharacterId, onSessionStart, true);
+      isFreshRequestHandledRef.current = disableAutoResume;
+      actualSessionState.initializeSession?.(worldId, sessionCharacterId, onStart, true);
       return;
     }
 
@@ -290,18 +312,7 @@ export const useGameSessionState = ({
         // Initialize a new session if:
         // 1. No saved session exists, OR
         // 2. disableAutoResume is true (fresh session requested)
-        // A fresh request is one-shot: once the new session is live, drop
-        // ?fresh=true so a reload resumes it instead of starting yet another.
-        // Reads the live URL so a player who already navigated away stays put.
-        const onStart = disableAutoResume && router
-          ? () => {
-              onSessionStart?.();
-              const url = new URL(window.location.href);
-              if (url.searchParams.get('fresh') !== 'true') return;
-              url.searchParams.delete('fresh');
-              router.replace(`${url.pathname}${url.search}`);
-            }
-          : onSessionStart;
+        isFreshRequestHandledRef.current = disableAutoResume;
         actualSessionState.initializeSession(
           worldId,
           sessionCharacterId,

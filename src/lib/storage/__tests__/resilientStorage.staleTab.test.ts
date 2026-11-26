@@ -9,18 +9,38 @@ const records = new Map<string, unknown>();
 
 // Readwrite transactions on one store never overlap in a browser: a transaction's
 // requests all finish, including ones its callbacks add, before the next starts.
-const transactions: Array<Array<() => void>> = [];
+interface Transaction {
+  tasks: Array<() => void>;
+  commit: () => void;
+}
+const transactions: Transaction[] = [];
+// Makes the next transaction that writes abort at commit, like a full disk.
+let abortNextWrite = false;
 
 function drain() {
-  const task = transactions[0].shift();
+  const task = transactions[0].tasks.shift();
   if (task) task();
-  else transactions.shift();
+  else transactions.shift()?.commit();
   if (transactions.length > 0) setTimeout(drain, 0);
 }
 
 function transaction() {
   const tasks: Array<() => void> = [];
-  if (transactions.push(tasks) === 1) setTimeout(drain, 0);
+  let before: Map<string, unknown> | undefined;
+  const handlers: {
+    oncomplete?: () => void;
+    onabort?: () => void;
+    error?: DOMException;
+  } = {};
+  const commit = () => {
+    if (!before || !abortNextWrite) return handlers.oncomplete?.();
+    abortNextWrite = false;
+    records.clear();
+    before.forEach((value, key) => records.set(key, value));
+    handlers.error = new DOMException('Disk full', 'QuotaExceededError');
+    handlers.onabort?.();
+  };
+  if (transactions.push({ tasks, commit }) === 1) setTimeout(drain, 0);
 
   const request = (run: () => unknown) => {
     const req: { result?: unknown; onsuccess?: () => void } = {};
@@ -34,10 +54,13 @@ function transaction() {
   const store = {
     get: (key: string) => request(() => structuredCloneJson(records.get(key))),
     put: (value: unknown, key: string) =>
-      request(() => records.set(key, structuredCloneJson(value))),
+      request(() => {
+        before ??= new Map(records);
+        records.set(key, structuredCloneJson(value));
+      }),
     delete: (key: string) => request(() => records.delete(key)),
   };
-  return { objectStore: () => store };
+  return Object.assign(handlers, { objectStore: () => store });
 }
 
 function structuredCloneJson<T>(value: T): T {
@@ -62,6 +85,7 @@ describe('ResilientStorageMiddleware with a second tab open', () => {
 
   beforeEach(() => {
     records.clear();
+    abortNextWrite = false;
     global.indexedDB = fakeIndexedDB as unknown as IDBFactory;
   });
 
@@ -139,5 +163,21 @@ describe('ResilientStorageMiddleware with a second tab open', () => {
     expect(await first.getItem('worlds')).toBe(worlds('B'));
     expect(await first.getItem('characters')).toBe(worlds('Hero'));
     expect(onStatusChange).not.toHaveBeenCalled();
+  });
+
+  it('does not blame another tab for writes queued behind one that aborted', async () => {
+    const onStatusChange = jest.fn();
+    const first = new ResilientStorageMiddleware({ onStatusChange });
+    await Promise.all([first.getItem('worlds'), first.getItem('characters')]);
+
+    abortNextWrite = true;
+    await Promise.all([
+      first.setItem('worlds', worlds('A')),
+      first.setItem('characters', worlds('Hero')),
+    ]);
+
+    expect(records.has('worlds')).toBe(false);
+    expect(onStatusChange).toHaveBeenCalledTimes(1);
+    expect(onStatusChange).toHaveBeenCalledWith(StorageStatus.UNAVAILABLE, expect.anything());
   });
 });

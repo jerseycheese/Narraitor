@@ -4,6 +4,7 @@ import {
   createMockIDB,
   createMockStore,
   createMockRequest,
+  createMockTransaction,
   setupSuccessfulOpen,
   setupMockTransaction,
   triggerSuccess
@@ -43,7 +44,8 @@ describe('IndexedDBAdapter - Error Scenarios', () => {
       return request;
     });
 
-    setupMockTransaction(mockDB, mockStore);
+    // Each write gets its own transaction, as in a real database
+    mockDB.transaction.mockImplementation(() => createMockTransaction(mockStore));
 
     // Initiate concurrent operations
     const promise1 = adapter.setItem('key1', JSON.stringify({ data: 1 }));
@@ -54,11 +56,28 @@ describe('IndexedDBAdapter - Error Scenarios', () => {
       mockRequests.forEach(req => {
         if (req.onsuccess) req.onsuccess({} as Event);
       });
+      mockDB.transaction.mock.results.forEach(({ value }) => value.oncomplete?.());
     }, 0);
 
     await Promise.all([promise1, promise2]);
 
     expect(mockStore.put).toHaveBeenCalledTimes(2);
+  });
+
+  test('should reject a write that aborts at commit after the request succeeded', async () => {
+    const mockRequest = createMockRequest();
+    const mockStore = createMockStore();
+    mockStore.put.mockReturnValue(mockRequest);
+    const mockTransaction = setupMockTransaction(mockDB, mockStore);
+
+    const setPromise = adapter.setItem('key1', JSON.stringify({ data: 1 }));
+    setTimeout(() => {
+      mockRequest.onsuccess?.({} as Event);
+      mockTransaction.error = new DOMException('Disk full', 'QuotaExceededError');
+      mockTransaction.onabort?.();
+    }, 0);
+
+    await expect(setPromise).rejects.toMatchObject({ name: 'QuotaExceededError' });
   });
 
   test('should recover from corrupted data', async () => {

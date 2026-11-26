@@ -5,7 +5,7 @@ import {
   createMockRequest,
   createMockStore,
   setupMockTransaction,
-  triggerSuccess
+  triggerCommit
 } from './indexedDBAdapter.testHelpers';
 
 describe('IndexedDBAdapter - Initialization', () => {
@@ -90,10 +90,10 @@ describe('IndexedDBAdapter - Initialization', () => {
     // unusable — prove the adapter can actually read/write through it.
     const mockStore = createMockStore();
     mockStore.put.mockImplementation(() => createMockRequest());
-    setupMockTransaction(mockDB, mockStore);
+    const writeTransaction = setupMockTransaction(mockDB, mockStore);
 
     const setPromise = adapter.setItem('smoke-key', JSON.stringify({ ok: true }));
-    triggerSuccess(mockStore.put.mock.results[0].value);
+    triggerCommit(mockStore.put.mock.results[0].value, writeTransaction);
     await expect(setPromise).resolves.toBeUndefined();
   });
 

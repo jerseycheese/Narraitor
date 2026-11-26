@@ -195,7 +195,16 @@ export class IndexedDBAdapter {
       try {
         const transaction = this.db!.transaction([this.storeName], 'readwrite');
         const store = transaction.objectStore(this.storeName);
-        
+        let forgetUncommitted = () => {};
+
+        // A successful request can still abort at commit (e.g. a full disk),
+        // so only a completed transaction counts as written.
+        transaction.oncomplete = () => resolve();
+        transaction.onabort = () => {
+          forgetUncommitted();
+          reject(transaction.error ?? new DOMException('Transaction aborted', 'AbortError'));
+        };
+
         // Parse the value to store as object
         let dataToStore: unknown;
         try {
@@ -209,11 +218,6 @@ export class IndexedDBAdapter {
             id: key,
             value: dataToStore
           }, key);
-
-          request.onsuccess = () => {
-            // Don't wait for oncomplete in the request handler
-            resolve();
-          };
 
           request.onerror = (event) => {
             const error = (event.target as IDBRequest).error;
@@ -253,7 +257,14 @@ export class IndexedDBAdapter {
             );
             return;
           }
+          const previous = this.knownFingerprints.get(key);
           this.knownFingerprints.set(key, next);
+          // An aborted write must not make the writes queued behind it look
+          // like another tab changed this record.
+          forgetUncommitted = () => {
+            if (previous === undefined) this.knownFingerprints.delete(key);
+            else this.knownFingerprints.set(key, previous);
+          };
           shared[key] = next;
           try {
             store.put({ id: FINGERPRINTS_KEY, value: shared }, FINGERPRINTS_KEY);
