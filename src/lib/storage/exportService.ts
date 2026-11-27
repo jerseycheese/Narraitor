@@ -13,7 +13,7 @@ import { useLoreStore } from '../../state/loreStore';
 import { useGoalStore } from '../../state/goalStore';
 import { useWorldThreadStore } from '../../state/worldThreadStore';
 import { useNPCStore } from '../../state/npcStore';
-import { validateWorld } from '@/lib/utils/typeGuards';
+import { isRecord, repairWorldSettings, validateWorld } from '@/lib/utils/typeGuards';
 import { getTimestamp } from '../utils';
 
 const CURRENT_VERSION = '1.0.0';
@@ -104,8 +104,27 @@ export async function downloadGameState(): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
+/**
+ * A backup can carry a world saved with a cleared or zero limit. Repair it so
+ * that one field doesn't fail validation and refuse the whole file.
+ */
+function repairImportedWorldSettings(gameState: unknown): void {
+  if (!isRecord(gameState) || !isRecord(gameState.worldState)) return;
+
+  const { worlds, entities } = gameState.worldState;
+  for (const records of [worlds, entities]) {
+    if (!isRecord(records)) continue;
+    for (const world of Object.values(records)) {
+      if (isRecord(world) && isRecord(world.settings)) {
+        world.settings = repairWorldSettings(world.settings);
+      }
+    }
+  }
+}
+
 async function importGameState(gameState: unknown): Promise<ImportResult> {
   try {
+    repairImportedWorldSettings(gameState);
     const validationResult = validateGameState(gameState);
 
     if (!validationResult.valid) {
