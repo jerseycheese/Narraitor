@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
+import { repairWorldSettings } from '@/lib/utils/typeGuards';
 import Logger from '@/lib/utils/logger';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { Button } from '@/components/ui/button';
@@ -73,8 +74,11 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
 
     setSaving(true);
     try {
-      const { updateWorld } = useWorldStore.getState();
-      updateWorld(worldId, world);
+      const { updateWorld, worlds } = useWorldStore.getState();
+      updateWorld(worldId, {
+        ...world,
+        settings: repairWorldSettings(world.settings, worlds[worldId]?.settings),
+      });
 
       router.push('/worlds'); // Navigate back to worlds list
     } catch {

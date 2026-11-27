@@ -1,6 +1,14 @@
 // src/lib/utils/typeGuards/worldGuards.ts
 
 import type { ValidationResult } from '@/lib/utils';
+import type { WorldSettings } from '@/types/world.types';
+
+const DEFAULT_WORLD_LIMITS = {
+  maxAttributes: 6,
+  maxSkills: 12,
+  attributePointPool: 20,
+  skillPointPool: 20,
+};
 
 /**
  * World validation with detailed error messages.
@@ -328,4 +336,23 @@ function validateGeneratedImage(obj: unknown): ValidationResult {
   }
 
   return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Replaces any limit that isn't a number above 0 (a cleared field is NaN, or
+ * null once saved) with the previous value, else the default.
+ */
+export function repairWorldSettings(
+  settings: object,
+  previous?: Partial<WorldSettings>
+): WorldSettings {
+  const repaired = { ...settings } as WorldSettings;
+  const keys = Object.keys(DEFAULT_WORLD_LIMITS) as (keyof typeof DEFAULT_WORLD_LIMITS)[];
+  for (const key of keys) {
+    repaired[key] =
+      [repaired[key], previous?.[key]].find(
+        (value): value is number => typeof value === 'number' && value > 0
+      ) ?? DEFAULT_WORLD_LIMITS[key];
+  }
+  return repaired;
 }

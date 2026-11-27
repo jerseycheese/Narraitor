@@ -83,6 +83,12 @@ jest.mock('@/components/forms/WorldSettingsForm', () => {
       <div>
         Settings Form
         <button onClick={() => onChange(settings)}>Update Settings</button>
+        <button
+          type="button"
+          onClick={() => onChange({ ...settings, skillPointPool: NaN })}
+        >
+          Clear Skill Pool
+        </button>
       </div>
     );
   };
@@ -230,6 +236,17 @@ describe('WorldEditor - MVP Level Tests', () => {
           name: 'Updated Name',
         })
       );
+    });
+  });
+
+  test('keeps the saved value when a world setting is cleared', async () => {
+    render(<WorldEditor worldId="world-123" />);
+
+    fireEvent.click(await screen.findByText('Clear Skill Pool'));
+    fireEvent.click(screen.getByText('Save Changes'));
+
+    await waitFor(() => {
+      expect(mockUpdateWorld).toHaveBeenLastCalledWith('world-123', mockWorld);
     });
   });
 });

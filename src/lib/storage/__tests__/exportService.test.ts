@@ -10,6 +10,7 @@ import { useInventoryStore } from '../../../state/inventoryStore';
 import { useLoreStore } from '../../../state/loreStore';
 import { useGoalStore } from '../../../state/goalStore';
 import { useNPCStore } from '../../../state/npcStore';
+import { useWorldStore } from '../../../state/worldStore';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -82,5 +83,34 @@ describe('exportService full-state coverage', () => {
     // Transient fields must remain usable Set/Map, not plain objects from JSON.
     expect(useInventoryStore.getState().generatingImageFor).toBeInstanceOf(Set);
     expect(useInventoryStore.getState().imageGenerationErrors).toBeInstanceOf(Map);
+  });
+
+  it('restores a backup whose world was saved with a cleared or zero setting', async () => {
+    const world = {
+      id: 'w1',
+      name: 'W',
+      description: 'd',
+      genre: 'fantasy',
+      attributes: [],
+      skills: [],
+      settings: { maxAttributes: 5, maxSkills: 5, attributePointPool: 0, skillPointPool: null },
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    };
+    const payload = {
+      version: '1.0.0',
+      exportedAt: '2026-01-01T00:00:00.000Z',
+      worldState: { worlds: { w1: world }, entities: { w1: world } },
+      characterState: {},
+      sessionState: {},
+    };
+    const fakeFile = { text: async () => JSON.stringify(payload) } as unknown as File;
+
+    const res = await importFromFile(fakeFile);
+
+    expect(res.success).toBe(true);
+    const repaired = { maxAttributes: 5, maxSkills: 5, attributePointPool: 20, skillPointPool: 20 };
+    expect(useWorldStore.getState().worlds.w1.settings).toEqual(repaired);
+    expect(useWorldStore.getState().entities.w1.settings).toEqual(repaired);
   });
 });
