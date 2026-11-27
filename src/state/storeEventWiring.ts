@@ -28,7 +28,9 @@ import {
   type SessionStartedEvent,
   type SessionEndedEvent,
   type CharacterDeletedEvent,
+  type WorldDeletedEvent,
 } from '@/lib/state/storePubSub';
+import { playerDecisionTracker } from '@/lib/ai/playerDecisionTracker';
 import { handleSessionStarted, handleSessionEnded } from '@/lib/session/sessionJournalEntries';
 import { cleanupCharacterSessions } from '@/lib/utils/sessionCleanup';
 
@@ -54,4 +56,12 @@ storeEvents.subscribeOnce<CharacterDeletedEvent>(
   StoreEventTypes.CHARACTER_DELETED,
   ({ characterId }) => cleanupCharacterSessions(characterId),
   'session-cleanup:character-deleted'
+);
+
+// Catches choices from stories that no saved session or journal entry still
+// points to, so the per-character cleanup can't find them.
+storeEvents.subscribeOnce<WorldDeletedEvent>(
+  StoreEventTypes.WORLD_DELETED,
+  ({ worldId }) => playerDecisionTracker.clearWorldDecisions(worldId),
+  'decision-tracker:world-deleted'
 );

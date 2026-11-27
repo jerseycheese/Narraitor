@@ -11,6 +11,7 @@ import '@/state/storeEventWiring';
 import { useNPCStore } from '@/state/npcStore';
 import { useGoalStore } from '@/state/goalStore';
 import { useLoreStore } from '@/state/loreStore';
+import { playerDecisionTracker } from '@/lib/ai/playerDecisionTracker';
 import { storeEvents, StoreEventTypes } from '@/lib/state/storePubSub';
 import type { NPC } from '@/types/npc.types';
 import type { NarrativeGoal } from '@/types/goal.types';
@@ -85,6 +86,17 @@ describe('WORLD_DELETED cascade', () => {
     expect(useGoalStore.getState().goals['goal-2']).toBeDefined();
     expect(useGoalStore.getState().goals['goal-no-world']).toBeDefined();
     expect(useLoreStore.getState().facts['fact-2']).toBeDefined();
+  });
+});
+
+describe('WORLD_DELETED and the decision tracker', () => {
+  it("removes only the deleted world's saved choices from the browser", async () => {
+    playerDecisionTracker.recordDecision('Prompt', 'Gone choice', 'neutral', 'session-1', 'world-1');
+    playerDecisionTracker.recordDecision('Prompt', 'Kept choice', 'neutral', 'session-2', 'world-2');
+
+    await storeEvents.emit(StoreEventTypes.WORLD_DELETED, { worldId: 'world-1' });
+
+    expect(playerDecisionTracker.getAllDecisions().map((d) => d.choiceText)).toEqual(['Kept choice']);
   });
 });
 
