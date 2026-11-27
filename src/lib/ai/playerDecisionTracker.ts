@@ -271,6 +271,11 @@ export class PlayerDecisionTracker {
     this.saveDecisions();
   }
 
+  clearWorldDecisions(worldId: EntityID): void {
+    this.decisions = this.decisions.filter(decision => decision.worldId !== worldId);
+    this.saveDecisions();
+  }
+
   /**
    * Gets most relevant decisions based on current narrative context
    * Uses simple recency-based filtering

@@ -13,6 +13,7 @@ import { useGoalStore } from '@/state/goalStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useLoreStore } from '@/state/loreStore';
 import { useWorldStore } from '@/state/worldStore';
+import { playerDecisionTracker } from '@/lib/ai/playerDecisionTracker';
 import { deleteCharacterWithCleanup } from '@/services/characterDeletionService';
 import { exportGameState } from '@/lib/storage/exportService';
 import { createTestCharacterData } from '@/state/__tests__/characterStore.testHelpers';
@@ -130,6 +131,17 @@ describe('character deletion cleanup', () => {
     });
     expect(exported).toContain('Shared lore');
   });
+  it("removes the deleted character's saved choices from the browser", async () => {
+    const goneId = useCharacterStore.getState().createCharacter(createTestCharacterData({ name: 'Gone', worldId: 'world-1' }));
+    saveSession('session-gone', 'world-1', goneId);
+    playerDecisionTracker.recordDecision('Prompt', 'Gone choice', 'neutral', 'session-gone', 'world-1');
+    playerDecisionTracker.recordDecision('Prompt', 'Kept choice', 'neutral', 'session-kept', 'world-1');
+
+    await deleteCharacterWithCleanup(goneId);
+
+    expect(playerDecisionTracker.getAllDecisions().map((d) => d.choiceText)).toEqual(['Kept choice']);
+  });
+
   it("drops the deleted character's world thread", async () => {
     const goneId = useCharacterStore.getState().createCharacter(createTestCharacterData({ name: 'Gone', worldId: 'world-1' }));
     useWorldStore.setState({ worlds: { 'world-1': { id: 'world-1', name: 'World' } } } as never);

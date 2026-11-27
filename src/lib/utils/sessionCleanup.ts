@@ -13,6 +13,7 @@ import { useGoalStore } from '@/state/goalStore';
 import { useWorldThreadStore } from '@/state/worldThreadStore';
 import { useLoreStore } from '@/state/loreStore';
 import { useWorldStore } from '@/state/worldStore';
+import { playerDecisionTracker } from '@/lib/ai/playerDecisionTracker';
 
 import Logger from '@/lib/utils/logger';
 const logger = new Logger('SessionCleanup');
@@ -67,6 +68,13 @@ export async function cleanupSessionData(sessionId: string): Promise<void> {
   try {
     const narrativeStore = useNarrativeStore.getState();
     narrativeStore.clearSessionDecisions(sessionId);
+  } catch (error) {
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
+
+  // The decision tracker keeps its own copy of each choice in localStorage
+  try {
+    playerDecisionTracker.clearSessionDecisions(sessionId);
   } catch (error) {
     errors.push(error instanceof Error ? error : new Error(String(error)));
   }
