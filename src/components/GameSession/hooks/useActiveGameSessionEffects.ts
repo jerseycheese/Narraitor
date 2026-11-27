@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import type { NarrativeStore } from '@/state/narrativeStore.types';
+import { isAwaitingChoices } from '@/lib/narrative/isAwaitingChoices';
 import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('ActiveGameSessionEffects');
@@ -60,15 +62,15 @@ export const useActiveGameSessionEffects = ({
     };
   }, [sessionId, controllerKey, setIsGenerating, setInitialized]);
 
-  // Track choice loading from the store: a decision ends it, and a session with
-  // narrative but no decision is waiting on choices. Gated on this session's
+  // Track choice loading from the store: a passage with no choices of its own
+  // is waiting on them, and a new decision ends the wait. Gated on this session's
   // decision and segment lists, since segments stream in token by token.
   useEffect(() => {
     let initialized = false;
     let prevDecisionIds: unknown;
     let prevSegmentIds: unknown;
 
-    const unsubscribe = useNarrativeStore.subscribe((state) => {
+    const syncChoiceLoading = (state: NarrativeStore) => {
       const decisionIds = state.sessionDecisions[sessionId];
       const segmentIds = state.sessionSegments[sessionId];
 
@@ -83,12 +85,22 @@ export const useActiveGameSessionEffects = ({
       prevDecisionIds = decisionIds;
       prevSegmentIds = segmentIds;
 
-      if ((decisionIds?.length ?? 0) > 0) {
-        setIsGeneratingChoices(false);
-      } else if ((segmentIds?.length ?? 0) > 0) {
+      const latestSegmentId = segmentIds?.[segmentIds.length - 1];
+      const latestDecisionId = decisionIds?.[decisionIds.length - 1];
+
+      if (
+        latestSegmentId &&
+        isAwaitingChoices(state.segments[latestSegmentId], latestDecisionId)
+      ) {
         setIsGeneratingChoices(true);
+      } else if (latestDecisionId) {
+        setIsGeneratingChoices(false);
       }
-    });
+    };
+
+    // A resumed session can mount with nothing left to change in the store.
+    syncChoiceLoading(useNarrativeStore.getState());
+    const unsubscribe = useNarrativeStore.subscribe(syncChoiceLoading);
 
     return () => {
       unsubscribe();

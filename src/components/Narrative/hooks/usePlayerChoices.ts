@@ -8,6 +8,7 @@ import {
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { truncate } from '@/lib/utils';
 import { getNarrativeError } from '@/lib/narrative/narrativeErrors';
+import { isAwaitingChoices } from '@/lib/narrative/isAwaitingChoices';
 import { logger } from '@/lib/utils/logger';
 import { AI_GENERATION_TIMEOUT_MS } from '@/lib/constants/timeouts';
 import type { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
@@ -236,12 +237,15 @@ export function usePlayerChoices({
       // Even if we get an unhandled error, try to provide fallback choices
 
       try {
-        // Only try to create fallback choices if we haven't already added any for this session
-        const existingDecisions = useNarrativeStore
-          .getState()
-          .getSessionDecisions(targetSessionId);
+        // Only create fallback choices if the latest passage still has none of its own
+        const store = useNarrativeStore.getState();
+        const existingDecisions = store.getSessionDecisions(targetSessionId);
+        const latestSegment = store.getSessionSegments(targetSessionId).at(-1);
 
-        if (existingDecisions.length === 0 && mountedRef.current) {
+        if (
+          isAwaitingChoices(latestSegment, existingDecisions.at(-1)?.id) &&
+          mountedRef.current
+        ) {
           const fallbackDecision = buildFallbackDecision(
             'Error occurred during choice generation.'
           );

@@ -443,6 +443,7 @@ describe('ActiveGameSession Manuscript Layout', () => {
     (useNarrativeStore as unknown as { subscribe: jest.Mock }).subscribe = jest.fn(
       (cb: (state: unknown) => void) => {
         cb({
+          segments: { 'seg-1': { id: 'seg-1', content: 'Story starts...' } },
           sessionSegments: { [mockSessionId]: ['seg-1'] },
           sessionDecisions: {},
           decisions: {},
