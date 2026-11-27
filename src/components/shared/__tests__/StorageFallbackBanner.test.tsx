@@ -45,6 +45,15 @@ describe('StorageFallbackBanner', () => {
     ).toBeInTheDocument();
   });
 
+  it('tells a stale tab to reload', () => {
+    _setStorageStatusForTesting(StorageStatus.STALE, null);
+
+    render(<StorageFallbackBanner />);
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/another tab saved newer changes/i);
+    expect(screen.getByRole('button', { name: 'Reload' })).toBeInTheDocument();
+  });
+
   it('reacts dynamically to storage status change events', () => {
     const { container } = render(<StorageFallbackBanner />);
     expect(container.firstChild).toBeNull();

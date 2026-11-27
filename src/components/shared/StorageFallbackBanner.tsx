@@ -2,6 +2,7 @@
 
 import React, { useSyncExternalStore } from 'react';
 import { ErrorBlock } from '@/components/shared/ErrorBlock';
+import { Button } from '@/components/ui/button';
 import {
   getStorageFallbackNotice,
   getStorageStatus,
@@ -14,9 +15,9 @@ interface StorageFallbackBannerProps {
 }
 
 /**
- * Surfaces a persistent warning whenever browser storage (IndexedDB)
- * fails and storage falls back to memory. Memory storage won't survive
- * a page reload, so players need to know their progress won't be saved.
+ * Surfaces a persistent warning whenever this tab stops saving: browser
+ * storage (IndexedDB) failed and fell back to memory, or another tab saved
+ * newer data. Either way players need to know their progress won't be kept.
  */
 export function StorageFallbackBanner({ className }: StorageFallbackBannerProps) {
   const notice = useSyncExternalStore(
@@ -34,15 +35,18 @@ export function StorageFallbackBanner({ className }: StorageFallbackBannerProps)
     return null;
   }
 
-  if (status !== StorageStatus.UNAVAILABLE && !notice) {
+  if (!status && !notice) {
     return null;
   }
+
+  const isStale = status === StorageStatus.STALE;
 
   // ResilientStorageMiddleware already logs the underlying failure (blocked
   // IndexedDB, quota, read/write error), so the banner stays on what the
   // player can actually do about it.
-  const message =
-    "Narraitor can't save to this browser right now. Keep this tab open, and export your data from Settings so you don't lose your progress.";
+  const message = isStale
+    ? "Another tab saved newer changes, so this tab has stopped saving. Reload it to carry on. Anything that didn't save here will be lost."
+    : "Narraitor can't save to this browser right now. Keep this tab open, and export your data from Settings so you don't lose your progress.";
 
   return (
     <aside
@@ -52,6 +56,16 @@ export function StorageFallbackBanner({ className }: StorageFallbackBannerProps)
       data-testid="storage-fallback-banner"
     >
       <ErrorBlock errors={[message]} />
+      {isStale && (
+        <Button
+          className="storage-fallback-reload"
+          variant="outline"
+          size="sm"
+          onClick={() => window.location.reload()}
+        >
+          Reload
+        </Button>
+      )}
     </aside>
   );
 }

@@ -27,7 +27,7 @@ export const useAutoSave = () => {
   // Keep session store autoSave status aligned with resilient storage health
   useEffect(() => {
     const handleStorageUpdate = (status: StorageStatus | null, notice: { message: string } | null) => {
-      if (status === StorageStatus.UNAVAILABLE) {
+      if (status) {
         useSessionStore.getState().updateAutoSaveStatus(
           'error',
           notice?.message || 'Storage unavailable'
@@ -38,7 +38,7 @@ export const useAutoSave = () => {
     };
 
     const initialStatus = getStorageStatus();
-    if (initialStatus === StorageStatus.UNAVAILABLE) {
+    if (initialStatus) {
       const notice = getStorageFallbackNotice();
       handleStorageUpdate(initialStatus, notice);
     } else {
@@ -56,7 +56,7 @@ export const useAutoSave = () => {
   const triggerSave = useCallback(
     async (reason: SaveTriggerReason = 'manual') => {
       const currentStorageStatus = getStorageStatus();
-      if (currentStorageStatus === StorageStatus.UNAVAILABLE) {
+      if (currentStorageStatus) {
         const message = getStorageFallbackNotice()?.message || 'Storage unavailable';
         useSessionStore.getState().updateAutoSaveStatus('error', message);
         toast.error('Save failed', message);
@@ -77,7 +77,7 @@ export const useAutoSave = () => {
     return triggerSave('manual');
   }, [triggerSave]);
 
-  const isStorageUnavailable = getStorageStatus() === StorageStatus.UNAVAILABLE;
+  const isStorageUnavailable = getStorageStatus() !== null;
   const effectiveStatus = isStorageUnavailable ? 'error' : autoSaveState.status;
   const effectiveErrorMessage = isStorageUnavailable
     ? (getStorageFallbackNotice()?.message || autoSaveState.errorMessage || 'Storage unavailable')
