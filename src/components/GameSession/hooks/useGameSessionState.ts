@@ -245,7 +245,7 @@ export const useGameSessionState = ({
 
     // Get current store state to check for existing session
     const currentStoreState = useSessionStore.getState();
-    const { isSessionEnded } = useNarrativeStore.getState();
+    const { isSessionEnded, currentEnding } = useNarrativeStore.getState();
     const isActiveMatch =
       currentStoreState.status === 'active' &&
       currentStoreState.worldId === worldId &&
@@ -266,16 +266,21 @@ export const useGameSessionState = ({
 
     // Replace the live session in two cases:
     // - Start New adds ?fresh=true without leaving the play screen.
-    // - An ended session refuses new segments, so landing on one leaves the play
-    //   screen on its loading skeleton forever. That state also persists, so this
-    //   recovers players who are already stuck there.
+    // - An ended session refuses new segments, so landing on one with no ending
+    //   to show leaves the play screen on its loading skeleton forever. That state
+    //   persists, so this recovers players who are already stuck there. A saved
+    //   ending stays on screen: it's the only copy.
+    const isStuckOnEndedSession =
+      !!currentStoreState.id &&
+      isSessionEnded(currentStoreState.id) &&
+      currentEnding?.sessionId !== currentStoreState.id;
     if (
       isActiveMatch &&
       worldExists &&
       sessionCharacterId &&
       currentStoreState.id &&
       ((disableAutoResume && !isFreshRequestHandledRef.current) ||
-        isSessionEnded(currentStoreState.id))
+        isStuckOnEndedSession)
     ) {
       isFreshRequestHandledRef.current = disableAutoResume;
       actualSessionState.initializeSession?.(worldId, sessionCharacterId, onStart, true);
