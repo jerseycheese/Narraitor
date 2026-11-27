@@ -254,6 +254,29 @@ describe('ended sessions without ?fresh=true', () => {
     expect(useSessionStore.getState().status).toBe('active');
   });
 
+  it('keeps the ending on screen when the page reloads on it', async () => {
+    useSessionStore.setState({ status: 'active' });
+    useNarrativeStore.getState().setCurrentEnding({
+      id: 'ending-1',
+      sessionId: endedSessionId,
+      characterId: 'character-1',
+      worldId: 'world-1',
+      type: 'player-choice',
+      tone: 'hopeful',
+      epilogue: 'The gate closes behind you.',
+      characterLegacy: 'Remembered at the gate.',
+      worldImpact: 'The road stays open.',
+      timestamp: new Date(),
+      createdAt: '2026-10-01T12:00:00.000Z',
+      updatedAt: '2026-10-01T12:00:00.000Z',
+    });
+    await act(async () => {
+      renderHook(() => useGameSessionState({ worldId: 'world-1', isClient: true }));
+    });
+    expect(useSessionStore.getState().id).toBe(endedSessionId);
+    expect(useNarrativeStore.getState().currentEnding?.id).toBe('ending-1');
+  });
+
   it('waits for narrative hydration before deciding the session ended', async () => {
     useSessionStore.setState({ status: 'active' });
     let finishHydration = () => {};
